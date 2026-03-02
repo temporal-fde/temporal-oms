@@ -1,0 +1,5 @@
+spring.config.import: classpath:acme.processing.yaml
+
+spring.application.name: processing-workers
+spring.main.web-application-type: none
+management.server.port: 9092

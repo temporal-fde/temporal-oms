@@ -1,0 +1,21 @@
+spring.config.import: classpath:acme.oms.yaml
+spring.temporal:
+  namespace: ${TEMPORAL_NAMESPACE:apps}
+  connection:
+
+    # Connection settings
+    target: ${TEMPORAL_ADDRESS:localhost:7233}
+
+    # API Key for Temporal Cloud
+    api-key: ${TEMPORAL_API_KEY:}
+  workers:
+    - task-queue: apps
+      workflow-classes:
+        - com.acme.apps.workflows.OrderImpl
+      activity-beans:
+        - options-activities
+#     deployment-properties:
+#       use-versioning: true
+#       default-versioning-behavior: PINNED
+#       deployment-name: apps
+#       build-id: 1.0.0

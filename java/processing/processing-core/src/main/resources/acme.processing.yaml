@@ -1,0 +1,32 @@
+spring.temporal:
+    connection:
+      # Connection settings
+      target: ${TEMPORAL_ADDRESS:localhost:7233}
+
+      # API Key for Temporal Cloud
+      api-key: ${TEMPORAL_API_KEY:}
+
+    start-workers: true
+    namespace: ${TEMPORAL_NAMESPACE:processing}
+    workers:
+      - task-queue: processing
+        workflow-classes:
+          - com.acme.processing.workflows.OrderImpl
+        activity-beans:
+          - enrichment-activities
+          - fulfillment-activities
+        nexus-service-beans:
+          - processing-service
+      - task-queue: commerce-app
+        activity-beans:
+          - commerce-app-activities
+        rate-limits:
+          max-task-queue-activities-per-second: 150
+      - task-queue: support
+        workflow-classes:
+          - com.acme.processing.workflows.SupportTeamImpl
+        activity-beans:
+          - support-activities
+#    workers-auto-discovery:
+#      # this is a workaround for the bug here: https://github.com/temporalio/sdk-java/pull/2789
+#      packages: com.acme.processing.services

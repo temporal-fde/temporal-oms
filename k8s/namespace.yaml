@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: temporal-oms
+  labels:
+    name: temporal-oms
+    app: temporal-oms

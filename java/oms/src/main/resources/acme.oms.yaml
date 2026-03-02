@@ -1,0 +1,39 @@
+# Shared defaults across all bounded contexts
+oms:
+  apps:
+    nexus:
+      endpoints:
+        #endpoints must start with A-Z or a-z and can only contain A-Z, a-z, 0-9, or -
+        order-processing: oms-processing-v1
+  processing:
+    nexus:
+      endpoints:
+        apps: oms-apps-v1
+  risk:
+    nexus:
+      endpoints:
+        rel: endpoint
+
+otel.sdk.disabled: true
+
+logging:
+  level:
+    root: INFO
+    com.acme: DEBUG
+    io.temporal: INFO
+
+# actuator (Spring Boot Actuator) endpoints
+# /actuator/health
+# /actuator/prometheus
+# /actuator/metrics
+management:
+  server:
+    port: 9090
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus,info
+  metrics:
+    export:
+      prometheus:
+        enabled: true

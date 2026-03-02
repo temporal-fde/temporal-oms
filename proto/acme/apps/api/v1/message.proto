@@ -1,0 +1,92 @@
+// REST API messages for Apps namespace webhooks
+syntax = "proto3";
+
+package acme.apps.api.orders.v1;
+
+import "google/protobuf/timestamp.proto";
+
+// PUT /api/v1/commerce-app/orders/{order_id}
+message SubmitOrderRequest {
+  string customer_id = 1;
+  Order order = 2;
+}
+
+message Order {
+  string order_id = 1;
+  repeated Item items = 2;
+  ShippingAddress shipping_address = 3;
+}
+
+message Item {
+  string item_id = 1;
+  int32 quantity = 2;
+}
+
+message ShippingAddress {
+  string street = 1;
+  string city = 2;
+  string state = 3;
+  string postal_code = 4;
+  string country = 5;
+}
+
+message SubmitOrderResponse {
+  string order_id = 1;
+  string status = 2;
+  google.protobuf.Timestamp created_at = 3;
+}
+
+// POST /api/v1/payments-app/orders
+message MakePaymentRequest {
+  string customer_id = 1;
+  string rrn = 2;  // Retrieval Reference Number / payment_intent
+  int64 amount_cents = 3;
+  Metadata metadata = 4;
+}
+
+message Metadata {
+  string order_id = 1;
+}
+
+message MakePaymentResponse {
+  string order_id = 1;
+  string status = 2;
+  google.protobuf.Timestamp processed_at = 3;
+}
+
+// GET /api/v1/commerce-app/orders
+message ListOrdersRequest {
+  string customer_id = 1;
+  int32 page_size = 2;
+  string page_token = 3;
+}
+
+message ListOrdersResponse {
+  repeated OrderSummary orders = 1;
+  string next_page_token = 2;
+}
+
+message OrderSummary {
+  string order_id = 1;
+  string customer_id = 2;
+  string status = 3;
+  int64 total_amount_cents = 4;
+  google.protobuf.Timestamp created_at = 5;
+}
+
+// GET /api/v1/commerce-app/clothing
+message ListProductsRequest {
+  int32 limit = 1;  // Default 50
+}
+
+message ListProductsResponse {
+  repeated Product items = 1;
+}
+
+message Product {
+  string item_id = 1;
+  string name = 2;
+  string description = 3;
+  int64 price_cents = 4;
+  string image_url = 5;
+}

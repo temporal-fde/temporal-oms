@@ -1,0 +1,13 @@
+// Domain value objects for Apps namespace
+syntax = "proto3";
+
+package acme.apps.domain.apps.v1;
+
+enum Errors {
+  ERRORS_UNSPECIFIED = 0;
+  ERRORS_INVALID_ARGUMENTS = 1;
+  ERRORS_ORDER_TIMED_OUT = 2;
+  ERRORS_SERVICE_UNAVAILABLE = 3;
+  ERRORS_UNAUTHORIZED = 4;
+  ERRORS_CONFLICT = 5;
+}

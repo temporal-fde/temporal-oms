@@ -1,0 +1,6 @@
+spring.config.import: classpath:acme.apps.yaml
+spring.main.web-application-type: none
+management.server.port: 9091
+spring:
+  application:
+    name: apps-workers

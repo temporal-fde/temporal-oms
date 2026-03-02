@@ -1,0 +1,18 @@
+spring.config.import: classpath:acme.apps.yaml
+
+spring.application.name: apps-api
+spring.temporal.start-workers: false
+management.server.port: 9090
+
+server:
+  port: 8080
+
+# Swagger/OpenAPI Configuration (MANDATORY per stack-api-rest)
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+#  swagger-ui:
+#    path: /docs  # Swagger UI at /docs
+#    operationsSorter: method
+#    tagsSorter: alpha
+  show-actuator: false

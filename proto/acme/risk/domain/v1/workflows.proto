@@ -1,0 +1,104 @@
+// Temporal Workflow contracts for Risk namespace
+syntax = "proto3";
+
+package acme.risk.domain.risk.v1;
+
+import "google/protobuf/timestamp.proto";
+
+// Fraud Detection Workflow
+message DetectFraudRequest {
+  string order_id = 1;
+  string customer_id = 2;
+  FraudCheckContext context = 3;
+  google.protobuf.Timestamp created_at = 4;
+}
+
+message DetectFraudResponse {
+  string order_id = 1;
+  Status status = 2;
+  double risk_score = 3;
+  repeated string flags = 4;
+  google.protobuf.Timestamp completed_at = 5;
+}
+
+message FraudCheckContext {
+  PaymentContext payment = 1;
+  AddressContext address = 2;
+  CustomerContext customer = 3;
+}
+
+message PaymentContext {
+  string rrn = 1;
+  int64 amount_cents = 2;
+  string payment_method = 3;
+}
+
+message AddressContext {
+  string street = 1;
+  string city = 2;
+  string state = 3;
+  string postal_code = 4;
+  string country = 5;
+}
+
+message CustomerContext {
+  string customer_id = 1;
+  int32 previous_order_count = 2;
+  google.protobuf.Timestamp account_created_at = 3;
+}
+
+// UpdateWithStart: performFraudCheck
+message PerformFraudCheckRequest {
+  FraudCheckContext context = 1;
+}
+
+message PerformFraudCheckResponse {
+  bool passed = 1;
+  double risk_score = 2;
+  repeated string flags = 3;
+  string recommendation = 4;
+}
+
+// Activity: CheckAddressFraud
+message CheckAddressFraudRequest {
+  AddressContext address = 1;
+}
+
+message CheckAddressFraudResponse {
+  bool is_fraudulent = 1;
+  double address_risk_score = 2;
+  repeated string flags = 3;
+}
+
+// Activity: CheckPaymentFraud
+message CheckPaymentFraudRequest {
+  PaymentContext payment = 1;
+  string customer_id = 2;
+}
+
+message CheckPaymentFraudResponse {
+  bool is_fraudulent = 1;
+  double payment_risk_score = 2;
+  repeated string flags = 3;
+}
+
+// Activity: GetCustomerRiskProfile
+message GetCustomerRiskProfileRequest {
+  string customer_id = 1;
+}
+
+message GetCustomerRiskProfileResponse {
+  string customer_id = 1;
+  double historical_risk_score = 2;
+  int32 fraud_incident_count = 3;
+  int32 successful_order_count = 4;
+  google.protobuf.Timestamp last_order_at = 5;
+}
+
+enum Status {
+  STATUS_UNSPECIFIED = 0;
+  STATUS_PENDING = 1;
+  STATUS_PASSED = 2;
+  STATUS_FLAGGED = 3;
+  STATUS_BLOCKED = 4;
+}

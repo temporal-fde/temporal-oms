@@ -1,0 +1,35 @@
+// Shared value objects across all bounded contexts
+syntax = "proto3";
+
+package acme.common.v1;
+
+import "google/protobuf/timestamp.proto";
+
+message Money {
+  string currency = 1;   // ISO 4217 currency code (USD, EUR, JPY, etc.)
+  int64 units = 2;       // Amount in minor units (ISO 4217 exponent)
+}
+
+message Address {
+  string street = 1;
+  string city = 2;
+  string state = 3;
+  string postal_code = 4;
+  string country = 5;  // ISO 3166-1 alpha-2
+}
+
+message TimeRange {
+  google.protobuf.Timestamp start = 1;
+  google.protobuf.Timestamp end = 2;
+}
+
+message Pagination {
+  int32 page_size = 1;
+  string page_token = 2;
+}
+
+message ErrorDetails {
+  string code = 1;
+  string message = 2;
+  map<string, string> metadata = 3;
+}

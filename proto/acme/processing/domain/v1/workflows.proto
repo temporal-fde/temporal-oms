@@ -1,0 +1,114 @@
+// Temporal Workflow contracts for Processing namespace
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "acme/oms/v1/values.proto";
+import "acme/common/v1/values.proto";
+
+package acme.processing.domain.processing.v1;
+
+
+// processing.Order
+message ProcessOrderRequest {
+  google.protobuf.Timestamp timestamp = 1;
+  optional ProcessOrderRequestExecutionOptions options = 2;
+  string order_id = 3;
+  string customer_id = 4;
+  acme.oms.v1.Order order = 5;
+  acme.oms.v1.Payment payment = 6;
+}
+
+message ProcessOrderRequestExecutionOptions {
+  optional int64 processing_timeout_secs = 1;
+}
+message GetProcessOrderStateResponse {
+  repeated ProcessOrderRequest args = 1;
+
+  ValidateOrderResponse validation = 2;
+  EnrichOrderResponse enrichment = 3;
+  FulfillOrderResponse fulfillment = 4;
+  repeated string errors = 5;
+}
+
+message EnrichOrderRequest {
+  acme.oms.v1.Order order = 1;
+}
+message EnrichOrderResponse {
+  acme.oms.v1.Order order = 1;
+  repeated EnrichedItem items = 2;
+}
+message ValidateOrderRequest {
+  int64 validation_timeout_secs = 1;
+  string customer_id = 2;
+  acme.oms.v1.Order order = 3;
+}
+
+message ValidateOrderResponse {
+  acme.oms.v1.Order order = 1;
+  bool manual_correction_needed = 2;
+  string support_ticket_id = 3;
+  repeated string validation_failures = 4;
+}
+
+message EnrichedItem {
+  string item_id = 1;
+  string sku_id = 2;
+  string brand_code = 3;
+  int32 quantity = 4;
+}
+
+// Update: completePayment
+message CompletePaymentRequest {
+  string rrn = 1;
+  int64 amount_cents = 2;
+}
+
+message CompletePaymentResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message ValidatePaymentRequest {
+  string rrn = 1;
+  int64 expected_amount_cents = 2;
+}
+
+message ValidatePaymentResponse {
+  bool valid = 1;
+  string payment_status = 2;
+  int64 actual_amount_cents = 3;
+}
+
+message FulfillOrderRequest {
+  string customer_id = 2;
+  acme.oms.v1.Order order = 1;
+  repeated EnrichedItem items = 3;
+}
+
+message FulfillOrderResponse {
+}
+
+
+/*
+Support messages
+ */
+
+message InitializeSupportTeam {
+
+}
+message ManuallyValidateOrderRequest {
+  string customer_id = 1;
+  acme.oms.v1.Order order = 2;
+  string workflow_id = 3;
+  string activity_id = 4;
+}
+message ManuallyValidateOrderResponse {
+}
+message CompleteOrderValidationRequest {
+  ManuallyValidateOrderRequest validation_request = 1;
+  ValidateOrderResponse validation_response = 2;
+}
+
+message GetSupportTeamStateResponse {
+  repeated ManuallyValidateOrderRequest validation_requests = 1;
+}

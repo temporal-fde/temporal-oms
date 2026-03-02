@@ -1,0 +1,33 @@
+server:
+  port: 8080
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: apps-core-tests
+  temporal:
+    test-server:
+      enabled: true
+    namespace: default
+    connection:
+      target: 127.0.0.1:7233
+    workers:
+      - task-queue: apps
+        workflow-classes:
+          - com.acme.apps.workflows.CompleteOrderWorkflowImpl
+
+logging:
+  level:
+    root: INFO
+    com.acme: DEBUG
+    io.temporal: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}

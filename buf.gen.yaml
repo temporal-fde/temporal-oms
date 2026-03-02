@@ -1,0 +1,25 @@
+version: v2
+clean: true
+managed:
+  enabled: true
+  override:
+    - file_option: java_package_prefix
+      value: com.acme.proto
+    - file_option: java_multiple_files
+      value: true
+plugins:
+  # Java generation
+  - remote: buf.build/protocolbuffers/java
+    out: java/generated/src/main/java
+
+  # Python generation
+  - remote: buf.build/protocolbuffers/python
+    out: python/generated
+
+  # Python type stubs
+  - remote: buf.build/protocolbuffers/pyi
+    out: python/generated
+
+  # TypeScript generation
+  - remote: buf.build/bufbuild/es:v2.10.2
+    out: web/src/lib/generated

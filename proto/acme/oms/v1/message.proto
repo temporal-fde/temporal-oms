@@ -1,0 +1,20 @@
+// Shared value objects across all bounded contexts
+syntax = "proto3";
+
+package acme.oms.v1;
+
+import "google/protobuf/timestamp.proto";
+
+message OmsProperties {
+  BoundedContextConfig apps = 1;
+  BoundedContextConfig processing = 2;
+  BoundedContextConfig risk = 3;
+
+  message BoundedContextConfig {
+    NexusConfig nexus = 1;
+
+    message NexusConfig {
+      map<string, string> endpoints = 1;
+    }
+  }
+}

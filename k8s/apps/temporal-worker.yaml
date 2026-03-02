@@ -1,0 +1,86 @@
+# Temporal Worker using Temporal Worker Controller CRD
+apiVersion: workload.temporal.io/v1
+kind: TemporalWorker
+metadata:
+  name: apps-worker
+  namespace: temporal-oms
+  labels:
+    app: apps-worker
+    component: worker
+    temporal-namespace: apps
+spec:
+  # Temporal connection
+  temporalNamespace: apps
+  temporalAddress: temporal-frontend.temporal.svc.cluster.local:7233
+
+  # Task queue
+  taskQueue: apps
+
+  # Worker Versioning
+  buildId: "1.0.0"
+  useBuildIdForVersioning: true
+
+  # Worker configuration
+  workerConfig:
+    maxConcurrentActivityExecutions: 100
+    maxConcurrentWorkflowTaskExecutions: 100
+    maxConcurrentLocalActivityExecutions: 100
+    maxConcurrentWorkflowTaskPollers: 5
+    maxConcurrentActivityTaskPollers: 5
+
+  # Pod template
+  template:
+    metadata:
+      labels:
+        app: apps-worker
+        component: worker
+        temporal-namespace: apps
+        version: "1.0.0"
+      annotations:
+        # OpenTelemetry auto-instrumentation
+        instrumentation.opentelemetry.io/inject-sdk: "true"
+    spec:
+      containers:
+      - name: worker
+        image: temporal-oms/apps-worker:latest
+        imagePullPolicy: Never  # For local Minikube
+        ports:
+        - containerPort: 9090
+          name: metrics
+          protocol: TCP
+        env:
+        - name: TEMPORAL_NAMESPACE
+          value: "apps"
+        - name: TEMPORAL_TASK_QUEUE
+          value: "apps"
+        - name: BUILD_ID
+          value: "1.0.0"
+        - name: MANAGEMENT_SERVER_PORT
+          value: "9090"
+        envFrom:
+        - configMapRef:
+            name: temporal-oms-config
+        - secretRef:
+            name: temporal-oms-secrets
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 9090
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 9090
+          initialDelaySeconds: 20
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
+
+  # Scaling
+  replicas: 2
