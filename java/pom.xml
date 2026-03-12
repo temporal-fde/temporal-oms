@@ -192,7 +192,7 @@
                         <source>21</source>
                         <target>21</target>
                         <fork>true</fork>
-                        <executable>/Users/mnichols/.asdf/shims/javac</executable>
+                        <executable>${user.home}/.asdf/shims/javac</executable>
                         <parameters>true</parameters>
                     </configuration>
                     <dependencies>
