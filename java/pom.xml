@@ -27,7 +27,7 @@
         <maven.compiler.plugin.version>3.14.1</maven.compiler.plugin.version>
 
         <!-- Temporal -->
-        <temporal.version>1.11.0-SNAPSHOT</temporal.version>
+        <temporal.version>1.33.0</temporal.version>
 
         <!-- Spring Boot -->
         <spring-boot.version>3.5.9</spring-boot.version>
