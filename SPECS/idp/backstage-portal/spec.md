@@ -3,6 +3,7 @@
 **Status**: Draft | In Review | In Progress | Complete
 **Tech Lead Review**: Not yet reviewed
 **Branch**: [branch-name]
+**Working Directory**: `idp/`
 
 ## Summary
 This backstage portal simplifies Temporal Application resource bootstrapping including Compute, Temporal Resources, and other related concerns.
@@ -42,7 +43,11 @@ Brief description of the technical strategy:
 
 ## Files Affected
 
-- `{root}/backstage-portal`
+- `k8s/backstage/` (Backstage Kubernetes deployment)
+- `plugins/` (Backstage plugins including TemporalProjectBackstagePlugin)
+- `workflows/` (Temporal workflows for provisioning)
+- `terraform/` (Terraform configuration for Temporal Cloud)
+- `docs/` (Portal documentation)
 
 ## Risks & Constraints
 

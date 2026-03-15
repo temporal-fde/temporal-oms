@@ -3,6 +3,7 @@
 **Status**: Draft | In Review | In Progress | Complete
 **Tech Lead Review**: Not yet reviewed
 **Branch**: [branch-name]
+**Working Directory**: `./` (or specify relative root, e.g., `idp/` for IDP specs)
 
 ## Summary
 One-sentence summary of what this feature does.
