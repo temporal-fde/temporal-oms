@@ -21,7 +21,17 @@ brew install helm
 
 ## Setup Steps
 
-### 1. Start Minikube
+### 1. Install Cert-Manager
+
+```bash
+# Install cert-manager (required by OpenTelemetry Operator)
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.0/cert-manager.yaml
+
+# Wait for cert-manager to be ready
+kubectl wait --for=condition=ready pod -l app.kubernetes.io/instance=cert-manager -n cert-manager --timeout=5m
+```
+
+### 2. Start Minikube
 
 ```bash
 # Start with sufficient resources
@@ -32,7 +42,7 @@ kubectl cluster-info
 kubectl get nodes
 ```
 
-### 2. Install OpenTelemetry Operator
+### 3. Install OpenTelemetry Operator
 
 ```bash
 # Add OpenTelemetry Operator repo
@@ -53,11 +63,16 @@ helm install opentelemetry-operator \
 kubectl get pods -n opentelemetry-operator-system
 ```
 
-### 3. Install Temporal Worker Controller
+### 4. Install Temporal Worker Controller
 
 ```bash
-# Install Temporal Worker Controller
-kubectl apply -f https://github.com/temporalio/temporal-worker-controller/releases/latest/download/temporal-worker-controller.yaml
+# Create namespace for temporal-worker-controller
+kubectl create namespace temporal-worker-controller-system
+
+# Install via Helm
+helm install temporal-worker-controller \
+  oci://docker.io/temporalio/temporal-worker-controller \
+  --namespace temporal-worker-controller-system
 
 # Verify installation
 kubectl get pods -n temporal-worker-controller-system
@@ -65,10 +80,10 @@ kubectl get crd | grep temporal
 ```
 
 **Expected CRDs:**
-- `temporalworkers.workload.temporal.io`
-- `temporalnamespaces.workload.temporal.io`
+- `temporalconnections.temporal.io`
+- `temporalworkerdeployments.temporal.io`
 
-### 4. Install Temporal Server
+### 5. Install Temporal Server
 
 ```bash
 # Add Temporal Helm repo
@@ -93,7 +108,7 @@ helm install temporal temporalio/temporal \
 kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=temporal -n temporal --timeout=5m
 ```
 
-### 5. Create Temporal Namespaces
+### 6. Create Temporal Namespaces
 
 ```bash
 # Port-forward to Temporal frontend
@@ -109,7 +124,7 @@ temporal operator namespace create fulfillments
 temporal operator namespace list
 ```
 
-### 6. Build Docker Images
+### 7. Build Docker Images
 
 ```bash
 # Use Minikube's Docker daemon
@@ -139,7 +154,7 @@ docker build -t temporal-oms/fulfillments-worker:latest .
 docker images | grep temporal-oms
 ```
 
-### 7. Deploy Application
+### 8. Deploy Application
 
 ```bash
 cd ../../  # Back to project root
@@ -165,14 +180,14 @@ kubectl apply -f k8s/risk/temporal-worker.yaml
 kubectl apply -f k8s/fulfillments/temporal-worker.yaml
 ```
 
-### 8. Verify Deployment
+### 9. Verify Deployment
 
 ```bash
 # Check all pods
 kubectl get pods -n temporal-oms
 
-# Check TemporalWorker CRDs
-kubectl get temporalworkers -n temporal-oms
+# Check TemporalWorkerDeployment CRDs
+kubectl get temporalworkerdeployments -n temporal-oms
 
 # Check logs
 kubectl logs -n temporal-oms -l app=apps-api
@@ -232,7 +247,7 @@ docker build -t temporal-oms/apps-worker:1.1.0 -f apps/docker/Dockerfile.worker 
 kubectl apply -f k8s/apps/temporal-worker.yaml
 
 # 4. Watch rollout
-kubectl get temporalworkers -n temporal-oms -w
+kubectl get temporalworkerdeployments -n temporal-oms -w
 
 # The Temporal Worker Controller will:
 # - Start new workers with buildId "1.1.0"
@@ -269,10 +284,10 @@ eval $(minikube docker-env)
 docker build -t temporal-oms/apps-worker:latest -f apps/docker/Dockerfile.worker apps/
 
 # 4. Restart workers (triggers new deployment)
-kubectl rollout restart temporalworker/apps-worker -n temporal-oms
+kubectl rollout restart temporalworkerdeployment/apps-worker -n temporal-oms
 
 # 5. Watch rollout
-kubectl rollout status temporalworker/apps-worker -n temporal-oms
+kubectl rollout status temporalworkerdeployment/apps-worker -n temporal-oms
 ```
 
 ### View Logs
@@ -346,7 +361,8 @@ kubectl delete namespace temporal
 ### Remove Operators
 
 ```bash
-kubectl delete -f https://github.com/temporalio/temporal-worker-controller/releases/latest/download/temporal-worker-controller.yaml
+helm uninstall temporal-worker-controller -n temporal-worker-controller-system
+kubectl delete namespace temporal-worker-controller-system
 
 helm uninstall opentelemetry-operator -n opentelemetry-operator-system
 kubectl delete namespace opentelemetry-operator-system
@@ -409,10 +425,10 @@ temporal operator namespace create apps --address localhost:7233
 | Service | Type | Port | Description |
 |---------|------|------|-------------|
 | apps-api | Deployment | 8080 | REST API for webhooks |
-| apps-worker | TemporalWorker | 9090 | CompleteOrder workflows |
-| processing-worker | TemporalWorker | 9090 | Order processing workflows |
-| risk-worker | TemporalWorker | 9090 | Fraud detection workflows |
-| fulfillments-worker | TemporalWorker | 9090 | AI Agent workflows (Python) |
+| apps-worker | TemporalWorkerDeployment | 9090 | CompleteOrder workflows |
+| processing-worker | TemporalWorkerDeployment | 9090 | Order processing workflows |
+| risk-worker | TemporalWorkerDeployment | 9090 | Fraud detection workflows |
+| fulfillments-worker | TemporalWorkerDeployment | 9090 | AI Agent workflows (Python) |
 
 ### Temporal Namespaces
 
