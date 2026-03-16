@@ -63,6 +63,13 @@ spec:
             name: temporal-oms-config
         - secretRef:
             name: temporal-oms-secrets
+        volumeMounts:
+        - name: temporal-secrets
+          mountPath: /etc/config/secrets/temporal
+          readOnly: true
+        - name: idp-secrets
+          mountPath: /etc/config/secrets/idp
+          readOnly: true
         resources:
           requests:
             memory: "512Mi"
@@ -70,6 +77,15 @@ spec:
           limits:
             memory: "2Gi"
             cpu: "1000m"
+      volumes:
+      - name: temporal-secrets
+        secret:
+          secretName: temporal-secrets
+          defaultMode: 0400
+      - name: idp-secrets
+        secret:
+          secretName: idp-secrets
+          defaultMode: 0400
 
   # Scaling
   replicas: 2

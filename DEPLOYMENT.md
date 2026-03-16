@@ -154,17 +154,59 @@ docker build -t temporal-oms/fulfillments-worker:latest .
 docker images | grep temporal-oms
 ```
 
-### 8. Deploy Application
+### 7.1 Configure Secrets (Local Development)
+
+Before deploying, set up your local secret files:
 
 ```bash
 cd ../../  # Back to project root
 
+# Copy secret templates to create local files
+cp config/temporal.secret.yaml.template config/temporal.secret.yaml
+cp config/idp.secret.yaml.template config/idp.secret.yaml
+
+# Edit and fill in actual values
+# For local Minikube: can use placeholder values
+vim config/temporal.secret.yaml
+vim config/idp.secret.yaml
+
+# Verify files were created and are ignored by git
+ls -la config/*.secret.yaml
+git status  # Should not show .secret.yaml files
+```
+
+**For Kubernetes deployment,** populate the K8s secret manifests:
+
+```bash
+# Generate base64-encoded content for temporal secrets
+base64 -i config/temporal.secret.yaml | pbcopy
+
+# Edit the manifest and paste into the data section
+vim k8s/secrets/temporal-secrets.yaml
+
+# Do the same for IDP secrets
+base64 -i config/idp.secret.yaml | pbcopy
+vim k8s/secrets/idp-secrets.yaml
+
+# Note: Use .gitignore'd populated manifests locally,
+# not the .template versions
+```
+
+See [Secrets Management Guide](idp/docs/secrets-management.md) for detailed instructions.
+
+### 8. Deploy Application
+
+```bash
 # Create namespace
 kubectl apply -f k8s/namespace.yaml
 
 # Create ConfigMap and Secrets
 kubectl apply -f k8s/configmap.yaml
 kubectl apply -f k8s/secrets.yaml
+
+# Apply K8s Secret objects (from populated manifests)
+kubectl apply -f k8s/secrets/temporal-secrets.yaml
+kubectl apply -f k8s/secrets/idp-secrets.yaml
 
 # Deploy Apps service (API + Worker)
 kubectl apply -f k8s/apps/deployment-api.yaml
@@ -195,7 +237,17 @@ kubectl logs -n temporal-oms -l app=apps-worker
 kubectl logs -n temporal-oms -l app=processing-worker
 kubectl logs -n temporal-oms -l app=risk-worker
 kubectl logs -n temporal-oms -l app=fulfillments-worker
+
+# Verify secrets are mounted (infrastructure validation only)
+POD=$(kubectl get pods -n temporal-oms -l app=apps-api -o jsonpath='{.items[0].metadata.name}')
+kubectl exec -it $POD -n temporal-oms -- ls -la /etc/config/secrets/
+kubectl exec -it $POD -n temporal-oms -- head -3 /etc/config/secrets/temporal/temporal.secret.yaml
+
+# Verify K8s Secrets exist
+kubectl get secrets -n temporal-oms
 ```
+
+**Note:** The verification above only checks that files are mounted. Application-specific integration testing (how each language loads and uses the secrets) is deferred to component-specific specs.
 
 ## Accessing Services
 
