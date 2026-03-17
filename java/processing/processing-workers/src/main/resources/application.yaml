@@ -1,4 +1,4 @@
-spring.config.import: classpath:acme.processing.yaml
+spring.config.import: classpath:acme.processing.yaml,file:${SECRETS_DIR:./config}/acme.processing.secret.yaml
 
 spring.application.name: processing-workers
 spring.main.web-application-type: none

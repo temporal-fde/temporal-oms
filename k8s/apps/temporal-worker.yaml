@@ -3,7 +3,7 @@ apiVersion: workload.temporal.io/v1
 kind: TemporalWorker
 metadata:
   name: apps-worker
-  namespace: temporal-oms
+  namespace: temporal-oms-apps
   labels:
     app: apps-worker
     component: worker
@@ -57,6 +57,8 @@ spec:
           value: "1.0.0"
         - name: MANAGEMENT_SERVER_PORT
           value: "9090"
+        - name: SECRETS_DIR
+          value: /etc/config/secrets/acme
         envFrom:
         - configMapRef:
             name: temporal-oms-config
@@ -81,6 +83,9 @@ spec:
         - name: idp-secrets
           mountPath: /etc/config/secrets/idp
           readOnly: true
+        - name: acme-apps-secrets
+          mountPath: /etc/config/secrets/acme
+          readOnly: true
         resources:
           requests:
             memory: "512Mi"
@@ -96,6 +101,10 @@ spec:
       - name: idp-secrets
         secret:
           secretName: idp-secrets
+          defaultMode: 0400
+      - name: acme-apps-secrets
+        secret:
+          secretName: acme-apps-secret
           defaultMode: 0400
 
   # Scaling

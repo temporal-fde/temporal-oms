@@ -1,46 +1,31 @@
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: temporal-oms-config
-  namespace: temporal-oms
+  namespace: temporal-oms-apps
 data:
   ENVIRONMENT: "local"
-
-  # Temporal configuration
   TEMPORAL_ADDRESS: "temporal-frontend.temporal.svc.cluster.local:7233"
   TEMPORAL_TLS_ENABLED: "false"
-
-  # Apps namespace configuration
-  TEMPORAL_NAMESPACE_APPS: "apps"
-  TEMPORAL_TASK_QUEUE_APPS: "apps"
-
-  # Processing namespace configuration
-  TEMPORAL_NAMESPACE_PROCESSING: "processing"
-  TEMPORAL_TASK_QUEUE_PROCESSING: "processing"
-
-  # Risk namespace configuration
-  TEMPORAL_NAMESPACE_RISK: "risk"
-  TEMPORAL_TASK_QUEUE_RISK: "risk"
-
-  # Fulfillments namespace configuration
-  TEMPORAL_NAMESPACE_FULFILLMENTS: "fulfillments"
-  TEMPORAL_TASK_QUEUE_FULFILLMENTS: "fulfillments"
-
-  # OpenTelemetry
   OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector.opentelemetry-operator-system:4317"
   OTEL_SERVICE_NAME: "temporal-oms"
-
-  # External services (mocks for local dev)
-  PIMS_BASE_URL: "http://pims-mock.temporal-oms.svc.cluster.local:8081"
-  COMMERCE_BASE_URL: "http://commerce-mock.temporal-oms.svc.cluster.local:8082"
-  PAYMENTS_BASE_URL: "http://payments-mock.temporal-oms.svc.cluster.local:8083"
-  INVENTORY_BASE_URL: "http://inventory-mock.temporal-oms.svc.cluster.local:8084"
-
-  # Kafka
-  KAFKA_BOOTSTRAP_SERVERS: "kafka.temporal-oms.svc.cluster.local:9092"
-  KAFKA_TOPIC_FULFILLMENT: "order-fulfillment"
-
-  # Database
-  DB_HOST: "postgres.temporal-oms.svc.cluster.local"
+  DB_HOST: "postgres.temporal-oms-apps.svc.cluster.local"
   DB_PORT: "5432"
-  DB_NAME: "temporal_oms"
+  DB_NAME: "temporal_oms_apps"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: temporal-oms-config
+  namespace: temporal-oms-processing
+data:
+  ENVIRONMENT: "local"
+  TEMPORAL_ADDRESS: "temporal-frontend.temporal.svc.cluster.local:7233"
+  TEMPORAL_TLS_ENABLED: "false"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector.opentelemetry-operator-system:4317"
+  OTEL_SERVICE_NAME: "temporal-oms"
+  DB_HOST: "postgres.temporal-oms-processing.svc.cluster.local"
+  DB_PORT: "5432"
+  DB_NAME: "temporal_oms_processing"

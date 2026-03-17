@@ -240,9 +240,9 @@ config/*.local.*
 
 # Secrets management - git-ignore actual secrets, keep templates
 config/**/*.secret.yaml
-!config/**/*.secret.yaml.template
-k8s/secrets/*.secret.yaml
-!k8s/secrets/*.secret.yaml.template
+!config/**/*.secret.template.yaml
+config/environments/*.secret.yaml
+!config/environments/*.secret.template.yaml
 
 # Build outputs
 dist/

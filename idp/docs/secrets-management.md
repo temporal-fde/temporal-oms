@@ -18,7 +18,7 @@ Copy the template files and fill in your actual values:
 
 ```bash
 # Temporal Cloud credentials
-cp config/temporal.secret.yaml.template config/temporal.secret.yaml
+cp config/temporal.secret.template.yaml config/temporal.secret.yaml
 
 # IDP API credentials
 cp config/idp.secret.yaml.template config/idp.secret.yaml
@@ -228,7 +228,7 @@ volumes:
 ls -la config/*.secret.yaml.template
 
 # Create from template
-cp config/temporal.secret.yaml.template config/temporal.secret.yaml
+cp config/temporal.secret.template.yaml config/temporal.secret.yaml
 
 # Check it was created
 cat config/temporal.secret.yaml

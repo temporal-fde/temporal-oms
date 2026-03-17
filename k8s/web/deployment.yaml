@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: web
-  namespace: temporal-oms
+  namespace: temporal-oms-apps
   labels:
     app: web
     component: frontend
@@ -32,7 +32,7 @@ spec:
           value: "http://localhost:3000"
         # API backend URL (proxy to apps-api service)
         - name: API_BASE_URL
-          value: "http://apps-api.temporal-oms.svc.cluster.local"
+          value: "http://apps-api.temporal-oms-apps.svc.cluster.local"
         envFrom:
         - configMapRef:
             name: temporal-oms-config
@@ -82,7 +82,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: web
-  namespace: temporal-oms
+  namespace: temporal-oms-apps
   labels:
     app: web
 spec:

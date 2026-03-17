@@ -1,7 +1,19 @@
+---
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: temporal-oms
+  name: temporal-oms-apps
   labels:
-    name: temporal-oms
+    name: temporal-oms-apps
     app: temporal-oms
+    component: apps
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: temporal-oms-processing
+  labels:
+    name: temporal-oms-processing
+    app: temporal-oms
+    component: processing

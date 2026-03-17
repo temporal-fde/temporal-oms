@@ -1,4 +1,4 @@
-spring.config.import: classpath:acme.apps.yaml
+spring.config.import: classpath:acme.apps.yaml,file:${SECRETS_DIR:./config}/acme.apps.secret.yaml
 spring.main.web-application-type: none
 management.server.port: 9091
 spring:

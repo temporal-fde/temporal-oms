@@ -2,6 +2,7 @@ spring.config.import: classpath:acme.apps.yaml
 
 spring.application.name: apps-api
 spring.temporal.start-workers: false
+
 management.server.port: 9090
 
 server:

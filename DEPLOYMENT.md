@@ -142,14 +142,6 @@ docker build -t temporal-oms/apps-worker:latest -f apps/docker/Dockerfile.worker
 mvn clean package -pl processing
 docker build -t temporal-oms/processing-worker:latest -f processing/docker/Dockerfile processing/
 
-# Build risk-worker image
-mvn clean package -pl risk
-docker build -t temporal-oms/risk-worker:latest -f risk/docker/Dockerfile risk/
-
-# Build fulfillments-worker image (Python)
-cd ../python/fulfillments
-docker build -t temporal-oms/fulfillments-worker:latest .
-
 # Verify images
 docker images | grep temporal-oms
 ```
@@ -162,13 +154,11 @@ Before deploying, set up your local secret files:
 cd ../../  # Back to project root
 
 # Copy secret templates to create local files
-cp config/temporal.secret.yaml.template config/temporal.secret.yaml
-cp config/idp.secret.yaml.template config/idp.secret.yaml
+cp config/temporal.secret.template.yaml config/temporal.secret.yaml
 
 # Edit and fill in actual values
 # For local Minikube: can use placeholder values
 vim config/temporal.secret.yaml
-vim config/idp.secret.yaml
 
 # Verify files were created and are ignored by git
 ls -la config/*.secret.yaml
@@ -184,67 +174,56 @@ base64 -i config/temporal.secret.yaml | pbcopy
 # Edit the manifest and paste into the data section
 vim k8s/secrets/temporal-secrets.yaml
 
-# Do the same for IDP secrets
-base64 -i config/idp.secret.yaml | pbcopy
-vim k8s/secrets/idp-secrets.yaml
-
 # Note: Use .gitignore'd populated manifests locally,
 # not the .template versions
 ```
 
-See [Secrets Management Guide](idp/docs/secrets-management.md) for detailed instructions.
-
 ### 8. Deploy Application
 
 ```bash
-# Create namespace
+# Create namespaces
 kubectl apply -f k8s/namespace.yaml
 
-# Create ConfigMap and Secrets
+# Create ConfigMaps (one per namespace)
 kubectl apply -f k8s/configmap.yaml
-kubectl apply -f k8s/secrets.yaml
 
 # Apply K8s Secret objects (from populated manifests)
 kubectl apply -f k8s/secrets/temporal-secrets.yaml
-kubectl apply -f k8s/secrets/idp-secrets.yaml
+kubectl apply -f k8s/secrets/acme-apps-secret.yaml
+kubectl apply -f k8s/secrets/acme-processing-secret.yaml
 
-# Deploy Apps service (API + Worker)
+# Deploy Apps service (API + Worker) in temporal-oms-apps namespace
 kubectl apply -f k8s/apps/deployment-api.yaml
 kubectl apply -f k8s/apps/temporal-worker.yaml
 
-# Deploy Processing worker
+# Deploy Processing worker in temporal-oms-processing namespace
 kubectl apply -f k8s/processing/temporal-worker.yaml
-
-# Deploy Risk worker
-kubectl apply -f k8s/risk/temporal-worker.yaml
-
-# Deploy Fulfillments worker (Python)
-kubectl apply -f k8s/fulfillments/temporal-worker.yaml
 ```
 
 ### 9. Verify Deployment
 
 ```bash
-# Check all pods
-kubectl get pods -n temporal-oms
+# Check all pods in both namespaces
+kubectl get pods -n temporal-oms-apps
+kubectl get pods -n temporal-oms-processing
 
 # Check TemporalWorkerDeployment CRDs
-kubectl get temporalworkerdeployments -n temporal-oms
+kubectl get temporalworkerdeployments -n temporal-oms-apps
+kubectl get temporalworkerdeployments -n temporal-oms-processing
 
 # Check logs
-kubectl logs -n temporal-oms -l app=apps-api
-kubectl logs -n temporal-oms -l app=apps-worker
-kubectl logs -n temporal-oms -l app=processing-worker
-kubectl logs -n temporal-oms -l app=risk-worker
-kubectl logs -n temporal-oms -l app=fulfillments-worker
+kubectl logs -n temporal-oms-apps -l app=apps-api
+kubectl logs -n temporal-oms-apps -l app=apps-worker
+kubectl logs -n temporal-oms-processing -l app=processing-worker
 
 # Verify secrets are mounted (infrastructure validation only)
-POD=$(kubectl get pods -n temporal-oms -l app=apps-api -o jsonpath='{.items[0].metadata.name}')
-kubectl exec -it $POD -n temporal-oms -- ls -la /etc/config/secrets/
-kubectl exec -it $POD -n temporal-oms -- head -3 /etc/config/secrets/temporal/temporal.secret.yaml
+POD=$(kubectl get pods -n temporal-oms-apps -l app=apps-api -o jsonpath='{.items[0].metadata.name}')
+kubectl exec -it $POD -n temporal-oms-apps -- ls -la /etc/config/secrets/
+kubectl exec -it $POD -n temporal-oms-apps -- head -3 /etc/config/secrets/acme/acme.apps.secret.yaml
 
 # Verify K8s Secrets exist
-kubectl get secrets -n temporal-oms
+kubectl get secrets -n temporal-oms-apps
+kubectl get secrets -n temporal-oms-processing
 ```
 
 **Note:** The verification above only checks that files are mounted. Application-specific integration testing (how each language loads and uses the secrets) is deferred to component-specific specs.
@@ -255,10 +234,10 @@ kubectl get secrets -n temporal-oms
 
 ```bash
 # Get API URL
-minikube service apps-api -n temporal-oms --url
+minikube service apps-api -n temporal-oms-apps --url
 
 # Or use port-forward
-kubectl port-forward -n temporal-oms svc/apps-api 8080:80
+kubectl port-forward -n temporal-oms-apps svc/apps-api 8080:80
 
 # Access Swagger UI (MANDATORY per stack-api-rest)
 open http://localhost:8080/docs
@@ -325,7 +304,7 @@ temporal task-queue describe --task-queue apps
 
 ```bash
 # 1. Edit Java code
-vim java/apps/src/main/java/com/acme/apps/workflows/CompleteOrderWorkflowImpl.java
+vim java/apps/src/main/java/com/acme/apps/workflows/OrderImpl.java
 
 # 2. Rebuild
 cd java
@@ -336,39 +315,35 @@ eval $(minikube docker-env)
 docker build -t temporal-oms/apps-worker:latest -f apps/docker/Dockerfile.worker apps/
 
 # 4. Restart workers (triggers new deployment)
-kubectl rollout restart temporalworkerdeployment/apps-worker -n temporal-oms
+kubectl rollout restart temporalworkerdeployment/apps-worker -n temporal-oms-apps
 
 # 5. Watch rollout
-kubectl rollout status temporalworkerdeployment/apps-worker -n temporal-oms
+kubectl rollout status temporalworkerdeployment/apps-worker -n temporal-oms-apps
 ```
 
 ### View Logs
 
 ```bash
 # API logs
-kubectl logs -f -n temporal-oms -l app=apps-api
+kubectl logs -f -n temporal-oms-apps -l app=apps-api
 
 # Apps worker logs
-kubectl logs -f -n temporal-oms -l app=apps-worker
+kubectl logs -f -n temporal-oms-apps -l app=apps-worker
 
 # Processing worker logs
-kubectl logs -f -n temporal-oms -l app=processing-worker
+kubectl logs -f -n temporal-oms-processing -l app=processing-worker
 
-# Risk worker logs
-kubectl logs -f -n temporal-oms -l app=risk-worker
-
-# Fulfillments worker logs
-kubectl logs -f -n temporal-oms -l app=fulfillments-worker
-
-# All workers
-kubectl logs -f -n temporal-oms -l component=worker
+# All workers in apps namespace
+kubectl logs -f -n temporal-oms-apps -l component=worker
+# All workers in processing namespace
+kubectl logs -f -n temporal-oms-processing -l component=worker
 ```
 
 ### Test the API
 
 ```bash
 # Get API URL
-API_URL=$(minikube service apps-api -n temporal-oms --url)
+API_URL=$(minikube service apps-api -n temporal-oms-apps --url)
 
 # Submit commerce order
 curl -X PUT "$API_URL/api/v1/commerce-app/orders/order-001" \
@@ -400,7 +375,8 @@ open "$API_URL/docs"
 ### Remove Application
 
 ```bash
-kubectl delete namespace temporal-oms
+kubectl delete namespace temporal-oms-apps
+kubectl delete namespace temporal-oms-processing
 ```
 
 ### Remove Temporal
@@ -432,11 +408,11 @@ minikube delete  # Complete removal
 ### Pods Not Starting
 
 ```bash
-# Check pod status
-kubectl describe pod <pod-name> -n temporal-oms
+# Check pod status (replace namespace with temporal-oms-apps or temporal-oms-processing)
+kubectl describe pod <pod-name> -n temporal-oms-apps
 
 # Check events
-kubectl get events -n temporal-oms --sort-by='.lastTimestamp'
+kubectl get events -n temporal-oms-apps --sort-by='.lastTimestamp'
 ```
 
 ### Image Pull Errors
@@ -454,11 +430,11 @@ docker images | grep temporal-oms
 ### Worker Not Registering
 
 ```bash
-# Check worker logs
-kubectl logs -n temporal-oms -l app=apps-worker
+# Check worker logs (replace namespace with temporal-oms-apps or temporal-oms-processing)
+kubectl logs -n temporal-oms-apps -l app=apps-worker
 
 # Check Temporal connectivity
-kubectl exec -it -n temporal-oms <worker-pod> -- sh
+kubectl exec -it -n temporal-oms-apps <worker-pod> -- sh
 wget -O- http://temporal-frontend.temporal.svc.cluster.local:7233
 ```
 
@@ -472,38 +448,41 @@ temporal operator namespace create apps --address localhost:7233
 
 ## Architecture
 
+### Kubernetes Namespaces
+
+| K8s Namespace | Components | Description |
+|---------------|-----------|-------------|
+| temporal-oms-apps | apps-api, apps-worker, web | Application services and workflows |
+| temporal-oms-processing | processing-worker | Order processing workflows |
+
 ### Services Deployed
 
-| Service | Type | Port | Description |
-|---------|------|------|-------------|
-| apps-api | Deployment | 8080 | REST API for webhooks |
-| apps-worker | TemporalWorkerDeployment | 9090 | CompleteOrder workflows |
-| processing-worker | TemporalWorkerDeployment | 9090 | Order processing workflows |
-| risk-worker | TemporalWorkerDeployment | 9090 | Fraud detection workflows |
-| fulfillments-worker | TemporalWorkerDeployment | 9090 | AI Agent workflows (Python) |
+| Service | Type | Port | K8s Namespace | Description |
+|---------|------|------|---------------|-------------|
+| apps-api | Deployment | 8080 | temporal-oms-apps | REST API for webhooks |
+| apps-worker | TemporalWorkerDeployment | 9090 | temporal-oms-apps | CompleteOrder workflows |
+| processing-worker | TemporalWorkerDeployment | 9090 | temporal-oms-processing | Order processing workflows |
+| web | Deployment | 3000 | temporal-oms-apps | Frontend web UI |
 
 ### Temporal Namespaces
 
-| Namespace | Task Queue | Workers | Description |
-|-----------|------------|---------|-------------|
-| apps | apps | 2 | Application orchestration |
-| processing | processing | 2 | Order processing |
-| risk | risk | 2 | Fraud detection |
-| fulfillments | fulfillments | 2 | Order fulfillment (AI) |
+| Temporal Namespace | Task Queue | Workers | K8s Namespace | Description |
+|-------------------|-----------|---------|---------------|-------------|
+| apps | apps | 2 | temporal-oms-apps | Application orchestration |
+| processing | processing | 2 | temporal-oms-processing | Order processing |
 
 ### Resource Allocation
 
-| Service | Memory Request | Memory Limit | CPU Request | CPU Limit |
-|---------|----------------|--------------|-------------|-----------|
-| apps-api | 512Mi | 1Gi | 250m | 1000m |
-| apps-worker | 512Mi | 2Gi | 250m | 2000m |
-| processing-worker | 512Mi | 2Gi | 250m | 2000m |
-| risk-worker | 256Mi | 1Gi | 200m | 1000m |
-| fulfillments-worker | 512Mi | 2Gi | 250m | 1000m |
+| Service | Memory Request | Memory Limit | CPU Request | CPU Limit | K8s Namespace |
+|---------|----------------|--------------|-------------|-----------|---|
+| apps-api | 512Mi | 1Gi | 250m | 1000m | temporal-oms-apps |
+| apps-worker | 512Mi | 2Gi | 250m | 2000m | temporal-oms-apps |
+| web | 256Mi | 512Mi | 100m | 500m | temporal-oms-apps |
+| processing-worker | 512Mi | 2Gi | 250m | 2000m | temporal-oms-processing |
 
 **Total Resources:**
-- Memory: ~8Gi
-- CPU: ~4 cores
+- Memory: ~6Gi
+- CPU: ~1.8 cores
 
 ## Skills Applied
 
