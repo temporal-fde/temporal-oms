@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: temporal-apps-config
+  namespace: temporal-oms-apps
+data:
+  temporal-config.yaml: |
+    spring:
+      temporal:
+        namespace: apps
+        connection:
+          target: temporal-frontend.temporal.svc.cluster.local:7233

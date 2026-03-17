@@ -1,13 +1,12 @@
 spring.temporal:
     connection:
       # Connection settings
-      target: ${TEMPORAL_ADDRESS:localhost:7233}
+      target: ${TEMPORAL_ADDRESS:}
 
       # API Key for Temporal Cloud
       api-key: ${TEMPORAL_API_KEY:}
 
-    start-workers: true
-    namespace: ${TEMPORAL_NAMESPACE:processing}
+    namespace: ${TEMPORAL_NAMESPACE:}
     workers:
       - task-queue: processing
         workflow-classes:

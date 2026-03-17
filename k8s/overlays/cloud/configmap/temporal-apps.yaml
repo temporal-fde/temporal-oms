@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: temporal-apps-config
+  namespace: temporal-oms-apps
+data:
+  temporal-config.yaml: |
+    spring:
+      temporal:
+        namespace: fde-oms-apps.sdvdw
+        connection:
+          target: <TEMPORAL_CLOUD_HOST>:7233

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: temporal-processing-config
+  namespace: temporal-oms-processing
+data:
+  temporal-config.yaml: |
+    spring:
+      temporal:
+        namespace: processing
+        connection:
+          target: temporal-frontend.temporal.svc.cluster.local:7233

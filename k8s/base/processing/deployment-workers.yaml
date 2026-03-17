@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: processing-worker
+  namespace: temporal-oms-processing
+  labels:
+    app: processing-worker
+    component: worker
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: processing-worker
+  template:
+    metadata:
+      labels:
+        app: processing-worker
+        component: worker
+        version: "1.0.0"
+      annotations:
+        instrumentation.opentelemetry.io/inject-sdk: "true"
+    spec:
+      containers:
+      - name: worker
+        image: temporal-oms/processing-worker:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 9092
+          name: management
+          protocol: TCP
+        env:
+        - name: TEMPORAL_NAMESPACE
+          value: "processing"
+        - name: TEMPORAL_TASK_QUEUE
+          value: "processing"
+        - name: BUILD_ID
+          value: "1.0.0"
+        - name: MANAGEMENT_SERVER_PORT
+          value: "9092"
+        - name: SECRETS_DIR
+          value: /etc/config/secrets/acme
+        envFrom:
+        - configMapRef:
+            name: temporal-oms-config
+        - secretRef:
+            name: temporal-oms-secrets
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 9092
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 9092
+          initialDelaySeconds: 20
+          periodSeconds: 5
+        volumeMounts: []
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
+      volumes: []
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: processing-worker
+  namespace: temporal-oms-processing
+  labels:
+    app: processing-worker
+spec:
+  type: ClusterIP
+  selector:
+    app: processing-worker
+  ports:
+  - port: 9092
+    targetPort: 9092
+    protocol: TCP
+    name: management

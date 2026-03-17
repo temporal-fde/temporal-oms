@@ -1,0 +1,78 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+  - configmap
+  - secrets
+
+# Same patches as local overlay, just different ConfigMap/Secret content
+patches:
+  - target:
+      kind: Deployment
+      name: apps-worker
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/volumeMounts/-
+        value:
+          name: temporal-config
+          mountPath: /etc/config/temporal
+          readOnly: true
+      - op: add
+        path: /spec/template/spec/volumes/-
+        value:
+          name: temporal-config
+          configMap:
+            name: temporal-apps-config
+            defaultMode: 0444
+  - target:
+      kind: Deployment
+      name: processing-worker
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/volumeMounts/-
+        value:
+          name: temporal-config
+          mountPath: /etc/config/temporal
+          readOnly: true
+      - op: add
+        path: /spec/template/spec/volumes/-
+        value:
+          name: temporal-config
+          configMap:
+            name: temporal-processing-config
+            defaultMode: 0444
+  - target:
+      kind: Deployment
+      name: apps-worker
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/volumeMounts/-
+        value:
+          name: temporal-secret
+          mountPath: /etc/config/temporal-secret
+          readOnly: true
+      - op: add
+        path: /spec/template/spec/volumes/-
+        value:
+          name: temporal-secret
+          secret:
+            secretName: temporal-api-key
+            defaultMode: 0444
+  - target:
+      kind: Deployment
+      name: processing-worker
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/volumeMounts/-
+        value:
+          name: temporal-secret
+          mountPath: /etc/config/temporal-secret
+          readOnly: true
+      - op: add
+        path: /spec/template/spec/volumes/-
+        value:
+          name: temporal-secret
+          secret:
+            secretName: temporal-api-key
+            defaultMode: 0444

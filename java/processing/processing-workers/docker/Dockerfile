@@ -1,22 +1,22 @@
-# API Dockerfile for Apps Service
+# Worker Dockerfile for Processing Service
 FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
 
-# Copy the API JAR
-COPY target/apps-api-*.jar app.jar
+# Copy the Worker JAR
+COPY target/processing-workers-*.jar app.jar
 
 # Create non-root user
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 USER appuser
 
-# Health check
+# Health check via actuator
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://localhost:9092/actuator/health || exit 1
 
-EXPOSE 8080
+EXPOSE 9092
 
-# Run the API
+# Run the Worker with graceful shutdown
 ENTRYPOINT ["java", \
   "-XX:+UseContainerSupport", \
   "-XX:MaxRAMPercentage=75.0", \

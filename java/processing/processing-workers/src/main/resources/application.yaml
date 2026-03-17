@@ -1,5 +1,6 @@
-spring.config.import: classpath:acme.processing.yaml,file:${SECRETS_DIR:./config}/acme.processing.secret.yaml
+spring.config.import: classpath:acme.processing.yaml,file:/etc/config/temporal/temporal-config.yaml,file:/etc/config/temporal-secret/temporal-secret.yaml
 
 spring.application.name: processing-workers
 spring.main.web-application-type: none
+spring.temporal.start-workers: true
 management.server.port: 9092

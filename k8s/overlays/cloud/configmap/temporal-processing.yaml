@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: temporal-processing-config
+  namespace: temporal-oms-processing
+data:
+  temporal-config.yaml: |
+    spring:
+      temporal:
+        namespace: fde-oms-processing.sdvdw
+        connection:
+          target: <TEMPORAL_CLOUD_HOST>:7233

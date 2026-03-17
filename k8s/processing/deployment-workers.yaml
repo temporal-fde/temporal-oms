@@ -1,40 +1,21 @@
-# Processing Worker using Temporal Worker Controller
-apiVersion: temporal.io/v1alpha1
-kind: TemporalWorkerDeployment
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: processing-worker
   namespace: temporal-oms-processing
   labels:
     app: processing-worker
     component: worker
-    temporal-namespace: processing
 spec:
-  # Temporal connection
-  temporalNamespace: processing
-  temporalAddress: temporal-frontend.temporal.svc.cluster.local:7233
-
-  # Task queue
-  taskQueue: processing
-
-  # Worker Versioning
-  buildId: "1.0.0"
-  useBuildIdForVersioning: true
-
-  # Worker configuration
-  workerConfig:
-    maxConcurrentActivityExecutions: 100
-    maxConcurrentWorkflowTaskExecutions: 50
-    maxConcurrentLocalActivityExecutions: 100
-    maxConcurrentWorkflowTaskPollers: 5
-    maxConcurrentActivityTaskPollers: 5
-
-  # Pod template
+  replicas: 2
+  selector:
+    matchLabels:
+      app: processing-worker
   template:
     metadata:
       labels:
         app: processing-worker
         component: worker
-        temporal-namespace: processing
         version: "1.0.0"
       annotations:
         instrumentation.opentelemetry.io/inject-sdk: "true"
@@ -44,8 +25,9 @@ spec:
         image: temporal-oms/processing-worker:latest
         imagePullPolicy: Never
         ports:
-        - containerPort: 9090
-          name: metrics
+        - containerPort: 9092
+          name: management
+          protocol: TCP
         env:
         - name: TEMPORAL_NAMESPACE
           value: "processing"
@@ -53,6 +35,8 @@ spec:
           value: "processing"
         - name: BUILD_ID
           value: "1.0.0"
+        - name: MANAGEMENT_SERVER_PORT
+          value: "9092"
         - name: SECRETS_DIR
           value: /etc/config/secrets/acme
         envFrom:
@@ -60,13 +44,19 @@ spec:
             name: temporal-oms-config
         - secretRef:
             name: temporal-oms-secrets
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 9092
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 9092
+          initialDelaySeconds: 20
+          periodSeconds: 5
         volumeMounts:
-        - name: temporal-secrets
-          mountPath: /etc/config/secrets/temporal
-          readOnly: true
-        - name: idp-secrets
-          mountPath: /etc/config/secrets/idp
-          readOnly: true
         - name: acme-processing-secrets
           mountPath: /etc/config/secrets/acme
           readOnly: true
@@ -78,18 +68,24 @@ spec:
             memory: "2Gi"
             cpu: "2000m"
       volumes:
-      - name: temporal-secrets
-        secret:
-          secretName: temporal-secrets
-          defaultMode: 0400
-      - name: idp-secrets
-        secret:
-          secretName: idp-secrets
-          defaultMode: 0400
       - name: acme-processing-secrets
         secret:
           secretName: acme-processing-secret
-          defaultMode: 0400
-
-  # Scaling
-  replicas: 2
+          defaultMode: 0444
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: processing-worker
+  namespace: temporal-oms-processing
+  labels:
+    app: processing-worker
+spec:
+  type: ClusterIP
+  selector:
+    app: processing-worker
+  ports:
+  - port: 9092
+    targetPort: 9092
+    protocol: TCP
+    name: management
