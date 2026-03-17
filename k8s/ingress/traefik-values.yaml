@@ -15,8 +15,6 @@ ports:
     port: 443
     exposedPort: 443
     protocol: TCP
-    tls:
-      enabled: true
 
 providers:
   kubernetesIngress:

@@ -36,16 +36,10 @@ kubectl create secret generic temporal-secrets -n temporal-oms-processing --from
 
 # Install Traefik Ingress Controller
 echo "→ Installing Traefik Ingress..."
-helm repo add traefik https://helm.traefik.io >/dev/null 2>&1 || true
-helm repo update >/dev/null 2>&1
+kubectl apply -f "$PROJECT_DIR/k8s/ingress/traefik-deployment.yaml" >/dev/null
 
-helm upgrade --install traefik traefik/traefik \
-  --namespace traefik \
-  --create-namespace \
-  --values "$PROJECT_DIR/k8s/ingress/traefik-values.yaml" \
-  -q
-
-kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=traefik -n traefik --timeout=60s 2>/dev/null || true
+# Wait for Traefik to be ready
+kubectl wait --for=condition=ready pod -l app=traefik -n traefik --timeout=60s 2>/dev/null || true
 
 echo "✅ Infrastructure ready!"
 echo ""

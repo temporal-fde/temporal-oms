@@ -32,14 +32,13 @@ docker build -q -t temporal-oms/processing-workers:latest \
 # Deploy to Kubernetes
 echo "→ Deploying to Minikube..."
 kubectl apply -k k8s/overlays/local >/dev/null
+kubectl apply -f k8s/ingress/apps-api-ingress.yaml >/dev/null
 
-# Set up secrets for processing namespace
-kubectl create secret generic temporal-api-key -n temporal-oms-processing \
-  --from-literal=dummy=true --dry-run=client -o yaml | kubectl apply -f - >/dev/null 2>&1 || true
-
+# Copy secrets to processing namespace (recreate if exists)
+kubectl delete secret temporal-api-key -n temporal-oms-processing 2>/dev/null || true
 kubectl get secret temporal-api-key -n temporal-oms-apps -o yaml | \
   sed 's/namespace: temporal-oms-apps/namespace: temporal-oms-processing/' | \
-  kubectl apply -f - >/dev/null 2>&1 || true
+  kubectl create -f - >/dev/null
 
 # Delete old pods to force image pull
 echo "→ Restarting pods..."
