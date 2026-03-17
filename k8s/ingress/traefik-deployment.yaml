@@ -21,6 +21,7 @@ rules:
       - services
       - endpoints
       - secrets
+      - nodes
     verbs:
       - get
       - list
@@ -31,6 +32,14 @@ rules:
     resources:
       - ingresses
       - ingressclasses
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - discovery.k8s.io
+    resources:
+      - endpointslices
     verbs:
       - get
       - list
