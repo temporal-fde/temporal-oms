@@ -1,0 +1,52 @@
+#!/bin/bash
+set -e
+
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$PROJECT_DIR"
+
+echo "🔧 Setting up infrastructure..."
+
+# Start Minikube
+if ! minikube status &>/dev/null; then
+    echo "→ Starting Minikube (4GB RAM, 4 CPUs)..."
+    minikube start --memory 4096 --cpus 4
+else
+    echo "✓ Minikube already running"
+fi
+
+# Start Temporal server
+if ! pgrep -f "temporal server start-dev" >/dev/null 2>&1; then
+    echo "→ Starting Temporal server on localhost:7233..."
+    temporal server start-dev > /tmp/temporal.log 2>&1 &
+    sleep 3
+    echo "✓ Temporal server started"
+else
+    echo "✓ Temporal server already running"
+fi
+
+# Create namespaces
+echo "→ Creating Kubernetes namespaces..."
+kubectl create namespace temporal-oms-apps --dry-run=client -o yaml | kubectl apply -f - >/dev/null
+kubectl create namespace temporal-oms-processing --dry-run=client -o yaml | kubectl apply -f - >/dev/null
+
+# Create base secrets (empty for local, will be overridden by app-deploy)
+echo "→ Creating secrets..."
+kubectl create secret generic temporal-secrets -n temporal-oms-apps --from-literal=temporal-secret.yaml="" --dry-run=client -o yaml | kubectl apply -f - >/dev/null
+kubectl create secret generic temporal-secrets -n temporal-oms-processing --from-literal=temporal-secret.yaml="" --dry-run=client -o yaml | kubectl apply -f - >/dev/null
+
+# Install Traefik Ingress Controller
+echo "→ Installing Traefik Ingress..."
+helm repo add traefik https://helm.traefik.io >/dev/null 2>&1 || true
+helm repo update >/dev/null 2>&1
+
+helm upgrade --install traefik traefik/traefik \
+  --namespace traefik \
+  --create-namespace \
+  --values "$PROJECT_DIR/k8s/ingress/traefik-values.yaml" \
+  -q
+
+kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=traefik -n traefik --timeout=60s 2>/dev/null || true
+
+echo "✅ Infrastructure ready!"
+echo ""
+echo "Next step: ./scripts/app-deploy.sh"
