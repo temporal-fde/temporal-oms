@@ -16,10 +16,12 @@
 
 ### Executive Summary
 
-Create the **WorkerVersionEnablement workflow** as the core of the Enablements application - a Temporal workflow that acts as an external caller to the OMS, enabling safe demonstration of worker versioning.
+Create the **WorkerVersionEnablement workflow** as a local enablement tool - a Temporal workflow that runs on the user's host and calls the OMS APIs (running in K8s/KinD), demonstrating safe worker versioning.
 
 The workflow:
-- Acts as an "enablement caller" - submits orders to the OMS (apps-api, processing-api)
+- Runs locally (not in K8s) - invoked via Temporal CLI or local Java execution
+- Acts as an external caller - submits orders to the OMS (apps-api, processing-api running in K8s)
+- Works with both local K8s (Minikube/KinD) and cloud Temporal
 - Tracks only its own execution state (which version is active, submission rate, demo phase)
 - Does NOT duplicate OMS state tracking (orders, completion, failures)
 - Supports interactive control signals (transitionToV2) to trigger version changes
@@ -31,7 +33,7 @@ Using Temporal to demonstrate Temporal versioning is powerful, but the key insig
 2. The OMS continues processing regardless of version transitions
 3. No failures or dropped orders during the transition
 
-This clarity separates "how we invoke the system" (enablement workflow) from "how the system works" (OMS application).
+This clarity separates "how we invoke the system" (enablement workflow running locally) from "how the system works" (OMS application running in K8s).
 
 ---
 
@@ -236,8 +238,8 @@ enablements:
 
   # Temporal integration
   temporal:
-    namespace: processing        # where enablement workflow runs
-    task-queue: processing
+    namespace: apps              # where enablement workflow runs (apps namespace, since enablement is external caller)
+    task-queue: enablements      # task queue for enablement workflows
 ```
 
 ### Data Model
@@ -272,24 +274,39 @@ load_gen_completion_rate_percent {gauge}    # Completed / Created %
 
 ### Deployment Model
 
-**Note:** The enablement workflow runs on enablements-workers, which is deployed separately (see Phase 2). The workflow is invoked externally and calls OMS APIs.
+**Local Execution (Not Kubernetes):**
+The enablement workflow runs on the user's local machine and calls the OMS APIs in K8s/KinD. No Kubernetes deployment needed.
 
-**External Invocation:**
+**Invocation (from local host):**
+
+**Option 1: Via Temporal CLI (requires temporal CLI installed)**
 ```bash
-# Start the workflow via Temporal CLI or REST API
 temporal workflow start \
   --workflow-id demo-session-1 \
+  --namespace apps \
   --type WorkerVersionEnablementWorkflow \
-  --task-queue processing \
+  --task-queue enablements \
   --input '{"demonstration_id":"demo-session-1","order_count":20,"submit_rate_per_min":12,"timeout":"5m"}'
 ```
 
-Or via the optional EnablementsController in apps-api:
+**Option 2: Via local Java execution**
+```bash
+cd java/enablements/enablements-core
+mvn exec:java -Dexec.mainClass="com.acme.enablements.LocalEnablementRunner" \
+  -Dexec.args="demo-session-1 20 12 5m"
+```
+
+**Option 3: Via optional EnablementsController in apps-api**
 ```bash
 curl -X POST http://localhost:8080/api/v1/enablements/worker-version/demo-session-1/start \
   -H "Content-Type: application/json" \
   -d '{"order_count":20,"submit_rate_per_min":12,"timeout":"5m"}'
 ```
+
+**Configuration:**
+- OMS APIs: `APPS_API_ENDPOINT` (default: http://localhost:8080 or tunneled Traefik)
+- Processing API: `PROCESSING_API_ENDPOINT` (default: http://localhost:8081 or tunneled)
+- Temporal: `TEMPORAL_TARGET` (default: localhost:7233 for local, or cloud Temporal)
 
 ---
 
@@ -313,19 +330,21 @@ Deliverables:
   - ProcessingActivities: enrichOrder(), capturePayment()
 - [ ] Unit tests (mocked HTTP calls to apps-api/processing-api)
 
-### Phase 2: Enablements Workers
-**Goal:** Deploy workflow with versioning support
+### Phase 2: Local Workflow Execution
+**Goal:** Enable running the workflow from local host
 
 Deliverables:
-- [ ] Maven module: `java/enablements/enablements-workers/pom.xml`
-- [ ] WorkerApplication.java (Spring Boot entry point)
-- [ ] Worker registration with build-ids
-  - v1 build-id: `enablements-worker:v1`
-  - Configuration via env vars
-- [ ] application.yaml + application-k8s.yaml
-- [ ] Dockerfile
-- [ ] `k8s/base/enablements/deployment-workers.yaml`
-- [ ] Integration tests (real Temporal workflow execution)
+- [ ] LocalEnablementRunner.java - Main entry point to run workflow locally
+  - Takes arguments: demonstration_id, order_count, submit_rate_per_min, timeout
+  - Configures WorkflowClient for local or remote Temporal
+  - Starts WorkerVersionEnablementWorkflow and tracks execution
+- [ ] Configuration via environment variables:
+  - `TEMPORAL_TARGET`: Temporal server address (local or cloud)
+  - `APPS_API_ENDPOINT`: OMS apps-api URL
+  - `PROCESSING_API_ENDPOINT`: OMS processing-api URL
+- [ ] Maven configuration: `java/enablements/enablements-core/pom.xml` includes exec plugin
+- [ ] Shell script: `scripts/run-enablement.sh` (optional - simplifies invocation)
+- [ ] Integration tests (local Temporal workflow execution against real K8s APIs)
 
 ### Phase 3: Enablements Controller (Optional - for monitoring API)
 **Goal:** Add REST endpoints to apps-api for workflow control and monitoring
@@ -371,12 +390,12 @@ Deliverables:
 - `java/enablements/enablements-core/src/main/java/com/acme/enablements/activities/OrderActivities.java`
 - `java/enablements/enablements-core/src/main/java/com/acme/enablements/activities/ProcessingActivities.java`
 
-**To Create (enablements-workers):**
-- `java/enablements/enablements-workers/pom.xml`
-- `java/enablements/enablements-workers/src/main/java/com/acme/enablements/WorkerApplication.java`
-- `java/enablements/enablements-workers/src/main/resources/application.yaml`
-- `java/enablements/enablements-workers/docker/Dockerfile`
-- `k8s/base/enablements/deployment-workers.yaml`
+**To Create (local execution):**
+- `java/enablements/enablements-core/src/main/java/com/acme/enablements/LocalEnablementRunner.java`
+  - Main entry point (public static void main) to run workflow locally
+  - Configures WorkflowClient, starts workflow, monitors execution
+- `scripts/run-enablement.sh` (optional - convenience wrapper)
+  - Sets env vars, calls LocalEnablementRunner with arguments
 
 **To Create (enablements controller - optional, in apps-api):**
 - `java/apps/apps-api/src/main/java/com/acme/enablements/controllers/EnablementsController.java`
@@ -391,11 +410,8 @@ Deliverables:
 **To Modify:**
 - `java/pom.xml` - Add enablements module
 - `proto/acme/pom.xml` - Add enablements proto generation
-- `k8s/base/kustomization.yaml` - Add enablements deployments
-- `k8s/base/processing/kustomization.yaml` - Include enablements deployments
-- `scripts/app-deploy.sh` - Build enablements images
-- `java/apps/apps-api/pom.xml` - (already has Temporal SDK, no changes needed)
-- `java/apps/apps-api/src/main/java/com/acme/apps/ApiApplication.java` - (already has @ComponentScan for multiple packages)
+- `java/apps/apps-api/pom.xml` - (if implementing EnablementsController in apps-api for remote invocation)
+- `java/apps/apps-api/src/main/java/com/acme/apps/ApiApplication.java` - (if implementing controller)
 
 ---
 
@@ -487,15 +503,16 @@ Deliverables:
 - Micrometer Prometheus (metrics)
 
 ### Cross-Cutting Concerns
-- **apps-api:** Must be running for order submission
-- **Temporal cluster:** Must be accessible from load-gen namespace
-- **Networking:** Load-gen must reach apps-api and Temporal
+- **apps-api:** Must be running in K8s (for order submission)
+- **Temporal cluster:** Must be running (local K8s, or cloud Temporal)
+- **Networking:** Local machine must reach Temporal, apps-api, and processing-api (via tunnel or direct)
 
 ### Rollout Blockers
-- [ ] Temporal cluster deployed and running
-- [ ] apps-api deployed and accessible
-- [ ] `temporal-oms-tools` namespace exists
-- [ ] KinD cluster has 256Mi headroom
+- [ ] Temporal cluster deployed and running (K8s or cloud)
+- [ ] `apps` namespace in Temporal created
+- [ ] apps-api deployed in K8s and accessible from local machine
+- [ ] processing-api deployed in K8s and accessible from local machine
+- [ ] Tunnel or port-forwarding setup (if using local K8s)
 
 ---
 

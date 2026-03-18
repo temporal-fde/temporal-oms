@@ -173,8 +173,15 @@ This is the key teaching moment: "Worker versions don't affect my ability to sub
 5. Orders continue flowing through OMS (same as before)
 6. Team observes: version changed, orders unaffected
 
+**Local Execution, Not K8s:**
+This is a local development/demo tool. It runs on your host machine and calls the OMS APIs in K8s. Benefits:
+- No need to deploy extra services to K8s
+- Easy to iterate and test locally
+- Works with both local (Minikube/KinD) and cloud Temporal
+- Simple invocation: `mvn exec:java` or `temporal workflow start`
+
 **Scope:**
-This spec defines the core enablement workflow + activities. Version deployment (v2 workers) and validation framework are separate sub-specs that build on this.
+This spec defines the core enablement workflow + activities + local runner. Version deployment (v2 workers) and validation framework are separate sub-specs that build on this.
 
 ---
 
@@ -185,3 +192,5 @@ This spec defines the core enablement workflow + activities. Version deployment 
 | 2026-03-18 | [Your Name] | Initial spec draft (workflow-based approach) | Draft |
 | 2026-03-18 | [Your Name] | Clarified API paths: workflow activities call production APIs, enablements endpoints in separate controller | In Progress |
 | 2026-03-18 | [Your Name] | **Major clarification:** Enablement workflow is external caller of OMS, doesn't duplicate OMS state tracking. Workflow owns execution state only, OMS owns order state. | In Progress |
+| 2026-03-18 | [Your Name] | **Namespace correction:** Enablement workflows run in `apps` namespace (external caller), not `processing` namespace. Task queue: `enablements`. | In Progress |
+| 2026-03-18 | [Your Name] | **Deployment model clarified:** Enablement runs locally on host (not in K8s). Calls OMS APIs in K8s/KinD. No K8s deployment manifests needed. | In Progress |
