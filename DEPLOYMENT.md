@@ -80,7 +80,7 @@ brew install java maven nodejs kind kubectl
 
 ### System Resources
 
-- **Minikube alternative**: Using KinD requires Docker, which is more lightweight than Minikube
+- **Minikube alternative**: Using KinD requires Docker
 - **Memory**: 4GB minimum (8GB recommended)
 - **Disk**: 5GB free space
 
