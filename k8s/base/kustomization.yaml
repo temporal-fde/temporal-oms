@@ -5,6 +5,7 @@ resources:
   - namespaces/namespace.yaml
   - apps/deployment-api.yaml
   - apps/deployment-workers.yaml
+  - processing/deployment-api.yaml
   - processing/deployment-workers.yaml
   - temporal-cloud-service.yaml
 

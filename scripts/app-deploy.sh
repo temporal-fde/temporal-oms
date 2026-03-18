@@ -30,6 +30,9 @@ docker build -q -t temporal-oms/apps-api:latest \
 docker build -q -t temporal-oms/apps-worker:latest \
   -f java/apps/apps-workers/docker/Dockerfile java/apps/apps-workers
 
+docker build -q -t temporal-oms/processing-api:latest \
+  -f java/processing/processing-api/docker/Dockerfile java/processing/processing-api
+
 docker build -q -t temporal-oms/processing-worker:latest \
   -f java/processing/processing-workers/docker/Dockerfile java/processing/processing-workers
 
@@ -37,12 +40,14 @@ docker build -q -t temporal-oms/processing-worker:latest \
 echo "→ Loading images into KinD..."
 kind load docker-image temporal-oms/apps-api:latest --name temporal-oms
 kind load docker-image temporal-oms/apps-worker:latest --name temporal-oms
+kind load docker-image temporal-oms/processing-api:latest --name temporal-oms
 kind load docker-image temporal-oms/processing-worker:latest --name temporal-oms
 
 # Deploy to Kubernetes
 echo "→ Deploying to KinD..."
 kubectl apply -k "k8s/overlays/${OVERLAY}" >/dev/null
 kubectl apply -f k8s/ingress/apps-api-ingress.yaml >/dev/null
+kubectl apply -f k8s/ingress/processing-api-ingress.yaml >/dev/null
 
 # Delete old pods to force image pull
 echo "→ Restarting pods..."

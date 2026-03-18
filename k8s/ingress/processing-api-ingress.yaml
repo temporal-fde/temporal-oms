@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: processing-api
+  namespace: temporal-oms-processing
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: localhost
+    http:
+      paths:
+      - path: /api/validations
+        pathType: Prefix
+        backend:
+          service:
+            name: processing-api
+            port:
+              number: 80
+  - host: processing-api.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: processing-api
+            port:
+              number: 80

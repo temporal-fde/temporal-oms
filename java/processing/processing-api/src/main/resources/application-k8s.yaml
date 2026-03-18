@@ -1,0 +1,14 @@
+spring:
+  config:
+    import: file:/etc/config/temporal/temporal-config.yaml,file:/etc/config/temporal-secret/temporal-secret.yaml
+  application:
+    name: processing-api
+  temporal:
+    start-workers: false
+
+server:
+  port: 8080
+
+management:
+  server:
+    port: 9090
