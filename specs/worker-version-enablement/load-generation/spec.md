@@ -16,39 +16,42 @@
 
 ### Executive Summary
 
-Create the **WorkerVersionEnablement workflow** as the core of the Enablements application - a self-referential Temporal workflow that demonstrates safe worker versioning by orchestrating orders through the entire system.
+Create the **WorkerVersionEnablement workflow** as the core of the Enablements application - a Temporal workflow that acts as an external caller to the OMS, enabling safe demonstration of worker versioning.
 
 The workflow:
-- Submits orders via apps-api (via activities)
-- Processes them through processing-api (via activities)
-- Tracks state progression (queries)
-- Runs in two versions (v1 baseline, v2 with enhancements)
+- Acts as an "enablement caller" - submits orders to the OMS (apps-api, processing-api)
+- Tracks only its own execution state (which version is active, submission rate, demo phase)
+- Does NOT duplicate OMS state tracking (orders, completion, failures)
+- Supports interactive control signals (transitionToV2) to trigger version changes
 - Demonstrates build-id routing live during enablement sessions
 
 **Why this approach:**
-Using Temporal to teach Temporal versioning is the most powerful demonstration. The workflow itself shows how to coordinate async operations, maintain state, and handle versioning - the exact concepts we're teaching.
+Using Temporal to demonstrate Temporal versioning is powerful, but the key insight is: the enablement workflow is just a *caller* of the OMS. It submits orders (like any client would) and lets the OMS do its job. The workflow demonstrates that:
+1. Worker versions don't affect external callers (orders submitted successfully)
+2. The OMS continues processing regardless of version transitions
+3. No failures or dropped orders during the transition
 
-This is the foundation workflow for the Enablements application (future: additional educational workflows can follow the same pattern).
+This clarity separates "how we invoke the system" (enablement workflow) from "how the system works" (OMS application).
 
 ---
 
 ## Goals & Success Criteria
 
 ### Primary Goals
-- Goal 1: WorkerVersionEnablementWorkflow submits orders continuously and reliably
-- Goal 2: Workflow maintains real-time state queryable via `getState()` query method
+- Goal 1: WorkerVersionEnablementWorkflow calls OMS APIs continuously (submit → enrich → capture)
+- Goal 2: Workflow tracks only its own execution state, not order details (OMS owns that)
 - Goal 3: Workflow supports interactive control signals (pause, resume, transitionToV2)
-- Goal 4: Workflow deploys v2 workers via activities during session
-- Goal 5: Demonstrate safe version transition with zero order failures
+- Goal 4: Workflow triggers v2 worker deployment via activities during session
+- Goal 5: Demonstrate safe version transition with zero workflow or OMS failures
 
 ### Acceptance Criteria
 - [ ] Workflow deploys to enablements-workers in Kubernetes
-- [ ] Can submit and process 20 orders continuously (12/min rate, ~2 min duration)
-- [ ] getState() query returns accurate, real-time workflow state
-- [ ] Transitionable from v1-only to v2 via transitionToV2() signal
-- [ ] Zero orders fail during v1 → v2 transition
-- [ ] Order version tracking (worker_version field) correctly identifies v1 vs v2 execution
-- [ ] Documentation complete with demo scripts and runbook
+- [ ] Workflow submits 20 orders at ~12/min to the OMS
+- [ ] getState() query returns accurate workflow execution state (phase, submission count, rate, versions)
+- [ ] Transitionable from RUNNING_V1_ONLY to RUNNING_BOTH via transitionToV2() signal
+- [ ] OMS processes all submitted orders without failures (0 FAILED orders in the OMS)
+- [ ] Order completion confirmed via OMS APIs, not workflow state (workflow doesn't track that)
+- [ ] Demo scripts and documentation complete
 
 ---
 
@@ -56,17 +59,17 @@ This is the foundation workflow for the Enablements application (future: additio
 
 ### What exists today?
 - **Scenario scripts** create single orders manually (`submit-order.sh`, `capture-payment.sh`)
-- **No continuous load** - orders created one-at-a-time for demos
-- **No workflow state tracking** - rely on manual Temporal UI inspection
-- **No metrics** - can't quantify throughput or completion rates
-- **Manual control** - need to run scripts individually
+- **No continuous ordering** - orders created one-at-a-time for demos
+- **No coordinated load generation** - can't trigger version transitions while orders are in flight
+- **Manual testing only** - can't easily show "orders flowing during version change"
+- **No version transition demo** - can't show v1 → v2 switch safely in action
 
 ### Pain points / gaps
-- Can't test with multiple in-flight workflows
-- No visibility into order completion stages without UI
-- Difficult to reproduce load for performance testing
-- Hard to validate system behavior under sustained load
-- No metrics for dashboards or monitoring
+- Can't demonstrate version transitions under realistic load
+- Hard to show that worker versions don't affect external callers (order clients)
+- Difficult to validate system behavior when worker code changes
+- No repeatable scenario for enablement/training sessions
+- No clear separation between "demo infrastructure" and "production application"
 
 ---
 
@@ -108,35 +111,22 @@ message StartWorkerVersionEnablementRequest {
   google.protobuf.Duration timeout = 4;  // How long to run (e.g., 5 minutes)
 }
 
-// State of an order being processed through the demonstration
-message OrderStatus {
-  string order_id = 1;
-  enum Phase { SUBMITTED, ENRICHED, CAPTURED, COMPLETED, FAILED }
-  Phase current_phase = 2;
-  google.protobuf.Timestamp created_at = 3;
-  google.protobuf.Timestamp updated_at = 4;
-  string worker_version = 5;  // v1 or v2 (which worker version handled it)
-}
-
 // Current state of the worker versioning enablement demonstration
+// (Order tracking is the responsibility of the OMS application, not this workflow)
 message WorkerVersionEnablementState {
   string demonstration_id = 1;
 
-  // Counts
-  int32 orders_submitted = 2;
-  int32 orders_completed = 3;
-  int32 orders_failed = 4;
+  // Workflow execution state
+  enum DemoPhase { RUNNING_V1_ONLY, TRANSITIONING_TO_V2, RUNNING_BOTH, COMPLETE }
+  DemoPhase current_phase = 2;
 
-  // Details
-  repeated OrderStatus recent_orders = 5;  // Last N orders for visibility
+  // Activity metrics
+  int32 orders_submitted_count = 3;    // How many times submitOrder() was called
+  float orders_per_minute = 4;         // Current submission rate
+  repeated string active_versions = 5; // ["v1"] or ["v1", "v2"] depending on phase
 
   // Versioning info
-  enum DemoPhase { RUNNING_V1_ONLY, TRANSITIONING_TO_V2, RUNNING_BOTH, COMPLETE }
-  DemoPhase current_phase = 6;
-
-  // Metrics
-  float orders_per_minute = 7;
-  float completion_rate = 8;  // completed / submitted %
+  string last_transition_at = 6;       // ISO8601 timestamp when transitionToV2 was signaled
 }
 ```
 
@@ -201,11 +191,10 @@ message WorkerVersionEnablementState {
     - Update DemoPhase → RUNNING_BOTH when deployment complete
 
   - **Responsibilities:**
-    - Maintain continuous order flow (submit → enrich → capture → complete)
-    - Track state: submitted, completed, failed counts
-    - Record worker_version for each order (auto-detected from activity execution)
+    - Call OMS APIs continuously: submitOrder → enrichOrder → capturePayment
+    - Track only workflow execution state (phase, submission count, rate)
     - Respond to control signals (pause, resume, transitionToV2)
-    - Provide real-time state via getState() query
+    - Provide real-time workflow state via getState() query (not order tracking—that's the OMS app's job)
 
 #### Activities (enablements-core)
 **OrderActivities:**
@@ -223,33 +212,31 @@ message WorkerVersionEnablementState {
 - **Note:** Activities call production API paths, not special enablements paths. The workflow demonstrates using versioning with real application flows.
 
 #### Query Handler
-- **Purpose:** Expose workflow state during demo
-- `getStatus()` returns:
-  - Orders submitted, completed, failed counts
-  - Recent order IDs and their states
-  - Submission rate
-  - Used by enablements-api or CLI to monitor progress
+- **Purpose:** Expose workflow execution state during demo (not order tracking—that's the OMS app's job)
+- `getState()` returns:
+  - Current demo phase (RUNNING_V1_ONLY, TRANSITIONING_TO_V2, RUNNING_BOTH, COMPLETE)
+  - Orders submitted count (how many times submitOrder() was called)
+  - Current submission rate (orders/min)
+  - Active worker versions (v1 only, or both v1+v2)
+  - **Note:** Order tracking (completion, failure, state progression) is the OMS app's responsibility—query apps-api or processing-api for that
 
 ### Configuration Model
 
 ```yaml
-# application.yaml
-load-generation:
-  rate: 1                    # orders per second
-  max-concurrent: 50         # max in-flight orders
-  submission-timeout: 5000   # ms to wait for api response
+# application.yaml (for enablements-workers)
+enablements:
+  # Submission rate
+  order-rate: 12                 # orders per minute (configurable for demo pacing)
+  submission-timeout: 5000       # ms to wait for submitOrder api response
 
-  # State tracking
-  query-interval: 2000       # ms between workflow queries
-  stuck-timeout: 300000      # ms before workflow considered stuck (5 min)
-
-  # Apps API integration
+  # OMS API integration
   apps-api-endpoint: ${APPS_API_ENDPOINT:http://localhost:8080}
-  apps-api-timeout: 10000    # ms
+  processing-api-endpoint: ${PROCESSING_API_ENDPOINT:http://localhost:8081}
+  api-timeout: 10000             # ms per API call
 
   # Temporal integration
   temporal:
-    namespace: processing    # where order workflows run
+    namespace: processing        # where enablement workflow runs
     task-queue: processing
 ```
 
@@ -285,41 +272,23 @@ load_gen_completion_rate_percent {gauge}    # Completed / Created %
 
 ### Deployment Model
 
-**Kubernetes Deployment:**
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: load-generator
-  namespace: temporal-oms-tools
-spec:
-  replicas: 1               # Single generator instance
-  selector:
-    matchLabels:
-      app: load-generator
-  template:
-    containers:
-    - name: load-gen
-      image: temporal-oms/load-generator:latest
-      ports:
-      - containerPort: 8082
-        name: http
-      - containerPort: 9093
-        name: metrics
-      env:
-      - name: SPRING_PROFILES_ACTIVE
-        value: k8s
-      - name: LOAD_GENERATION_RATE
-        value: "1"           # orders/sec (configurable)
-      - name: MAX_CONCURRENT_ORDERS
-        value: "50"
-      resources:
-        requests:
-          memory: "256Mi"
-          cpu: "100m"
-        limits:
-          memory: "1Gi"
-          cpu: "500m"
+**Note:** The enablement workflow runs on enablements-workers, which is deployed separately (see Phase 2). The workflow is invoked externally and calls OMS APIs.
+
+**External Invocation:**
+```bash
+# Start the workflow via Temporal CLI or REST API
+temporal workflow start \
+  --workflow-id demo-session-1 \
+  --type WorkerVersionEnablementWorkflow \
+  --task-queue processing \
+  --input '{"demonstration_id":"demo-session-1","order_count":20,"submit_rate_per_min":12,"timeout":"5m"}'
+```
+
+Or via the optional EnablementsController in apps-api:
+```bash
+curl -X POST http://localhost:8080/api/v1/enablements/worker-version/demo-session-1/start \
+  -H "Content-Type: application/json" \
+  -d '{"order_count":20,"submit_rate_per_min":12,"timeout":"5m"}'
 ```
 
 ---
@@ -393,8 +362,7 @@ Deliverables:
 **Proto Definitions (New):**
 - `proto/acme/enablements/v1/worker_version_enablement.proto`
   - `StartWorkerVersionEnablementRequest` message (input to workflow)
-  - `OrderStatus` message (state of individual order)
-  - `WorkerVersionEnablementState` message (output from workflow queries)
+  - `WorkerVersionEnablementState` message (output from workflow queries—workflow execution state only, not order tracking)
 
 **To Create (enablements-core):**
 - `java/enablements/enablements-core/pom.xml`
@@ -457,39 +425,45 @@ Deliverables:
    - DemoPhase: RUNNING_V1_ONLY
    - Workflow begins submitting orders to apps-api `/api/v1/commerce/orders`
 
-2. **Monitor:** Query workflow state every 10 seconds
+2. **Monitor Workflow State:** Query workflow state every 10 seconds
    - Script or curl: `GET http://localhost:8080/api/v1/enablements/worker-version/demo-session-1` (or use Temporal SDK)
-   - Verify: Orders submitting at ~12/min (from workflow activities)
-   - Verify: Orders progressing through phases (enrichment, payment capture)
-   - Verify: worker_version field shows "v1"
+   - Verify: Workflow submitting at ~12/min
+   - Verify: DemoPhase is RUNNING_V1_ONLY
+   - Verify: active_versions shows ["v1"]
 
-3. **Transition (at ~2 min mark):** Deploy v2 workers, mark compatible
+3. **Monitor OMS:** In parallel, watch the OMS application
+   - Orders appearing in apps-api `/orders` endpoint
+   - Orders progressing through enrichment and payment capture in processing-api
+   - Temporal UI shows: OrderSubmissionWorkflow, EnrichmentWorkflow, PaymentWorkflow (the real business workflows)
+
+4. **Transition (at ~2 min mark):** Deploy v2 workers, mark compatible
    - Script or curl: `POST http://localhost:8080/api/v1/enablements/worker-version/demo-session-1/transition-to-v2` (sends signal to workflow)
    - Workflow activity deployV2Workers() executes kubectl deploy
    - Workflow activity registerCompatibility() sets up Temporal build-ids
    - DemoPhase transitions to: TRANSITIONING_TO_V2 → RUNNING_BOTH
 
-4. **Observe:** Continue monitoring
-   - New orders submitted after transition execute on v2 workers
-   - Old orders submitted before transition continue on v1 workers
-   - worker_version field shows mix: "v1" and "v2"
-   - Completion rates unchanged (no failures during transition)
+5. **Observe Transition:** Continue monitoring
+   - Workflow state: DemoPhase = RUNNING_BOTH, active_versions = ["v1", "v2"]
+   - OMS continues processing orders (submit/enrich/capture)
+   - Orders submitted before transition continue on v1 workers
+   - Orders submitted after transition may execute on v2 workers (build-id routing)
+   - **Key point:** No failures, no dropped orders—the OMS app is unaffected by the version change
 
-5. **Complete:** Wait for all orders to finish
+5. **Complete:** Workflow reaches timeout/completion
    - Workflow final state: COMPLETE
-   - All orders should be COMPLETED (0 FAILED)
    - Demonstrates: Safe worker version transition with zero downtime
+   - OMS has processed all submitted orders (verify via OMS app, not workflow)
 
 **Acceptance Criteria:**
 - [ ] Workflow starts and runs smoothly
-- [ ] Query results provide real-time visibility (getState() returns current state)
-- [ ] Orders process at configured rate (~12/min)
-- [ ] DemoPhase transitions correctly reflect v1 → v2 transition
-- [ ] worker_version field accurately tracks which version processed each order
-- [ ] Completion rate ≥95% (at least 19/20 orders complete)
-- [ ] No failures during transition (zero orders with FAILED status)
+- [ ] getState() query returns accurate workflow execution state
+- [ ] Workflow submits orders at configured rate (~12/min)
+- [ ] DemoPhase transitions correctly (RUNNING_V1_ONLY → TRANSITIONING_TO_V2 → RUNNING_BOTH → COMPLETE)
+- [ ] active_versions correctly reflects current versioning state
+- [ ] No workflow failures during version transition
+- [ ] OMS processes all submitted orders (0 FAILED in the OMS, not the workflow)
 - [ ] Graceful shutdown: workflow finishes cleanly
-- [ ] Demo runs as a self-contained, observable flow
+- [ ] Demo clearly shows: enablement calls OMS, OMS handles everything else
 
 ---
 
@@ -497,12 +471,11 @@ Deliverables:
 
 | Risk | Impact | Likelihood | Mitigation |
 |------|--------|------------|-----------|
-| Workflow order submission fails during demo | High | Low | Test with same rate/config before live session; have fallback demo data |
-| Query state() during transition shows stale data | Medium | Medium | State updates are eventual; document lag expectation (< 2 sec) |
+| Workflow order submission fails during demo | High | Low | Test with same rate/config before live session; have fallback demo order flow |
 | v2 deployment takes too long, breaks demo flow | Medium | Low | Pre-stage v2 deployment, test timing offline; use smaller order count if needed |
-| Orders complete before v2 is deployed | Medium | Low | Use 20-order count with 2-min delay before deploying v2; test pacing |
-| Apps-api or processing-api becomes unavailable | High | Low | Health checks before session; have secondary demo URL handy |
-| Workflow crashes mid-demo | High | Low | Implement error handling and retries; monitor logs during session |
+| Apps-api or processing-api becomes unavailable | High | Low | Health checks before session; verify OMS services running |
+| Workflow crashes mid-demo | High | Low | Implement error handling and retries in activities; monitor Temporal logs during session |
+| Order failures in OMS (not workflow's fault) | Medium | Medium | Not the workflow's responsibility, but communicate that to team; demo focuses on version transition, not order success |
 
 ---
 

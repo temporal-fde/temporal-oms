@@ -151,23 +151,30 @@ Approved By: ________________    Date: ________________
 
 ## Notes for Tech Lead
 
-**Why Workflow-Based Demo?**
-Using a Temporal workflow to demonstrate Temporal versioning is the most powerful teaching approach. The workflow itself orchestrates orders, demonstrating:
-- Continuous async operations (order submission)
-- State management (tracking order progression)
-- Interactive control (signals for team to trigger v2 deployment)
-- Version routing (build-ids routing orders to v1/v2)
+**Critical Insight: Enablement is an External Caller**
+The enablement workflow is NOT part of the OMS. It's an external caller (like a client/user would be) that:
+- Calls OMS APIs to submit orders
+- Watches the version transition happen
+- Demonstrates that the OMS is unaffected by worker version changes
 
-**Self-Referential Teaching:**
-The demo *is* the thing being taught - a Temporal workflow that manages versioning. This clarity helps the team understand the concepts better.
+This is the key teaching moment: "Worker versions don't affect my ability to submit orders or any application behavior."
 
-**API Clarity:**
-- **Workflow activities** call production APIs: apps-api `/api/v1/commerce/orders` and processing-api `/api/v1/enrichment`, `/api/v1/payments/capture`
-- **Enablements API endpoints** (optional controller) are separate: `/api/v1/enablements/worker-version/...` in apps-api
-- This separation keeps enablements testing isolated from production concerns
+**No State Duplication:**
+- **Enablement workflow owns:** execution phase, submission count, submission rate, active versions
+- **OMS app owns:** order state, completion, failure, enrichment, payment capture
+- The workflow does NOT track "completed orders" or "failed orders"—that's the OMS's job
+- This clean separation prevents confusion and keeps the demo focused on versioning, not order tracking
+
+**Interactive Demo Flow:**
+1. Enablement workflow starts submitting orders (calls OMS APIs)
+2. Team observes orders flowing through OMS (via OMS UI or APIs)
+3. Team triggers `transitionToV2()` signal
+4. Enablement workflow deploys v2 workers
+5. Orders continue flowing through OMS (same as before)
+6. Team observes: version changed, orders unaffected
 
 **Scope:**
-This spec defines the core workflow + activities. Version deployment (v2 workers) and validation framework are separate sub-specs that build on this.
+This spec defines the core enablement workflow + activities. Version deployment (v2 workers) and validation framework are separate sub-specs that build on this.
 
 ---
 
@@ -176,4 +183,5 @@ This spec defines the core workflow + activities. Version deployment (v2 workers
 | Date | Author | Change | Status |
 |------|--------|--------|--------|
 | 2026-03-18 | [Your Name] | Initial spec draft (workflow-based approach) | Draft |
-| 2026-03-18 | [Your Name] | Clarified API paths: workflow activities call production APIs, enablements endpoints in separate controller | Ready for Review |
+| 2026-03-18 | [Your Name] | Clarified API paths: workflow activities call production APIs, enablements endpoints in separate controller | In Progress |
+| 2026-03-18 | [Your Name] | **Major clarification:** Enablement workflow is external caller of OMS, doesn't duplicate OMS state tracking. Workflow owns execution state only, OMS owns order state. | In Progress |
