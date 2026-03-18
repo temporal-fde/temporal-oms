@@ -2,4 +2,5 @@ spring.config.import: classpath:acme.processing.yaml
 
 spring.application.name: processing-workers
 spring.main.web-application-type: none
+spring.temporal.start-workers: true
 management.server.port: 9092

@@ -1,10 +1,10 @@
 spring.config.import: classpath:acme.oms.yaml
 spring.temporal:
-  namespace: ${TEMPORAL_NAMESPACE:apps}
+  namespace: ${TEMPORAL_NAMESPACE:}
   connection:
 
     # Connection settings
-    target: ${TEMPORAL_ADDRESS:localhost:7233}
+    target: ${TEMPORAL_ADDRESS:}
 
     # API Key for Temporal Cloud
     api-key: ${TEMPORAL_API_KEY:}

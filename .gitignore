@@ -238,6 +238,12 @@ config/*.local.*
 **/application-local.properties
 **/application-local.yml
 
+# Secrets management - git-ignore actual secrets, keep templates
+config/**/*.secret.yaml
+!config/**/*.secret.template.yaml
+config/environments/*.secret.yaml
+!config/environments/*.secret.template.yaml
+
 # Build outputs
 dist/
 build/

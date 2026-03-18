@@ -2,6 +2,25 @@
 
 A Java-based Order Management System powered by Temporal workflows.
 
+## Choose Your Setup Path
+
+### 🎯 Want to Deploy to Kubernetes?
+
+If you want to run the full application stack in Kubernetes (either locally via KinD or with Temporal Cloud), see **[DEPLOYMENT.md](DEPLOYMENT.md)** for:
+- One-liner deployment with `./scripts/demo-up.sh`
+- Support for both local Temporal and Temporal Cloud
+- Production-like Kubernetes environment
+- Traefik ingress for API access
+
+### 🏃 Want to Run Locally First?
+
+Continue below for pure local development without Kubernetes. This is great for:
+- Quick iteration on code
+- Understanding the architecture
+- Running workflows directly on your machine
+
+---
+
 ## Quick Start
 
 ### Prerequisites
@@ -466,6 +485,27 @@ temporal operator namespace list
 3. ✅ Observe workflows in Temporal UI at http://localhost:8233
 4. ✅ Modify a workflow and restart the worker
 5. ✅ Check metrics at http://localhost:8080/actuator/prometheus
+
+### Ready to Deploy to Kubernetes?
+
+Once you understand the local setup, deploy the full environment to KinD with one command:
+
+```bash
+# Full Kubernetes deployment with Temporal Cloud
+OVERLAY=cloud ./scripts/demo-up.sh
+
+# Or with local Temporal
+OVERLAY=local ./scripts/demo-up.sh
+
+# See DEPLOYMENT.md for full documentation
+```
+
+See **[DEPLOYMENT.md](DEPLOYMENT.md)** for:
+- Temporal Cloud API key setup
+- KinD cluster creation and management
+- API access via Traefik ingress
+- Multi-overlay deployments
+- Complete troubleshooting guide
 
 ## Resources
 

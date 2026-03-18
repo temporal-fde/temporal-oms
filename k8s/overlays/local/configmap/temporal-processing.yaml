@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: temporal-processing-config
+  namespace: temporal-oms-processing
+data:
+  temporal-config.yaml: |
+    spring.temporal.namespace: processing
+    spring.temporal.connection.target: host.docker.internal:7233

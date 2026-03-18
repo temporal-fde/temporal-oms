@@ -1,59 +1,18 @@
-# Processing Service Configuration
-spring:
-  application:
-    name: processing-service
+spring.config.import: classpath:acme.oms.yaml,classpath:acme.processing.yaml
+spring.application.name: processing-api
+spring.temporal.start-workers: false
 
-  profiles:
-    active: ${ENVIRONMENT:local}
-  temporal:
-
-    connection:
-      # Connection settings
-      target: ${TEMPORAL_ADDRESS:localhost:7233}
-
-      # API Key for Temporal Cloud
-      api-key: ${TEMPORAL_API_KEY:}
-
-    # Worker configuration
-    # Worker versioning
-    build-id: ${BUILD_ID:local-dev}
-    use-worker-versioning: true
-    start-workers: false
-    namespace: ${TEMPORAL_NAMESPACE:default}
+management.server.port: 9090
 
 server:
   port: 8081
-
-management:
-  server:
-    port: 9091  # Separate port for actuator
-  endpoints:
-    web:
-      exposure:
-        include: health,prometheus,info
-  metrics:
-    export:
-      prometheus:
-        enabled: true
 
 # Swagger/OpenAPI Configuration (MANDATORY per stack-api-rest)
 springdoc:
   api-docs:
     path: /v3/api-docs
-  swagger-ui:
-    path: /docs  # Swagger UI at /docs
-    operationsSorter: method
-    tagsSorter: alpha
+#  swagger-ui:
+#    path: /docs  # Swagger UI at /docs
+#    operationsSorter: method
+#    tagsSorter: alpha
   show-actuator: false
-
-# Nexus endpoints for cross-namespace communication
-nexus:
-  apps-endpoint: ${APPS_NEXUS_ENDPOINT:http://localhost:8080/nexus}
-  risk-endpoint: ${RISK_NEXUS_ENDPOINT:http://localhost:8082/nexus}
-  fulfillments-endpoint: ${FULFILLMENTS_NEXUS_ENDPOINT:http://localhost:8083/nexus}
-
-logging:
-  level:
-    root: INFO
-    com.acme: DEBUG
-    io.temporal: INFO

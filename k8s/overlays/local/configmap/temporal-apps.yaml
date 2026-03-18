@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: temporal-apps-config
+  namespace: temporal-oms-apps
+data:
+  temporal-config.yaml: |
+    spring.temporal.namespace: apps
+    spring.temporal.connection.target: host.docker.internal:7233

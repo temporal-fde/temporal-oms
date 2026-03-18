@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: temporal-processing-config
+  namespace: temporal-oms-processing
+data:
+  temporal-config.yaml: |
+    spring.temporal.namespace: fde-oms-processing.sdvdw
+    spring.temporal.connection.target: us-east-1.aws.api.temporal.io:7233
+    spring.temporal.connection.tls.enabled: true
+    spring.temporal.connection.tls.server-name: us-east-1.aws.api.temporal.io

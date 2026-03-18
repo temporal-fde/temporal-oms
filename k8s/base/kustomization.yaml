@@ -1,0 +1,57 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - namespaces/namespace.yaml
+  - apps/deployment-api.yaml
+  - apps/deployment-workers.yaml
+  - processing/deployment-api.yaml
+  - processing/deployment-workers.yaml
+  - temporal-cloud-service.yaml
+
+patchesStrategicMerge: []
+
+# ConfigMaps and Secrets will be patched by overlays
+configMapGenerator:
+  - name: temporal-oms-config
+    namespace: temporal-oms-apps
+    literals:
+      - ENVIRONMENT=local
+      - TEMPORAL_TLS_ENABLED=false
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector.opentelemetry-operator-system:4317
+      - OTEL_SERVICE_NAME=temporal-oms
+      - DB_PORT=5432
+      - DB_NAME=temporal_oms
+  - name: temporal-oms-config
+    namespace: temporal-oms-processing
+    literals:
+      - ENVIRONMENT=local
+      - TEMPORAL_TLS_ENABLED=false
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector.opentelemetry-operator-system:4317
+      - OTEL_SERVICE_NAME=temporal-oms
+      - DB_PORT=5432
+      - DB_NAME=temporal_oms
+
+secretGenerator:
+  - name: temporal-oms-secrets
+    namespace: temporal-oms-apps
+    literals:
+      - COMMERCE_API_KEY=dev-commerce-key-12345
+      - PAYMENTS_API_KEY=dev-payments-key-67890
+      - DB_USERNAME=temporal_oms
+      - DB_PASSWORD=temporal_oms_password
+      - STRIPE_API_KEY=sk_test_PLACEHOLDER
+      - STRIPE_WEBHOOK_SECRET=whsec_PLACEHOLDER
+      - OPENAI_API_KEY=sk-PLACEHOLDER
+      - ANTHROPIC_API_KEY=sk-ant-PLACEHOLDER
+  - name: temporal-oms-secrets
+    namespace: temporal-oms-processing
+    literals:
+      - COMMERCE_API_KEY=dev-commerce-key-12345
+      - PAYMENTS_API_KEY=dev-payments-key-67890
+      - DB_USERNAME=temporal_oms
+      - DB_PASSWORD=temporal_oms_password
+      - STRIPE_API_KEY=sk_test_PLACEHOLDER
+      - STRIPE_WEBHOOK_SECRET=whsec_PLACEHOLDER
+      - OPENAI_API_KEY=sk-PLACEHOLDER
+      - ANTHROPIC_API_KEY=sk-ant-PLACEHOLDER

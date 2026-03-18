@@ -46,6 +46,14 @@
             <artifactId>opentelemetry-sdk</artifactId>
         </dependency>
 
+        <!-- Swagger/OpenAPI Annotations -->
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations-jakarta</artifactId>
+            <version>2.2.42</version>
+            <scope>compile</scope>
+        </dependency>
+
         <!-- Jackson -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: processing-api
+  namespace: temporal-oms-processing
+  labels:
+    app: processing-api
+    component: api
+    namespace: processing
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: processing-api
+  template:
+    metadata:
+      labels:
+        app: processing-api
+        component: api
+        namespace: processing
+      annotations:
+        # OpenTelemetry auto-instrumentation
+        instrumentation.opentelemetry.io/inject-sdk: "true"
+    spec:
+      containers:
+      - name: api
+        image: temporal-oms/processing-api:latest
+        imagePullPolicy: Never  # For local Minikube builds
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        - containerPort: 9090
+          name: metrics
+          protocol: TCP
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: k8s
+        envFrom:
+        - configMapRef:
+            name: temporal-oms-config
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 9090
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 9090
+          initialDelaySeconds: 20
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - name: temporal-config
+          mountPath: /etc/config/temporal
+          readOnly: true
+        - name: temporal-secret
+          mountPath: /etc/config/temporal-secret
+          readOnly: true
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+      volumes:
+      - name: temporal-config
+        configMap:
+          name: temporal-processing-config
+          defaultMode: 0444
+      - name: temporal-secret
+        secret:
+          secretName: temporal-processing-api-key
+          defaultMode: 0444
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: processing-api
+  namespace: temporal-oms-processing
+  labels:
+    app: processing-api
+spec:
+  type: NodePort  # For Minikube access
+  selector:
+    app: processing-api
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  - port: 9090
+    targetPort: 9090
+    protocol: TCP
+    name: metrics

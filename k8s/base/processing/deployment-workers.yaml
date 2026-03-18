@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: processing-worker
+  namespace: temporal-oms-processing
+  labels:
+    app: processing-worker
+    component: worker
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: processing-worker
+  template:
+    metadata:
+      labels:
+        app: processing-worker
+        component: worker
+        version: "1.0.0"
+      annotations:
+        instrumentation.opentelemetry.io/inject-sdk: "true"
+    spec:
+      containers:
+      - name: worker
+        image: temporal-oms/processing-worker:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 9092
+          name: management
+          protocol: TCP
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: k8s
+        - name: JAVA_OPTS
+          value: "-Dio.grpc.netty.shaded.io.netty.util.NetUtil.ipv4Preferred=true -Dgrpc.netty.keepaliveTime=30 -Dgrpc.netty.keepaliveTimeout=5 -Dgrpc.netty.keepaliveWithoutCalls=true"
+        envFrom:
+        - configMapRef:
+            name: temporal-oms-config
+        - secretRef:
+            name: temporal-oms-secrets
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 9092
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 9092
+          initialDelaySeconds: 20
+          periodSeconds: 5
+        volumeMounts:
+        - name: temporal-config
+          mountPath: /etc/config/temporal
+          readOnly: true
+        - name: temporal-secret
+          mountPath: /etc/config/temporal-secret
+          readOnly: true
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
+      volumes:
+      - name: temporal-config
+        configMap:
+          name: temporal-processing-config
+          defaultMode: 0444
+      - name: temporal-secret
+        secret:
+          secretName: temporal-processing-api-key
+          defaultMode: 0444
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: processing-worker
+  namespace: temporal-oms-processing
+  labels:
+    app: processing-worker
+spec:
+  type: ClusterIP
+  selector:
+    app: processing-worker
+  ports:
+  - port: 9092
+    targetPort: 9092
+    protocol: TCP
+    name: management
