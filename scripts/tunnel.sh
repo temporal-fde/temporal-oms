@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export KUBECONFIG=/tmp/kind-config.yaml
+
 echo "🌉 Port-forwarding Traefik to localhost:8080..."
 echo "Apps API available at: http://localhost:8080/api"
 echo ""

@@ -2,6 +2,8 @@
 
 echo "🔌 Tearing down infrastructure..."
 
+export KUBECONFIG=/tmp/kind-config.yaml
+
 # Stop apps first
 echo "→ Stopping applications..."
 kubectl delete namespace temporal-oms-apps temporal-oms-processing 2>/dev/null || true
@@ -10,8 +12,8 @@ kubectl delete namespace temporal-oms-apps temporal-oms-processing 2>/dev/null |
 echo "→ Stopping Traefik..."
 kubectl delete namespace traefik 2>/dev/null || true
 
-# Stop Minikube
-echo "→ Stopping Minikube..."
-minikube stop
+# Delete KinD cluster
+echo "→ Deleting KinD cluster..."
+kind delete cluster --name temporal-oms 2>/dev/null || true
 
 echo "✅ Infrastructure stopped"

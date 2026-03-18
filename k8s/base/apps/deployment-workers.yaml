@@ -31,8 +31,6 @@ spec:
         env:
         - name: SPRING_PROFILES_ACTIVE
           value: k8s
-        - name: JAVA_OPTS
-          value: "-Dio.grpc.netty.shaded.io.netty.util.NetUtil.ipv4Preferred=true -Dgrpc.netty.keepaliveTime=30 -Dgrpc.netty.keepaliveTimeout=5 -Dgrpc.netty.keepaliveWithoutCalls=true"
         envFrom:
         - configMapRef:
             name: temporal-oms-config

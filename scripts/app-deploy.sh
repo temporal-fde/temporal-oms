@@ -4,6 +4,9 @@ set -e
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_DIR"
 
+# Configure kubectl for KinD
+export KUBECONFIG=/tmp/kind-config.yaml
+
 # Default to local overlay if not specified
 OVERLAY="${OVERLAY:-local}"
 
@@ -19,10 +22,8 @@ cd java/processing
 mvn clean package -DskipTests -q
 cd "$PROJECT_DIR"
 
-# Build Docker images in Minikube context
+# Build Docker images and load into KinD
 echo "→ Building Docker images..."
-eval $(minikube docker-env)
-
 docker build -q -t temporal-oms/apps-api:latest \
   -f java/apps/apps-api/docker/Dockerfile java/apps/apps-api
 
@@ -32,8 +33,14 @@ docker build -q -t temporal-oms/apps-worker:latest \
 docker build -q -t temporal-oms/processing-worker:latest \
   -f java/processing/processing-workers/docker/Dockerfile java/processing/processing-workers
 
+# Load images into KinD cluster
+echo "→ Loading images into KinD..."
+kind load docker-image temporal-oms/apps-api:latest --name temporal-oms
+kind load docker-image temporal-oms/apps-worker:latest --name temporal-oms
+kind load docker-image temporal-oms/processing-worker:latest --name temporal-oms
+
 # Deploy to Kubernetes
-echo "→ Deploying to Minikube..."
+echo "→ Deploying to KinD..."
 kubectl apply -k "k8s/overlays/${OVERLAY}" >/dev/null
 kubectl apply -f k8s/ingress/apps-api-ingress.yaml >/dev/null
 

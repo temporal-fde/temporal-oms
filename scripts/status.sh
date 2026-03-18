@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export KUBECONFIG=/tmp/kind-config.yaml
+
 echo "📊 Deployment Status"
 echo ""
 echo "Apps Namespace:"
@@ -18,9 +20,9 @@ else
 fi
 
 echo ""
-echo "Minikube:"
-if minikube status >/dev/null 2>&1; then
-    echo "  ✓ $(minikube status | grep "minikube:" | awk '{print $2}')"
+echo "KinD Cluster:"
+if kind get clusters 2>/dev/null | grep -q temporal-oms; then
+    echo "  ✓ temporal-oms (running)"
 else
     echo "  ✗ Not running"
 fi

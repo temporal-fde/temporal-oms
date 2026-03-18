@@ -6,23 +6,21 @@ cd "$PROJECT_DIR"
 
 echo "🔧 Setting up infrastructure..."
 
-# Start Minikube
-if ! minikube status &>/dev/null; then
-    echo "→ Starting Minikube (4GB RAM, 4 CPUs)..."
-    minikube start --memory 4096 --cpus 4
+# Create KinD cluster
+if ! kind get clusters 2>/dev/null | grep -q temporal-oms; then
+    echo "→ Creating KinD cluster (temporal-oms)..."
+    kind create cluster --name temporal-oms
+    kind get kubeconfig --name temporal-oms > /tmp/kind-config.yaml
+    export KUBECONFIG=/tmp/kind-config.yaml
 else
-    echo "✓ Minikube already running"
+    echo "✓ KinD cluster (temporal-oms) already exists"
+    export KUBECONFIG=/tmp/kind-config.yaml
 fi
 
 # Create namespaces
 echo "→ Creating Kubernetes namespaces..."
 kubectl create namespace temporal-oms-apps --dry-run=client -o yaml | kubectl apply -f - >/dev/null
 kubectl create namespace temporal-oms-processing --dry-run=client -o yaml | kubectl apply -f - >/dev/null
-
-# Create base secrets (empty for local, will be overridden by app-deploy)
-echo "→ Creating secrets..."
-kubectl create secret generic temporal-secrets -n temporal-oms-apps --from-literal=temporal-secret.yaml="" --dry-run=client -o yaml | kubectl apply -f - >/dev/null
-kubectl create secret generic temporal-secrets -n temporal-oms-processing --from-literal=temporal-secret.yaml="" --dry-run=client -o yaml | kubectl apply -f - >/dev/null
 
 # Install Traefik Ingress Controller
 echo "→ Installing Traefik Ingress..."

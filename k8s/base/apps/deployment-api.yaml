@@ -36,8 +36,6 @@ spec:
         env:
         - name: SPRING_PROFILES_ACTIVE
           value: k8s
-        - name: JAVA_OPTS
-          value: "-Dio.grpc.netty.shaded.io.netty.util.NetUtil.ipv4Preferred=true -Dgrpc.netty.keepaliveTime=30 -Dgrpc.netty.keepaliveTimeout=5 -Dgrpc.netty.keepaliveWithoutCalls=true"
         envFrom:
         - configMapRef:
             name: temporal-oms-config
@@ -61,9 +59,6 @@ spec:
         - name: temporal-config
           mountPath: /etc/config/temporal
           readOnly: true
-        - name: temporal-secrets
-          mountPath: /etc/config/secrets/temporal
-          readOnly: true
         - name: temporal-secret
           mountPath: /etc/config/temporal-secret
           readOnly: true
@@ -78,10 +73,6 @@ spec:
       - name: temporal-config
         configMap:
           name: temporal-apps-config
-          defaultMode: 0444
-      - name: temporal-secrets
-        secret:
-          secretName: temporal-secrets
           defaultMode: 0444
       - name: temporal-secret
         secret:
