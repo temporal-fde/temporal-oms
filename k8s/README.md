@@ -1,6 +1,6 @@
 # Kubernetes Deployment with Kustomize
 
-This directory contains a Kustomize-based deployment structure that supports both local (Minikube) and cloud (Temporal Cloud) environments.
+This directory contains a Kustomize-based deployment structure that supports both local (Temporal server on localhost) and cloud (Temporal Cloud) environments, deployed to KinD (Kubernetes in Docker).
 
 ## Directory Structure
 
@@ -11,45 +11,57 @@ k8s/
 │   ├── apps/
 │   └── processing/
 ├── overlays/
-│   ├── local/                     # Local Minikube configuration
-│   │   ├── configmap/             # Temporal connection: localhost:7233
-│   │   ├── secrets/               # Temporal API key for local
+│   ├── local/                     # Local Temporal configuration
+│   │   ├── configmap/             # Temporal connection: host.docker.internal:7233
+│   │   ├── secrets/               # Temporal API key stub for local
 │   │   └── kustomization.yaml
-│   └── cloud/                     # Cloud Temporal configuration
-│       ├── configmap/             # Temporal connection: cloud address
-│       ├── secrets/               # Temporal API key for cloud
+│   └── cloud/                     # Temporal Cloud configuration
+│       ├── configmap/             # Temporal connection: Temporal Cloud address
+│       ├── secrets/               # Temporal API key from Temporal Cloud
 │       └── kustomization.yaml
 ```
 
-## Usage
+## Quick Start
 
-### Deploy to Local Minikube
+For complete deployment instructions including API key setup, prerequisites, and troubleshooting, see [../DEPLOYMENT.md](../DEPLOYMENT.md).
+
+### Deploy to Local Temporal (localhost:7233)
 
 ```bash
-kubectl apply -k k8s/overlays/local
+# 1. Start local Temporal server
+temporal server start-dev &
+
+# 2. Deploy to KinD
+OVERLAY=local ./scripts/demo-up.sh
+
+# 3. Verify
+./scripts/status.sh
 ```
 
 **Deployment details:**
+- Kubernetes: KinD cluster named `temporal-oms`
 - Namespaces: `temporal-oms-apps`, `temporal-oms-processing`
 - Temporal namespaces: `apps`, `processing`
-- Temporal address: `temporal-frontend.temporal.svc.cluster.local:7233` → localhost:7233
+- Temporal connection: `host.docker.internal:7233` (reaches host's localhost)
 
-### Deploy to Cloud
+### Deploy to Temporal Cloud
 
-**Before deploying:**
-1. Update `k8s/overlays/cloud/configmap/temporal-apps.yaml` — replace `<TEMPORAL_CLOUD_HOST>`
-2. Update `k8s/overlays/cloud/configmap/temporal-processing.yaml` — replace `<TEMPORAL_CLOUD_HOST>`
-3. Update `k8s/overlays/cloud/secrets/temporal-api-key.yaml` — replace `<YOUR_TEMPORAL_CLOUD_API_KEY>`
-
-**Then deploy:**
 ```bash
-kubectl apply -k k8s/overlays/cloud
+# 1. Configure API keys
+# See DEPLOYMENT.md for detailed Temporal Cloud API key setup
+
+# 2. Deploy to KinD
+OVERLAY=cloud ./scripts/demo-up.sh
+
+# 3. Verify
+./scripts/status.sh
 ```
 
 **Deployment details:**
+- Kubernetes: KinD cluster named `temporal-oms`
 - Namespaces: `temporal-oms-apps`, `temporal-oms-processing`
-- Temporal namespaces: `fde-oms-apps.sdvdw`, `fde-oms-processing.sdvdw`
-- Temporal address: Your Temporal Cloud host
+- Temporal connection: `us-east-1.aws.api.temporal.io:7233` (or your Temporal Cloud host)
+- TLS: Enabled with API key authentication
 
 ## How Configuration Works
 
@@ -62,73 +74,91 @@ kubectl apply -k k8s/overlays/cloud
 2. **Temporal config** (ConfigMap from overlay)
    - Temporal namespace name
    - Temporal connection target (host:port)
+   - TLS settings
    - **Non-sensitive, environment-specific**
 
 3. **Temporal secret** (Secret from overlay)
-   - Temporal API key
+   - Temporal API key (Temporal Cloud only)
    - **Sensitive data only**
 
-Later sources override earlier ones. Both overlay configs mounted at:
+Later sources override earlier ones. Overlay configs are mounted at:
 - ConfigMap: `/etc/config/temporal/temporal-config.yaml`
 - Secret: `/etc/config/temporal-secret/temporal-secret.yaml`
 
-## Local Minikube Setup
+These are imported via Spring profile `k8s` which activates `application-k8s.yaml` (only when running in Kubernetes).
 
-To run with Temporal on your localhost:
+## Configuration Overlays
 
-1. **Start Temporal locally**
-   ```bash
-   temporal server start-dev
-   ```
+### Local Overlay (host.docker.internal)
 
-2. **Create namespaces** (if needed)
-   ```bash
-   temporal operator namespace create apps
-   temporal operator namespace create processing
-   ```
+```yaml
+# k8s/overlays/local/configmap/temporal-apps.yaml
+spring:
+  temporal:
+    namespace: apps
+    connection:
+      target: host.docker.internal:7233
+      tls:
+        enabled: false
+```
 
-3. **Create bridge service** (already done)
-   ```bash
-   kubectl create namespace temporal
-   kubectl apply -f k8s/overlays/local/temporal-bridge-service.yaml
-   ```
+Connects directly to your machine's localhost:7233 via KinD's `host.docker.internal` network alias.
 
-4. **Deploy workers**
-   ```bash
-   kubectl apply -k k8s/overlays/local
-   ```
+### Cloud Overlay (Temporal Cloud)
 
-The ExternalName Service routes `temporal-frontend.temporal.svc.cluster.local:7233` → `host.docker.internal:7233` → your host's localhost:7233.
+```yaml
+# k8s/overlays/cloud/configmap/temporal-apps.yaml
+spring:
+  temporal:
+    namespace: fde-oms-apps.account-id
+    connection:
+      target: us-east-1.aws.api.temporal.io:7233
+      tls-server-name: us-east-1.aws.api.temporal.io
+      tls:
+        enabled: true
+```
+
+API key loaded from Kubernetes Secret (not shown here for security).
 
 ## Updating Configuration
 
 ### Local changes
-Edit `k8s/overlays/local/configmap/temporal-*.yaml`, then:
+Edit `k8s/overlays/local/configmap/temporal-*.yaml`, then redeploy:
 ```bash
-kubectl apply -k k8s/overlays/local
+OVERLAY=local ./scripts/app-deploy.sh
 ```
 
 ### Cloud changes
-Edit `k8s/overlays/cloud/configmap/temporal-*.yaml` or `k8s/overlays/cloud/secrets/temporal-api-key.yaml`, then:
+1. Update API keys in secret files: `k8s/overlays/cloud/secrets/temporal-*-api-key.yaml`
+2. Update ConfigMap: `k8s/overlays/cloud/configmap/temporal-*.yaml`
+3. Redeploy:
 ```bash
-kubectl apply -k k8s/overlays/cloud
+OVERLAY=cloud ./scripts/app-deploy.sh
 ```
 
 ## Troubleshooting
 
 **Workers can't connect to Temporal:**
 ```bash
-# Check service
-kubectl get svc -n temporal
+# Check pod logs
+kubectl logs -n temporal-oms-apps -l app=apps-worker
 
 # Check mounted config
 kubectl exec -it <pod-name> -n temporal-oms-apps -- cat /etc/config/temporal/temporal-config.yaml
 
-# Check logs
-kubectl logs -n temporal-oms-apps -l app=apps-worker
+# Verify KinD cluster is running
+kind get clusters
+kubectl get pods -A
 ```
 
-**Config not merging:**
-- Verify `spring.config.import` in `application.yaml`
-- Check that files mount to correct paths
-- Review Spring Boot startup logs
+**Connection refused errors:**
+- **For local overlay**: Ensure `temporal server start-dev` is running on your host
+- **For cloud overlay**: Verify API key is correct and TLS is enabled
+
+**TLS handshake failures:**
+- Check that `tls.enabled: true` is set in cloud overlay
+- Verify `tls-server-name` matches the connection target hostname
+- Check API key format is valid JWT token
+
+**For more troubleshooting:**
+See [../DEPLOYMENT.md](../DEPLOYMENT.md) — Troubleshooting section

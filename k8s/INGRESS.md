@@ -1,18 +1,18 @@
 # Apps API Ingress Setup
 
-The apps-api service is exposed via Traefik ingress controller, making it accessible from your local machine.
+The apps-api service is exposed via Traefik ingress controller running in your KinD cluster, making it accessible from your local machine.
 
 ## Quick Start
 
 ```bash
-# Full setup with ingress
+# Full setup with KinD cluster and ingress
 ./scripts/demo-up.sh
 
-# In a new terminal, port-forward Traefik
+# In a new terminal, port-forward Traefik to localhost:8080
 ./scripts/tunnel.sh
 
 # Now you can access the API
-curl http://localhost:8080/api/health
+curl http://localhost:8080/api/actuator/health
 ```
 
 ## Access Methods
@@ -20,11 +20,12 @@ curl http://localhost:8080/api/health
 ### Method 1: Port-Forward (Recommended for local demo)
 
 ```bash
+export KUBECONFIG=/tmp/kind-config.yaml
 ./scripts/tunnel.sh
 # API available at: http://localhost:8080/api
 ```
 
-This is the simplest method. Traefik will be port-forwarded to `localhost:8080`.
+This is the simplest method for local development. Traefik's ingress controller will be port-forwarded to your `localhost:8080`.
 
 ### Method 2: Using api.local Hostname
 
@@ -33,44 +34,34 @@ Add to your `/etc/hosts`:
 echo "127.0.0.1 api.local" >> /etc/hosts
 ```
 
-Then access via:
+Then with port-forwarding running:
 ```bash
-curl http://api.local/
-# Note: requires port-forwarding or minikube tunnel
-```
-
-### Method 3: Direct Minikube IP (Advanced)
-
-Get the Traefik external IP:
-```bash
-kubectl get svc -n traefik traefik
-```
-
-Access via the external IP:
-```bash
-curl http://<TRAEFIK_IP>/api
+curl http://api.local/api/actuator/health
 ```
 
 ## API Endpoints
 
-Apps API runs on port 8080 (HTTP) and 9090 (metrics). Via Traefik:
+Apps API runs on port 8080 (HTTP) and 9090 (metrics) within the cluster. Via Traefik ingress:
 
 - **Main API**: `http://localhost:8080/api/*`
 - **Health check**: `http://localhost:8080/api/actuator/health`
 - **Metrics**: `http://localhost:8080/api/actuator/prometheus`
 - **OpenAPI**: `http://localhost:8080/api/v3/api-docs`
+- **Swagger UI**: `http://localhost:8080/api/docs`
 
-## Routing Rules
+## Routing Configuration
 
-Two ingress paths are configured:
+The Traefik ingress is configured with a path-based rule:
 
-1. **Host-based**: `api.local` → `/` (any path)
-2. **Path-based**: `localhost` → `/api` prefix
+- **Rule**: Any request to `/api*` is routed to the apps-api service
+- **Service**: `apps-api` in `temporal-oms-apps` namespace
+- **Port**: 8080
 
-So these all work:
+Example requests:
 ```bash
 curl http://localhost:8080/api/actuator/health
-curl http://api.local/actuator/health  (with hosts entry)
+curl http://localhost:8080/api/v1/commerce-app/clothing
+curl http://localhost:8080/api/actuator/prometheus
 ```
 
 ## Testing the API
@@ -87,30 +78,48 @@ curl http://localhost:8080/api/actuator/prometheus
 
 # OpenAPI spec
 curl http://localhost:8080/api/v3/api-docs | jq
+
+# Sample domain endpoint
+curl http://localhost:8080/api/v1/commerce-app/clothing
 ```
 
 ## Troubleshooting
 
-**Cannot reach API:**
+**Cannot reach API (connection refused):**
 ```bash
-# Check tunnel is running
+# Make sure tunnel.sh is running in another terminal
 ./scripts/tunnel.sh
 
 # Check Traefik pods
+export KUBECONFIG=/tmp/kind-config.yaml
 kubectl get pods -n traefik
 
 # Check Ingress is created
 kubectl get ingress -n temporal-oms-apps
 ```
 
-**Check Ingress status:**
+**Cannot reach API (504 Bad Gateway):**
 ```bash
+# Check that apps-api pods are running
+kubectl get pods -n temporal-oms-apps -l app=apps-api
+
+# Check apps-api service endpoints
+kubectl get endpoints -n temporal-oms-apps apps-api
+
+# Check Ingress routing
 kubectl describe ingress apps-api -n temporal-oms-apps
 ```
 
-**View Traefik logs:**
+**View Traefik logs for debugging:**
 ```bash
+export KUBECONFIG=/tmp/kind-config.yaml
 kubectl logs -n traefik -l app.kubernetes.io/name=traefik -f
+```
+
+**View apps-api logs:**
+```bash
+export KUBECONFIG=/tmp/kind-config.yaml
+kubectl logs -n temporal-oms-apps -l app=apps-api --tail=50
 ```
 
 ## Cleanup
@@ -120,7 +129,4 @@ Ingress is torn down with the rest of the demo:
 ./scripts/demo-down.sh
 ```
 
-Or just remove Traefik:
-```bash
-./scripts/ingress-down.sh
-```
+This removes the entire KinD cluster including all services, ingress, and pods.

@@ -1,500 +1,505 @@
-# Temporal OMS - Minikube Deployment Guide
+# Temporal OMS - Deployment Guide
 
-> WIP - Not yet ready 
+This guide covers deploying the Temporal OMS application to **KinD (Kubernetes in Docker)** or **running locally** without Kubernetes.
+
+## Quick Start
+
+### Option 1: Deploy to KinD with Cloud Temporal
+
+```bash
+# Ensure Temporal Cloud credentials are set up (see below)
+OVERLAY=cloud ./scripts/demo-up.sh
+
+# Check status
+./scripts/status.sh
+
+# Port-forward API access (in another terminal)
+./scripts/tunnel.sh
+
+# Test the API
+curl http://localhost:8080/api/v1/commerce-app/clothing
+
+# Tear down
+./scripts/demo-down.sh
+```
+
+### Option 2: Deploy to KinD with Local Temporal
+
+```bash
+# Start your local Temporal server first (on port 7233)
+temporal server start-dev &
+
+# Deploy with local overlay
+OVERLAY=local ./scripts/demo-up.sh
+
+# Check status
+./scripts/status.sh
+
+# Port-forward API access
+./scripts/tunnel.sh
+
+# Tear down
+./scripts/demo-down.sh
+```
+
+### Option 3: Run Everything Locally (No Kubernetes)
+
+```bash
+# Start Temporal server
+temporal server start-dev &
+
+# In another terminal, build and run the apps
+cd java/apps
+mvn spring-boot:run
+
+# Test
+curl http://localhost:8080/api/v1/commerce-app/clothing
+```
+
+---
 
 ## Prerequisites
 
-### Install Required Tools
+### Required Tools
+
+Install using asdf (recommended) or your preferred package manager:
 
 ```bash
-# Minikube
-brew install minikube
+# Using asdf
+asdf plugin add java https://github.com/halcyon/asdf-java.git
+asdf plugin add maven https://github.com/asdf-community/asdf-maven.git
+asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git
+asdf plugin add kind https://github.com/johnlayton/asdf-kind.git
 
-# kubectl
-brew install kubectl
+# Install versions from .tool-versions
+asdf install
 
-# Helm
-brew install helm
-
-# Docker Desktop (already installed)
+# Or install manually
+brew install java maven nodejs kind kubectl
 ```
 
-## Setup Steps
+### System Resources
 
-### 1. Install Cert-Manager
+- **Minikube alternative**: Using KinD requires Docker, which is more lightweight than Minikube
+- **Memory**: 4GB minimum (8GB recommended)
+- **Disk**: 5GB free space
+
+---
+
+## Setup Instructions
+
+### 1. Temporal Cloud API Key Setup
+
+If deploying to **Temporal Cloud** (OVERLAY=cloud):
+
+#### Step 1a: Get Your API Key
+
+1. Log in to [Temporal Cloud Console](https://cloud.temporal.io)
+2. Navigate to **Settings → API Keys**
+3. Create or copy your API key (JWT format)
+4. Note your Namespace and Account ID
+
+#### Step 1b: Configure Temporal CLI
 
 ```bash
-# Install cert-manager (required by OpenTelemetry Operator)
-kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.0/cert-manager.yaml
+# Get your cloud environment configuration
+temporal env get --env your-env-name
 
-# Wait for cert-manager to be ready
-kubectl wait --for=condition=ready pod -l app.kubernetes.io/instance=cert-manager -n cert-manager --timeout=5m
+# This shows:
+# - address: us-east-1.aws.api.temporal.io:7233 (or your region)
+# - namespace: your-namespace.account-id
+# - api-key: eyJhbGc... (JWT token)
 ```
 
-### 2. Start Minikube
+#### Step 1c: Store API Key in Secret Template
+
+Create/update `k8s/overlays/cloud/secrets/temporal-apps-api-key.yaml`:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: temporal-apps-api-key
+  namespace: temporal-oms-apps
+type: Opaque
+stringData:
+  temporal-secret.yaml: |
+    spring.temporal.connection.api-key: "eyJhbGc..."
+```
+
+Create/update `k8s/overlays/cloud/secrets/temporal-processing-api-key.yaml`:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: temporal-processing-api-key
+  namespace: temporal-oms-processing
+type: Opaque
+stringData:
+  temporal-secret.yaml: |
+    spring.temporal.connection.api-key: "eyJhbGc..."
+```
+
+**Important:** These files contain secrets and should NOT be committed to git. They're already in `.gitignore`.
+
+#### Step 1d: Verify Cloud Configuration
 
 ```bash
-# Start with sufficient resources
-minikube start --cpus=4 --memory=8192 --driver=docker
+# Test connection to Temporal Cloud from your machine
+temporal workflow list --env your-env-name
 
-# Verify cluster is running
-kubectl cluster-info
-kubectl get nodes
+# This should show your workflows (even if empty)
 ```
 
-### 3. Install OpenTelemetry Operator
+### 2. Local Temporal Setup (Optional)
+
+If deploying to **local Temporal** (OVERLAY=local):
 
 ```bash
-# Add OpenTelemetry Operator repo
-helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts
-helm repo update
+# Install Temporal CLI (if not already installed)
+brew install temporal
 
-# Install OpenTelemetry Operator
-kubectl create namespace opentelemetry-operator-system
+# Start local Temporal server (in background or separate terminal)
+temporal server start-dev
 
-helm install opentelemetry-operator \
-  open-telemetry/opentelemetry-operator \
-  --namespace opentelemetry-operator-system \
-  --set manager.collectorImage.repository=otel/opentelemetry-collector-k8s
+# Verify it's running
+temporal workflow list
+
+# Note: Runs on localhost:7233 by default
 ```
 
-**Verify installation:**
-```bash
-kubectl get pods -n opentelemetry-operator-system
-```
+No additional configuration needed for local overlay - it's configured in `k8s/overlays/local/configmap/`.
 
-### 4. Install Temporal Worker Controller
+### 3. Build and Deploy to KinD
+
+#### Step 3a: Deploy Complete Environment
 
 ```bash
-# Create namespace for temporal-worker-controller
-kubectl create namespace temporal-worker-controller-system
+# For Temporal Cloud deployment
+OVERLAY=cloud ./scripts/demo-up.sh
 
-# Install via Helm
-helm install temporal-worker-controller \
-  oci://docker.io/temporalio/temporal-worker-controller \
-  --namespace temporal-worker-controller-system
-
-# Verify installation
-kubectl get pods -n temporal-worker-controller-system
-kubectl get crd | grep temporal
+# OR for Local Temporal deployment
+OVERLAY=local ./scripts/demo-up.sh
 ```
 
-**Expected CRDs:**
-- `temporalconnections.temporal.io`
-- `temporalworkerdeployments.temporal.io`
+This script:
+1. Creates KinD cluster (if not exists)
+2. Builds Docker images
+3. Loads images into KinD
+4. Creates namespaces
+5. Installs Traefik ingress
+6. Deploys applications with ConfigMaps and Secrets
 
-### 5. Install Temporal Server
+#### Step 3b: Verify Deployment
 
 ```bash
-# Add Temporal Helm repo
-helm repo add temporalio https://go.temporal.io/helm-charts
-helm repo update
+# Check all pods are running
+./scripts/status.sh
 
-# Create temporal namespace
-kubectl create namespace temporal
-
-# Install Temporal
-helm install temporal temporalio/temporal \
-  --namespace temporal \
-  --set server.replicaCount=1 \
-  --set cassandra.config.cluster_size=1 \
-  --set prometheus.enabled=true \
-  --set grafana.enabled=true \
-  --set web.enabled=true
+# Should show:
+# - apps-api: Running (2 replicas)
+# - apps-worker: Running (2 replicas)
+# - processing-worker: Running (2 replicas)
+# - KinD cluster: temporal-oms (running)
 ```
 
-**Wait for Temporal to be ready:**
-```bash
-kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=temporal -n temporal --timeout=5m
-```
-
-### 6. Create Temporal Namespaces
+#### Step 3c: Access the API
 
 ```bash
-# Port-forward to Temporal frontend
-kubectl port-forward -n temporal svc/temporal-frontend 7233:7233 &
+# In one terminal, port-forward
+./scripts/tunnel.sh
 
-# Create namespaces using Temporal CLI
-temporal operator namespace create apps
-temporal operator namespace create processing
-temporal operator namespace create risk
-temporal operator namespace create fulfillments
+# In another terminal, test the API
+curl http://localhost:8080/api/v1/commerce-app/clothing
 
-# Verify namespaces
-temporal operator namespace list
+# Or visit Swagger UI
+open http://localhost:8080/api/docs
 ```
 
-### 7. Build Docker Images
+---
 
+## Configuration Details
+
+### Environment Overlays
+
+#### Local Overlay (OVERLAY=local)
+
+- **Temporal Target**: `host.docker.internal:7233`
+- **API Key**: Not required (empty)
+- **TLS**: Disabled
+- **Use Case**: Local development with localhost Temporal
+
+**Config Files:**
+- `k8s/overlays/local/configmap/temporal-apps.yaml`
+- `k8s/overlays/local/configmap/temporal-processing.yaml`
+- `k8s/overlays/local/secrets/temporal-apps-api-key.yaml` (empty stub)
+
+#### Cloud Overlay (OVERLAY=cloud)
+
+- **Temporal Target**: `us-east-1.aws.api.temporal.io:7233` (or your region)
+- **API Key**: Required (from Temporal Cloud)
+- **TLS**: Enabled
+- **Namespace**: Your Temporal Cloud namespace (e.g., `fde-oms-apps.account-id`)
+
+**Config Files:**
+- `k8s/overlays/cloud/configmap/temporal-apps.yaml`
+- `k8s/overlays/cloud/configmap/temporal-processing.yaml`
+- `k8s/overlays/cloud/secrets/temporal-apps-api-key.yaml` (contains JWT)
+- `k8s/overlays/cloud/secrets/temporal-processing-api-key.yaml` (contains JWT)
+
+### Spring Boot Configuration
+
+The applications use Spring profiles to load configuration:
+
+1. **application.yaml** (classpath): Base configuration
+2. **application-k8s.yaml** (classpath): Kubernetes-specific imports
+3. **Mounted ConfigMap**: `temporal-config.yaml` at `/etc/config/temporal/`
+4. **Mounted Secret**: `temporal-secret.yaml` at `/etc/config/temporal-secret/`
+
+Environment variable:
 ```bash
-# Use Minikube's Docker daemon
-eval $(minikube docker-env)
-
-# Build apps-api image
-cd java
-mvn clean package -pl apps
-docker build -t temporal-oms/apps-api:latest -f apps/docker/Dockerfile.api apps/
-
-# Build apps-worker image
-docker build -t temporal-oms/apps-worker:latest -f apps/docker/Dockerfile.worker apps/
-
-# Build processing-worker image
-mvn clean package -pl processing
-docker build -t temporal-oms/processing-worker:latest -f processing/docker/Dockerfile processing/
-
-# Verify images
-docker images | grep temporal-oms
+SPRING_PROFILES_ACTIVE=k8s  # Activates k8s profile
 ```
 
-### 7.1 Configure Secrets (Local Development)
+This ensures configuration files are only imported when running in Kubernetes, not during local development.
 
-Before deploying, set up your local secret files:
-
-```bash
-cd ../../  # Back to project root
-
-# Copy secret templates to create local files
-cp config/temporal.secret.template.yaml config/temporal.secret.yaml
-
-# Edit and fill in actual values
-# For local Minikube: can use placeholder values
-vim config/temporal.secret.yaml
-
-# Verify files were created and are ignored by git
-ls -la config/*.secret.yaml
-git status  # Should not show .secret.yaml files
-```
-
-**For Kubernetes deployment,** populate the K8s secret manifests:
-
-```bash
-# Generate base64-encoded content for temporal secrets
-base64 -i config/temporal.secret.yaml | pbcopy
-
-# Edit the manifest and paste into the data section
-vim k8s/secrets/temporal-secrets.yaml
-
-# Note: Use .gitignore'd populated manifests locally,
-# not the .template versions
-```
-
-### 8. Deploy Application
-
-```bash
-# Create namespaces
-kubectl apply -f k8s/namespace.yaml
-
-# Create ConfigMaps (one per namespace)
-kubectl apply -f k8s/configmap.yaml
-
-# Apply K8s Secret objects (from populated manifests)
-kubectl apply -f k8s/secrets/temporal-secrets.yaml
-kubectl apply -f k8s/secrets/acme-apps-secret.yaml
-kubectl apply -f k8s/secrets/acme-processing-secret.yaml
-
-# Deploy Apps service (API + Worker) in temporal-oms-apps namespace
-kubectl apply -f k8s/apps/deployment-api.yaml
-kubectl apply -f k8s/apps/temporal-worker.yaml
-
-# Deploy Processing worker in temporal-oms-processing namespace
-kubectl apply -f k8s/processing/temporal-worker.yaml
-```
-
-### 9. Verify Deployment
-
-```bash
-# Check all pods in both namespaces
-kubectl get pods -n temporal-oms-apps
-kubectl get pods -n temporal-oms-processing
-
-# Check TemporalWorkerDeployment CRDs
-kubectl get temporalworkerdeployments -n temporal-oms-apps
-kubectl get temporalworkerdeployments -n temporal-oms-processing
-
-# Check logs
-kubectl logs -n temporal-oms-apps -l app=apps-api
-kubectl logs -n temporal-oms-apps -l app=apps-worker
-kubectl logs -n temporal-oms-processing -l app=processing-worker
-
-# Verify secrets are mounted (infrastructure validation only)
-POD=$(kubectl get pods -n temporal-oms-apps -l app=apps-api -o jsonpath='{.items[0].metadata.name}')
-kubectl exec -it $POD -n temporal-oms-apps -- ls -la /etc/config/secrets/
-kubectl exec -it $POD -n temporal-oms-apps -- head -3 /etc/config/secrets/acme/acme.apps.secret.yaml
-
-# Verify K8s Secrets exist
-kubectl get secrets -n temporal-oms-apps
-kubectl get secrets -n temporal-oms-processing
-```
-
-**Note:** The verification above only checks that files are mounted. Application-specific integration testing (how each language loads and uses the secrets) is deferred to component-specific specs.
-
-## Accessing Services
-
-### API Swagger UI
-
-```bash
-# Get API URL
-minikube service apps-api -n temporal-oms-apps --url
-
-# Or use port-forward
-kubectl port-forward -n temporal-oms-apps svc/apps-api 8080:80
-
-# Access Swagger UI (MANDATORY per stack-api-rest)
-open http://localhost:8080/docs
-```
-
-### Temporal UI
-
-```bash
-# Port-forward to Temporal UI
-kubectl port-forward -n temporal svc/temporal-web 8233:8233
-
-# Access Temporal UI
-open http://localhost:8233
-```
-
-## Worker Versioning Workflow
-
-### Initial Deployment (v1.0.0)
-
-Already deployed above with buildId "1.0.0"
-
-### Rolling Update to v1.1.0
-
-```bash
-# 1. Build new images with updated code
-eval $(minikube docker-env)
-cd java
-mvn clean package -pl apps
-docker build -t temporal-oms/apps-worker:1.1.0 -f apps/docker/Dockerfile.worker apps/
-
-# 2. Update buildId in worker manifests
-# Edit k8s/apps/temporal-worker.yaml:
-#   spec.buildId: "1.1.0"
-#   template.metadata.labels.version: "1.1.0"
-#   template.spec.containers[0].env BUILD_ID: "1.1.0"
-
-# 3. Apply update
-kubectl apply -f k8s/apps/temporal-worker.yaml
-
-# 4. Watch rollout
-kubectl get temporalworkerdeployments -n temporal-oms -w
-
-# The Temporal Worker Controller will:
-# - Start new workers with buildId "1.1.0"
-# - Register new version with Temporal
-# - New workflows use v1.1.0
-# - Existing workflows continue on v1.0.0
-# - Gradually drain v1.0.0 workers
-```
-
-### Check Worker Versions
-
-```bash
-# Via Temporal CLI
-temporal task-queue describe --task-queue apps
-
-# Via Temporal UI
-# Navigate to: Workflows -> Task Queues -> apps
-```
+---
 
 ## Development Workflow
 
-### Make Code Changes
+### Making Code Changes
 
 ```bash
-# 1. Edit Java code
-vim java/apps/src/main/java/com/acme/apps/workflows/OrderImpl.java
+# 1. Edit code
+vim java/apps/src/main/java/com/acme/apps/...
 
-# 2. Rebuild
-cd java
-mvn clean package -pl apps
+# 2. Redeploy (rebuilds images and restarts pods)
+OVERLAY=cloud ./scripts/app-deploy.sh
 
-# 3. Rebuild Docker image
-eval $(minikube docker-env)
-docker build -t temporal-oms/apps-worker:latest -f apps/docker/Dockerfile.worker apps/
+# 3. Check status
+./scripts/status.sh
 
-# 4. Restart workers (triggers new deployment)
-kubectl rollout restart temporalworkerdeployment/apps-worker -n temporal-oms-apps
+# 4. View logs
+export KUBECONFIG=/tmp/kind-config.yaml
+kubectl logs -n temporal-oms-apps -l app=apps-worker --tail=50
+```
 
-# 5. Watch rollout
-kubectl rollout status temporalworkerdeployment/apps-worker -n temporal-oms-apps
+### Debugging
+
+```bash
+# Enable KUBECONFIG for all commands
+export KUBECONFIG=/tmp/kind-config.yaml
+
+# Check all pods and their status
+kubectl get pods -A
+
+# View logs from all pods
+export KUBECONFIG=/tmp/kind-config.yaml
+for pod in $(kubectl get pods -n temporal-oms-apps -o name); do
+  echo "=== $pod ===" && \
+  kubectl logs -n temporal-oms-apps $pod --tail=30
+done
+
+# Shell into a pod
+kubectl exec -it -n temporal-oms-apps <pod-name> -- /bin/bash
+
+# Check mounted secrets
+kubectl exec -n temporal-oms-apps <pod-name> -- cat /etc/config/temporal-secret/temporal-secret.yaml
+```
+
+---
+
+## Running Locally (Without Kubernetes)
+
+For local development without Kubernetes:
+
+```bash
+# Terminal 1: Start Temporal
+temporal server start-dev
+
+# Terminal 2: Start apps-api
+cd java/apps/apps-api
+mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=local"
+
+# Terminal 3: Start apps-workers
+cd java/apps/apps-workers
+mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=local"
+
+# Terminal 4: Start processing-workers
+cd java/processing/processing-workers
+mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=local"
+
+# Terminal 5: Test the API
+curl http://localhost:8080/api/v1/commerce-app/clothing
+```
+
+**Notes:**
+- Each service runs on its configured port (apps-api: 8080, workers: internal only)
+- No configuration mounting needed - classpath configuration is used
+- Logs appear in the terminal where you started each service
+
+---
+
+## Common Commands
+
+### Check Cluster Status
+
+```bash
+./scripts/status.sh
+```
+
+### Redeploy Applications (keep cluster running)
+
+```bash
+OVERLAY=cloud ./scripts/app-deploy.sh
+```
+
+### Full Teardown and Restart
+
+```bash
+./scripts/demo-down.sh
+sleep 5
+OVERLAY=cloud ./scripts/demo-up.sh
 ```
 
 ### View Logs
 
 ```bash
-# API logs
-kubectl logs -f -n temporal-oms-apps -l app=apps-api
+export KUBECONFIG=/tmp/kind-config.yaml
 
-# Apps worker logs
-kubectl logs -f -n temporal-oms-apps -l app=apps-worker
+# Apps API
+kubectl logs -n temporal-oms-apps -l app=apps-api --tail=50
 
-# Processing worker logs
-kubectl logs -f -n temporal-oms-processing -l app=processing-worker
-
-# All workers in apps namespace
-kubectl logs -f -n temporal-oms-apps -l component=worker
-# All workers in processing namespace
-kubectl logs -f -n temporal-oms-processing -l component=worker
+# All workers
+kubectl logs -n temporal-oms-apps -l app=apps-worker --tail=50
+kubectl logs -n temporal-oms-processing -l app=processing-worker --tail=50
 ```
 
-### Test the API
+### Port Forward (for API access)
 
 ```bash
-# Get API URL
-API_URL=$(minikube service apps-api -n temporal-oms-apps --url)
-
-# Submit commerce order
-curl -X PUT "$API_URL/api/v1/commerce-app/orders/order-001" \
-  -H "Content-Type: application/json" \
-  -H "X-API-Key: dev-commerce-key-12345" \
-  -d '{
-    "customerId": "customer-123",
-    "order": {
-      "orderId": "order-001",
-      "items": [
-        {"itemId": "item-1", "quantity": 2}
-      ],
-      "shippingAddress": {
-        "street": "123 Main St",
-        "city": "San Francisco",
-        "state": "CA",
-        "postalCode": "94105",
-        "country": "US"
-      }
-    }
-  }'
-
-# Check Swagger UI
-open "$API_URL/docs"
+./scripts/tunnel.sh
+# Then access: http://localhost:8080/api/
 ```
 
-## Cleanup
-
-### Remove Application
-
-```bash
-kubectl delete namespace temporal-oms-apps
-kubectl delete namespace temporal-oms-processing
-```
-
-### Remove Temporal
-
-```bash
-helm uninstall temporal -n temporal
-kubectl delete namespace temporal
-```
-
-### Remove Operators
-
-```bash
-helm uninstall temporal-worker-controller -n temporal-worker-controller-system
-kubectl delete namespace temporal-worker-controller-system
-
-helm uninstall opentelemetry-operator -n opentelemetry-operator-system
-kubectl delete namespace opentelemetry-operator-system
-```
-
-### Stop Minikube
-
-```bash
-minikube stop
-minikube delete  # Complete removal
-```
+---
 
 ## Troubleshooting
 
-### Pods Not Starting
+### "Connection refused" to Temporal
+
+**For OVERLAY=cloud:**
+1. Verify API key is correct in secret files
+2. Check `spring.temporal.connection.tls.enabled: true` in ConfigMap
+3. Verify namespace matches Temporal Cloud (e.g., `fde-oms-apps.account-id`)
+
+**For OVERLAY=local:**
+1. Ensure temporal server is running: `temporal workflow list`
+2. Check pods can reach `host.docker.internal:7233`: `kubectl exec <pod> -- nc -zv host.docker.internal 7233`
+
+### Pods in CrashLoopBackOff
 
 ```bash
-# Check pod status (replace namespace with temporal-oms-apps or temporal-oms-processing)
-kubectl describe pod <pod-name> -n temporal-oms-apps
+# Check logs
+kubectl logs -n temporal-oms-apps <pod-name>
 
-# Check events
-kubectl get events -n temporal-oms-apps --sort-by='.lastTimestamp'
+# Check pod events
+kubectl describe pod -n temporal-oms-apps <pod-name>
+
+# Common issues:
+# - Missing ConfigMap/Secret
+# - TLS handshake failure (check api-key format)
+# - Network connectivity (check target host/port)
 ```
 
-### Image Pull Errors
+### Images not loading
 
 ```bash
-# Ensure using Minikube's Docker daemon
-eval $(minikube docker-env)
+# Ensure KUBECONFIG is set for your shell
+export KUBECONFIG=/tmp/kind-config.yaml
 
-# Verify images exist
-docker images | grep temporal-oms
+# Check images in KinD
+kind load docker-image temporal-oms/apps-api:latest --name temporal-oms
 
-# imagePullPolicy should be "Never" for local images
+# Or just redeploy
+OVERLAY=cloud ./scripts/app-deploy.sh
 ```
 
-### Worker Not Registering
+### Docker context issues
 
 ```bash
-# Check worker logs (replace namespace with temporal-oms-apps or temporal-oms-processing)
-kubectl logs -n temporal-oms-apps -l app=apps-worker
+# Reset to default Docker context
+docker context use default
 
-# Check Temporal connectivity
-kubectl exec -it -n temporal-oms-apps <worker-pod> -- sh
-wget -O- http://temporal-frontend.temporal.svc.cluster.local:7233
+# Verify Docker is working
+docker ps
+
+# Then deploy
+OVERLAY=cloud ./scripts/demo-up.sh
 ```
 
-### Temporal Namespace Not Found
+---
 
-```bash
-# Create namespace via Temporal CLI
-kubectl port-forward -n temporal svc/temporal-frontend 7233:7233 &
-temporal operator namespace create apps --address localhost:7233
+## Architecture Overview
+
+### Deployment Structure
+
+```
+KinD Cluster (temporal-oms)
+├── temporal-oms-apps namespace
+│   ├── apps-api (2 replicas) - REST API
+│   └── apps-worker (2+ replicas) - Workflow workers
+├── temporal-oms-processing namespace
+│   └── processing-worker (2+ replicas) - Processing workers
+└── traefik namespace
+    └── Traefik Ingress Controller
 ```
 
-## Architecture
+### Configuration Flow
 
-### Kubernetes Namespaces
+```
+Application → Spring Boot Profile (k8s)
+           ↓
+        application-k8s.yaml (imports mounted files)
+           ↓
+        /etc/config/temporal/temporal-config.yaml (ConfigMap)
+        /etc/config/temporal-secret/temporal-secret.yaml (Secret)
+           ↓
+        Temporal Client Configuration
+           ↓
+        Connect to Temporal (Cloud or Local)
+```
 
-| K8s Namespace | Components | Description |
-|---------------|-----------|-------------|
-| temporal-oms-apps | apps-api, apps-worker, web | Application services and workflows |
-| temporal-oms-processing | processing-worker | Order processing workflows |
+---
 
-### Services Deployed
+## Scripts Reference
 
-| Service | Type | Port | K8s Namespace | Description |
-|---------|------|------|---------------|-------------|
-| apps-api | Deployment | 8080 | temporal-oms-apps | REST API for webhooks |
-| apps-worker | TemporalWorkerDeployment | 9090 | temporal-oms-apps | CompleteOrder workflows |
-| processing-worker | TemporalWorkerDeployment | 9090 | temporal-oms-processing | Order processing workflows |
-| web | Deployment | 3000 | temporal-oms-apps | Frontend web UI |
+| Script | Purpose | Example |
+|--------|---------|---------|
+| `demo-up.sh` | Full environment setup | `OVERLAY=cloud ./scripts/demo-up.sh` |
+| `demo-down.sh` | Complete teardown | `./scripts/demo-down.sh` |
+| `app-deploy.sh` | Rebuild and redeploy apps only | `OVERLAY=cloud ./scripts/app-deploy.sh` |
+| `status.sh` | Check deployment status | `./scripts/status.sh` |
+| `tunnel.sh` | Port-forward API access | `./scripts/tunnel.sh` |
+| `infra-up.sh` | Create KinD cluster only | `./scripts/infra-up.sh` |
+| `infra-down.sh` | Delete KinD cluster | `./scripts/infra-down.sh` |
 
-### Temporal Namespaces
+---
 
-| Temporal Namespace | Task Queue | Workers | K8s Namespace | Description |
-|-------------------|-----------|---------|---------------|-------------|
-| apps | apps | 2 | temporal-oms-apps | Application orchestration |
-| processing | processing | 2 | temporal-oms-processing | Order processing |
+## Next Steps
 
-### Resource Allocation
+1. **First time setup**: Follow the "Quick Start" section above
+2. **Make changes**: Edit Java code and run `./scripts/app-deploy.sh`
+3. **Test workflows**: Submit orders via API or scenarios
+4. **Monitor**: Check logs with `kubectl logs` commands
+5. **Deploy to production**: Adapt the deployment for your cloud provider (GKE, EKS, AKS, etc.)
 
-| Service | Memory Request | Memory Limit | CPU Request | CPU Limit | K8s Namespace |
-|---------|----------------|--------------|-------------|-----------|---|
-| apps-api | 512Mi | 1Gi | 250m | 1000m | temporal-oms-apps |
-| apps-worker | 512Mi | 2Gi | 250m | 2000m | temporal-oms-apps |
-| web | 256Mi | 512Mi | 100m | 500m | temporal-oms-apps |
-| processing-worker | 512Mi | 2Gi | 250m | 2000m | temporal-oms-processing |
-
-**Total Resources:**
-- Memory: ~6Gi
-- CPU: ~1.8 cores
-
-## Skills Applied
-
-This deployment follows patterns from:
-- ✅ **deployment-kubernetes-local** - Minikube setup, TemporalWorker CRD, OpenTelemetry
-- ✅ **stack-temporal** - Worker versioning, graceful shutdown, resource tuning
-- ✅ **stack-api-rest** - Swagger UI at /docs, health checks
-- ✅ **patterns** - Bounded contexts as separate workers
+---
 
 ## References
 
-- Temporal Worker Controller: https://github.com/temporalio/temporal-worker-controller
-- OpenTelemetry Operator: https://github.com/open-telemetry/opentelemetry-operator
-- Minikube: https://minikube.sigs.k8s.io/
-- Temporal Helm Charts: https://github.com/temporalio/helm-charts
+- [KinD Documentation](https://kind.sigs.k8s.io/)
+- [Temporal Cloud API Keys](https://docs.temporal.io/cloud/api-keys)
+- [Spring Boot Configuration](https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.external-config)
+- [Kubectl Documentation](https://kubernetes.io/docs/reference/kubectl/)

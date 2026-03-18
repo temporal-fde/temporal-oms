@@ -1,18 +1,25 @@
 # Demo Scripts
 
-Modular scripts for managing the Temporal OMS demo environment.
+Modular scripts for managing the Temporal OMS Kubernetes deployment with KinD.
+
+> For complete deployment documentation including Temporal Cloud API key setup, see [../DEPLOYMENT.md](../DEPLOYMENT.md)
 
 ## Quick Start
 
-**First time setup (full demo):**
+**For Temporal Cloud deployment (OVERLAY=cloud):**
 ```bash
-./scripts/demo-up.sh
+OVERLAY=cloud ./scripts/demo-up.sh
+```
+
+**For local Temporal deployment (OVERLAY=local):**
+```bash
+OVERLAY=local ./scripts/demo-up.sh
 ```
 
 **For live coding (after infrastructure is up):**
 ```bash
 # Make code changes...
-./scripts/app-deploy.sh
+OVERLAY=cloud ./scripts/app-deploy.sh
 # Repeat as needed
 ```
 
@@ -27,7 +34,7 @@ For more control, use individual scripts:
 
 ### Infrastructure Only
 ```bash
-# Start Minikube, Temporal server, Traefik ingress, create namespaces
+# Create KinD cluster, create namespaces, install Traefik ingress
 ./scripts/infra-up.sh
 
 # In another terminal, expose API via port-forward
@@ -36,12 +43,12 @@ For more control, use individual scripts:
 # ... make code changes ...
 
 # Redeploy apps (fast - skips infra setup)
-./scripts/app-deploy.sh
+OVERLAY=cloud ./scripts/app-deploy.sh
 
-# Tear down just apps (keeps Minikube/Temporal/Traefik running)
+# Tear down just apps (keeps KinD cluster running)
 ./scripts/app-down.sh
 
-# Stop everything
+# Stop everything (delete KinD cluster)
 ./scripts/infra-down.sh
 ```
 
@@ -54,45 +61,64 @@ For more control, use individual scripts:
 
 | Script | Purpose |
 |--------|---------|
-| `infra-up.sh` | Start Minikube, Temporal server, create namespaces, install Traefik ingress |
-| `app-deploy.sh` | Build Java projects, build Docker images, deploy to Minikube |
-| `app-down.sh` | Remove applications (keeps infrastructure running) |
-| `infra-down.sh` | Stop Minikube, Temporal server, Traefik, remove everything |
+| `infra-up.sh` | Create KinD cluster, create namespaces, install Traefik ingress |
+| `app-deploy.sh` | Build Java projects, build Docker images, load to KinD, deploy apps |
+| `app-down.sh` | Remove applications (keeps KinD cluster running) |
+| `infra-down.sh` | Delete KinD cluster and all infrastructure |
 | `demo-up.sh` | Full setup: runs infra-up + app-deploy |
 | `demo-down.sh` | Full teardown: runs app-down + infra-down |
 | `tunnel.sh` | Port-forward Traefik to localhost:8080 (run in another terminal) |
-| `status.sh` | Show current deployment status |
+| `status.sh` | Show current deployment status (pods, KinD cluster, Temporal server)
 
 ## Live Coding Workflow
 
 1. **Initial setup** (once per session):
    ```bash
-   ./scripts/infra-up.sh
-   ./scripts/app-deploy.sh
+   OVERLAY=cloud ./scripts/demo-up.sh
    ```
 
-2. **Edit code** in your IDE
-
-3. **Quick redeploy** (takes ~30 seconds):
+2. **Port-forward** (in another terminal):
    ```bash
-   ./scripts/app-deploy.sh
+   ./scripts/tunnel.sh
    ```
 
-4. **Repeat steps 2-3** as needed
+3. **Edit code** in your IDE
 
-5. **Clean up** when done:
+4. **Quick redeploy** (takes ~30 seconds):
    ```bash
-   ./scripts/infra-down.sh
+   OVERLAY=cloud ./scripts/app-deploy.sh
+   ```
+
+5. **Repeat steps 3-4** as needed
+
+6. **Clean up** when done:
+   ```bash
+   ./scripts/demo-down.sh
    ```
 
 ## Requirements
 
 - `kubectl` - Kubernetes CLI
-- `minikube` - Local Kubernetes cluster
-- `docker` - Docker CLI (uses Minikube's Docker daemon)
+- `kind` - KinD (Kubernetes in Docker) cluster
+- `docker` - Docker CLI
 - `temporal` - Temporal CLI for server (install: `brew install temporal`)
-- Maven - For Java builds
-- Java 21+ - For compiling
+- Maven - For Java builds (uses asdf from .tool-versions)
+- Java 21+ - For compiling (uses asdf from .tool-versions)
+
+## Overlays
+
+Scripts support environment overlays via `OVERLAY` variable:
+
+```bash
+# Temporal Cloud deployment (requires API key setup - see DEPLOYMENT.md)
+OVERLAY=cloud ./scripts/demo-up.sh
+
+# Local Temporal deployment (uses host.docker.internal:7233)
+OVERLAY=local ./scripts/demo-up.sh
+
+# Default is 'local' if not specified
+./scripts/demo-up.sh
+```
 
 ## Troubleshooting
 
