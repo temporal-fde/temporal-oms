@@ -1,4 +1,4 @@
-spring.config.import: classpath:acme.apps.yaml,file:/etc/config/temporal/temporal-config.yaml,file:/etc/config/temporal-secret/temporal-secret.yaml
+spring.config.import: classpath:acme.apps.yaml
 spring.main.web-application-type: none
 management.server.port: 9091
 spring.temporal.start-workers: true

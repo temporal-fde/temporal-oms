@@ -34,12 +34,10 @@ spec:
           name: metrics
           protocol: TCP
         env:
-        - name: SERVER_PORT
-          value: "8080"
-        - name: MANAGEMENT_SERVER_PORT
-          value: "9090"
-        - name: BUILD_ID
-          value: "1.0.0"
+        - name: SPRING_PROFILES_ACTIVE
+          value: k8s
+        - name: JAVA_OPTS
+          value: "-Dio.grpc.netty.shaded.io.netty.util.NetUtil.ipv4Preferred=true -Dgrpc.netty.keepaliveTime=30 -Dgrpc.netty.keepaliveTimeout=5 -Dgrpc.netty.keepaliveWithoutCalls=true"
         envFrom:
         - configMapRef:
             name: temporal-oms-config
@@ -87,7 +85,7 @@ spec:
           defaultMode: 0444
       - name: temporal-secret
         secret:
-          secretName: temporal-api-key
+          secretName: temporal-apps-api-key
           defaultMode: 0444
 ---
 apiVersion: v1

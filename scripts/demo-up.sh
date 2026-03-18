@@ -1,7 +1,10 @@
 #!/bin/bash
 set -e
 
-echo "🚀 Starting complete demo environment..."
+# Default to local overlay if not specified
+OVERLAY="${OVERLAY:-local}"
+
+echo "🚀 Starting complete demo environment (${OVERLAY} Temporal)..."
 echo ""
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -10,7 +13,7 @@ cd "$PROJECT_DIR"
 # Run setup steps
 bash scripts/infra-up.sh
 echo ""
-bash scripts/app-deploy.sh
+OVERLAY="${OVERLAY}" bash scripts/app-deploy.sh
 echo ""
 echo "🎉 Demo environment ready!"
 echo ""
@@ -23,3 +26,7 @@ echo "  ./scripts/demo-down.sh     - Tear down everything"
 echo "  ./scripts/app-deploy.sh    - Redeploy apps only"
 echo "  ./scripts/status.sh        - Check deployment status"
 echo "  ./scripts/tunnel.sh        - Port-forward (run in another terminal)"
+echo ""
+echo "Use OVERLAY to switch Temporal backend:"
+echo "  OVERLAY=cloud ./scripts/demo-up.sh   - Deploy with Temporal Cloud"
+echo "  OVERLAY=local ./scripts/demo-up.sh   - Deploy with localhost Temporal (default)"

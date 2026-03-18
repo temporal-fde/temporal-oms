@@ -5,8 +5,5 @@ metadata:
   namespace: temporal-oms-apps
 data:
   temporal-config.yaml: |
-    spring:
-      temporal:
-        namespace: apps
-        connection:
-          target: temporal-frontend.temporal.svc.cluster.local:7233
+    spring.temporal.namespace: apps
+    spring.temporal.connection.target: host.docker.internal:7233

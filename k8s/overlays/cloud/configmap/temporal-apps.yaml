@@ -5,8 +5,7 @@ metadata:
   namespace: temporal-oms-apps
 data:
   temporal-config.yaml: |
-    spring:
-      temporal:
-        namespace: fde-oms-apps.sdvdw
-        connection:
-          target: <TEMPORAL_CLOUD_HOST>:7233
+    spring.temporal.namespace: fde-oms-apps.sdvdw
+    spring.temporal.connection.target: temporal-cloud.default.svc.cluster.local:7233
+    spring.temporal.connection.tls.enabled: true
+    spring.temporal.connection.tls.server-name: us-east-1.aws.api.temporal.io

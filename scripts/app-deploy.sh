@@ -4,7 +4,10 @@ set -e
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_DIR"
 
-echo "📦 Building and deploying applications..."
+# Default to local overlay if not specified
+OVERLAY="${OVERLAY:-local}"
+
+echo "📦 Building and deploying applications (${OVERLAY} Temporal)..."
 
 # Build Java
 echo "→ Building Java projects..."
@@ -23,22 +26,16 @@ eval $(minikube docker-env)
 docker build -q -t temporal-oms/apps-api:latest \
   -f java/apps/apps-api/docker/Dockerfile java/apps/apps-api
 
-docker build -q -t temporal-oms/apps-workers:latest \
+docker build -q -t temporal-oms/apps-worker:latest \
   -f java/apps/apps-workers/docker/Dockerfile java/apps/apps-workers
 
-docker build -q -t temporal-oms/processing-workers:latest \
+docker build -q -t temporal-oms/processing-worker:latest \
   -f java/processing/processing-workers/docker/Dockerfile java/processing/processing-workers
 
 # Deploy to Kubernetes
 echo "→ Deploying to Minikube..."
-kubectl apply -k k8s/overlays/local >/dev/null
+kubectl apply -k "k8s/overlays/${OVERLAY}" >/dev/null
 kubectl apply -f k8s/ingress/apps-api-ingress.yaml >/dev/null
-
-# Copy secrets to processing namespace (recreate if exists)
-kubectl delete secret temporal-api-key -n temporal-oms-processing 2>/dev/null || true
-kubectl get secret temporal-api-key -n temporal-oms-apps -o yaml | \
-  sed 's/namespace: temporal-oms-apps/namespace: temporal-oms-processing/' | \
-  kubectl create -f - >/dev/null
 
 # Delete old pods to force image pull
 echo "→ Restarting pods..."

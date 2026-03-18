@@ -14,16 +14,6 @@ else
     echo "✓ Minikube already running"
 fi
 
-# Start Temporal server
-if ! pgrep -f "temporal server start-dev" >/dev/null 2>&1; then
-    echo "→ Starting Temporal server on localhost:7233..."
-    temporal server start-dev > /tmp/temporal.log 2>&1 &
-    sleep 3
-    echo "✓ Temporal server started"
-else
-    echo "✓ Temporal server already running"
-fi
-
 # Create namespaces
 echo "→ Creating Kubernetes namespaces..."
 kubectl create namespace temporal-oms-apps --dry-run=client -o yaml | kubectl apply -f - >/dev/null

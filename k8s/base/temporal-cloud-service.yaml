@@ -1,0 +1,13 @@
+---
+# ExternalName Service for Temporal Cloud - allows Minikube pods to reach external service
+apiVersion: v1
+kind: Service
+metadata:
+  name: temporal-cloud
+spec:
+  type: ExternalName
+  externalName: us-east-1.aws.api.temporal.io
+  ports:
+  - port: 7233
+    targetPort: 7233
+    protocol: TCP
