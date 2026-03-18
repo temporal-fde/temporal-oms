@@ -59,13 +59,12 @@ public class ValidationController {
                       "This signals that manual validation has been completed and the order can proceed."
     )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "202", description = "Validation update accepted",
-            content = @Content(schema = @Schema(implementation = ValidationUpdateResponse.class))),
+        @ApiResponse(responseCode = "202", description = "Validation update accepted"),
         @ApiResponse(responseCode = "400", description = "Invalid request or missing orderId"),
         @ApiResponse(responseCode = "409", description = "Workflow conflict or validation already completed"),
         @ApiResponse(responseCode = "500", description = "Unexpected error executing validation update")
     })
-    public ResponseEntity<ValidationUpdateResponse> completeValidation(
+    public ResponseEntity completeValidation(
             @Parameter(description = "Order ID for validation completion", required = true)
             @PathVariable String orderId) {
 
@@ -80,67 +79,18 @@ public class ValidationController {
 
             logger.info("Validation completion update executed successfully for orderId: {}", orderId);
 
-            var response = new ValidationUpdateResponse(
-                orderId,
-                "accepted",
-                "completeOrderValidation",
-                "Update accepted - support team workflow will process validation completion"
-            );
-
-            return ResponseEntity.accepted().body(response);
+            return ResponseEntity.accepted().build();
 
         } catch (WorkflowUpdateException e) {
             logger.error("Failed to execute validation update: {}", e.getMessage(), e);
-            var errorResponse = new ValidationUpdateResponse(
-                orderId,
-                "failed",
-                "completeOrderValidation",
-                "Workflow conflict or update failed: " + e.getMessage()
-            );
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
 
         } catch (Exception e) {
             logger.error("Unexpected error executing validation update: {}", e.getMessage(), e);
-            var errorResponse = new ValidationUpdateResponse(
-                orderId,
-                "error",
-                "completeOrderValidation",
-                "Unexpected error: " + e.getMessage()
-            );
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    /**
-     * Response DTO for validation updates
-     */
-    public static class ValidationUpdateResponse {
-        public String orderId;
-        public String status;
-        public String updateName;
-        public String message;
-
-        public ValidationUpdateResponse(String orderId, String status, String updateName, String message) {
-            this.orderId = orderId;
-            this.status = status;
-            this.updateName = updateName;
-            this.message = message;
-        }
-
-        public String getOrderId() {
-            return orderId;
-        }
-
-        public String getStatus() {
-            return status;
-        }
-
-        public String getUpdateName() {
-            return updateName;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-    }
 }
