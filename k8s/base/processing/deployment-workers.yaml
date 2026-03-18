@@ -7,7 +7,7 @@ metadata:
     app: processing-worker
     component: worker
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: processing-worker
@@ -59,8 +59,8 @@ spec:
           readOnly: true
         resources:
           requests:
-            memory: "512Mi"
-            cpu: "250m"
+            memory: "384Mi"
+            cpu: "200m"
           limits:
             memory: "2Gi"
             cpu: "2000m"
