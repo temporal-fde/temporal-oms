@@ -60,6 +60,7 @@ public class OrderImpl implements Order {
         // 3. fulfill order
         // if any of this fails, cancel order with `void` specified for payment
         var scope = Workflow.newCancellationScope(inner-> {
+
             // this might block for quite some time due to invalid order correction
             var validation = this.commerceApp.validateOrder(ValidateOrderRequest.newBuilder()
                     .setOrder(request.getOrder())
@@ -85,10 +86,12 @@ public class OrderImpl implements Order {
                 }
             }
 
+
             // enrich the order
             this.state = this.state.toBuilder().setEnrichment(
                     this.enrichments.enrichOrder(EnrichOrderRequest.newBuilder()
                             .setOrder(request.getOrder()).build())).build();
+
 
             // fulfill the order
             this.state = this.state.toBuilder().setFulfillment(this.fulfillments.fulfillOrder(FulfillOrderRequest.newBuilder()

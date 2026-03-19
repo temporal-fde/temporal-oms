@@ -132,6 +132,7 @@ public class OrderImpl implements Order {
         if(this.state.getErrorsCount() == 0) {
             // the order was processed successfully
             Workflow.await(Workflow::isEveryHandlerFinished);
+            return;
         }
 
         // the order was not processed successfully
@@ -141,10 +142,13 @@ public class OrderImpl implements Order {
     private void compensateOrder() {
         // use a detached scope to step outside the parent scope and perform cleanup operations (even activities)
         var detached = Workflow.newDetachedCancellationScope(()-> {
-            logger.warn("Order {} was cancelled or could not be processed", state.getArgs().getOrderId());
-            // TODO start order compensation process where
-            // 1. void or refund payment (payments namespace)
-            // 2. notify customer of inability to complete order
+            if(this.state.getCapturedPaymentsCount() > 0) {
+                // void or refund payment
+            }
+            if (this.state.getSubmittedOrdersCount() > 0) {
+                // notify customer of inability to complete order
+            }
+
         });
         detached.run();
     }

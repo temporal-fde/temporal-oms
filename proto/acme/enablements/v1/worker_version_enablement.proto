@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package acme.enablements.v1;
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+// Start a worker versioning enablement demonstration
+message StartWorkerVersionEnablementRequest {
+
+  string enablement_id = 1;      // e.g., "demo-session-2026-03-18"
+  int32 order_count = 2;            // How many orders to process (e.g., 20)
+  int32 submit_rate_per_min = 3;    // Orders per minute (e.g., 12)
+  google.protobuf.Duration timeout = 4;  // How long to run (e.g., 5 minutes)
+}
+
+// Current state of the worker versioning enablement demonstration
+// (Order tracking is the responsibility of the OMS application, not this workflow)
+message WorkerVersionEnablementState {
+
+  string enablement_id = 1;
+  StartWorkerVersionEnablementRequest args = 2;
+  // Workflow execution state
+  enum DemoPhase {
+    DEMO_PHASE_UNSPECIFIED = 0;
+    RUNNING_V1_ONLY = 1;
+    TRANSITIONING_TO_V2 = 2;
+    RUNNING_BOTH = 3;
+    COMPLETE = 4;
+  }
+  DemoPhase current_phase = 3;
+
+  // Activity metrics
+  int32 orders_submitted_count = 4;    // How many times submitOrder() was called
+  float orders_per_minute = 5;         // Current submission rate
+  repeated string active_versions = 6; // ["v1"] or ["v1", "v2"] depending on phase
+
+  // Versioning info
+  google.protobuf.Timestamp last_transition_at = 7;  // When transitionToV2 was signaled
+}
+
+message SubmitOrdersRequest {
+  string enablement_id = 1;
+  int32 submit_rate_per_min = 2;
+}
+message SubmitOrdersResponse {
+  string orders_submitted_count = 1;
+}

@@ -17,6 +17,7 @@
         <module>oms</module>
         <module>apps</module>
         <module>processing</module>
+        <module>enablements</module>
         <module>generated</module>
     </modules>
 
