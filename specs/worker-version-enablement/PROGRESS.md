@@ -11,7 +11,7 @@
 
 This initiative has 3 sub-specs that work together:
 
-1. **Load Generation Service** - Continuous order submission + state tracking
+1. **Worker Version Enablement Workflow** - Orchestrates continuous order submission while demonstrating version transitions
 2. **Version Deployment Setup** - Multi-version workers with build-id routing
 3. **Validation Framework** - Verify zero failures during transitions
 
@@ -23,7 +23,7 @@ See [INDEX.md](./INDEX.md) for architecture overview and dependency diagram.
 
 | Sub-Spec | Status | Owner | Review Date | Approval |
 |----------|--------|-------|-------------|----------|
-| [Load Generation](./load-generation/) | 📋 Draft | [Your Name] | TBD | ⏳ Pending |
+| [Worker Version Enablement Workflow](./load-generation/) | 📋 Draft | [Your Name] | TBD | ⏳ Pending |
 | [Version Deployment](./version-deployment/) | 📋 Draft | [Your Name] | TBD | ⏳ Pending |
 | [Validation Framework](./validation-framework/) | 📋 Draft | [Your Name] | TBD | ⏳ Pending |
 
@@ -35,7 +35,7 @@ See [INDEX.md](./INDEX.md) for architecture overview and dependency diagram.
 
 All three specs complete and ready for review:
 
-### Load Generation Service
+### Worker Version Enablement Workflow
 - [x] Spec written
 - [x] Goals & acceptance criteria clear
 - [x] Architecture documented
@@ -75,10 +75,10 @@ For each sub-spec, tech lead should:
 
 **Open Questions** for tech lead review:
 
-**Load Generation:**
-- [ ] Load rate default: 1/sec or different?
-- [ ] Metrics persistence: In-memory only?
-- [ ] Failure handling: Max retries?
+**Worker Version Enablement Workflow:**
+- [ ] Order submission rate: 12/min suitable for demo?
+- [ ] Order count: 20 orders good for demo duration?
+- [ ] Enablement duration: ~5 minutes OK?
 
 **Version Deployment:**
 - [ ] V2 code: New features or just version test?
@@ -86,8 +86,8 @@ For each sub-spec, tech lead should:
 - [ ] Runbook audience: Engineering or prod team?
 
 **Validation Framework:**
-- [ ] Separate module or part of load-generator?
-- [ ] Report formats: JSON only or add HTML?
+- [ ] Separate module or part of enablement workflow?
+- [ ] Failure threshold: Fail on first issue or collect all?
 - [ ] Validation in CI/CD later?
 
 ### Phase 2: Planning (After Approval)
@@ -97,7 +97,7 @@ For each sub-spec, tech lead should:
 Once all specs approved:
 1. Break each spec into detailed tasks
 2. Estimate effort per phase
-3. Identify execution sequence (load-gen → versions → validation)
+3. Identify execution sequence (enablement workflow → versions → validation)
 4. Create Jira/Linear tickets
 5. Assign owners + target dates
 
@@ -106,18 +106,18 @@ Once all specs approved:
 **Timeline:** Weeks of 2026-04-01 through 2026-04-14 (est. 2-3 weeks)
 
 Phases 1-4 for each sub-spec, in sequence:
-- Load Generation: 4 phases, ~11 days
-- Version Deployment: 4 phases, ~7 days (can overlap with load-gen phase 3-4)
+- Worker Version Enablement Workflow: 4 phases, ~11 days
+- Version Deployment: 4 phases, ~7 days (can overlap with enablement phase 3-4)
 - Validation Framework: 4 phases, ~9 days (starts after versions deployed)
 
-### Phase 4: Validation & Demo
+### Phase 4: Enablement Session
 
 **Timeline:** Week of 2026-04-21
 
-1. Run load generator test
-2. Deploy version 2 workers
+1. Run enablement workflow
+2. Deploy version 2 workers (via workflow activity)
 3. Run validation framework
-4. Demo to team + discuss learnings
+4. Enablement session with team + discuss learnings
 5. Update PROGRESS.md: Initiative → COMPLETE
 
 ---
@@ -126,24 +126,24 @@ Phases 1-4 for each sub-spec, in sequence:
 
 ```
 Week 1: Review & Approval
-├─ [Load Generation] ← review
+├─ [Enablement Workflow] ← review
 ├─ [Version Deployment] ← review
 └─ [Validation Framework] ← review
 
 Week 2: Planning
-├─ [Load Generation] ← plan
+├─ [Enablement Workflow] ← plan
 ├─ [Version Deployment] ← plan
 └─ [Validation Framework] ← plan
 
 Weeks 3-5: Implementation (Sequential)
-├─ [Load Generation] Phase 1-4 ── done ✓
+├─ [Enablement Workflow] Phase 1-4 ── done ✓
 │                                    ↓
 ├─ [Version Deployment] Phase 1-4 ──  done ✓
 │                                        ↓
 └─ [Validation Framework] Phase 1-4 ── running
 
-Week 6: Demo & Close
-└─ Run demo + update documentation
+Week 6: Enablement & Close
+└─ Run enablement session + update documentation
 ```
 
 ---
@@ -211,10 +211,10 @@ Execute phases in sequence:
 By end of Week 4, we will have run an **enablement session** where:
 
 ### Pre-Session (Infrastructure)
-- [x] Load Generator Service
-  - Submits 10-20 orders continuously
-  - Tracks workflow state
-  - Can be started/stopped via REST
+- [x] Worker Version Enablement Workflow
+  - Submits 10-20 orders continuously to OMS
+  - Tracks workflow execution state
+  - Can be started/paused/transitioned via Temporal or REST API
 - [x] Version Deployment
   - V1 and V2 workers configured
   - Build-ids wired
@@ -229,7 +229,7 @@ By end of Week 4, we will have run an **enablement session** where:
 
 - [x] **Demo Scripts (3 scenarios, 5 min each)**
   1. Scenario: "New workflows use v2, old stay on v1"
-     - Start load gen (v1 only)
+     - Start enablement workflow (v1 only)
      - Deploy v2 workers
      - Show new orders go to v2
      - Show old orders complete on v1
@@ -280,6 +280,7 @@ By end of Week 4, we will have run an **enablement session** where:
 **Alternatives Considered:**
 - Single monolithic spec (harder to review, too many open questions, harder to track progress)
 - Waterfall sequential specs (would block review and planning)
+- Load generator service deployed to K8s (more complex, unnecessary complexity)
 
 **Status:** Accepted (used for this initiative)
 

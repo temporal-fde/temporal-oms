@@ -7,7 +7,7 @@
 **Updated:** 2026-03-18
 
 **Part of:** [Worker Version Enablement Initiative](../INDEX.md)
-**Depends on:** [Load Generation Service](../load-generation/spec.md)
+**Depends on:** [Worker Version Enablement Workflow](../load-generation/spec.md)
 
 ---
 
@@ -201,32 +201,37 @@ env:
   value: "true"
 ```
 
-**Kubernetes Deployments:**
+**Kubernetes Deployment (via Temporal Worker Controller):**
+
+We use the Temporal Worker Controller (temporalio/temporal-worker-controller) with TemporalWorkerDeployment CRD for versioned worker management.
+
 ```yaml
-# k8s/base/processing/deployment-workers-v1.yaml (rename from deployment-workers.yaml)
-apiVersion: apps/v1
-kind: Deployment
+# k8s/base/processing/temporal-worker-deployment-v1.yaml
+apiVersion: workload.temporal.io/v1
+kind: TemporalWorkerDeployment
 metadata:
   name: processing-workers-v1
-  labels:
-    app: processing-worker
-    version: v1
+  namespace: temporal-oms-processing
 spec:
-  replicas: 1
-  # ... (rest same as current deployment-workers.yaml)
+  workload:
+    buildId: processing-worker:v1
+    replicaCount: 1
+    # ... (container spec with processing-workers image)
 
-# k8s/base/processing/deployment-workers-v2.yaml (new)
-apiVersion: apps/v1
-kind: Deployment
+# k8s/base/processing/temporal-worker-deployment-v2.yaml (new for v2)
+apiVersion: workload.temporal.io/v1
+kind: TemporalWorkerDeployment
 metadata:
   name: processing-workers-v2
-  labels:
-    app: processing-worker
-    version: v2
+  namespace: temporal-oms-processing
 spec:
-  replicas: 1
-  # ... (same as v1, but BUILD_ID=processing-worker:v2)
+  workload:
+    buildId: processing-worker:v2
+    replicaCount: 1
+    # ... (same as v1, but buildId=processing-worker:v2)
 ```
+
+**Note:** The Temporal Worker Controller manages the actual Pods and handles build-id registration automatically. This simplifies version management compared to manual Deployment objects.
 
 **Temporal Compatibility Registration:**
 Java code in worker initialization:
@@ -368,7 +373,7 @@ Deliverables:
 
 ### External Dependencies
 - Temporal 1.33+ (build-id support)
-- Temporal CLI (for manual verification)
+- Temporal Worker Controller v1.1.2+ (temporalio/temporal-worker-controller) - for managing TemporalWorkerDeployment CRD
 - Kubernetes 1.24+
 
 ### Cross-Cutting Concerns
@@ -378,9 +383,10 @@ Deliverables:
 - **Validation framework:** Needed to verify zero failures (from validation-framework spec)
 
 ### Rollout Blockers
-- [ ] Load generator deployed (needed for test load during transition)
-- [ ] Temporal cluster supports build-ids (verify version)
+- [ ] Temporal Worker Controller deployed (v1.1.2+) with TemporalWorkerDeployment CRD
+- [ ] Temporal cluster supports build-ids (verify version 1.33+)
 - [ ] Processing workflows forward-compatible with v2
+- [ ] Enablement workflow deployment ready (needed for test scenarios)
 
 ---
 
@@ -406,7 +412,7 @@ Deliverables:
 ## References & Links
 
 - [Worker Version Enablement Initiative](../INDEX.md)
-- [Load Generation Service](../load-generation/spec.md)
+- [Worker Version Enablement Workflow](../load-generation/spec.md)
 - [Validation Framework](../validation-framework/spec.md)
 - [Temporal Build-ID Docs](https://temporal.io/blog/worker-versioning)
 - [Temporal CLI Worker Build-ID](https://docs.temporal.io/cli/worker/build-id)

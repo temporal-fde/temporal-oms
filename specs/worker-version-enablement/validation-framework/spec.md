@@ -7,7 +7,7 @@
 **Updated:** 2026-03-18
 
 **Part of:** [Worker Version Enablement Initiative](../INDEX.md)
-**Depends on:** [Load Generation Service](../load-generation/spec.md), [Version Deployment](../version-deployment/spec.md)
+**Depends on:** [Worker Version Enablement Workflow](../load-generation/spec.md), [Version Deployment](../version-deployment/spec.md)
 
 ---
 
@@ -124,7 +124,7 @@ This provides objective proof that Temporal's versioning mechanism works as expe
 | Validation runs as separate script (not service) | Test infrastructure separate from production; easy to iterate and debug | Continuous validation service - adds complexity, harder to control test scenarios |
 | Query Temporal SDK directly (no intermediate DB) | Source of truth; real-time; no sync issues | External state tracking - eventual consistency issues |
 | Assertions not exceptions (collect all failures) | See complete picture before failing; better diagnostics | Fail-fast - miss secondary issues |
-| Report format: JSON + human summary | Structured data for parsing, human-readable for team | Binary format or only text - less useful for analysis |
+| All data contracts use protobuf | Single source of truth for all messages; generated Java classes; consistent serialization | Separate JSON schema + custom POJOs - duplication and sync issues |
 
 ### Component Design
 
@@ -165,16 +165,16 @@ This provides objective proof that Temporal's versioning mechanism works as expe
   - Exposes: Metrics summary (JSON)
 
 #### ReportGenerator
-- **Purpose:** Create human + machine-readable report
+- **Purpose:** Create validation report as protobuf message
 - **Responsibilities:**
-  - Format metrics summary
-  - Summarize failures (if any)
-  - Provide pass/fail verdict
-  - Generate recommendations
+  - Aggregate HealthChecker + MetricsCollector results
+  - Format as protobuf message (ValidationReport)
+  - Include pass/fail verdict
+  - Include failure details and recommendations
   - Include workflow version breakdown
 - **Interfaces:**
-  - Consumes: HealthChecker + MetricsCollector
-  - Produces: Report (JSON + text)
+  - Consumes: HealthChecker + MetricsCollector results
+  - Produces: `ValidationReport` protobuf message (can be serialized to JSON for human review)
 
 ### Validation Model
 
@@ -218,9 +218,8 @@ validation:
   baseline-period: 60             # seconds before transition
   transition-period: 300          # seconds during/after transition
 
-  # Report
-  output-format: json+text        # JSON for parsing, text for humans
-  include-failure-details: true   # detailed failure info in report
+  # Report output
+  include-failure-details: true   # detailed failure info in ValidationReport
 ```
 
 ### Data Model
@@ -239,40 +238,43 @@ class WorkflowSnapshot {
 }
 ```
 
-**Validation Report:**
-```json
-{
-  "verdict": "PASS",
-  "timestamp": "2026-03-18T15:30:00Z",
-  "transition": {
-    "from_version": "v1",
-    "to_version": "v2",
-    "duration_seconds": 300
-  },
-  "metrics": {
-    "total_workflows": 100,
-    "by_state": {
-      "created": 5,
-      "processing": 10,
-      "completed": 85,
-      "failed": 0
-    },
-    "by_version": {
-      "v1": {"count": 50, "state": "completed"},
-      "v2": {"count": 50, "state": "mixed"}
-    },
-    "completion_rate": 0.99,
-    "throughput": {
-      "before_transition": 10.5,
-      "after_transition": 10.2,
-      "variance": -0.03
-    }
-  },
-  "failures": [],
-  "stuck_workflows": [],
-  "recommendations": []
+**Validation Report (Protobuf):**
+```proto
+// proto/acme/enablements/v1/validation_report.proto
+
+message ValidationReport {
+  enum Verdict { UNKNOWN = 0; PASS = 1; FAIL = 2; }
+  Verdict verdict = 1;
+
+  google.protobuf.Timestamp timestamp = 2;
+
+  message VersionMetrics {
+    string version = 1;           // "v1" or "v2"
+    int32 workflow_count = 2;
+    float completion_rate = 3;
+  }
+
+  message TransitionMetrics {
+    string from_version = 1;
+    string to_version = 2;
+    int32 duration_seconds = 3;
+    repeated VersionMetrics by_version = 4;
+  }
+
+  TransitionMetrics transition = 3;
+
+  message FailureDetail {
+    string workflow_id = 1;
+    string error = 2;
+    google.protobuf.Timestamp occurred_at = 3;
+  }
+
+  repeated FailureDetail failures = 4;
+  repeated string recommendations = 5;
 }
 ```
+
+(Can be serialized to JSON for human review, or used directly in code as generated Java class)
 
 ---
 
@@ -298,13 +300,14 @@ Deliverables:
 - [ ] Unit tests (mock workflow data)
 
 ### Phase 3: ReportGenerator
-**Goal:** Create human + machine-readable report
+**Goal:** Create validation report as protobuf message
 
 Deliverables:
-- [ ] Report formatting (JSON + text)
+- [ ] `ValidationReport` protobuf message (proto/acme/enablements/v1/validation_report.proto)
+- [ ] ReportGenerator.java - Generates ValidationReport from HealthChecker + MetricsCollector results
 - [ ] Pass/fail verdict logic
 - [ ] Recommendations generation
-- [ ] HTML report option (nice-to-have)
+- [ ] Unit tests
 
 ### Phase 4: Test Script & Integration
 **Goal:** Run validation against live system
@@ -347,7 +350,7 @@ Deliverables:
 - Can query real Temporal cluster workflows
 - Detects known failures (workflows with exceptions)
 - Detects known stuck workflows (no progress)
-- Report format is valid JSON
+- Report format is valid `ValidationReport` protobuf message
 
 ### Validation Test Scenario
 
@@ -371,12 +374,13 @@ Deliverables:
 
 **Acceptance Criteria:**
 - [ ] Validation framework completes without errors
-- [ ] Report format valid JSON + human-readable
+- [ ] Report is valid `ValidationReport` protobuf message
 - [ ] Report shows correct workflow counts and versions
 - [ ] All workflows accounted for (v1 + v2 = total)
-- [ ] Zero unexpected failures
+- [ ] Zero unexpected failures (failures list empty if all pass)
 - [ ] Metrics show version distribution accurately
 - [ ] Recommendations provided if issues detected
+- [ ] Protobuf can be serialized to JSON for human review
 
 ---
 
@@ -399,7 +403,7 @@ Deliverables:
 - Java 21+
 
 ### Cross-Cutting Concerns
-- **Load Generation:** Provides orders for testing (from load-generation spec)
+- **Worker Version Enablement Workflow:** Provides continuous order flow for testing (from enablement workflow spec)
 - **Worker Versioning:** Must have v1 and v2 configured (from version-deployment spec)
 - **Temporal Cluster:** Must be running and queryable
 
@@ -415,7 +419,6 @@ Deliverables:
 ### Questions for Tech Lead / Product
 
 - [ ] Separate validation module or embed in load-generator?
-- [ ] Report format: JSON only, or HTML dashboard too?
 - [ ] Failure threshold: Fail on first issue or collect all and report?
 - [ ] Should validation be part of CI/CD pipeline later?
 
@@ -425,14 +428,14 @@ Deliverables:
 - **Stuck detection:** Use last update timestamp from workflow state, not history
 - **Data corruption:** Check key fields (order ID, completion status, amounts)
 - **Version verification:** Use Temporal workflow metadata (if available) or infer from history
-- **Report output:** Both JSON (for automation) and text (for human review)
+- **Report output:** `ValidationReport` protobuf message (serialized to JSON if needed for human review)
 
 ---
 
 ## References & Links
 
 - [Worker Version Enablement Initiative](../INDEX.md)
-- [Load Generation Service](../load-generation/spec.md)
+- [Worker Version Enablement Workflow](../load-generation/spec.md)
 - [Version Deployment Setup](../version-deployment/spec.md)
 - [Temporal Workflow Queries](https://docs.temporal.io/concepts/what-is-a-query)
 - [Temporal Workflow History](https://docs.temporal.io/concepts/what-is-a-workflow-history)

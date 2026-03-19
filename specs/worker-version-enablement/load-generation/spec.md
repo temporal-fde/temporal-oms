@@ -83,9 +83,8 @@ This clarity separates "how we invoke the system" (enablement workflow running l
 Enablements Application (new bounded context)
 ├── enablements-core/
 │   └── WorkerVersionEnablementWorkflow (v1 & v2)
-│       ├─ Activity: submitOrder (→ apps-api /commerce-app/orders)
-│       ├─ Activity: enrichOrder (→ processing-api /processing)
-│       ├─ Activity: capturePayment (→ processing-api /processing)
+│       ├─ Activity: submitOrder (→ apps-api)
+│       │   (OMS handles enrichment + payments internally)
 │       └─ Query: getState()
 │
 ├── enablements-workers/
@@ -101,7 +100,10 @@ Enablements Application (new bounded context)
        • POST /api/v1/enablements/worker-version/{enablement_id}/transition-to-v2 - Signal v2 transition
 ```
 
-**Data Layer (Proto):**
+**Data Layer (Protobuf):**
+
+All workflow inputs, outputs, and state are protobuf messages. This is the single source of truth for all data contracts.
+
 ```proto
 // proto/acme/enablements/v1/worker_version_enablement.proto
 
@@ -128,9 +130,15 @@ message WorkerVersionEnablementState {
   repeated string active_versions = 5; // ["v1"] or ["v1", "v2"] depending on phase
 
   // Versioning info
-  string last_transition_at = 6;       // ISO8601 timestamp when transitionToV2 was signaled
+  google.protobuf.Timestamp last_transition_at = 6;  // When transitionToV2 was signaled
 }
 ```
+
+**Java Generation:**
+- `buf generate` creates: `StartWorkerVersionEnablementRequest.java`, `WorkerVersionEnablementState.java`
+- Workflow input param: `StartWorkerVersionEnablementRequest` (protobuf)
+- Query method returns: `WorkerVersionEnablementState` (protobuf)
+- All data serialized/deserialized as protobuf
 
 ### Key Capabilities
 - **Continuous Submission:** Generate orders at configurable rate
@@ -179,39 +187,33 @@ message WorkerVersionEnablementState {
   ```
 - **Workflow Logic:**
   - **Phase 1 (RUNNING_V1_ONLY):**
-    - Continuously submit orders at configured rate
-    - Process via apps-api and processing-api
-    - Track each order's state and which version handled it
+    - Continuously submit orders to apps-api at configured rate
+    - OMS internally handles enrichment and payment capture
     - Wait for signal: transitionToV2()
 
   - **Phase 2 (On transitionToV2() signal):**
     - Trigger activities:
-      - deployV2Workers() - kubectl deploy v2
+      - deployV2Workers() - kubectl apply TemporalWorkerDeployment v2 (via Temporal Worker Controller)
       - registerCompatibility() - Temporal build-id setup
     - Update DemoPhase → TRANSITIONING_TO_V2
-    - Continue order processing (now both v1 and v2 available)
+    - Continue submitting orders (now both v1 and v2 workers available)
     - Update DemoPhase → RUNNING_BOTH when deployment complete
 
   - **Responsibilities:**
-    - Call OMS APIs continuously: submitOrder → enrichOrder → capturePayment
+    - Submit orders to OMS via apps-api (just the submission boundary)
+    - Let OMS handle all processing: enrichment, payments, completion
     - Track only workflow execution state (phase, submission count, rate)
     - Respond to control signals (pause, resume, transitionToV2)
     - Provide real-time workflow state via getState() query (not order tracking—that's the OMS app's job)
 
 #### Activities (enablements-core)
-**OrderActivities:**
-- `submitOrder(orderId)` → HTTP POST to apps-api `/api/v1/commerce/orders`
-  - Calls standard commerce API (same as production orders)
-  - Handle retry logic (exponential backoff)
-  - Return: order confirmation or failure
 
-**ProcessingActivities:**
-- `enrichOrder(orderId)` → HTTP POST to processing-api `/api/v1/enrichment`
-  - Calls standard processing API
-- `capturePayment(orderId)` → HTTP POST to processing-api `/api/v1/payments/capture`
-  - Calls standard payment capture API
-- Each can fail (activity retries handled by Temporal)
-- **Note:** Activities call production API paths, not special enablements paths. The workflow demonstrates using versioning with real application flows.
+**SubmitOrderActivity:**
+- `submitOrder()` → HTTP POST to apps-api to create an order
+  - Calls standard commerce API (same as production order submission)
+  - Handle retry logic (exponential backoff)
+  - Return: order ID or failure
+- **Note:** Enrichment and payment capture are handled internally by the OMS (processing and payments workflows). The enablement workflow only orchestrates order submission. This demonstrates that version transitions don't affect the order submission boundary.
 
 #### Query Handler
 - **Purpose:** Expose workflow execution state during demo (not order tracking—that's the OMS app's job)
@@ -298,10 +300,12 @@ mvn exec:java -Dexec.mainClass="com.acme.enablements.LocalEnablementRunner" \
 
 **Option 3: Via optional EnablementsController in apps-api**
 ```bash
+# Controller accepts protobuf message (encoded as JSON for convenience)
 curl -X POST http://localhost:8080/api/v1/enablements/worker-version/demo-session-1/start \
   -H "Content-Type: application/json" \
-  -d '{"order_count":20,"submit_rate_per_min":12,"timeout":"5m"}'
+  -d '{"demonstration_id":"demo-session-1","order_count":20,"submit_rate_per_min":12,"timeout":"300s"}'
 ```
+(Protobuf JSON encoding - same message structure as defined in proto)
 
 **Configuration:**
 - OMS APIs: `APPS_API_ENDPOINT` (default: http://localhost:8080 or tunneled Traefik)
@@ -354,11 +358,11 @@ Deliverables:
   - Separate controller (not conflated with CommerceWebhookController)
   - Inject WorkflowClient (reuse from apps-api Spring config)
   - Endpoints:
-    - `GET /api/v1/enablements/worker-version/{enablement_id}` - Query workflow state
-    - `POST /api/v1/enablements/worker-version/{enablement_id}/start` - Start demonstration
-    - `POST /api/v1/enablements/worker-version/{enablement_id}/pause` - Pause workflow
-    - `POST /api/v1/enablements/worker-version/{enablement_id}/transition-to-v2` - Signal v2 transition
-- [ ] Response DTOs (e.g., WorkerVersionEnablementStateDto)
+    - `GET /api/v1/enablements/worker-version/{enablement_id}` - Returns `WorkerVersionEnablementState` protobuf (JSON encoded)
+    - `POST /api/v1/enablements/worker-version/{enablement_id}/start` - Takes `StartWorkerVersionEnablementRequest` protobuf (JSON encoded)
+    - `POST /api/v1/enablements/worker-version/{enablement_id}/pause` - Sends pause signal
+    - `POST /api/v1/enablements/worker-version/{enablement_id}/transition-to-v2` - Sends transitionToV2 signal
+- [ ] Uses protobuf messages directly (no separate DTOs) - Spring handles JSON serialization of protobuf
 - [ ] Unit tests
 - [ ] **Can be deferred** if using Temporal CLI or direct workflow execution for demo
 
@@ -454,7 +458,7 @@ Deliverables:
 
 4. **Transition (at ~2 min mark):** Deploy v2 workers, mark compatible
    - Script or curl: `POST http://localhost:8080/api/v1/enablements/worker-version/demo-session-1/transition-to-v2` (sends signal to workflow)
-   - Workflow activity deployV2Workers() executes kubectl deploy
+   - Workflow activity deployV2Workers() applies TemporalWorkerDeployment v2 via Temporal Worker Controller
    - Workflow activity registerCompatibility() sets up Temporal build-ids
    - DemoPhase transitions to: TRANSITIONING_TO_V2 → RUNNING_BOTH
 
@@ -536,6 +540,7 @@ Deliverables:
 - **Activity execution tracking:** Orders inherit worker_version from activity context (Temporal tracks which worker executed activity)
 - **Workflow state size:** `WorkerVersionEnablementState` with 50 recent orders ~5KB; well within Temporal event size limits
 - **Error handling:** If activity fails (apps-api down), retry with exponential backoff per Temporal defaults; continue with remaining orders
+- **V2 Deployment:** deployV2Workers activity uses Temporal Worker Controller (TemporalWorkerDeployment CRD) to deploy v2 workers. Pre-existing TemporalWorkerDeployment manifest for v2 must be available in the cluster; activity applies it via kubectl
 
 ---
 

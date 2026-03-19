@@ -37,19 +37,19 @@ Run an **enablement session** to teach the team how to safely deploy workflow co
 
 ## Sub-Specifications
 
-### 1. Load Generation Service
+### 1. Worker Version Enablement Workflow
 **Spec:** [load-generation/spec.md](./load-generation/spec.md)
 **Status:** 📋 Draft
 **Owner:** TBD
-**Purpose:** Create orders continuously, track state across completion stages, expose metrics
+**Purpose:** Orchestrate continuous order submissions to the OMS while demonstrating safe worker version transitions
 
 **Key Deliverables:**
-- REST API for load control (`/load/start`, `/load/stop`)
-- Workflow state tracking (via Temporal SDK queries)
-- Metrics endpoint for monitoring
-- Kubernetes deployment + Ingress
+- WorkerVersionEnablementWorkflow that calls OMS APIs (apps-api, processing-api)
+- Protobuf data contracts: `StartWorkerVersionEnablementRequest`, `WorkerVersionEnablementState`
+- Local runner (Java main class) to execute workflow from host
+- Optional REST endpoints in apps-api: `/api/v1/enablements/worker-version/{enablement_id}/...`
 
-**Why it matters:** Provides realistic, observable load for testing version transitions
+**Why it matters:** Provides realistic, observable order flow for demonstrating safe version transitions
 
 ---
 
@@ -91,13 +91,13 @@ Run an **enablement session** to teach the team how to safely deploy workflow co
 
 ```
 ┌─────────────────────────────────────────┐
-│  Load Generation Service (Phase 1)      │ ← Can start independently
-│  (Creates load for testing)             │
+│  Worker Version Enablement Workflow     │ ← Runs locally (Phase 1)
+│  (Orchestrates order flow)              │
 └──────────────┬──────────────────────────┘
                │
                ↓
 ┌─────────────────────────────────────────┐
-│  Version Deployment Setup (Phase 2)     │ ← Builds on load gen
+│  Version Deployment Setup (Phase 2)     │ ← Workflow deploys v2
 │  (V1 + V2 workers, build-ids)          │
 └──────────────┬──────────────────────────┘
                │
@@ -114,7 +114,7 @@ Run an **enablement session** to teach the team how to safely deploy workflow co
 └─────────────────────────────────────────┘
 ```
 
-**Note:** Load Gen and Version Deployment can be reviewed in parallel, but Version Deployment depends on Load Gen being available for testing.
+**Note:** Enablement workflow and Version Deployment can be reviewed in parallel, but Version Deployment depends on Enablement workflow being available for testing.
 
 ---
 
@@ -141,7 +141,7 @@ Part 3: Runbook (5 min)
 └─ Rollback procedure
 
 Timeline:
-├─ Week 1: Build demo infrastructure (load gen + versions)
+├─ Week 1: Build enablement infrastructure (workflow + versions)
 ├─ Week 2: Write talk track & scenario scripts
 ├─ Week 3: Dry run + refine
 └─ Week 4: Team enablement session
@@ -152,9 +152,8 @@ Timeline:
 ## Open Questions (For All Sub-Specs)
 
 - [ ] Should V2 workers have code changes (logic, schema) or just version bump?
-- [ ] Load test duration: 5 min, 30 min, or 1 hour?
-- [ ] Success metrics: throughput maintained? latency <5s? zero failures?
-- [ ] After demo, should load-gen be production feature or test-only?
+- [ ] Enablement session duration: 5 min, 30 min, or 1 hour?
+- [ ] Success metrics: orders submitted uninterrupted? zero failures?
 - [ ] Document Temporal build-id patterns for entire team?
 
 ---
