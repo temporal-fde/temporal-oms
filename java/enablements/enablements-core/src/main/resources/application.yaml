@@ -1,0 +1,6 @@
+enablements:
+  apps-api:
+    # Base URL for the apps-api service
+    # Local development: http://localhost:8080
+    # Kubernetes: http://apps-api.temporal-oms-apps.svc.cluster.local:8080
+    base-url: http://localhost:8080

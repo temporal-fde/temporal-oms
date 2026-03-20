@@ -7,6 +7,7 @@ import com.acme.proto.acme.enablements.v1.SubmitOrdersRequest;
 import com.acme.proto.acme.enablements.v1.WorkerVersionEnablementState;
 import io.temporal.activity.ActivityOptions;
 import io.temporal.common.RetryOptions;
+import io.temporal.workflow.Async;
 import io.temporal.workflow.Workflow;
 import io.temporal.workflow.WorkflowInit;
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Implementation of WorkerVersionEnablementWorkflow for demonstrating safe version transitions.
@@ -62,6 +64,7 @@ public class WorkerVersionEnablementWorkflowImpl implements WorkerVersionEnablem
     private final AtomicInteger ordersSubmittedCount = new AtomicInteger(0);
     private final AtomicBoolean isPaused = new AtomicBoolean(false);
     private final AtomicBoolean transitionSignalReceived = new AtomicBoolean(false);
+    private final AtomicReference<Exception> submitOrderException = new AtomicReference<>();
 
     @WorkflowInit
     public WorkerVersionEnablementWorkflowImpl(StartWorkerVersionEnablementRequest request) {
@@ -71,23 +74,33 @@ public class WorkerVersionEnablementWorkflowImpl implements WorkerVersionEnablem
 
     @Override
     public void startDemonstration(StartWorkerVersionEnablementRequest req) {
-        var submitScope = Workflow.newCancellationScope(() -> {
-            submitOrdersUntilSignal();
-        })
         this.request = req;
         logger.info(
                 "Starting enablement demonstration: {} with {} orders at {}/min",
-                req.getDemonstrationId(),
+                req.getEnablementId(),
                 req.getOrderCount(),
                 req.getSubmitRatePerMin());
 
-        // Calculate timing
-        long submissionIntervalMs = 60_000L / req.getSubmitRatePerMin();
-        long timeoutMs = req.getTimeout().getSeconds() * 1000 + req.getTimeout().getNanos() / 1_000_000L;
+        var submitScope = Workflow.newCancellationScope(inner -> {
+            Async.function(() -> {
+                submitOrdersUntilSignal();
+                return null;
+            }).thenApply(v -> {
+                logger.info("Order submissions completed successfully");
+                return v;
+            }).exceptionally(e -> {
+                logger.error("Order submission failed", e);
+                submitOrderException.set((Exception) e);
+                return null;
+            });
+        });
 
-
-        // Phase 1: Submit orders with v1 only
-        submitOrdersUntilSignal(req.getOrderCount(), submissionIntervalMs, timeoutMs);
+        try {
+            submitScope.run();
+        } catch (Exception e) {
+            logger.error("Order submission failed, cancelling scope", e);
+            throw e;
+        }
 
         // Phase 2: If transition signal received, deploy v2 and continue
         if (transitionSignalReceived.get()) {
@@ -101,15 +114,7 @@ public class WorkerVersionEnablementWorkflowImpl implements WorkerVersionEnablem
             currentPhase = WorkerVersionEnablementState.DemoPhase.RUNNING_BOTH;
             logger.info("V2 workers deployed and compatibility registered");
 
-            // Continue submitting remaining orders (if any)
-            long remainingTime =
-                    timeoutMs - (Workflow.currentTimeMillis() - System.currentTimeMillis());
-            if (remainingTime > 0 && ordersSubmittedCount.get() < req.getOrderCount()) {
-                submitRemainingOrders(
-                        req.getOrderCount() - ordersSubmittedCount.get(),
-                        submissionIntervalMs,
-                        remainingTime);
-            }
+            // Continue submitting orders during v2 phase (activity will loop until timeout)
         }
 
         currentPhase = WorkerVersionEnablementState.DemoPhase.COMPLETE;
@@ -126,7 +131,7 @@ public class WorkerVersionEnablementWorkflowImpl implements WorkerVersionEnablem
 
         WorkerVersionEnablementState.Builder stateBuilder =
                 WorkerVersionEnablementState.newBuilder()
-                        .setDemonstrationId(request.getDemonstrationId())
+                        .setEnablementId(request.getEnablementId())
                         .setCurrentPhase(currentPhase)
                         .setOrdersSubmittedCount(ordersSubmittedCount.get())
                         .setOrdersPerMinute(request.getSubmitRatePerMin());
@@ -180,37 +185,4 @@ public class WorkerVersionEnablementWorkflowImpl implements WorkerVersionEnablem
                 ordersSubmittedCount.get());
     }
 
-    private void submitRemainingOrders(int remaining, long submissionIntervalMs, long remainingTimeMs) {
-        long startTime = Workflow.currentTimeMillis();
-        int submitted = 0;
-
-        while (submitted < remaining) {
-            long elapsedMs = Workflow.currentTimeMillis() - startTime;
-            if (elapsedMs >= remainingTimeMs) {
-                logger.info("Timeout reached during v2 phase");
-                break;
-            }
-
-            // Wait if paused
-            if (isPaused.get()) {
-                Workflow.sleep(Duration.ofSeconds(1));
-                continue;
-            }
-
-            // Submit order
-            try {
-                String orderId = orderActivities.submitOrders();
-                ordersSubmittedCount.incrementAndGet();
-                submitted++;
-                logger.debug("Submitted order (v2 available): {}", orderId);
-            } catch (Exception e) {
-                logger.warn("Failed to submit order during v2 phase (will continue)", e);
-            }
-
-            // Wait for next submission slot
-            Workflow.sleep(Duration.ofMillis(submissionIntervalMs));
-        }
-
-        logger.info("Completed v2 phase: submitted {} additional orders", submitted);
-    }
 }
