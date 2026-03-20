@@ -1,0 +1,16 @@
+spring.temporal:
+    connection:
+      # Connection settings
+      target: ${TEMPORAL_ADDRESS:}
+
+      # API Key for Temporal Cloud
+      api-key: ${TEMPORAL_API_KEY:}
+
+    namespace: ${TEMPORAL_NAMESPACE:}
+    workers:
+      - task-queue: enablements
+        workflow-classes:
+          - com.acme.enablements.workflows.WorkerVersionEnablementWorkflowImpl
+        activity-beans:
+          - order-activities
+          - deployment-activities

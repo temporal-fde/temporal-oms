@@ -18,6 +18,7 @@
 
     <modules>
         <module>enablements-core</module>
+        <module>enablements-workers</module>
     </modules>
 
     <dependencies>

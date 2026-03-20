@@ -10,12 +10,13 @@ echo "🔧 Setting up infrastructure..."
 if ! kind get clusters 2>/dev/null | grep -q temporal-oms; then
     echo "→ Creating KinD cluster (temporal-oms)..."
     kind create cluster --name temporal-oms
-    kind get kubeconfig --name temporal-oms > /tmp/kind-config.yaml
-    export KUBECONFIG=/tmp/kind-config.yaml
 else
     echo "✓ KinD cluster (temporal-oms) already exists"
-    export KUBECONFIG=/tmp/kind-config.yaml
 fi
+
+# Always (re)write the kubeconfig — /tmp can be wiped between sessions
+kind get kubeconfig --name temporal-oms > /tmp/kind-config.yaml
+export KUBECONFIG=/tmp/kind-config.yaml
 
 # Create namespaces
 echo "→ Creating Kubernetes namespaces..."

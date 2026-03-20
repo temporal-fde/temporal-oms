@@ -5,6 +5,7 @@ import com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,6 +18,7 @@ import java.nio.file.Paths;
  *
  * Handles Kubernetes deployments of v2 workers and build-id compatibility registration.
  */
+@Component("deployment-activities")
 public class DeploymentActivitiesImpl implements DeploymentActivities {
 
     private static final Logger logger = LoggerFactory.getLogger(DeploymentActivitiesImpl.class);

@@ -1,0 +1,6 @@
+spring.config.import: classpath:acme.enablements.yaml
+
+spring.application.name: enablements-workers
+spring.main.web-application-type: none
+spring.temporal.start-workers: true
+management.server.port: 9093

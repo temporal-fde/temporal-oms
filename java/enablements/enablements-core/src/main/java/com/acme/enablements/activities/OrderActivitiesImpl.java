@@ -10,21 +10,25 @@ import io.temporal.client.ActivityCompletionException;
 import io.temporal.failure.CanceledFailure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Component("order-activities")
 public class OrderActivitiesImpl implements OrderActivities {
 
     private static final Logger logger = LoggerFactory.getLogger(OrderActivitiesImpl.class);
 
     private final RestClient restClient;
 
-    public OrderActivitiesImpl(RestClient restClient) {
-        this.restClient = restClient;
+    public OrderActivitiesImpl(
+            RestClient.Builder restClientBuilder,
+            @Value("${enablements.apps-api.base-url:http://localhost:8080}") String appsApiBaseUrl) {
+        this.restClient = restClientBuilder.baseUrl(appsApiBaseUrl).build();
     }
 
     @Override
