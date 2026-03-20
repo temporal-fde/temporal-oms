@@ -37,6 +37,8 @@ message WorkerVersionEnablementState {
 
   // Versioning info
   google.protobuf.Timestamp last_transition_at = 7;  // When transitionToV2 was signaled
+  repeated DeployWorkerVersionRequest deploy_requests = 8;
+  repeated DeployWorkerVersionResponse deployments = 9;
 }
 
 message SubmitOrdersRequest {
@@ -45,4 +47,14 @@ message SubmitOrdersRequest {
 }
 message SubmitOrdersResponse {
   string orders_submitted_count = 1;
+}
+
+message DeployWorkerVersionRequest {
+  string deployment_name = 1;
+  string build_id = 2;
+  string version = 3;
+  optional int32 replica_count = 4;
+}
+message DeployWorkerVersionResponse {
+
 }

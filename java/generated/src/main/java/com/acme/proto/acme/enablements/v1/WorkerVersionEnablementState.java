@@ -37,6 +37,8 @@ private static final long serialVersionUID = 0L;
     currentPhase_ = 0;
     activeVersions_ =
         com.google.protobuf.LazyStringArrayList.emptyList();
+    deployRequests_ = java.util.Collections.emptyList();
+    deployments_ = java.util.Collections.emptyList();
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
@@ -410,6 +412,88 @@ private static final long serialVersionUID = 0L;
     return lastTransitionAt_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : lastTransitionAt_;
   }
 
+  public static final int DEPLOY_REQUESTS_FIELD_NUMBER = 8;
+  @SuppressWarnings("serial")
+  private java.util.List<com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest> deployRequests_;
+  /**
+   * <code>repeated .acme.enablements.v1.DeployWorkerVersionRequest deploy_requests = 8 [json_name = "deployRequests"];</code>
+   */
+  @java.lang.Override
+  public java.util.List<com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest> getDeployRequestsList() {
+    return deployRequests_;
+  }
+  /**
+   * <code>repeated .acme.enablements.v1.DeployWorkerVersionRequest deploy_requests = 8 [json_name = "deployRequests"];</code>
+   */
+  @java.lang.Override
+  public java.util.List<? extends com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequestOrBuilder> 
+      getDeployRequestsOrBuilderList() {
+    return deployRequests_;
+  }
+  /**
+   * <code>repeated .acme.enablements.v1.DeployWorkerVersionRequest deploy_requests = 8 [json_name = "deployRequests"];</code>
+   */
+  @java.lang.Override
+  public int getDeployRequestsCount() {
+    return deployRequests_.size();
+  }
+  /**
+   * <code>repeated .acme.enablements.v1.DeployWorkerVersionRequest deploy_requests = 8 [json_name = "deployRequests"];</code>
+   */
+  @java.lang.Override
+  public com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest getDeployRequests(int index) {
+    return deployRequests_.get(index);
+  }
+  /**
+   * <code>repeated .acme.enablements.v1.DeployWorkerVersionRequest deploy_requests = 8 [json_name = "deployRequests"];</code>
+   */
+  @java.lang.Override
+  public com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequestOrBuilder getDeployRequestsOrBuilder(
+      int index) {
+    return deployRequests_.get(index);
+  }
+
+  public static final int DEPLOYMENTS_FIELD_NUMBER = 9;
+  @SuppressWarnings("serial")
+  private java.util.List<com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse> deployments_;
+  /**
+   * <code>repeated .acme.enablements.v1.DeployWorkerVersionResponse deployments = 9 [json_name = "deployments"];</code>
+   */
+  @java.lang.Override
+  public java.util.List<com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse> getDeploymentsList() {
+    return deployments_;
+  }
+  /**
+   * <code>repeated .acme.enablements.v1.DeployWorkerVersionResponse deployments = 9 [json_name = "deployments"];</code>
+   */
+  @java.lang.Override
+  public java.util.List<? extends com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponseOrBuilder> 
+      getDeploymentsOrBuilderList() {
+    return deployments_;
+  }
+  /**
+   * <code>repeated .acme.enablements.v1.DeployWorkerVersionResponse deployments = 9 [json_name = "deployments"];</code>
+   */
+  @java.lang.Override
+  public int getDeploymentsCount() {
+    return deployments_.size();
+  }
+  /**
+   * <code>repeated .acme.enablements.v1.DeployWorkerVersionResponse deployments = 9 [json_name = "deployments"];</code>
+   */
+  @java.lang.Override
+  public com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse getDeployments(int index) {
+    return deployments_.get(index);
+  }
+  /**
+   * <code>repeated .acme.enablements.v1.DeployWorkerVersionResponse deployments = 9 [json_name = "deployments"];</code>
+   */
+  @java.lang.Override
+  public com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponseOrBuilder getDeploymentsOrBuilder(
+      int index) {
+    return deployments_.get(index);
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -444,6 +528,12 @@ private static final long serialVersionUID = 0L;
     }
     if (((bitField0_ & 0x00000002) != 0)) {
       output.writeMessage(7, getLastTransitionAt());
+    }
+    for (int i = 0; i < deployRequests_.size(); i++) {
+      output.writeMessage(8, deployRequests_.get(i));
+    }
+    for (int i = 0; i < deployments_.size(); i++) {
+      output.writeMessage(9, deployments_.get(i));
     }
     getUnknownFields().writeTo(output);
   }
@@ -485,6 +575,24 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(7, getLastTransitionAt());
     }
+
+        {
+          final int count = deployRequests_.size();
+          for (int i = 0; i < count; i++) {
+            size += com.google.protobuf.CodedOutputStream
+              .computeMessageSizeNoTag(deployRequests_.get(i));
+          }
+          size += 1 * count;
+        }
+
+        {
+          final int count = deployments_.size();
+          for (int i = 0; i < count; i++) {
+            size += com.google.protobuf.CodedOutputStream
+              .computeMessageSizeNoTag(deployments_.get(i));
+          }
+          size += 1 * count;
+        }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -520,6 +628,10 @@ private static final long serialVersionUID = 0L;
       if (!getLastTransitionAt()
           .equals(other.getLastTransitionAt())) return false;
     }
+    if (!getDeployRequestsList()
+        .equals(other.getDeployRequestsList())) return false;
+    if (!getDeploymentsList()
+        .equals(other.getDeploymentsList())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -551,6 +663,14 @@ private static final long serialVersionUID = 0L;
     if (hasLastTransitionAt()) {
       hash = (37 * hash) + LAST_TRANSITION_AT_FIELD_NUMBER;
       hash = (53 * hash) + getLastTransitionAt().hashCode();
+    }
+    if (getDeployRequestsCount() > 0) {
+      hash = (37 * hash) + DEPLOY_REQUESTS_FIELD_NUMBER;
+      hash = (53 * hash) + getDeployRequestsList().hashCode();
+    }
+    if (getDeploymentsCount() > 0) {
+      hash = (37 * hash) + DEPLOYMENTS_FIELD_NUMBER;
+      hash = (53 * hash) + getDeploymentsList().hashCode();
     }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
@@ -689,6 +809,8 @@ private static final long serialVersionUID = 0L;
               .alwaysUseFieldBuilders) {
         internalGetArgsFieldBuilder();
         internalGetLastTransitionAtFieldBuilder();
+        internalGetDeployRequestsFieldBuilder();
+        internalGetDeploymentsFieldBuilder();
       }
     }
     @java.lang.Override
@@ -711,6 +833,20 @@ private static final long serialVersionUID = 0L;
         lastTransitionAtBuilder_.dispose();
         lastTransitionAtBuilder_ = null;
       }
+      if (deployRequestsBuilder_ == null) {
+        deployRequests_ = java.util.Collections.emptyList();
+      } else {
+        deployRequests_ = null;
+        deployRequestsBuilder_.clear();
+      }
+      bitField0_ = (bitField0_ & ~0x00000080);
+      if (deploymentsBuilder_ == null) {
+        deployments_ = java.util.Collections.emptyList();
+      } else {
+        deployments_ = null;
+        deploymentsBuilder_.clear();
+      }
+      bitField0_ = (bitField0_ & ~0x00000100);
       return this;
     }
 
@@ -737,9 +873,31 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.acme.proto.acme.enablements.v1.WorkerVersionEnablementState buildPartial() {
       com.acme.proto.acme.enablements.v1.WorkerVersionEnablementState result = new com.acme.proto.acme.enablements.v1.WorkerVersionEnablementState(this);
+      buildPartialRepeatedFields(result);
       if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
+    }
+
+    private void buildPartialRepeatedFields(com.acme.proto.acme.enablements.v1.WorkerVersionEnablementState result) {
+      if (deployRequestsBuilder_ == null) {
+        if (((bitField0_ & 0x00000080) != 0)) {
+          deployRequests_ = java.util.Collections.unmodifiableList(deployRequests_);
+          bitField0_ = (bitField0_ & ~0x00000080);
+        }
+        result.deployRequests_ = deployRequests_;
+      } else {
+        result.deployRequests_ = deployRequestsBuilder_.build();
+      }
+      if (deploymentsBuilder_ == null) {
+        if (((bitField0_ & 0x00000100) != 0)) {
+          deployments_ = java.util.Collections.unmodifiableList(deployments_);
+          bitField0_ = (bitField0_ & ~0x00000100);
+        }
+        result.deployments_ = deployments_;
+      } else {
+        result.deployments_ = deploymentsBuilder_.build();
+      }
     }
 
     private void buildPartial0(com.acme.proto.acme.enablements.v1.WorkerVersionEnablementState result) {
@@ -818,6 +976,58 @@ private static final long serialVersionUID = 0L;
       if (other.hasLastTransitionAt()) {
         mergeLastTransitionAt(other.getLastTransitionAt());
       }
+      if (deployRequestsBuilder_ == null) {
+        if (!other.deployRequests_.isEmpty()) {
+          if (deployRequests_.isEmpty()) {
+            deployRequests_ = other.deployRequests_;
+            bitField0_ = (bitField0_ & ~0x00000080);
+          } else {
+            ensureDeployRequestsIsMutable();
+            deployRequests_.addAll(other.deployRequests_);
+          }
+          onChanged();
+        }
+      } else {
+        if (!other.deployRequests_.isEmpty()) {
+          if (deployRequestsBuilder_.isEmpty()) {
+            deployRequestsBuilder_.dispose();
+            deployRequestsBuilder_ = null;
+            deployRequests_ = other.deployRequests_;
+            bitField0_ = (bitField0_ & ~0x00000080);
+            deployRequestsBuilder_ = 
+              com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                 internalGetDeployRequestsFieldBuilder() : null;
+          } else {
+            deployRequestsBuilder_.addAllMessages(other.deployRequests_);
+          }
+        }
+      }
+      if (deploymentsBuilder_ == null) {
+        if (!other.deployments_.isEmpty()) {
+          if (deployments_.isEmpty()) {
+            deployments_ = other.deployments_;
+            bitField0_ = (bitField0_ & ~0x00000100);
+          } else {
+            ensureDeploymentsIsMutable();
+            deployments_.addAll(other.deployments_);
+          }
+          onChanged();
+        }
+      } else {
+        if (!other.deployments_.isEmpty()) {
+          if (deploymentsBuilder_.isEmpty()) {
+            deploymentsBuilder_.dispose();
+            deploymentsBuilder_ = null;
+            deployments_ = other.deployments_;
+            bitField0_ = (bitField0_ & ~0x00000100);
+            deploymentsBuilder_ = 
+              com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                 internalGetDeploymentsFieldBuilder() : null;
+          } else {
+            deploymentsBuilder_.addAllMessages(other.deployments_);
+          }
+        }
+      }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -883,6 +1093,32 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000040;
               break;
             } // case 58
+            case 66: {
+              com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest m =
+                  input.readMessage(
+                      com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest.parser(),
+                      extensionRegistry);
+              if (deployRequestsBuilder_ == null) {
+                ensureDeployRequestsIsMutable();
+                deployRequests_.add(m);
+              } else {
+                deployRequestsBuilder_.addMessage(m);
+              }
+              break;
+            } // case 66
+            case 74: {
+              com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse m =
+                  input.readMessage(
+                      com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse.parser(),
+                      extensionRegistry);
+              if (deploymentsBuilder_ == null) {
+                ensureDeploymentsIsMutable();
+                deployments_.add(m);
+              } else {
+                deploymentsBuilder_.addMessage(m);
+              }
+              break;
+            } // case 74
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -1535,6 +1771,486 @@ private static final long serialVersionUID = 0L;
         lastTransitionAt_ = null;
       }
       return lastTransitionAtBuilder_;
+    }
+
+    private java.util.List<com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest> deployRequests_ =
+      java.util.Collections.emptyList();
+    private void ensureDeployRequestsIsMutable() {
+      if (!((bitField0_ & 0x00000080) != 0)) {
+        deployRequests_ = new java.util.ArrayList<com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest>(deployRequests_);
+        bitField0_ |= 0x00000080;
+       }
+    }
+
+    private com.google.protobuf.RepeatedFieldBuilder<
+        com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest, com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest.Builder, com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequestOrBuilder> deployRequestsBuilder_;
+
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionRequest deploy_requests = 8 [json_name = "deployRequests"];</code>
+     */
+    public java.util.List<com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest> getDeployRequestsList() {
+      if (deployRequestsBuilder_ == null) {
+        return java.util.Collections.unmodifiableList(deployRequests_);
+      } else {
+        return deployRequestsBuilder_.getMessageList();
+      }
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionRequest deploy_requests = 8 [json_name = "deployRequests"];</code>
+     */
+    public int getDeployRequestsCount() {
+      if (deployRequestsBuilder_ == null) {
+        return deployRequests_.size();
+      } else {
+        return deployRequestsBuilder_.getCount();
+      }
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionRequest deploy_requests = 8 [json_name = "deployRequests"];</code>
+     */
+    public com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest getDeployRequests(int index) {
+      if (deployRequestsBuilder_ == null) {
+        return deployRequests_.get(index);
+      } else {
+        return deployRequestsBuilder_.getMessage(index);
+      }
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionRequest deploy_requests = 8 [json_name = "deployRequests"];</code>
+     */
+    public Builder setDeployRequests(
+        int index, com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest value) {
+      if (deployRequestsBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureDeployRequestsIsMutable();
+        deployRequests_.set(index, value);
+        onChanged();
+      } else {
+        deployRequestsBuilder_.setMessage(index, value);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionRequest deploy_requests = 8 [json_name = "deployRequests"];</code>
+     */
+    public Builder setDeployRequests(
+        int index, com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest.Builder builderForValue) {
+      if (deployRequestsBuilder_ == null) {
+        ensureDeployRequestsIsMutable();
+        deployRequests_.set(index, builderForValue.build());
+        onChanged();
+      } else {
+        deployRequestsBuilder_.setMessage(index, builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionRequest deploy_requests = 8 [json_name = "deployRequests"];</code>
+     */
+    public Builder addDeployRequests(com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest value) {
+      if (deployRequestsBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureDeployRequestsIsMutable();
+        deployRequests_.add(value);
+        onChanged();
+      } else {
+        deployRequestsBuilder_.addMessage(value);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionRequest deploy_requests = 8 [json_name = "deployRequests"];</code>
+     */
+    public Builder addDeployRequests(
+        int index, com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest value) {
+      if (deployRequestsBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureDeployRequestsIsMutable();
+        deployRequests_.add(index, value);
+        onChanged();
+      } else {
+        deployRequestsBuilder_.addMessage(index, value);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionRequest deploy_requests = 8 [json_name = "deployRequests"];</code>
+     */
+    public Builder addDeployRequests(
+        com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest.Builder builderForValue) {
+      if (deployRequestsBuilder_ == null) {
+        ensureDeployRequestsIsMutable();
+        deployRequests_.add(builderForValue.build());
+        onChanged();
+      } else {
+        deployRequestsBuilder_.addMessage(builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionRequest deploy_requests = 8 [json_name = "deployRequests"];</code>
+     */
+    public Builder addDeployRequests(
+        int index, com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest.Builder builderForValue) {
+      if (deployRequestsBuilder_ == null) {
+        ensureDeployRequestsIsMutable();
+        deployRequests_.add(index, builderForValue.build());
+        onChanged();
+      } else {
+        deployRequestsBuilder_.addMessage(index, builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionRequest deploy_requests = 8 [json_name = "deployRequests"];</code>
+     */
+    public Builder addAllDeployRequests(
+        java.lang.Iterable<? extends com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest> values) {
+      if (deployRequestsBuilder_ == null) {
+        ensureDeployRequestsIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, deployRequests_);
+        onChanged();
+      } else {
+        deployRequestsBuilder_.addAllMessages(values);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionRequest deploy_requests = 8 [json_name = "deployRequests"];</code>
+     */
+    public Builder clearDeployRequests() {
+      if (deployRequestsBuilder_ == null) {
+        deployRequests_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000080);
+        onChanged();
+      } else {
+        deployRequestsBuilder_.clear();
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionRequest deploy_requests = 8 [json_name = "deployRequests"];</code>
+     */
+    public Builder removeDeployRequests(int index) {
+      if (deployRequestsBuilder_ == null) {
+        ensureDeployRequestsIsMutable();
+        deployRequests_.remove(index);
+        onChanged();
+      } else {
+        deployRequestsBuilder_.remove(index);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionRequest deploy_requests = 8 [json_name = "deployRequests"];</code>
+     */
+    public com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest.Builder getDeployRequestsBuilder(
+        int index) {
+      return internalGetDeployRequestsFieldBuilder().getBuilder(index);
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionRequest deploy_requests = 8 [json_name = "deployRequests"];</code>
+     */
+    public com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequestOrBuilder getDeployRequestsOrBuilder(
+        int index) {
+      if (deployRequestsBuilder_ == null) {
+        return deployRequests_.get(index);  } else {
+        return deployRequestsBuilder_.getMessageOrBuilder(index);
+      }
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionRequest deploy_requests = 8 [json_name = "deployRequests"];</code>
+     */
+    public java.util.List<? extends com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequestOrBuilder> 
+         getDeployRequestsOrBuilderList() {
+      if (deployRequestsBuilder_ != null) {
+        return deployRequestsBuilder_.getMessageOrBuilderList();
+      } else {
+        return java.util.Collections.unmodifiableList(deployRequests_);
+      }
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionRequest deploy_requests = 8 [json_name = "deployRequests"];</code>
+     */
+    public com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest.Builder addDeployRequestsBuilder() {
+      return internalGetDeployRequestsFieldBuilder().addBuilder(
+          com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest.getDefaultInstance());
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionRequest deploy_requests = 8 [json_name = "deployRequests"];</code>
+     */
+    public com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest.Builder addDeployRequestsBuilder(
+        int index) {
+      return internalGetDeployRequestsFieldBuilder().addBuilder(
+          index, com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest.getDefaultInstance());
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionRequest deploy_requests = 8 [json_name = "deployRequests"];</code>
+     */
+    public java.util.List<com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest.Builder> 
+         getDeployRequestsBuilderList() {
+      return internalGetDeployRequestsFieldBuilder().getBuilderList();
+    }
+    private com.google.protobuf.RepeatedFieldBuilder<
+        com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest, com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest.Builder, com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequestOrBuilder> 
+        internalGetDeployRequestsFieldBuilder() {
+      if (deployRequestsBuilder_ == null) {
+        deployRequestsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+            com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest, com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest.Builder, com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequestOrBuilder>(
+                deployRequests_,
+                ((bitField0_ & 0x00000080) != 0),
+                getParentForChildren(),
+                isClean());
+        deployRequests_ = null;
+      }
+      return deployRequestsBuilder_;
+    }
+
+    private java.util.List<com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse> deployments_ =
+      java.util.Collections.emptyList();
+    private void ensureDeploymentsIsMutable() {
+      if (!((bitField0_ & 0x00000100) != 0)) {
+        deployments_ = new java.util.ArrayList<com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse>(deployments_);
+        bitField0_ |= 0x00000100;
+       }
+    }
+
+    private com.google.protobuf.RepeatedFieldBuilder<
+        com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse, com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse.Builder, com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponseOrBuilder> deploymentsBuilder_;
+
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionResponse deployments = 9 [json_name = "deployments"];</code>
+     */
+    public java.util.List<com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse> getDeploymentsList() {
+      if (deploymentsBuilder_ == null) {
+        return java.util.Collections.unmodifiableList(deployments_);
+      } else {
+        return deploymentsBuilder_.getMessageList();
+      }
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionResponse deployments = 9 [json_name = "deployments"];</code>
+     */
+    public int getDeploymentsCount() {
+      if (deploymentsBuilder_ == null) {
+        return deployments_.size();
+      } else {
+        return deploymentsBuilder_.getCount();
+      }
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionResponse deployments = 9 [json_name = "deployments"];</code>
+     */
+    public com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse getDeployments(int index) {
+      if (deploymentsBuilder_ == null) {
+        return deployments_.get(index);
+      } else {
+        return deploymentsBuilder_.getMessage(index);
+      }
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionResponse deployments = 9 [json_name = "deployments"];</code>
+     */
+    public Builder setDeployments(
+        int index, com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse value) {
+      if (deploymentsBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureDeploymentsIsMutable();
+        deployments_.set(index, value);
+        onChanged();
+      } else {
+        deploymentsBuilder_.setMessage(index, value);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionResponse deployments = 9 [json_name = "deployments"];</code>
+     */
+    public Builder setDeployments(
+        int index, com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse.Builder builderForValue) {
+      if (deploymentsBuilder_ == null) {
+        ensureDeploymentsIsMutable();
+        deployments_.set(index, builderForValue.build());
+        onChanged();
+      } else {
+        deploymentsBuilder_.setMessage(index, builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionResponse deployments = 9 [json_name = "deployments"];</code>
+     */
+    public Builder addDeployments(com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse value) {
+      if (deploymentsBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureDeploymentsIsMutable();
+        deployments_.add(value);
+        onChanged();
+      } else {
+        deploymentsBuilder_.addMessage(value);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionResponse deployments = 9 [json_name = "deployments"];</code>
+     */
+    public Builder addDeployments(
+        int index, com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse value) {
+      if (deploymentsBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureDeploymentsIsMutable();
+        deployments_.add(index, value);
+        onChanged();
+      } else {
+        deploymentsBuilder_.addMessage(index, value);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionResponse deployments = 9 [json_name = "deployments"];</code>
+     */
+    public Builder addDeployments(
+        com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse.Builder builderForValue) {
+      if (deploymentsBuilder_ == null) {
+        ensureDeploymentsIsMutable();
+        deployments_.add(builderForValue.build());
+        onChanged();
+      } else {
+        deploymentsBuilder_.addMessage(builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionResponse deployments = 9 [json_name = "deployments"];</code>
+     */
+    public Builder addDeployments(
+        int index, com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse.Builder builderForValue) {
+      if (deploymentsBuilder_ == null) {
+        ensureDeploymentsIsMutable();
+        deployments_.add(index, builderForValue.build());
+        onChanged();
+      } else {
+        deploymentsBuilder_.addMessage(index, builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionResponse deployments = 9 [json_name = "deployments"];</code>
+     */
+    public Builder addAllDeployments(
+        java.lang.Iterable<? extends com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse> values) {
+      if (deploymentsBuilder_ == null) {
+        ensureDeploymentsIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, deployments_);
+        onChanged();
+      } else {
+        deploymentsBuilder_.addAllMessages(values);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionResponse deployments = 9 [json_name = "deployments"];</code>
+     */
+    public Builder clearDeployments() {
+      if (deploymentsBuilder_ == null) {
+        deployments_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000100);
+        onChanged();
+      } else {
+        deploymentsBuilder_.clear();
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionResponse deployments = 9 [json_name = "deployments"];</code>
+     */
+    public Builder removeDeployments(int index) {
+      if (deploymentsBuilder_ == null) {
+        ensureDeploymentsIsMutable();
+        deployments_.remove(index);
+        onChanged();
+      } else {
+        deploymentsBuilder_.remove(index);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionResponse deployments = 9 [json_name = "deployments"];</code>
+     */
+    public com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse.Builder getDeploymentsBuilder(
+        int index) {
+      return internalGetDeploymentsFieldBuilder().getBuilder(index);
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionResponse deployments = 9 [json_name = "deployments"];</code>
+     */
+    public com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponseOrBuilder getDeploymentsOrBuilder(
+        int index) {
+      if (deploymentsBuilder_ == null) {
+        return deployments_.get(index);  } else {
+        return deploymentsBuilder_.getMessageOrBuilder(index);
+      }
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionResponse deployments = 9 [json_name = "deployments"];</code>
+     */
+    public java.util.List<? extends com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponseOrBuilder> 
+         getDeploymentsOrBuilderList() {
+      if (deploymentsBuilder_ != null) {
+        return deploymentsBuilder_.getMessageOrBuilderList();
+      } else {
+        return java.util.Collections.unmodifiableList(deployments_);
+      }
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionResponse deployments = 9 [json_name = "deployments"];</code>
+     */
+    public com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse.Builder addDeploymentsBuilder() {
+      return internalGetDeploymentsFieldBuilder().addBuilder(
+          com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse.getDefaultInstance());
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionResponse deployments = 9 [json_name = "deployments"];</code>
+     */
+    public com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse.Builder addDeploymentsBuilder(
+        int index) {
+      return internalGetDeploymentsFieldBuilder().addBuilder(
+          index, com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse.getDefaultInstance());
+    }
+    /**
+     * <code>repeated .acme.enablements.v1.DeployWorkerVersionResponse deployments = 9 [json_name = "deployments"];</code>
+     */
+    public java.util.List<com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse.Builder> 
+         getDeploymentsBuilderList() {
+      return internalGetDeploymentsFieldBuilder().getBuilderList();
+    }
+    private com.google.protobuf.RepeatedFieldBuilder<
+        com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse, com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse.Builder, com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponseOrBuilder> 
+        internalGetDeploymentsFieldBuilder() {
+      if (deploymentsBuilder_ == null) {
+        deploymentsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+            com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse, com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse.Builder, com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponseOrBuilder>(
+                deployments_,
+                ((bitField0_ & 0x00000100) != 0),
+                getParentForChildren(),
+                isClean());
+        deployments_ = null;
+      }
+      return deploymentsBuilder_;
     }
 
     // @@protoc_insertion_point(builder_scope:acme.enablements.v1.WorkerVersionEnablementState)

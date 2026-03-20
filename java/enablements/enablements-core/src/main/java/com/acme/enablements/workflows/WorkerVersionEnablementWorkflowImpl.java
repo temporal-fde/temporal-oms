@@ -2,6 +2,7 @@ package com.acme.enablements.workflows;
 
 import com.acme.enablements.activities.DeploymentActivities;
 import com.acme.enablements.activities.OrderActivities;
+import com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest;
 import com.acme.proto.acme.enablements.v1.StartWorkerVersionEnablementRequest;
 import com.acme.proto.acme.enablements.v1.SubmitOrdersRequest;
 import com.acme.proto.acme.enablements.v1.WorkerVersionEnablementState;
@@ -55,7 +56,7 @@ public class WorkerVersionEnablementWorkflowImpl implements WorkerVersionEnablem
                                             .setMaximumAttempts(3)
                                             .build())
                             .build());
-    private final WorkerVersionEnablementState state;
+    private WorkerVersionEnablementState state;
 
     private StartWorkerVersionEnablementRequest request;
     private WorkerVersionEnablementState.DemoPhase currentPhase =
@@ -73,7 +74,7 @@ public class WorkerVersionEnablementWorkflowImpl implements WorkerVersionEnablem
 
 
     @Override
-    public void startDemonstration(StartWorkerVersionEnablementRequest req) {
+    public void execute(StartWorkerVersionEnablementRequest req) {
         this.request = req;
         logger.info(
                 "Starting enablement demonstration: {} with {} orders at {}/min",
@@ -101,25 +102,13 @@ public class WorkerVersionEnablementWorkflowImpl implements WorkerVersionEnablem
             logger.error("Order submission failed, cancelling scope", e);
             throw e;
         }
-
-        // Phase 2: If transition signal received, deploy v2 and continue
-        if (transitionSignalReceived.get()) {
-            currentPhase = WorkerVersionEnablementState.DemoPhase.TRANSITIONING_TO_V2;
-            lastTransitionAt = Instant.now();
-
-            // Deploy v2 and register compatibility
-            deploymentActivities.deployV2Workers();
-            deploymentActivities.registerCompatibility();
-
-            currentPhase = WorkerVersionEnablementState.DemoPhase.RUNNING_BOTH;
-            logger.info("V2 workers deployed and compatibility registered");
-
-            // Continue submitting orders during v2 phase (activity will loop until timeout)
+        if(state.getDeployRequestsCount() > 0) {
+            for(var i = state.getDeployRequestsCount(); i > -1; i--) {
+                var deploy = this.state.getDeployRequests(i);
+                this.state = this.state.toBuilder().removeDeployRequests(i).build();
+                this.state =  this.state.toBuilder().addDeployments(deploymentActivities.deployWorkerVersion(deploy)).build();
+            }
         }
-
-        currentPhase = WorkerVersionEnablementState.DemoPhase.COMPLETE;
-        logger.info("Enablement demonstration complete. Total orders submitted: {}",
-                ordersSubmittedCount.get());
     }
 
     @Override
@@ -168,9 +157,8 @@ public class WorkerVersionEnablementWorkflowImpl implements WorkerVersionEnablem
     }
 
     @Override
-    public void transitionToV2() {
-        transitionSignalReceived.set(true);
-        logger.info("Received signal to transition to v2");
+    public void deployWorkerVersion(DeployWorkerVersionRequest cmd) {
+        this.state = this.state.toBuilder().addDeployRequests(cmd).build();
     }
 
     private void submitOrdersUntilSignal() {

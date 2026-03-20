@@ -2,11 +2,8 @@ package com.acme.apps.workflows;
 
 import com.acme.proto.acme.apps.domain.apps.v1.*;
 
-import io.temporal.workflow.QueryMethod;
-import io.temporal.workflow.UpdateMethod;
-import io.temporal.workflow.UpdateValidatorMethod;
-import io.temporal.workflow.WorkflowInterface;
-import io.temporal.workflow.WorkflowMethod;
+import io.temporal.common.VersioningBehavior;
+import io.temporal.workflow.*;
 
 /**
  * CompleteOrder Workflow - Application Service
@@ -22,6 +19,7 @@ import io.temporal.workflow.WorkflowMethod;
 public interface Order {
 
     @WorkflowMethod
+    @WorkflowVersioningBehavior(VersioningBehavior.PINNED)
     void execute(CompleteOrderRequest request);
 
     /**

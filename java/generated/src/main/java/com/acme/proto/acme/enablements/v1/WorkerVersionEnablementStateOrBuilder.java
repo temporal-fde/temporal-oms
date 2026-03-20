@@ -135,4 +135,52 @@ public interface WorkerVersionEnablementStateOrBuilder extends
    * <code>.google.protobuf.Timestamp last_transition_at = 7 [json_name = "lastTransitionAt"];</code>
    */
   com.google.protobuf.TimestampOrBuilder getLastTransitionAtOrBuilder();
+
+  /**
+   * <code>repeated .acme.enablements.v1.DeployWorkerVersionRequest deploy_requests = 8 [json_name = "deployRequests"];</code>
+   */
+  java.util.List<com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest> 
+      getDeployRequestsList();
+  /**
+   * <code>repeated .acme.enablements.v1.DeployWorkerVersionRequest deploy_requests = 8 [json_name = "deployRequests"];</code>
+   */
+  com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest getDeployRequests(int index);
+  /**
+   * <code>repeated .acme.enablements.v1.DeployWorkerVersionRequest deploy_requests = 8 [json_name = "deployRequests"];</code>
+   */
+  int getDeployRequestsCount();
+  /**
+   * <code>repeated .acme.enablements.v1.DeployWorkerVersionRequest deploy_requests = 8 [json_name = "deployRequests"];</code>
+   */
+  java.util.List<? extends com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequestOrBuilder> 
+      getDeployRequestsOrBuilderList();
+  /**
+   * <code>repeated .acme.enablements.v1.DeployWorkerVersionRequest deploy_requests = 8 [json_name = "deployRequests"];</code>
+   */
+  com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequestOrBuilder getDeployRequestsOrBuilder(
+      int index);
+
+  /**
+   * <code>repeated .acme.enablements.v1.DeployWorkerVersionResponse deployments = 9 [json_name = "deployments"];</code>
+   */
+  java.util.List<com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse> 
+      getDeploymentsList();
+  /**
+   * <code>repeated .acme.enablements.v1.DeployWorkerVersionResponse deployments = 9 [json_name = "deployments"];</code>
+   */
+  com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponse getDeployments(int index);
+  /**
+   * <code>repeated .acme.enablements.v1.DeployWorkerVersionResponse deployments = 9 [json_name = "deployments"];</code>
+   */
+  int getDeploymentsCount();
+  /**
+   * <code>repeated .acme.enablements.v1.DeployWorkerVersionResponse deployments = 9 [json_name = "deployments"];</code>
+   */
+  java.util.List<? extends com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponseOrBuilder> 
+      getDeploymentsOrBuilderList();
+  /**
+   * <code>repeated .acme.enablements.v1.DeployWorkerVersionResponse deployments = 9 [json_name = "deployments"];</code>
+   */
+  com.acme.proto.acme.enablements.v1.DeployWorkerVersionResponseOrBuilder getDeploymentsOrBuilder(
+      int index);
 }

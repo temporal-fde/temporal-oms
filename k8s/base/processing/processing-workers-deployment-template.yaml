@@ -1,0 +1,24 @@
+apiVersion: workload.temporal.io/v1
+kind: TemporalWorkerDeployment
+metadata:
+  name: processing-workers-{VERSION}
+  namespace: temporal-oms-processing
+spec:
+  workload:
+    buildId: {BUILD_ID}
+    replicaCount: {REPLICAS}
+    container:
+      image: temporal-oms/processing-workers:latest
+      imagePullPolicy: IfNotPresent
+      env:
+        - name: BUILD_ID
+          value: {BUILD_ID}
+        - name: USE_WORKER_VERSIONING
+          value: "true"
+      resources:
+        requests:
+          memory: "512Mi"
+          cpu: "250m"
+        limits:
+          memory: "1Gi"
+          cpu: "1000m"

@@ -3,6 +3,7 @@ package com.acme.processing.workflows;
 import com.acme.proto.acme.apps.domain.apps.v1.*;
 import com.acme.proto.acme.processing.domain.processing.v1.GetProcessOrderStateResponse;
 import com.acme.proto.acme.processing.domain.processing.v1.ProcessOrderRequest;
+import io.temporal.common.VersioningBehavior;
 import io.temporal.workflow.*;
 
 /**
@@ -19,6 +20,7 @@ import io.temporal.workflow.*;
 public interface Order {
 
     @WorkflowMethod
+    @WorkflowVersioningBehavior(VersioningBehavior.PINNED)
     GetProcessOrderStateResponse execute(ProcessOrderRequest request);
 
     /**

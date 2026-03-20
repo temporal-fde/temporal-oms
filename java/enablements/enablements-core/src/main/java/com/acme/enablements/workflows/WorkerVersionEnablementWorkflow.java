@@ -1,5 +1,6 @@
 package com.acme.enablements.workflows;
 
+import com.acme.proto.acme.enablements.v1.DeployWorkerVersionRequest;
 import com.acme.proto.acme.enablements.v1.StartWorkerVersionEnablementRequest;
 import com.acme.proto.acme.enablements.v1.WorkerVersionEnablementState;
 import io.temporal.workflow.QueryMethod;
@@ -29,7 +30,7 @@ public interface WorkerVersionEnablementWorkflow {
    * @param request Contains demonstration ID, order count, submission rate, and timeout
    */
   @WorkflowMethod
-  void startDemonstration(StartWorkerVersionEnablementRequest request);
+  void execute(StartWorkerVersionEnablementRequest request);
 
   /**
    * Query current workflow execution state.
@@ -55,5 +56,5 @@ public interface WorkerVersionEnablementWorkflow {
    * Trigger deployment of v2 workers and transition to RUNNING_BOTH phase.
    */
   @SignalMethod
-  void transitionToV2();
+  void deployWorkerVersion(DeployWorkerVersionRequest cmd);
 }
