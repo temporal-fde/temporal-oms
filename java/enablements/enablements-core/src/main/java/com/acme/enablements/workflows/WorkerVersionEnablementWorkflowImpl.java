@@ -58,13 +58,6 @@ public class WorkerVersionEnablementWorkflowImpl implements WorkerVersionEnablem
                             .build());
     private WorkerVersionEnablementState state;
 
-    private StartWorkerVersionEnablementRequest request;
-    private WorkerVersionEnablementState.DemoPhase currentPhase =
-            WorkerVersionEnablementState.DemoPhase.RUNNING_V1_ONLY;
-    private Instant lastTransitionAt = null;
-    private final AtomicInteger ordersSubmittedCount = new AtomicInteger(0);
-    private final AtomicBoolean isPaused = new AtomicBoolean(false);
-    private final AtomicBoolean transitionSignalReceived = new AtomicBoolean(false);
     private final AtomicReference<Exception> submitOrderException = new AtomicReference<>();
 
     @WorkflowInit
@@ -75,7 +68,6 @@ public class WorkerVersionEnablementWorkflowImpl implements WorkerVersionEnablem
 
     @Override
     public void execute(StartWorkerVersionEnablementRequest req) {
-        this.request = req;
         logger.info(
                 "Starting enablement demonstration: {} with {} orders at {}/min",
                 req.getEnablementId(),
@@ -95,6 +87,10 @@ public class WorkerVersionEnablementWorkflowImpl implements WorkerVersionEnablem
                 return null;
             });
         });
+        if(submitOrderException.get() != null) {
+            logger.error("Order submissions failed", submitOrderException.get());
+            return;
+        }
 
         try {
             submitScope.run();
@@ -113,46 +109,16 @@ public class WorkerVersionEnablementWorkflowImpl implements WorkerVersionEnablem
 
     @Override
     public WorkerVersionEnablementState getState() {
-        if (request == null) {
-            // Not yet initialized
-            return WorkerVersionEnablementState.getDefaultInstance();
-        }
-
-        WorkerVersionEnablementState.Builder stateBuilder =
-                WorkerVersionEnablementState.newBuilder()
-                        .setEnablementId(request.getEnablementId())
-                        .setCurrentPhase(currentPhase)
-                        .setOrdersSubmittedCount(ordersSubmittedCount.get())
-                        .setOrdersPerMinute(request.getSubmitRatePerMin());
-
-        if (lastTransitionAt != null) {
-            stateBuilder.setLastTransitionAt(
-                    com.google.protobuf.Timestamp.newBuilder()
-                            .setSeconds(lastTransitionAt.getEpochSecond())
-                            .setNanos(lastTransitionAt.getNano())
-                            .build());
-        }
-
-        // Set active versions based on phase
-        if (currentPhase == WorkerVersionEnablementState.DemoPhase.RUNNING_V1_ONLY) {
-            stateBuilder.addActiveVersions("v1");
-        } else if (currentPhase == WorkerVersionEnablementState.DemoPhase.RUNNING_BOTH ||
-                currentPhase == WorkerVersionEnablementState.DemoPhase.TRANSITIONING_TO_V2) {
-            stateBuilder.addActiveVersions("v1").addActiveVersions("v2");
-        }
-
-        return stateBuilder.build();
+        return state;
     }
 
     @Override
     public void pause() {
-        isPaused.set(true);
         logger.info("Enablement workflow paused");
     }
 
     @Override
     public void resume() {
-        isPaused.set(false);
         logger.info("Enablement workflow resumed");
     }
 
@@ -164,13 +130,9 @@ public class WorkerVersionEnablementWorkflowImpl implements WorkerVersionEnablem
     private void submitOrdersUntilSignal() {
         // call activity with forever-order-starter
         orderActivities.submitOrders(SubmitOrdersRequest.newBuilder().
-                setSubmitRatePerMin(request.getSubmitRatePerMin()).
+                setSubmitRatePerMin(state.getArgs().getSubmitRatePerMin()).
                 setEnablementId(state.getEnablementId()).build());
 
-
-        logger.info(
-                "Completed v1-only phase: submitted {} orders",
-                ordersSubmittedCount.get());
     }
 
 }
