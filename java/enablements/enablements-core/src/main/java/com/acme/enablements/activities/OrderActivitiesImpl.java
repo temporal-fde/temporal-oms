@@ -2,6 +2,9 @@ package com.acme.enablements.activities;
 
 import com.acme.proto.acme.enablements.v1.SubmitOrdersRequest;
 import com.acme.proto.acme.enablements.v1.SubmitOrdersResponse;
+import io.temporal.activity.Activity;
+import io.temporal.client.ActivityCompletionException;
+import io.temporal.failure.CanceledFailure;
 import io.temporal.workflow.Workflow;
 
 import java.time.Duration;
@@ -9,34 +12,24 @@ import java.time.Duration;
 public class OrderActivitiesImpl implements OrderActivities {
     @Override
     public SubmitOrdersResponse submitOrders(SubmitOrdersRequest cmd) {
-        long startTime = Workflow.currentTimeMillis();
-        long submissionCount = 0;
-
-        while (ordersSubmittedCount.get() < totalOrders && !transitionSignalReceived.get()) {
-            long elapsedMs = Workflow.currentTimeMillis() - startTime;
-            if (elapsedMs >= timeoutMs) {
-                logger.info("Timeout reached during v1 phase");
-                break;
-            }
-
-            // Wait if paused
-            if (isPaused.get()) {
-                Workflow.sleep(Duration.ofSeconds(1));
-                continue;
-            }
-
-            // Submit order
+        var res = SubmitOrdersResponse.getDefaultInstance();
+        var ctx = Activity.getExecutionContext();
+        var sleepIntervalMs = (60 / cmd.getSubmitRatePerMin()) * 1000;
+        var canceled = false;
+        while(!canceled) {
             try {
-                String orderId = orderActivities.submitOrders();
-                ordersSubmittedCount.incrementAndGet();
-                logger.debug("Submitted order: {}", orderId);
-            } catch (Exception e) {
-                logger.warn("Failed to submit order (will continue)", e);
+                ctx.heartbeat(null);
+                // call /orders/{order_id} submit order
+                res = res.toBuilder().setOrdersSubmittedCount(res.getOrdersSubmittedCount() + 1).build();
+                try {
+                    Thread.sleep(Duration.ofMillis(sleepIntervalMs));
+                } catch (InterruptedException e) {
+                    canceled = true;
+                }
+            } catch (ActivityCompletionException e){
+                canceled = true;
             }
-
-            // Wait for next submission slot
-            Workflow.sleep(Duration.ofMillis(submissionIntervalMs));
-            submissionCount++;
         }
+        return res;
     }
 }
