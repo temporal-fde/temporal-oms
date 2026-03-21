@@ -12,14 +12,10 @@ OVERLAY="${OVERLAY:-local}"
 
 echo "📦 Building and deploying applications (${OVERLAY} Temporal)..."
 
-# Build Java
+# Build Java (from root to ensure shared modules like oms are rebuilt and installed)
 echo "→ Building Java projects..."
-cd java/apps
-mvn clean package -DskipTests -q
-cd "$PROJECT_DIR"
-
-cd java/processing
-mvn clean package -DskipTests -q
+cd java
+mvn clean install -DskipTests -q
 cd "$PROJECT_DIR"
 
 # Build Docker images and load into KinD

@@ -1,5 +1,5 @@
 spring.config.import: classpath:acme.apps.yaml
-spring.main.web-application-type: none
+server.port: -1
 management.server.port: 9091
 spring.temporal.start-workers: true
 spring:
