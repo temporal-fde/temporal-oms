@@ -16,6 +16,11 @@ spring.temporal:
           - fulfillment-activities
         nexus-service-beans:
           - processing-service
+#        deployment-properties:
+#          use-versioning: true
+#          default-versioning-behavior: PINNED
+#          deployment-name: processing
+#          build-id: 1.0.0
       - task-queue: commerce-app
         activity-beans:
           - commerce-app-activities

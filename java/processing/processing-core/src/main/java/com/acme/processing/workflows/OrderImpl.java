@@ -6,6 +6,7 @@ import com.acme.processing.workflows.activities.Fulfillments;
 import com.acme.processing.workflows.activities.Support;
 import com.acme.proto.acme.processing.domain.processing.v1.*;
 import io.temporal.activity.ActivityOptions;
+import io.temporal.common.VersioningBehavior;
 import io.temporal.failure.ActivityFailure;
 import io.temporal.workflow.*;
 import org.slf4j.Logger;
@@ -52,6 +53,7 @@ public class OrderImpl implements Order {
     }
 
     @Override
+    @WorkflowVersioningBehavior(VersioningBehavior.PINNED)
     public GetProcessOrderStateResponse execute(ProcessOrderRequest request) {
         logger.info("Processing order {}", request);
 

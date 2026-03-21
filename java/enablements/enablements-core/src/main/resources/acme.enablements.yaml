@@ -1,3 +1,18 @@
+enablements:
+  apps-api:
+    # Base URL for the apps-api service
+    # Local development: http://localhost:8080
+    # Kubernetes: http://apps-api.temporal-oms-apps.svc.cluster.local:8080
+    base-url: http://localhost:8080
+
+  deployment:
+    # Kubernetes namespace for worker deployments
+    namespace: temporal-oms-processing
+    # Path to manifest template (supports variable substitution: {VERSION}, {BUILD_ID}, {REPLICAS})
+    manifest-template: k8s/base/processing/processing-workers-deployment-template.yaml
+    # Optional kubeconfig path (leave empty to use default)
+    kubeconfig: ""
+
 spring.temporal:
     connection:
       # Connection settings
@@ -14,3 +29,4 @@ spring.temporal:
         activity-beans:
           - order-activities
           - deployment-activities
+

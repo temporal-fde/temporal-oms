@@ -20,7 +20,6 @@ import io.temporal.workflow.*;
 public interface Order {
 
     @WorkflowMethod
-    @WorkflowVersioningBehavior(VersioningBehavior.PINNED)
     GetProcessOrderStateResponse execute(ProcessOrderRequest request);
 
     /**
