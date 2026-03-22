@@ -1,0 +1,8 @@
+apiVersion: temporal.io/v1alpha1
+kind: TemporalWorkerDeployment
+metadata:
+  name: processing-workers
+  namespace: temporal-oms-processing
+spec:
+  workerOptions:
+    temporalNamespace: fde-oms-processing.sdvdw

@@ -4,3 +4,6 @@ kind: Kustomization
 resources:
   - ../../base
   - temporal-connection.yaml
+
+patches:
+  - path: temporal-namespace-patch.yaml

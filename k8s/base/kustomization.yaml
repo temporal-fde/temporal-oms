@@ -9,6 +9,9 @@ resources:
   - temporal-cloud-service.yaml
 
 # ConfigMaps and Secrets will be patched by overlays
+generatorOptions:
+  disableNameSuffixHash: true
+
 configMapGenerator:
   - name: temporal-oms-config
     namespace: temporal-oms-apps
