@@ -35,11 +35,15 @@ kubectl apply -k k8s/overlays/local
 
 ### 3. Processing worker image built and loaded
 
+Tag with an explicit version — the controller derives the Temporal build-id from the image tag, so
+`:latest` would produce the same build-id on every deploy and the controller would not register a
+new version.
+
 ```bash
 cd java
 mvn install -pl processing/processing-workers -am -DskipTests
-docker build -t temporal-oms/processing-worker:latest processing/processing-workers
-kind load docker-image temporal-oms/processing-worker:latest
+docker build -t temporal-oms/processing-workers:v1 processing/processing-workers
+kind load docker-image temporal-oms/processing-workers:v1
 ```
 
 ---
@@ -58,7 +62,7 @@ spins up pods and registers this version with Temporal.
 Verify:
 ```bash
 kubectl get temporalworkerdeployments -n temporal-oms-processing
-kubectl get pods -n temporal-oms-processing -l app=processing-worker
+kubectl get pods -n temporal-oms-processing -l app=processing-workers
 ```
 
 ---
@@ -98,8 +102,8 @@ Make your code change to the processing worker, then build and load the v2 image
 ```bash
 cd java
 mvn install -pl processing/processing-workers -am -DskipTests
-docker build -t temporal-oms/processing-worker:v2 processing/processing-workers
-kind load docker-image temporal-oms/processing-worker:v2
+docker build -t temporal-oms/processing-workers:v2 processing/processing-workers
+kind load docker-image temporal-oms/processing-workers:v2
 ```
 
 ---
@@ -113,7 +117,7 @@ the v2 image, registers the new build-id with Temporal, and shifts new workflow 
 kubectl patch temporalworkerdeployment processing-workers \
   -n temporal-oms-processing \
   --type='merge' \
-  -p='{"spec": {"template": {"spec": {"containers": [{"name": "worker", "image": "temporal-oms/processing-worker:v2"}]}}}}'
+  -p='{"spec": {"template": {"spec": {"containers": [{"name": "worker", "image": "temporal-oms/processing-workers:v2"}]}}}}'
 ```
 
 Alternatively, update `k8s/processing-versioned/temporal-worker-deployment.yaml` with the new image
@@ -126,7 +130,7 @@ kubectl apply -k k8s/processing-versioned/overlays/local
 Watch the rollout:
 ```bash
 kubectl get temporalworkerdeployments -n temporal-oms-processing -w
-kubectl get pods -n temporal-oms-processing -l app=processing-worker -w
+kubectl get pods -n temporal-oms-processing -l app=processing-workers -w
 ```
 
 ---
@@ -139,7 +143,7 @@ kubectl get pods -n temporal-oms-processing -l app=processing-worker -w
 
 **In kubectl**, both pod sets coexist during the transition:
 ```bash
-kubectl get pods -n temporal-oms-processing -l app=processing-worker
+kubectl get pods -n temporal-oms-processing -l app=processing-workers
 # Old v1 pods drain, new v2 pods serve new workflows
 ```
 
@@ -168,4 +172,4 @@ workers **without** versioning enabled. To compare, comment out `deployment-prop
 kubectl apply -k k8s/overlays/local
 ```
 
-This deploys `processing-worker` as a regular Deployment with no version-aware routing.
+This deploys `processing-workers` as a regular Deployment with no version-aware routing.

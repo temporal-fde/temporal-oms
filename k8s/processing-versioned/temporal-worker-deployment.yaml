@@ -5,6 +5,10 @@ metadata:
   namespace: temporal-oms-processing
 spec:
   replicas: 1
+  workerOptions:
+    connectionRef:
+      name: temporal-connection
+    temporalNamespace: processing
   rollout:
     strategy: Progressive
     steps:
@@ -15,13 +19,13 @@ spec:
   template:
     metadata:
       labels:
-        app: processing-worker
+        app: processing-workers
       annotations:
         instrumentation.opentelemetry.io/inject-sdk: "true"
     spec:
       containers:
       - name: worker
-        image: temporal-oms/processing-worker:latest
+        image: temporal-oms/processing-workers:v1
         imagePullPolicy: Never
         ports:
         - containerPort: 9092
