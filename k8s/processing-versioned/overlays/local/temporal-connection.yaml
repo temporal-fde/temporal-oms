@@ -4,4 +4,4 @@ metadata:
   name: temporal-connection
   namespace: temporal-oms-processing
 spec:
-  address: host.docker.internal:7233
+  hostPort: host.docker.internal:7233

@@ -9,6 +9,9 @@ spec:
     connectionRef:
       name: temporal-connection
     temporalNamespace: processing
+  sunset:
+    scaledownDelay: 1h
+    deleteDelay: 24h
   rollout:
     strategy: Progressive
     steps:
