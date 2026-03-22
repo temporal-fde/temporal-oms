@@ -25,7 +25,7 @@ spec:
       containers:
       - name: api
         image: temporal-oms/apps-api:latest
-        imagePullPolicy: Never  # For local Minikube builds
+        imagePullPolicy: Never  # For local KinD builds
         ports:
         - containerPort: 8080
           name: http
@@ -87,7 +87,7 @@ metadata:
   labels:
     app: apps-api
 spec:
-  type: NodePort  # For Minikube access
+  type: NodePort  # For local KinD access
   selector:
     app: apps-api
   ports:

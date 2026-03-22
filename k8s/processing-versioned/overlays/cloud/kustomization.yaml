@@ -1,0 +1,8 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../temporal-connection-cloud.yaml
+  - ../../temporal-worker-deployment.yaml
+  - ../../../overlays/cloud/configmap/temporal-processing.yaml
+  - ../../../overlays/cloud/secrets/temporal-processing-api-key.yaml

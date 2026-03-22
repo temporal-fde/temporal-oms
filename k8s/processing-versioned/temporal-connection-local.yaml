@@ -1,0 +1,7 @@
+apiVersion: temporal.io/v1alpha1
+kind: TemporalConnection
+metadata:
+  name: temporal-connection
+  namespace: temporal-oms-processing
+spec:
+  address: host.docker.internal:7233

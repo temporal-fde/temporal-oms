@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Deploy versioned processing workers using TemporalWorkerDeployment CRD.
+# Requires temporal-worker-controller to be installed in the cluster.
+# See: https://github.com/temporalio/temporal-worker-controller
+#
+# Usage (local):
+#   kubectl apply -k k8s/processing-versioned/overlays/local
+#
+# Usage (cloud):
+#   kubectl apply -k k8s/processing-versioned/overlays/cloud
+
+resources:
+  - temporal-worker-deployment.yaml

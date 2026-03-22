@@ -20,7 +20,7 @@ spring.temporal:
           use-versioning: true
           default-versioning-behavior: PINNED
           deployment-name: processing
-          build-id: 1.0.0
+          build-id: ${TEMPORAL_WORKER_BUILD_ID:1.0.0}
       - task-queue: commerce-app
         activity-beans:
           - commerce-app-activities

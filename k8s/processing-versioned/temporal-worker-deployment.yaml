@@ -4,7 +4,7 @@ metadata:
   name: processing-workers
   namespace: temporal-oms-processing
 spec:
-  replicas: {REPLICAS}
+  replicas: 1
   rollout:
     strategy: Progressive
     steps:
@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: worker
-        image: temporal-oms/processing-worker:{VERSION}
+        image: temporal-oms/processing-worker:latest
         imagePullPolicy: Never
         ports:
         - containerPort: 9092
