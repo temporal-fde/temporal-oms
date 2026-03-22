@@ -117,6 +117,7 @@ public class WorkerVersionEnablementImpl implements WorkerVersionEnablement {
     private void submitOrdersUntilSignal() {
         // call activity with forever-order-starter
         orderActivities.submitOrders(SubmitOrdersRequest.newBuilder().
+                setOrderIdSeed(state.getArgs().getOrderIdSeed()).
                 setEnablementId(state.getArgs().getEnablementId()).
                 setSubmitRatePerMin(state.getArgs().getSubmitRatePerMin()).
                 setEnablementId(state.getEnablementId()).build());

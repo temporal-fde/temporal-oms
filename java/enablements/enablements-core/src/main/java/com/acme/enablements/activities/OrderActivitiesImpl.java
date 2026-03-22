@@ -52,13 +52,15 @@ public class OrderActivitiesImpl implements OrderActivities {
 
                 // Generate order ID as enablement_id + timestamp
                 long timestamp = System.currentTimeMillis();
-                String orderId = cmd.getEnablementId() + "-" + timestamp;
+                String orderId = cmd.getOrderIdSeed() + "-" + cmd.getEnablementId() + "-" + timestamp;
 
                 try {
                     // Call /api/v1/orders/{orderId} endpoint
                     callOrderEndpoint(orderId);
                     callPaymentEndpoint(orderId);
-                    scheduleValidation(orderId);
+                    if(cmd.getOrderIdSeed().contains("invalid")) {
+                        scheduleValidation(orderId);
+                    }
 
                     submittedOrderIds.add(orderId);
                     submittedCount++;

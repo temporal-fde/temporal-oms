@@ -12,6 +12,7 @@ message StartWorkerVersionEnablementRequest {
   int32 order_count = 2;            // How many orders to process (e.g., 20)
   int32 submit_rate_per_min = 3;    // Orders per minute (e.g., 12)
   google.protobuf.Duration timeout = 4;  // How long to run (e.g., 5 minutes)
+  optional string order_id_seed = 5;
 }
 
 // Current state of the worker versioning enablement demonstration
@@ -44,6 +45,7 @@ message WorkerVersionEnablementState {
 message SubmitOrdersRequest {
   string enablement_id = 1;
   int32 submit_rate_per_min = 2;
+  string order_id_seed = 3;
 }
 message SubmitOrdersResponse {
   string orders_submitted_count = 1;
