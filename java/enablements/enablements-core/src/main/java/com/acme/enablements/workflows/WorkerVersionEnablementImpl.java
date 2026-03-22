@@ -14,9 +14,6 @@ import io.temporal.workflow.WorkflowInit;
 import org.slf4j.Logger;
 
 import java.time.Duration;
-import java.time.Instant;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -25,43 +22,31 @@ import java.util.concurrent.atomic.AtomicReference;
  * This workflow continuously submits orders to the OMS at a configured rate,
  * allowing manual control over worker version transitions via signals.
  */
-public class WorkerVersionEnablementWorkflowImpl implements WorkerVersionEnablementWorkflow {
+public class WorkerVersionEnablementImpl implements WorkerVersionEnablement {
 
-    private static final Logger logger = Workflow.getLogger(WorkerVersionEnablementWorkflowImpl.class);
+    private static final Logger logger = Workflow.getLogger(WorkerVersionEnablementImpl.class);
 
     private final OrderActivities orderActivities =
             Workflow.newActivityStub(
                     OrderActivities.class,
                     ActivityOptions.newBuilder()
-                            .setStartToCloseTimeout(Duration.ofSeconds(30))
-                            .setRetryOptions(
-                                    RetryOptions.newBuilder()
-                                            .setInitialInterval(Duration.ofSeconds(1))
-                                            .setMaximumInterval(Duration.ofSeconds(10))
-                                            .setBackoffCoefficient(2.0)
-                                            .setMaximumAttempts(5)
-                                            .build())
+                            .setStartToCloseTimeout(Duration.ofSeconds(86400))
+                            .setHeartbeatTimeout(Duration.ofSeconds(30))
                             .build());
 
     private final DeploymentActivities deploymentActivities =
             Workflow.newActivityStub(
                     DeploymentActivities.class,
                     ActivityOptions.newBuilder()
-                            .setStartToCloseTimeout(Duration.ofMinutes(5))
-                            .setRetryOptions(
-                                    RetryOptions.newBuilder()
-                                            .setInitialInterval(Duration.ofSeconds(5))
-                                            .setMaximumInterval(Duration.ofSeconds(30))
-                                            .setBackoffCoefficient(2.0)
-                                            .setMaximumAttempts(3)
-                                            .build())
+                            .setHeartbeatTimeout(Duration.ofSeconds(30))
+                            .setScheduleToCloseTimeout(Duration.ofMinutes(5))
                             .build());
     private WorkerVersionEnablementState state;
 
     private final AtomicReference<Exception> submitOrderException = new AtomicReference<>();
 
     @WorkflowInit
-    public WorkerVersionEnablementWorkflowImpl(StartWorkerVersionEnablementRequest request) {
+    public WorkerVersionEnablementImpl(StartWorkerVersionEnablementRequest request) {
         this.state = WorkerVersionEnablementState.newBuilder().setArgs(request).build();
     }
 
@@ -105,6 +90,8 @@ public class WorkerVersionEnablementWorkflowImpl implements WorkerVersionEnablem
                 this.state =  this.state.toBuilder().addDeployments(deploymentActivities.deployWorkerVersion(deploy)).build();
             }
         }
+        Workflow.await(Workflow::isEveryHandlerFinished);
+        Workflow.await(()-> false);
     }
 
     @Override
@@ -130,6 +117,7 @@ public class WorkerVersionEnablementWorkflowImpl implements WorkerVersionEnablem
     private void submitOrdersUntilSignal() {
         // call activity with forever-order-starter
         orderActivities.submitOrders(SubmitOrdersRequest.newBuilder().
+                setEnablementId(state.getArgs().getEnablementId()).
                 setSubmitRatePerMin(state.getArgs().getSubmitRatePerMin()).
                 setEnablementId(state.getEnablementId()).build());
 

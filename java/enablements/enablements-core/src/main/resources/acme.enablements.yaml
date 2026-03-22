@@ -1,3 +1,4 @@
+spring.config.import: classpath:acme.oms.yaml
 enablements:
   apps-api:
     # Base URL for the apps-api service
@@ -16,16 +17,16 @@ enablements:
 spring.temporal:
     connection:
       # Connection settings
-      target: ${TEMPORAL_ADDRESS:}
+      target: ${TEMPORAL_ADDRESS:localhost:7233}
 
       # API Key for Temporal Cloud
       api-key: ${TEMPORAL_API_KEY:}
 
-    namespace: ${TEMPORAL_NAMESPACE:}
+    namespace: ${TEMPORAL_NAMESPACE:default}
     workers:
       - task-queue: enablements
         workflow-classes:
-          - com.acme.enablements.workflows.WorkerVersionEnablementWorkflowImpl
+          - com.acme.enablements.workflows.WorkerVersionEnablementImpl
         activity-beans:
           - order-activities
           - deployment-activities

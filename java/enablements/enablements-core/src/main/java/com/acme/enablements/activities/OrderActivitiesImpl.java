@@ -5,12 +5,14 @@ import com.acme.proto.acme.apps.api.orders.v1.ShippingAddress;
 import com.acme.proto.acme.apps.api.orders.v1.SubmitOrderRequest;
 import com.acme.proto.acme.enablements.v1.SubmitOrdersRequest;
 import com.acme.proto.acme.enablements.v1.SubmitOrdersResponse;
+import com.google.protobuf.util.JsonFormat;
 import io.temporal.activity.Activity;
 import io.temporal.client.ActivityCompletionException;
 import io.temporal.failure.CanceledFailure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
@@ -54,8 +56,8 @@ public class OrderActivitiesImpl implements OrderActivities {
                     submittedCount++;
                     logger.debug("Submitted order: {} (total: {})", orderId, submittedCount);
                 } catch (Exception e) {
-                    logger.warn("Failed to submit order {}: {}", orderId, e.getMessage());
-                    canceled = true;
+                    logger.error("Failed to submit order {}: {}", orderId, e.getMessage());
+                    throw e;
                 }
 
                 try {
@@ -66,7 +68,13 @@ public class OrderActivitiesImpl implements OrderActivities {
                     }
                 }
             } catch (ActivityCompletionException e) {
-                canceled = true;
+                logger.error("Activity failed: {}", e.getMessage());
+                if (e.getCause() instanceof CanceledFailure) {
+                    logger.info("Activity canceled");
+                    canceled = true;
+                } else {
+                    throw e;
+                }
             }
         }
 
@@ -101,9 +109,12 @@ public class OrderActivitiesImpl implements OrderActivities {
                 .setOrder(order)
                 .build();
 
-        restClient.put()
-                .uri("/api/v1/orders/{orderId}", orderId)
-                .body(req)
+        try {
+            String body = JsonFormat.printer().print(req);
+            restClient.put()
+                .uri("/api/v1/commerce-app/orders/{orderId}", orderId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(body)
                 .retrieve()
                 .onStatus(status -> status.value() != 202,
                         (request, response) -> {
@@ -111,5 +122,8 @@ public class OrderActivitiesImpl implements OrderActivities {
                                     ": expected 202 Accepted, got " + response.getStatusCode());
                         })
                 .body(Void.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to serialize or submit order " + orderId, e);
+        }
     }
 }

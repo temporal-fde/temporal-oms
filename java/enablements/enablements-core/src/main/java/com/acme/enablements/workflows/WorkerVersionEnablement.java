@@ -22,7 +22,7 @@ import io.temporal.workflow.WorkflowMethod;
  * 4. COMPLETE: All orders submitted and workflow ends
  */
 @WorkflowInterface
-public interface WorkerVersionEnablementWorkflow {
+public interface WorkerVersionEnablement {
 
   /**
    * Start a new enablement demonstration.
