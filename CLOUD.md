@@ -1,159 +1,99 @@
 # Temporal Cloud Setup
 
-Configure the Temporal OMS applications to connect to Temporal Cloud instead of a local Temporal server.
+Configure Temporal OMS to connect to Temporal Cloud instead of a local Temporal server.
 
-## Quick Start
+> **First time?** Complete the one-time Temporal Cloud setup in [README.md](README.md) — Level 3, Step 1 before continuing here.
 
-For complete step-by-step instructions, see [DEPLOYMENT.md](DEPLOYMENT.md) — **Section: Temporal Cloud API Key Setup**.
+---
 
-## Overview
+## Prerequisites
 
-Temporal Cloud deployment requires:
+- KinD cluster running (`kind get clusters` shows `temporal-oms`)
+- Three `config/*.secret.yaml` files populated with API keys:
+  - `config/acme.apps.secret.yaml`
+  - `config/acme.processing.secret.yaml`
+  - `config/acme.automations.secret.yaml`
+- Cloud ConfigMaps updated with your account's namespace and region values
 
-1. **Temporal Cloud Account**: Create at https://cloud.temporal.io
-2. **API Key**: Generated in Temporal Cloud console (JWT format)
-3. **Namespace**: Your Temporal Cloud namespace (e.g., `fde-oms-apps.account-id`)
-4. **Region**: Your Temporal Cloud region endpoint (e.g., `us-east-1.aws.api.temporal.io:7233`)
+---
 
-## Configuration Steps
-
-### Step 1: Get API Key from Temporal Cloud Console
-
-1. Log in to [https://cloud.temporal.io](https://cloud.temporal.io)
-2. Navigate to **Settings → API Keys**
-3. Create or copy your API key (JWT format)
-4. Note your:
-   - Namespace ID
-   - Account ID
-   - Region endpoint
-
-### Step 2: Verify with Temporal CLI
-
-Configure your local Temporal CLI to verify connectivity:
+## Deploy
 
 ```bash
-# Set up environment
-temporal env set --env fde-oms-apps \
-  --address us-east-1.aws.api.temporal.io:7233 \
-  --api-key "eyJhbGc..." \
-  --namespace fde-oms-apps.account-id
-
-# Test connection
-temporal workflow list --env fde-oms-apps
+OVERLAY=cloud ./scripts/infra-up.sh    # installs controller, applies secrets from config/*.secret.yaml
+OVERLAY=cloud ./scripts/app-deploy.sh  # builds images, deploys all apps
 ```
 
-This should list your workflows (even if empty).
-
-### Step 3: Configure Kubernetes Secrets
-
-Store your API keys in Kubernetes Secrets for deployment:
-
-#### For Apps Workers:
-
-Update or create `k8s/overlays/cloud/secrets/temporal-apps-api-key.yaml`:
-
-```yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: temporal-apps-api-key
-  namespace: temporal-oms-apps
-type: Opaque
-stringData:
-  temporal-secret.yaml: |
-    spring.temporal.connection.api-key: "eyJhbGc..."
-```
-
-#### For Processing Workers:
-
-Update or create `k8s/overlays/cloud/secrets/temporal-processing-api-key.yaml`:
-
-```yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: temporal-processing-api-key
-  namespace: temporal-oms-processing
-type: Opaque
-stringData:
-  temporal-secret.yaml: |
-    spring.temporal.connection.api-key: "eyJhbGc..."
-```
-
-**Important**: These files contain secrets and should NOT be committed to git. They're already in `.gitignore`.
-
-### Step 4: Update ConfigMap for Your Cloud Region
-
-Update `k8s/overlays/cloud/configmap/temporal-apps.yaml`:
-
-```yaml
-spring:
-  temporal:
-    namespace: fde-oms-apps.account-id
-    connection:
-      target: us-east-1.aws.api.temporal.io:7233  # Your region
-      tls-server-name: us-east-1.aws.api.temporal.io
-      tls:
-        enabled: true
-```
-
-(Replace with your actual namespace, account ID, and region endpoint)
-
-### Step 5: Deploy to KinD
-
-```bash
-export KUBECONFIG=/tmp/kind-config.yaml
-OVERLAY=cloud ./scripts/demo-up.sh
-```
+---
 
 ## Verification
 
-After deployment, verify connectivity:
-
 ```bash
-# Check pods are running
+# All pods healthy
 ./scripts/status.sh
 
-# View logs to see connection messages
+# Worker Controller connected to Temporal Cloud
 export KUBECONFIG=/tmp/kind-config.yaml
-kubectl logs -n temporal-oms-apps -l app=apps-worker --tail=20
-kubectl logs -n temporal-oms-processing -l app=processing-worker --tail=20
+kubectl get temporalworkerdeployment processing-workers -n temporal-oms-processing
+# TemporalConnectionHealthy: True
 
-# Verify workflows are executing
-temporal workflow list --env fde-oms-apps
+# App worker logs show connection to cloud
+kubectl logs -n temporal-oms-processing -l app=processing-workers --tail=20
+kubectl logs -n temporal-oms-apps -l app=apps-worker --tail=20
+
+# Workflows are reachable
+temporal workflow list \
+  --address <your-region>.aws.api.temporal.io:7233 \
+  --namespace apps.<your-account-id> \
+  --api-key "$(yq '.temporal.connection.api-key' config/acme.apps.secret.yaml)" \
+  --tls
 ```
+
+---
+
+## How Secrets Get Into the Cluster
+
+`infra-up.sh` (when `OVERLAY=cloud`) reads the gitignored `config/*.secret.yaml` files and
+creates k8s secrets imperatively — no secret values are ever written to committed files:
+
+| config file | k8s secret | key | consumer |
+|---|---|---|---|
+| `config/acme.automations.secret.yaml` | `temporal-processing-api-key` | `TEMPORAL_API_KEY` | Temporal Worker Controller (`TemporalConnection`) |
+| `config/acme.processing.secret.yaml` | `temporal-processing-api-key` | `temporal-secret.yaml` | Spring app workers (processing namespace) |
+| `config/acme.apps.secret.yaml` | `temporal-apps-api-key` | `temporal-secret.yaml` | Spring app workers (apps namespace) |
+
+---
 
 ## Troubleshooting
 
-**TLS handshake failures:**
-- Verify `tls.enabled: true` is set
+**`TemporalConnectionHealthy: False` — `Request unauthorized`**
+- The Worker Controller uses the `acme-automations-service-account` key, not the processing key
+- Verify `config/acme.automations.secret.yaml` has the correct API key
+- Re-run `OVERLAY=cloud ./scripts/infra-up.sh` to re-apply the secret
+- Verify `temporalNamespace` in the cloud overlay patch is `<namespace>.<account-id>` (fully qualified)
+
+**`Request unauthorized` on all keys**
+- Test with the CLI: `temporal workflow list --address <region>.aws.api.temporal.io:7233 --namespace <namespace>.<account-id> --api-key "..." --tls`
+- The key may have been revoked — regenerate in Temporal Cloud → Settings → Identities
+
+**TLS handshake failures**
+- Verify `TEMPORAL_TLS_ENABLED=true` is set in the cloud configmap overlay
 - Verify `tls-server-name` matches your cloud hostname
-- Check API key format (should be JWT token starting with `eyJ...`)
 
-**Connection refused:**
-- Verify API key is correct and hasn't expired
-- Verify namespace matches your Temporal Cloud setup
-- Verify region endpoint is correct
+**Pods in `CreateContainerConfigError`**
+- Check pod events: `kubectl describe pod -n temporal-oms-processing -l app=processing-workers`
+- Usually means a configmap or secret is missing — re-run `infra-up.sh` and `app-deploy.sh`
 
-**For more details:**
-See [DEPLOYMENT.md](DEPLOYMENT.md) — **Troubleshooting** section
+**`processing-workers` pod not appearing**
+- Check controller logs: `kubectl logs -n temporal-worker-controller-system deployment/temporal-worker-controller-manager -c manager --tail=30`
+- Common causes: `TemporalConnection` unauthorized, bad namespace format, invalid rollout config
 
-## Local Fallback
+---
 
-To use a local Temporal server instead:
+## Switching Back to Local
 
 ```bash
-# Start local Temporal
-temporal server start-dev &
-
-# Deploy with local overlay
-OVERLAY=local ./scripts/demo-up.sh
+./scripts/infra-down.sh   # destroy cluster
+./scripts/infra-up.sh     # rebuild with OVERLAY=local (default)
+./scripts/app-deploy.sh
 ```
-
-See [DEPLOYMENT.md](DEPLOYMENT.md) — **Option 2: Local Temporal Setup**
-
-## Resources
-
-- [Temporal Cloud Console](https://cloud.temporal.io/)
-- [Temporal Cloud API Keys Documentation](https://docs.temporal.io/cloud/api-keys)
-- [Temporal Cloud Namespaces](https://docs.temporal.io/cloud/namespaces)

@@ -58,12 +58,12 @@ kubectl wait --for=condition=ready pod -l app=traefik -n traefik --timeout=60s 2
 if [ "${OVERLAY:-local}" = "cloud" ]; then
     echo "→ Applying cloud secrets from config/*.secret.yaml..."
 
-    AUTOMATIONS_KEY=$(yq '.temporal.connection.api-key' "$PROJECT_DIR/config/fde.automations.secret.yaml")
+    AUTOMATIONS_KEY=$(yq '.temporal.connection.api-key' "$PROJECT_DIR/config/acme.automations.secret.yaml")
     PROCESSING_KEY=$(yq '.temporal.connection.api-key' "$PROJECT_DIR/config/acme.processing.secret.yaml")
     APPS_KEY=$(yq '.temporal.connection.api-key' "$PROJECT_DIR/config/acme.apps.secret.yaml")
 
     # temporal-processing-api-key:
-    #   TEMPORAL_API_KEY  → fde.automations key (used by Temporal Worker Controller's TemporalConnection)
+    #   TEMPORAL_API_KEY  → acme.automations key (used by Temporal Worker Controller's TemporalConnection)
     #   temporal-secret.yaml → acme.processing key (used by Spring app workers)
     kubectl create secret generic temporal-processing-api-key \
         -n temporal-oms-processing \
