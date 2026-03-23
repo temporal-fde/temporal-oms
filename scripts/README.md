@@ -131,7 +131,7 @@ kubectl describe pod POD_NAME -n NAMESPACE
 **Need to see logs:**
 ```bash
 kubectl logs -n temporal-oms-apps -l app=apps-worker -f
-kubectl logs -n temporal-oms-processing -l app=processing-worker -f
+kubectl logs -n temporal-oms-processing -l app=processing-workers -f
 ```
 
 **Reset everything:**

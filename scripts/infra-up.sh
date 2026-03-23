@@ -10,17 +10,42 @@ echo "🔧 Setting up infrastructure..."
 if ! kind get clusters 2>/dev/null | grep -q temporal-oms; then
     echo "→ Creating KinD cluster (temporal-oms)..."
     kind create cluster --name temporal-oms
-    kind get kubeconfig --name temporal-oms > /tmp/kind-config.yaml
-    export KUBECONFIG=/tmp/kind-config.yaml
 else
     echo "✓ KinD cluster (temporal-oms) already exists"
-    export KUBECONFIG=/tmp/kind-config.yaml
 fi
+
+# Always (re)write the kubeconfig — /tmp can be wiped between sessions
+kind get kubeconfig --name temporal-oms > /tmp/kind-config.yaml
+export KUBECONFIG=/tmp/kind-config.yaml
 
 # Create namespaces
 echo "→ Creating Kubernetes namespaces..."
 kubectl create namespace temporal-oms-apps --dry-run=client -o yaml | kubectl apply -f - >/dev/null
 kubectl create namespace temporal-oms-processing --dry-run=client -o yaml | kubectl apply -f - >/dev/null
+
+# Install Temporal Worker Controller CRDs
+# The published OCI chart does not include CRDs; applying directly from the release tag.
+echo "→ Installing Temporal Worker Controller CRDs..."
+if ! kubectl get crd temporalworkerdeployments.temporal.io &>/dev/null; then
+    CRDS_BASE="https://raw.githubusercontent.com/temporalio/temporal-worker-controller/v1.3.1/helm/temporal-worker-controller/crds"
+    kubectl apply -f "${CRDS_BASE}/temporal.io_temporalconnections.yaml"
+    kubectl apply -f "${CRDS_BASE}/temporal.io_temporalworkerdeployments.yaml"
+    kubectl wait --for=condition=established crd/temporalworkerdeployments.temporal.io --timeout=60s
+    kubectl wait --for=condition=established crd/temporalconnections.temporal.io --timeout=60s
+else
+    echo "✓ Temporal Worker Controller CRDs already installed"
+fi
+
+# Install Temporal Worker Controller
+echo "→ Installing Temporal Worker Controller..."
+if ! kubectl get deployment temporal-worker-controller-manager -n temporal-worker-controller-system &>/dev/null; then
+    helm install temporal-worker-controller \
+        oci://docker.io/temporalio/temporal-worker-controller \
+        --namespace temporal-worker-controller-system \
+        --create-namespace
+else
+    echo "✓ Temporal Worker Controller already installed"
+fi
 
 # Install Traefik Ingress Controller
 echo "→ Installing Traefik Ingress..."
@@ -28,6 +53,31 @@ kubectl apply -f "$PROJECT_DIR/k8s/ingress/traefik-deployment.yaml" >/dev/null
 
 # Wait for Traefik to be ready
 kubectl wait --for=condition=ready pod -l app=traefik -n traefik --timeout=60s 2>/dev/null || true
+
+# Apply cloud secrets from gitignored config files (never written to committed files)
+if [ "${OVERLAY:-local}" = "cloud" ]; then
+    echo "→ Applying cloud secrets from config/*.secret.yaml..."
+
+    AUTOMATIONS_KEY=$(yq '.temporal.connection.api-key' "$PROJECT_DIR/config/fde.automations.secret.yaml")
+    PROCESSING_KEY=$(yq '.temporal.connection.api-key' "$PROJECT_DIR/config/acme.processing.secret.yaml")
+    APPS_KEY=$(yq '.temporal.connection.api-key' "$PROJECT_DIR/config/acme.apps.secret.yaml")
+
+    # temporal-processing-api-key:
+    #   TEMPORAL_API_KEY  → fde.automations key (used by Temporal Worker Controller's TemporalConnection)
+    #   temporal-secret.yaml → acme.processing key (used by Spring app workers)
+    kubectl create secret generic temporal-processing-api-key \
+        -n temporal-oms-processing \
+        --from-literal=TEMPORAL_API_KEY="$AUTOMATIONS_KEY" \
+        --from-literal="temporal-secret.yaml=spring.temporal.connection.api-key: \"$PROCESSING_KEY\"" \
+        --dry-run=client -o yaml | kubectl apply -f - >/dev/null
+
+    # temporal-apps-api-key:
+    #   temporal-secret.yaml → acme.apps key (used by Spring app workers)
+    kubectl create secret generic temporal-apps-api-key \
+        -n temporal-oms-apps \
+        --from-literal="temporal-secret.yaml=spring.temporal.connection.api-key: \"$APPS_KEY\"" \
+        --dry-run=client -o yaml | kubectl apply -f - >/dev/null
+fi
 
 echo "✅ Infrastructure ready!"
 echo ""

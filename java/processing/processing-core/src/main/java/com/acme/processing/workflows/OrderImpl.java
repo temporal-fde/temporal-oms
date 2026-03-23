@@ -6,6 +6,7 @@ import com.acme.processing.workflows.activities.Fulfillments;
 import com.acme.processing.workflows.activities.Support;
 import com.acme.proto.acme.processing.domain.processing.v1.*;
 import io.temporal.activity.ActivityOptions;
+import io.temporal.common.VersioningBehavior;
 import io.temporal.failure.ActivityFailure;
 import io.temporal.workflow.*;
 import org.slf4j.Logger;
@@ -52,6 +53,7 @@ public class OrderImpl implements Order {
     }
 
     @Override
+    @WorkflowVersioningBehavior(VersioningBehavior.PINNED)
     public GetProcessOrderStateResponse execute(ProcessOrderRequest request) {
         logger.info("Processing order {}", request);
 
@@ -60,6 +62,7 @@ public class OrderImpl implements Order {
         // 3. fulfill order
         // if any of this fails, cancel order with `void` specified for payment
         var scope = Workflow.newCancellationScope(inner-> {
+
             // this might block for quite some time due to invalid order correction
             var validation = this.commerceApp.validateOrder(ValidateOrderRequest.newBuilder()
                     .setOrder(request.getOrder())
@@ -85,10 +88,12 @@ public class OrderImpl implements Order {
                 }
             }
 
+
             // enrich the order
             this.state = this.state.toBuilder().setEnrichment(
                     this.enrichments.enrichOrder(EnrichOrderRequest.newBuilder()
                             .setOrder(request.getOrder()).build())).build();
+
 
             // fulfill the order
             this.state = this.state.toBuilder().setFulfillment(this.fulfillments.fulfillOrder(FulfillOrderRequest.newBuilder()

@@ -1,5 +1,5 @@
 ---
-# ExternalName Service for Temporal Cloud - allows Minikube pods to reach external service
+# ExternalName Service for Temporal Cloud - allows KinD pods to reach external service
 apiVersion: v1
 kind: Service
 metadata:

@@ -1,7 +1,7 @@
 spring.temporal:
     connection:
       # Connection settings
-      target: ${TEMPORAL_ADDRESS:}
+      target: ${TEMPORAL_ADDRESS:localhost:7233}
 
       # API Key for Temporal Cloud
       api-key: ${TEMPORAL_API_KEY:}
@@ -16,16 +16,34 @@ spring.temporal:
           - fulfillment-activities
         nexus-service-beans:
           - processing-service
+        deployment-properties:
+          use-versioning: true
+          default-versioning-behavior: PINNED
+          # https://github.com/temporalio/temporal-worker-controller/blob/main/docs/concepts.md#temporal_deployment_name
+          deployment-name: ${TEMPORAL_DEPLOYMENT_NAME:processing}
+          # https://github.com/temporalio/temporal-worker-controller/blob/main/docs/concepts.md#temporal_worker_build_id
+          build-id: ${TEMPORAL_WORKER_BUILD_ID:1.0.0}
       - task-queue: commerce-app
         activity-beans:
           - commerce-app-activities
         rate-limits:
           max-task-queue-activities-per-second: 150
+        deployment-properties:
+          use-versioning: true
+          default-versioning-behavior: PINNED
+          # https://github.com/temporalio/temporal-worker-controller/blob/main/docs/concepts.md#temporal_deployment_name
+          deployment-name: ${TEMPORAL_DEPLOYMENT_NAME:processing}
+          # https://github.com/temporalio/temporal-worker-controller/blob/main/docs/concepts.md#temporal_worker_build_id
+          build-id: ${TEMPORAL_WORKER_BUILD_ID:1.0.0}
       - task-queue: support
         workflow-classes:
           - com.acme.processing.workflows.SupportTeamImpl
         activity-beans:
           - support-activities
-#    workers-auto-discovery:
-#      # this is a workaround for the bug here: https://github.com/temporalio/sdk-java/pull/2789
-#      packages: com.acme.processing.services
+        deployment-properties:
+          use-versioning: true
+          default-versioning-behavior: PINNED
+          # https://github.com/temporalio/temporal-worker-controller/blob/main/docs/concepts.md#temporal_deployment_name
+          deployment-name: ${TEMPORAL_DEPLOYMENT_NAME:processing}
+          # https://github.com/temporalio/temporal-worker-controller/blob/main/docs/concepts.md#temporal_worker_build_id
+          build-id: ${TEMPORAL_WORKER_BUILD_ID:1.0.0}

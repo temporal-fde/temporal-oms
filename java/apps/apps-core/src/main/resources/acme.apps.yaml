@@ -4,7 +4,7 @@ spring.temporal:
   connection:
 
     # Connection settings
-    target: ${TEMPORAL_ADDRESS:}
+    target: ${TEMPORAL_ADDRESS:localhost:7233}
 
     # API Key for Temporal Cloud
     api-key: ${TEMPORAL_API_KEY:}

@@ -1,0 +1,153 @@
+# Specifications Directory
+
+This directory contains architectural specifications for major features and initiatives. Specs drive design alignment before implementation begins.
+
+## Workflow
+
+```
+1. DRAFT          → Author writes spec using TEMPLATE.md
+2. TECH LEAD      → Tech lead reviews spec, provides feedback
+3. APPROVED       → Spec approved with guidance on trade-offs
+4. PLANNING       → Implementation team breaks into detailed tasks
+5. IMPLEMENTING   → Work proceeds in phases per implementation strategy
+6. VALIDATING     → Verify against acceptance criteria
+7. COMPLETE       → Feature shipped, lessons captured
+```
+
+## Directory Structure
+
+```
+SPECS/
+├── TEMPLATE.md                           # Copy this to create new specs
+├── README.md                             # This file
+└── feature-name/                         # One dir per feature
+    ├── spec.md                           # Main specification document
+    ├── PROGRESS.md                       # Status tracking + checklist
+    └── [optional artifacts]              # Diagrams, examples, design docs
+```
+
+## Creating a New Spec
+
+1. **Copy the template:**
+   ```bash
+   mkdir -p SPECS/my-feature-name
+   cp SPECS/TEMPLATE.md SPECS/my-feature-name/spec.md
+   cp SPECS/TEMPLATE-PROGRESS.md SPECS/my-feature-name/PROGRESS.md  # [when available]
+   ```
+
+2. **Fill in each section:**
+   - Start with Executive Summary (2-3 paragraphs)
+   - Define Goals & Acceptance Criteria
+   - Document Current & Desired state
+   - Propose Technical Approach (decisions + design)
+   - Break into Implementation Phases
+   - Cover Testing Strategy
+   - List Risks & Mitigations
+   - Note Open Questions for Tech Lead
+
+3. **Create PROGRESS.md:**
+   - Track spec review status
+   - List open items before approval
+   - Prepare for tech lead review meeting
+
+4. **Request review:**
+   ```bash
+   # Signal to tech lead that spec is ready
+   # Create a PR or schedule a sync
+   ```
+
+## Spec Checklist (For Author)
+
+Before requesting tech lead review, ensure:
+
+- [ ] Executive summary is clear (non-technical person can understand)
+- [ ] Goals are measurable and specific
+- [ ] Acceptance criteria are testable (yes/no, not vague)
+- [ ] Design decisions explain the "why" not just the "what"
+- [ ] Alternatives considered are documented
+- [ ] Implementation phases are realistic (not too big)
+- [ ] Testing strategy covers happy path + edge cases
+- [ ] Risks are identified (no "this will definitely work")
+- [ ] Open questions are explicit (don't hide unknowns)
+- [ ] No forward references (explain concepts as you introduce them)
+
+## Tech Lead Review Checklist
+
+When reviewing a spec:
+
+1. **Clarity:** Can I understand the feature goal without asking?
+2. **Scope:** Is this appropriately sized? (not a 1-person-year effort)
+3. **Risks:** Are major risks identified? Are mitigations sound?
+4. **Dependencies:** Will this block other teams? Does it need other work first?
+5. **Testing:** Can we validate this objectively?
+6. **Architecture:** Is the design sound? Any red flags?
+7. **Trade-offs:** Are we making intentional choices or drifting?
+
+Provide feedback in PROGRESS.md → Feedback Items section.
+
+## Current Specs
+
+### 🆕 Worker Version Enablement
+- **Status:** Draft - Ready for Review
+- **Goal:** Generate load + deploy worker versions + validate zero failures
+- **Owner:** [Your Name]
+- **Next:** Awaiting tech lead review (see PROGRESS.md)
+
+## Example: Complete Workflow
+
+```
+SPECS/my-feature/
+├── spec.md
+│   └── [Author writes comprehensive design]
+│
+├── PROGRESS.md
+│   ├── Open items: "What should V2 change?" "How long test?"
+│   └── Ready for review
+│
+→ [Tech Lead reviews spec.md]
+│   ├── Provides feedback in PROGRESS.md
+│   └── Marks as APPROVED WITH CHANGES or APPROVED
+│
+→ [Author revises if needed]
+│
+→ [Planning Phase begins]
+│   ├── Break into smaller tasks
+│   ├── Create Jira/Linear tickets
+│   ├── Assign owners + dates
+│   └── Update PROGRESS.md with roadmap
+│
+→ [Implementation begins]
+│   └── Reference spec for design decisions
+│   └── Update PROGRESS.md with phase status
+│
+→ [Validation & Demo]
+│   ├── Run acceptance tests
+│   ├── Demo to team
+│   └── Update PROGRESS.md: COMPLETE
+│
+→ [Post-Ship]
+    ├── Capture lessons learned
+    ├── Update runbooks
+    └── Archive spec
+```
+
+## Tips
+
+- **Be specific:** "Create REST service on port 8082" beats "Add new service"
+- **Show your work:** Include architecture diagrams, data models, example configs
+- **Question everything:** Explicitly list assumptions and open questions
+- **Think about ops:** How will this be deployed? Monitored? Debugged?
+- **Assume async:** Tech lead may not respond for days; spec should be self-contained
+- **One feature per spec:** Tempting to bundle related work; resist (easier to scope, review, iterate)
+
+## Questions?
+
+Specs are a tool to improve collaboration. If something's unclear:
+- Add it to the template
+- Create an example in this README
+- Ask in team sync
+
+---
+
+**Last Updated:** 2026-03-18
+**Owner:** [Engineering Team]

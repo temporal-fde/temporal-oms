@@ -6,12 +6,12 @@ resources:
   - apps/deployment-api.yaml
   - apps/deployment-workers.yaml
   - processing/deployment-api.yaml
-  - processing/deployment-workers.yaml
   - temporal-cloud-service.yaml
 
-patchesStrategicMerge: []
-
 # ConfigMaps and Secrets will be patched by overlays
+generatorOptions:
+  disableNameSuffixHash: true
+
 configMapGenerator:
   - name: temporal-oms-config
     namespace: temporal-oms-apps

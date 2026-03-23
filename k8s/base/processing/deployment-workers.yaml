@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: processing-worker
+  name: processing-workers
   namespace: temporal-oms-processing
   labels:
-    app: processing-worker
+    app: processing-workers
     component: worker
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
-      app: processing-worker
+      app: processing-workers
   template:
     metadata:
       labels:
-        app: processing-worker
+        app: processing-workers
         component: worker
         version: "1.0.0"
       annotations:
@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: worker
-        image: temporal-oms/processing-worker:latest
+        image: temporal-oms/processing-workers:latest
         imagePullPolicy: Never
         ports:
         - containerPort: 9092
@@ -32,7 +32,7 @@ spec:
         - name: SPRING_PROFILES_ACTIVE
           value: k8s
         - name: JAVA_OPTS
-          value: "-Dio.grpc.netty.shaded.io.netty.util.NetUtil.ipv4Preferred=true -Dgrpc.netty.keepaliveTime=30 -Dgrpc.netty.keepaliveTimeout=5 -Dgrpc.netty.keepaliveWithoutCalls=true"
+          value: "-Dgrpc.netty.keepaliveTime=30 -Dgrpc.netty.keepaliveTimeout=5 -Dgrpc.netty.keepaliveWithoutCalls=true"
         envFrom:
         - configMapRef:
             name: temporal-oms-config
@@ -59,8 +59,8 @@ spec:
           readOnly: true
         resources:
           requests:
-            memory: "512Mi"
-            cpu: "250m"
+            memory: "384Mi"
+            cpu: "200m"
           limits:
             memory: "2Gi"
             cpu: "2000m"
@@ -77,14 +77,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: processing-worker
+  name: processing-workers
   namespace: temporal-oms-processing
   labels:
-    app: processing-worker
+    app: processing-workers
 spec:
   type: ClusterIP
   selector:
-    app: processing-worker
+    app: processing-workers
   ports:
   - port: 9092
     targetPort: 9092

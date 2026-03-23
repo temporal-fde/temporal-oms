@@ -1,0 +1,38 @@
+spring.config.import: classpath:acme.oms.yaml
+enablements:
+  apps-api:
+    # Base URL for the apps-api service
+    # Local development: http://localhost:8080
+    # Kubernetes: http://apps-api.temporal-oms-apps.svc.cluster.local:8080
+    base-url: http://localhost:8080
+  processing-api:
+    # Base URL for the apps-api service
+    # Local development: http://localhost:8081
+    # Kubernetes: http://processing-api.temporal-oms-apps.svc.cluster.local:8081
+    base-url: http://localhost:8081
+
+  deployment:
+    # Kubernetes namespace for worker deployments
+    namespace: temporal-oms-processing
+    # Path to manifest template (supports variable substitution: {VERSION}, {BUILD_ID}, {REPLICAS})
+    manifest-template: k8s/base/processing/processing-workers-deployment-template.yaml
+    # Optional kubeconfig path (leave empty to use default)
+    kubeconfig: ""
+
+spring.temporal:
+    connection:
+      # Connection settings
+      target: ${TEMPORAL_ADDRESS:localhost:7233}
+
+      # API Key for Temporal Cloud
+      api-key: ${TEMPORAL_API_KEY:}
+
+    namespace: ${TEMPORAL_NAMESPACE:default}
+    workers:
+      - task-queue: enablements
+        workflow-classes:
+          - com.acme.enablements.workflows.WorkerVersionEnablementImpl
+        activity-beans:
+          - order-activities
+          - deployment-activities
+

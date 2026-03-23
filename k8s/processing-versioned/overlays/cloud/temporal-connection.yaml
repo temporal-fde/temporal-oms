@@ -1,0 +1,10 @@
+apiVersion: temporal.io/v1alpha1
+kind: TemporalConnection
+metadata:
+  name: temporal-connection
+  namespace: temporal-oms-processing
+spec:
+  hostPort: us-east-1.aws.api.temporal.io:7233
+  apiKeySecretRef:
+    name: temporal-processing-api-key
+    key: TEMPORAL_API_KEY

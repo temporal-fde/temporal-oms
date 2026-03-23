@@ -12,14 +12,10 @@ OVERLAY="${OVERLAY:-local}"
 
 echo "📦 Building and deploying applications (${OVERLAY} Temporal)..."
 
-# Build Java
+# Build Java (from root to ensure shared modules like oms are rebuilt and installed)
 echo "→ Building Java projects..."
-cd java/apps
-mvn clean package -DskipTests -q
-cd "$PROJECT_DIR"
-
-cd java/processing
-mvn clean package -DskipTests -q
+cd java
+mvn clean install -DskipTests -q
 cd "$PROJECT_DIR"
 
 # Build Docker images and load into KinD
@@ -33,7 +29,7 @@ docker build -q -t temporal-oms/apps-worker:latest \
 docker build -q -t temporal-oms/processing-api:latest \
   -f java/processing/processing-api/docker/Dockerfile java/processing/processing-api
 
-docker build -q -t temporal-oms/processing-worker:latest \
+docker build -q -t temporal-oms/processing-workers:v1 \
   -f java/processing/processing-workers/docker/Dockerfile java/processing/processing-workers
 
 # Load images into KinD cluster
@@ -41,18 +37,18 @@ echo "→ Loading images into KinD..."
 kind load docker-image temporal-oms/apps-api:latest --name temporal-oms
 kind load docker-image temporal-oms/apps-worker:latest --name temporal-oms
 kind load docker-image temporal-oms/processing-api:latest --name temporal-oms
-kind load docker-image temporal-oms/processing-worker:latest --name temporal-oms
+kind load docker-image temporal-oms/processing-workers:v1 --name temporal-oms
 
 # Deploy to Kubernetes
 echo "→ Deploying to KinD..."
 kubectl apply -k "k8s/overlays/${OVERLAY}" >/dev/null
+kubectl apply -k "k8s/processing-versioned/overlays/${OVERLAY}" >/dev/null
 kubectl apply -f k8s/ingress/apps-api-ingress.yaml >/dev/null
 kubectl apply -f k8s/ingress/processing-api-ingress.yaml >/dev/null
 
-# Delete old pods to force image pull
-echo "→ Restarting pods..."
+# Restart apps pods to pick up new images (processing pods are managed by the controller)
+echo "→ Restarting apps pods..."
 kubectl delete pods -n temporal-oms-apps --all 2>/dev/null || true
-kubectl delete pods -n temporal-oms-processing --all 2>/dev/null || true
 
 # Wait for pods to start
 sleep 8
