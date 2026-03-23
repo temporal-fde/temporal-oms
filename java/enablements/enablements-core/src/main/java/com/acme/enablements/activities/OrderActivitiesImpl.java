@@ -49,10 +49,11 @@ public class OrderActivitiesImpl implements OrderActivities {
         while (!canceled) {
             try {
                 ctx.heartbeat(null);
+                var enablementId = cmd.getEnablementId().isBlank() ? ctx.getInfo().getWorkflowId() : cmd.getEnablementId();
 
                 // Generate order ID as enablement_id + timestamp
                 long timestamp = System.currentTimeMillis();
-                String orderId = cmd.getOrderIdSeed() + "-" + cmd.getEnablementId() + "-" + timestamp;
+                String orderId = cmd.getOrderIdSeed() + "-" + enablementId + "-" + timestamp;
 
                 try {
                     // Call /api/v1/orders/{orderId} endpoint

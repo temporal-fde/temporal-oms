@@ -119,8 +119,7 @@ public class WorkerVersionEnablementImpl implements WorkerVersionEnablement {
         orderActivities.submitOrders(SubmitOrdersRequest.newBuilder().
                 setOrderIdSeed(state.getArgs().getOrderIdSeed()).
                 setEnablementId(state.getArgs().getEnablementId()).
-                setSubmitRatePerMin(state.getArgs().getSubmitRatePerMin()).
-                setEnablementId(state.getEnablementId()).build());
+                setSubmitRatePerMin(state.getArgs().getSubmitRatePerMin()).build());
 
     }
 
