@@ -1,11 +1,11 @@
-spring.config.import: classpath:acme.oms.yaml,classpath:acme.processing.yaml
+spring.config.import: classpath:acme.processing.yaml
 spring.application.name: processing-api
 spring.temporal.start-workers: false
 
-management.server.port: 9090
+management.server.port: 9080
 
 server:
-  port: 8081
+  port: 8070
 
 # Swagger/OpenAPI Configuration (MANDATORY per stack-api-rest)
 springdoc:
