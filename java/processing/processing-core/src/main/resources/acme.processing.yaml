@@ -20,7 +20,7 @@ spring.temporal:
         nexus-service-beans:
           - processing-service
         deployment-properties:
-          use-versioning: true
+          use-versioning: ${TEMPORAL_WORKER_VERSIONING_ENABLED:false}
           default-versioning-behavior: PINNED
           # https://github.com/temporalio/temporal-worker-controller/blob/main/docs/concepts.md#temporal_deployment_name
           deployment-name: ${TEMPORAL_DEPLOYMENT_NAME:processing}
@@ -32,7 +32,7 @@ spring.temporal:
         rate-limits:
           max-task-queue-activities-per-second: 150
         deployment-properties:
-          use-versioning: true
+          use-versioning: ${TEMPORAL_WORKER_VERSIONING_ENABLED:false}
           default-versioning-behavior: PINNED
           # https://github.com/temporalio/temporal-worker-controller/blob/main/docs/concepts.md#temporal_deployment_name
           deployment-name: ${TEMPORAL_DEPLOYMENT_NAME:processing}
@@ -44,7 +44,7 @@ spring.temporal:
         activity-beans:
           - support-activities
         deployment-properties:
-          use-versioning: true
+          use-versioning: ${TEMPORAL_WORKER_VERSIONING_ENABLED:false}
           default-versioning-behavior: PINNED
           # https://github.com/temporalio/temporal-worker-controller/blob/main/docs/concepts.md#temporal_deployment_name
           deployment-name: ${TEMPORAL_DEPLOYMENT_NAME:processing}
