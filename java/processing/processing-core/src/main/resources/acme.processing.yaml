@@ -20,33 +20,27 @@ spring.temporal:
         nexus-service-beans:
           - processing-service
         deployment-properties:
-          use-versioning: ${TEMPORAL_WORKER_VERSIONING_ENABLED:false}
+          use-versioning: true
           default-versioning-behavior: PINNED
-          # https://github.com/temporalio/temporal-worker-controller/blob/main/docs/concepts.md#temporal_deployment_name
           deployment-name: ${TEMPORAL_DEPLOYMENT_NAME:processing}
-          # https://github.com/temporalio/temporal-worker-controller/blob/main/docs/concepts.md#temporal_worker_build_id
-          build-id: ${TEMPORAL_WORKER_BUILD_ID:1.0.0}
+          build-id: ${TEMPORAL_WORKER_BUILD_ID:local}
       - task-queue: commerce-app
         activity-beans:
           - commerce-app-activities
         rate-limits:
           max-task-queue-activities-per-second: 150
         deployment-properties:
-          use-versioning: ${TEMPORAL_WORKER_VERSIONING_ENABLED:false}
+          use-versioning: true
           default-versioning-behavior: PINNED
-          # https://github.com/temporalio/temporal-worker-controller/blob/main/docs/concepts.md#temporal_deployment_name
           deployment-name: ${TEMPORAL_DEPLOYMENT_NAME:processing}
-          # https://github.com/temporalio/temporal-worker-controller/blob/main/docs/concepts.md#temporal_worker_build_id
-          build-id: ${TEMPORAL_WORKER_BUILD_ID:1.0.0}
+          build-id: ${TEMPORAL_WORKER_BUILD_ID:local}
       - task-queue: support
         workflow-classes:
           - com.acme.processing.workflows.SupportTeamImpl
         activity-beans:
           - support-activities
         deployment-properties:
-          use-versioning: ${TEMPORAL_WORKER_VERSIONING_ENABLED:false}
+          use-versioning: true
           default-versioning-behavior: PINNED
-          # https://github.com/temporalio/temporal-worker-controller/blob/main/docs/concepts.md#temporal_deployment_name
           deployment-name: ${TEMPORAL_DEPLOYMENT_NAME:processing}
-          # https://github.com/temporalio/temporal-worker-controller/blob/main/docs/concepts.md#temporal_worker_build_id
-          build-id: ${TEMPORAL_WORKER_BUILD_ID:1.0.0}
+          build-id: ${TEMPORAL_WORKER_BUILD_ID:local}

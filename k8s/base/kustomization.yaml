@@ -31,7 +31,6 @@ configMapGenerator:
       - OTEL_SERVICE_NAME=temporal-oms
       - DB_PORT=5432
       - DB_NAME=temporal_oms
-      - TEMPORAL_WORKER_VERSIONING_ENABLED=true
 
 secretGenerator:
   - name: temporal-oms-secrets

@@ -30,6 +30,15 @@ echo "Creating namespace: processing"
 temporal operator namespace create --namespace processing
 
 echo ""
+echo "Setting 'processing' Worker Deployment to as build-id='local'"
+echo ""
+temporal worker deployment set-current-version \
+  --deployment-name processing \
+  --build-id local \
+  --allow-no-pollers \
+  --namespace processing
+
+echo ""
 echo "Registering Nexus endpoints..."
 echo ""
 
@@ -47,7 +56,7 @@ temporal operator nexus endpoint create \
   --target-task-queue processing
 
 # Processing namespace: apps endpoint -> oms-apps-v1 service
-echo "Registering endpoint 'apps' in processing namespace"
+echo "Registering endpoint 'oms-apps-v1' in processing namespace"
 #temporal nexus endpoint create \
 #  --address "$TEMPORAL_ADDRESS" \
 #  --namespace "apps" \

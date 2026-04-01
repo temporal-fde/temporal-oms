@@ -23,15 +23,29 @@ echo "→ Creating Kubernetes namespaces..."
 kubectl create namespace temporal-oms-apps --dry-run=client -o yaml | kubectl apply -f - >/dev/null
 kubectl create namespace temporal-oms-processing --dry-run=client -o yaml | kubectl apply -f - >/dev/null
 
+# Install cert-manager (required by Temporal Worker Controller)
+echo "→ Installing cert-manager..."
+if ! kubectl get crd certificates.cert-manager.io &>/dev/null; then
+    kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.0/cert-manager.yaml >/dev/null
+    until kubectl get deployment cert-manager -n cert-manager &>/dev/null; do sleep 2; done
+    kubectl -n cert-manager wait --for=condition=available deployment/cert-manager --timeout=120s
+    kubectl -n cert-manager wait --for=condition=available deployment/cert-manager-webhook --timeout=120s
+    kubectl -n cert-manager wait --for=condition=available deployment/cert-manager-cainjector --timeout=120s
+else
+    echo "✓ cert-manager already installed"
+fi
+
 # Install Temporal Worker Controller CRDs
-# The published OCI chart does not include CRDs; applying directly from the release tag.
+# CRDs live in a separate chart path as of v1.5.1: helm/temporal-worker-controller-crds/templates/
 echo "→ Installing Temporal Worker Controller CRDs..."
 if ! kubectl get crd temporalworkerdeployments.temporal.io &>/dev/null; then
-    CRDS_BASE="https://raw.githubusercontent.com/temporalio/temporal-worker-controller/v1.3.1/helm/temporal-worker-controller/crds"
+    CRDS_BASE="https://raw.githubusercontent.com/temporalio/temporal-worker-controller/v1.5.1/helm/temporal-worker-controller-crds/templates"
     kubectl apply -f "${CRDS_BASE}/temporal.io_temporalconnections.yaml"
     kubectl apply -f "${CRDS_BASE}/temporal.io_temporalworkerdeployments.yaml"
+    kubectl apply -f "${CRDS_BASE}/temporal.io_workerresourcetemplates.yaml"
     kubectl wait --for=condition=established crd/temporalworkerdeployments.temporal.io --timeout=60s
     kubectl wait --for=condition=established crd/temporalconnections.temporal.io --timeout=60s
+    kubectl wait --for=condition=established crd/workerresourcetemplates.temporal.io --timeout=60s
 else
     echo "✓ Temporal Worker Controller CRDs already installed"
 fi
