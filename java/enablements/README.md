@@ -35,12 +35,25 @@ resource. When you change the `image` tag, the controller:
 1. Computes a new build-id from the image tag + a hash of the pod template spec
 2. Registers the new build-id with Temporal
 3. Starts pods with the new image
-4. Progressively ramps traffic to the new version (per the rollout strategy)
-5. Old pods drain — existing in-flight workflows complete on the version they started on
+4. Waits for pollers to appear on the new build-id
+5. Calls `set-current-version` — this is the moment Temporal begins routing new tasks to the new version
+6. Progressively ramps traffic per the rollout strategy
+7. Old pods drain — in-flight workflows complete on the version they started on
 
 **Why explicit version tags matter:** The build-id is derived from the image tag. Using `:latest`
 would produce the same build-id on every deploy and Temporal would not see a new version.
 Always use `:v1`, `:v2`, etc.
+
+> **Controller vs. raw CLI — why tasks only flow after `set-current-version`**
+>
+> When a worker runs with `deployment-properties` configured, Temporal tracks it as part of a Deployment. The server will not route tasks to any version of that deployment until one version is explicitly designated "current" via `set-current-version`. Workers poll successfully and show as connected — but the task queue appears empty.
+>
+> The Temporal Worker Controller handles this automatically. It watches the Temporal API for pollers to register against a new build-id, and once they do, it calls `set-current-version` on your behalf. This is why deploying a new image in Kubernetes just works.
+>
+> Without the controller (e.g. running workers locally for Level 1 development), `set-current-version` must be called manually. The `scripts/setup-temporal-namespaces.sh` script does this with `--allow-no-pollers` so it can run before workers start. If you ever see orders submitted but never progressing, a missing current version is the first thing to check:
+> ```bash
+> temporal worker deployment describe --deployment-name processing --namespace processing
+> ```
 
 **Rollout strategy (configured in `k8s/processing-versioned/base/temporal-worker-deployment.yaml`):**
 ```

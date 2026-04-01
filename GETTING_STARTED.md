@@ -117,6 +117,21 @@ This creates:
 - ✅ `apps` namespace - Order orchestration and data collection
 - ✅ `processing` namespace - Order validation, enrichment, fulfillment
 - ✅ Nexus endpoints for Apps → Processing communication
+- ✅ Sets the current worker version for the `processing` deployment
+
+> **Why `set-current-version`?** The workers in this project run with Worker Versioning enabled (`deployment-properties` in their config). When versioning is active, Temporal tracks each deployment by build-id and only routes tasks to a version that has been explicitly set as the "current" version. Until that happens, workers will connect and poll successfully — but the server will not dispatch any tasks to them, and Nexus calls into `processing` will silently stall.
+>
+> The script calls this on your behalf:
+> ```bash
+> temporal worker deployment set-current-version \
+>   --deployment-name processing \
+>   --build-id local \
+>   --allow-no-pollers \
+>   --namespace processing
+> ```
+> The `--allow-no-pollers` flag lets you set the version before the workers have started. Once workers come up and poll, they see themselves as the current version and tasks flow normally.
+>
+> **This is different from Levels 2 and 3 (Kubernetes).** When running in KinD with the Temporal Worker Controller, `set-current-version` is called automatically — the controller waits for pollers to appear on a new build-id and then promotes that version itself. You never run it manually. See [DEPLOYMENT.md](DEPLOYMENT.md) for details.
 
 Verify setup:
 ```bash
@@ -339,6 +354,14 @@ temporal workflow show --workflow-id {orderId} --namespace apps --output json > 
 
 ## Troubleshooting
 
+### ❌ `INVALID_ARGUMENT: versioning behavior cannot be specified without deployment options`
+
+This error means a worker registered a workflow type with a `@WorkflowVersioningBehavior` annotation but the worker itself does not have `deployment-properties` (i.e. `use-versioning: true`) configured.
+
+The `@WorkflowVersioningBehavior` annotation is compiled into the workflow type registration and is always sent to the server — it cannot be disabled via Spring config or environment variables. If the worker config doesn't declare a deployment, the server rejects it.
+
+**Fix**: Ensure the worker running this workflow has `deployment-properties.use-versioning: true` in its config, and that a current version has been set for that deployment.
+
 ### ❌ "Failed to connect to localhost:4317" (OpenTelemetry Error)
 
 This is expected in development. OpenTelemetry is trying to send metrics but there's no collector.
@@ -383,6 +406,31 @@ temporal workflow list --namespace apps
 2. Both namespaces exist: `temporal operator namespace list`
 3. Nexus endpoints are registered: `temporal operator nexus endpoint list`
 4. Order ID doesn't contain "invalid" (that's a special test case)
+
+### ❌ Workers are connected but orders never progress (tasks not dispatched)
+
+This is the Worker Versioning routing problem. Workers with `deployment-properties` configured will connect and poll successfully but receive no tasks if a current version has not been set.
+
+**Fix**: Re-run the setup script (it is idempotent):
+```bash
+./scripts/setup-temporal-namespaces.sh
+```
+
+Or set the version directly:
+```bash
+temporal worker deployment set-current-version \
+  --deployment-name processing \
+  --build-id local \
+  --allow-no-pollers \
+  --namespace processing
+```
+
+Verify the current version is set:
+```bash
+temporal worker deployment describe \
+  --deployment-name processing \
+  --namespace processing
+```
 
 ## Project Structure
 
