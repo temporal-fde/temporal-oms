@@ -46,9 +46,12 @@ asdf install
 
 ## Level 1 — Run Locally (No Kubernetes)
 
-Fastest path to a working system. All services run as local JVM processes against a Docker-hosted Temporal server.
+Fastest path to a working system. All services run as local JVM processes against a local Temporal server.
 
-→ **[GETTING_STARTED.md](GETTING_STARTED.md)**
+> **Important:** The workers use Worker Versioning (Temporal Deployments). Without the Temporal Worker Controller in the environment, you must call `set-current-version` manually before tasks will be dispatched — `scripts/setup-temporal-namespaces.sh` handles this. See [GETTING_STARTED.md](GETTING_STARTED.md) for the full explanation.
+
+→ **[GETTING_STARTED.md](GETTING_STARTED.md)** — local setup, demo scenarios, troubleshooting
+→ **[DEVELOPMENT.md](DEVELOPMENT.md)** — protobuf changes, workflow modifications, debugging, testing
 
 ---
 

@@ -1,4 +1,7 @@
+spring.config.import: classpath:acme.oms.yaml
+
 spring.temporal:
+
     connection:
       # Connection settings
       target: ${TEMPORAL_ADDRESS:localhost:7233}
@@ -6,7 +9,7 @@ spring.temporal:
       # API Key for Temporal Cloud
       api-key: ${TEMPORAL_API_KEY:}
 
-    namespace: ${TEMPORAL_NAMESPACE:}
+    namespace: ${TEMPORAL_NAMESPACE:processing}
     workers:
       - task-queue: processing
         workflow-classes:
@@ -19,10 +22,8 @@ spring.temporal:
         deployment-properties:
           use-versioning: true
           default-versioning-behavior: PINNED
-          # https://github.com/temporalio/temporal-worker-controller/blob/main/docs/concepts.md#temporal_deployment_name
           deployment-name: ${TEMPORAL_DEPLOYMENT_NAME:processing}
-          # https://github.com/temporalio/temporal-worker-controller/blob/main/docs/concepts.md#temporal_worker_build_id
-          build-id: ${TEMPORAL_WORKER_BUILD_ID:1.0.0}
+          build-id: ${TEMPORAL_WORKER_BUILD_ID:local}
       - task-queue: commerce-app
         activity-beans:
           - commerce-app-activities
@@ -31,10 +32,8 @@ spring.temporal:
         deployment-properties:
           use-versioning: true
           default-versioning-behavior: PINNED
-          # https://github.com/temporalio/temporal-worker-controller/blob/main/docs/concepts.md#temporal_deployment_name
           deployment-name: ${TEMPORAL_DEPLOYMENT_NAME:processing}
-          # https://github.com/temporalio/temporal-worker-controller/blob/main/docs/concepts.md#temporal_worker_build_id
-          build-id: ${TEMPORAL_WORKER_BUILD_ID:1.0.0}
+          build-id: ${TEMPORAL_WORKER_BUILD_ID:local}
       - task-queue: support
         workflow-classes:
           - com.acme.processing.workflows.SupportTeamImpl
@@ -43,7 +42,5 @@ spring.temporal:
         deployment-properties:
           use-versioning: true
           default-versioning-behavior: PINNED
-          # https://github.com/temporalio/temporal-worker-controller/blob/main/docs/concepts.md#temporal_deployment_name
           deployment-name: ${TEMPORAL_DEPLOYMENT_NAME:processing}
-          # https://github.com/temporalio/temporal-worker-controller/blob/main/docs/concepts.md#temporal_worker_build_id
-          build-id: ${TEMPORAL_WORKER_BUILD_ID:1.0.0}
+          build-id: ${TEMPORAL_WORKER_BUILD_ID:local}

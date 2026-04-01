@@ -1,3 +1,38 @@
 spring:
   config:
     import: file:/etc/config/temporal/temporal-config.yaml,file:/etc/config/temporal-secret/temporal-secret.yaml
+  temporal:
+    workers:
+      - task-queue: processing
+        workflow-classes:
+          - com.acme.processing.workflows.OrderImpl
+        activity-beans:
+          - enrichment-activities
+          - fulfillment-activities
+        nexus-service-beans:
+          - processing-service
+        deployment-properties:
+          use-versioning: true
+          default-versioning-behavior: PINNED
+          deployment-name: ${TEMPORAL_DEPLOYMENT_NAME:processing}
+          build-id: ${TEMPORAL_WORKER_BUILD_ID:1.0.0}
+      - task-queue: commerce-app
+        activity-beans:
+          - commerce-app-activities
+        rate-limits:
+          max-task-queue-activities-per-second: 150
+        deployment-properties:
+          use-versioning: true
+          default-versioning-behavior: PINNED
+          deployment-name: ${TEMPORAL_DEPLOYMENT_NAME:processing}
+          build-id: ${TEMPORAL_WORKER_BUILD_ID:1.0.0}
+      - task-queue: support
+        workflow-classes:
+          - com.acme.processing.workflows.SupportTeamImpl
+        activity-beans:
+          - support-activities
+        deployment-properties:
+          use-versioning: true
+          default-versioning-behavior: PINNED
+          deployment-name: ${TEMPORAL_DEPLOYMENT_NAME:processing}
+          build-id: ${TEMPORAL_WORKER_BUILD_ID:1.0.0}

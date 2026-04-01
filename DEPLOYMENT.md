@@ -90,71 +90,23 @@ brew install java maven nodejs kind kubectl
 
 ### 1. Temporal Cloud API Key Setup
 
-If deploying to **Temporal Cloud** (OVERLAY=cloud):
+If deploying to **Temporal Cloud** (OVERLAY=cloud), API keys are managed through gitignored local config files. They are never written to committed files.
 
-#### Step 1a: Get Your API Key
+See **[README.md — Level 3](README.md)** for the full one-time Temporal Cloud setup (namespaces, service accounts, API keys, Nexus endpoints).
 
-1. Log in to [Temporal Cloud Console](https://cloud.temporal.io)
-2. Navigate to **Settings → API Keys**
-3. Create or copy your API key (JWT format)
-4. Note your Namespace and Account ID
-
-#### Step 1b: Configure Temporal CLI
+Once you have your API keys, copy the templates and fill them in:
 
 ```bash
-# Get your cloud environment configuration
-temporal env get --env your-env-name
-
-# This shows:
-# - address: us-east-1.aws.api.temporal.io:7233 (or your region)
-# - namespace: your-namespace.account-id
-# - api-key: eyJhbGc... (JWT token)
+cp config/acme.apps.secret.template.yaml        config/acme.apps.secret.yaml
+cp config/acme.processing.secret.template.yaml  config/acme.processing.secret.yaml
+cp config/acme.automations.secret.template.yaml config/acme.automations.secret.yaml
 ```
 
-#### Step 1c: Store API Key in Secret Template
+`infra-up.sh` reads these files at deploy time and creates the Kubernetes secrets imperatively — nothing with a real key ever touches a committed file.
 
-Create/update `k8s/overlays/cloud/secrets/temporal-apps-api-key.yaml`:
+See **[CLOUD.md](CLOUD.md)** for the full secret-to-Kubernetes mapping and troubleshooting.
 
-```yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: temporal-apps-api-key
-  namespace: temporal-oms-apps
-type: Opaque
-stringData:
-  temporal-secret.yaml: |
-    spring.temporal.connection.api-key: "eyJhbGc..."
-```
-
-Create/update `k8s/overlays/cloud/secrets/temporal-processing-api-key.yaml`:
-
-```yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: temporal-processing-api-key
-  namespace: temporal-oms-processing
-type: Opaque
-stringData:
-  temporal-secret.yaml: |
-    spring.temporal.connection.api-key: "eyJhbGc..."
-```
-
-**Important:** These files contain secrets and should NOT be committed to git. They're already in `.gitignore`.
-
-#### Step 1d: Verify Cloud Configuration
-
-```bash
-# Test connection to Temporal Cloud from your machine
-temporal workflow list --env your-env-name
-
-# This should show your workflows (even if empty)
-```
-
-### 2. Local Temporal Setup (Optional)
-
-If deploying to **local Temporal** (OVERLAY=local):
+### 2. Local Temporal Setup (OVERLAY=local)
 
 ```bash
 # Install Temporal CLI (if not already installed)
@@ -165,11 +117,16 @@ temporal server start-dev
 
 # Verify it's running
 temporal workflow list
-
 # Note: Runs on localhost:7233 by default
 ```
 
-No additional configuration needed for local overlay - it's configured in `k8s/overlays/local/configmap/`.
+> **Worker Versioning and `set-current-version`**
+>
+> When running with `OVERLAY=local`, the apps and processing workers start with Worker Versioning enabled. The **Temporal Worker Controller** handles version promotion automatically: it watches for pollers to appear on a new build-id, then calls `set-current-version` itself. You never need to run it manually when the controller is present.
+>
+> This is why tasks route correctly after deploy without any extra steps — the controller is the bridge between a new image landing in Kubernetes and Temporal knowing to route work to it.
+>
+> If workers are running **without the Temporal Worker Controller in the environment** (e.g. Level 1, running directly on your machine), you must call `set-current-version` yourself. This is what `scripts/setup-temporal-namespaces.sh` does. If you skip it, workers will connect and poll but the server will dispatch no tasks — workflows stall silently. See [GETTING_STARTED.md](GETTING_STARTED.md) for details.
 
 ### 3. Build and Deploy to KinD
 
@@ -237,16 +194,18 @@ open http://localhost:8080/api/docs
 
 #### Cloud Overlay (OVERLAY=cloud)
 
-- **Temporal Target**: `us-east-1.aws.api.temporal.io:7233` (or your region)
-- **API Key**: Required (from Temporal Cloud)
+- **Temporal Target**: Your region endpoint (e.g. `us-east-1.aws.api.temporal.io:7233`)
+- **API Key**: Required — sourced from gitignored `config/*.secret.yaml` files at deploy time
 - **TLS**: Enabled
-- **Namespace**: Your Temporal Cloud namespace (e.g., `fde-oms-apps.account-id`)
+- **Namespace**: Your fully-qualified Temporal Cloud namespace (e.g., `apps.<account-id>`)
 
 **Config Files:**
-- `k8s/overlays/cloud/configmap/temporal-apps.yaml`
-- `k8s/overlays/cloud/configmap/temporal-processing.yaml`
-- `k8s/overlays/cloud/secrets/temporal-apps-api-key.yaml` (contains JWT)
-- `k8s/overlays/cloud/secrets/temporal-processing-api-key.yaml` (contains JWT)
+- `k8s/overlays/cloud/configmap/` — Temporal address, namespace, TLS settings (committed, no secrets)
+- `config/acme.apps.secret.yaml` — Apps worker API key (gitignored, created from template)
+- `config/acme.processing.secret.yaml` — Processing worker API key (gitignored, created from template)
+- `config/acme.automations.secret.yaml` — Temporal Worker Controller API key (gitignored, created from template)
+
+Kubernetes secrets are created imperatively by `infra-up.sh` from those files. No secrets are committed.
 
 ### Spring Boot Configuration
 
