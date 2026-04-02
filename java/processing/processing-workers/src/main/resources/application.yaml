@@ -4,4 +4,6 @@ spring.application.name: processing-workers
 spring.main.web-application-type: reactive
 spring.temporal.start-workers: true
 server.port: 8071
-management.server.port: 9082
+management.server.port: 9081
+
+kafka.topic: order-fulfillment
