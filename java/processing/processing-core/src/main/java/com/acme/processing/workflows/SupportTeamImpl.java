@@ -6,6 +6,7 @@ import com.acme.processing.workflows.activities.Support;
 import com.acme.proto.acme.processing.domain.processing.v1.*;
 import io.temporal.activity.ActivityOptions;
 import io.temporal.failure.ApplicationFailure;
+import io.temporal.workflow.ContinueAsNewOptions;
 import io.temporal.workflow.Workflow;
 import io.temporal.workflow.WorkflowInit;
 
@@ -19,7 +20,8 @@ public class SupportTeamImpl implements SupportTeam {
 
     @WorkflowInit
     public SupportTeamImpl(InitializeSupportTeam args) {
-        this.state = GetSupportTeamStateResponse.getDefaultInstance();
+        this.state = GetSupportTeamStateResponse.newBuilder().addAllValidationRequests(args.getValidationRequestsList()).build();
+
         this.support = Workflow.newActivityStub(Support.class,
                 ActivityOptions.newBuilder()
                         .setScheduleToCloseTimeout(Duration.ofSeconds(60))
@@ -27,6 +29,13 @@ public class SupportTeamImpl implements SupportTeam {
     }
     @Override
     public void execute(InitializeSupportTeam request) {
+        if(this.state.getValidationRequestsCount() > 500) {
+            // we've reached an arbitrary threshhold so do a continue as new to keep it sane
+            var can = Workflow.newContinueAsNewStub(SupportTeam.class);
+            Workflow.await(Workflow::isEveryHandlerFinished);
+            can.execute(InitializeSupportTeam.newBuilder().addAllValidationRequests(this.state.getValidationRequestsList()).build());
+            return;
+        }
         Workflow.await(()->false);
     }
 
@@ -57,6 +66,12 @@ public class SupportTeamImpl implements SupportTeam {
                         .setManualCorrectionNeeded(true)
                         .setSupportTicketId("support-team-" + request.get().getOrder().getOrderId())).build();
         this.support.completeOrderValidation(cmd);
+        this.state = this.state.toBuilder()
+                .clearValidationRequests()
+                .addAllValidationRequests(this.state.getValidationRequestsList().stream()
+                        .filter(r -> !r.getOrder().getOrderId().equals(orderId))
+                        .toList())
+                .build();
     }
     @Override
     public GetSupportTeamStateResponse getState() {

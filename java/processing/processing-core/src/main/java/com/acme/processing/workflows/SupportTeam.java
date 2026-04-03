@@ -11,6 +11,8 @@ public interface SupportTeam {
     @UpdateValidatorMethod(updateName = "validateOrder")
     void validateValidateOrder(ManuallyValidateOrderRequest request);
 
+    // TODO should I SIGNAL or UPDATE
+    // What are the benefits of one over the other?
     @UpdateMethod
     ManuallyValidateOrderResponse validateOrder(ManuallyValidateOrderRequest request);
 

@@ -9,7 +9,7 @@ enablements:
     # Base URL for the apps-api service
     # Local development: http://localhost:8081
     # Kubernetes: http://processing-api.temporal-oms-apps.svc.cluster.local:8081
-    base-url: http://localhost:8081
+    base-url: http://localhost:8070
 
   deployment:
     # Kubernetes namespace for worker deployments
