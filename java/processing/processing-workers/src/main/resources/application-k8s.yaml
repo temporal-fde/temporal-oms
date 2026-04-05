@@ -1,6 +1,6 @@
 spring:
   config:
-    import: file:/etc/config/temporal/temporal-config.yaml,file:/etc/config/temporal-secret/temporal-secret.yaml
+    import: file:/etc/config/temporal/temporal-config.yaml,optional:file:/etc/config/temporal-secret/temporal-secret.yaml
   temporal:
     workers:
       - task-queue: processing

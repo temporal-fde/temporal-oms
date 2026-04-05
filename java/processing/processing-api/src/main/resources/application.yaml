@@ -2,7 +2,7 @@ spring.config.import: classpath:acme.processing.yaml
 spring.application.name: processing-api
 spring.temporal.start-workers: false
 
-management.server.port: 9080
+management.server.port: 9081
 
 server:
   port: 8070
