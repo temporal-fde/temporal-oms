@@ -30,7 +30,7 @@ spec:
         - containerPort: 8080
           name: http
           protocol: TCP
-        - containerPort: 9090
+        - containerPort: 9091
           name: metrics
           protocol: TCP
         env:
@@ -42,7 +42,7 @@ spec:
         livenessProbe:
           httpGet:
             path: /actuator/health/liveness
-            port: 9090
+            port: 9091
           initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
@@ -50,7 +50,7 @@ spec:
         readinessProbe:
           httpGet:
             path: /actuator/health/readiness
-            port: 9090
+            port: 9091
           initialDelaySeconds: 20
           periodSeconds: 5
           timeoutSeconds: 3
@@ -95,7 +95,7 @@ spec:
     targetPort: 8080
     protocol: TCP
     name: http
-  - port: 9090
-    targetPort: 9090
+  - port: 9091
+    targetPort: 9091
     protocol: TCP
     name: metrics
