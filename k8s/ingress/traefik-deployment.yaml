@@ -81,6 +81,9 @@ spec:
     - name: websecure
       port: 443
       targetPort: 8443
+    - name: processing
+      port: 8070
+      targetPort: 8070
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -105,6 +108,7 @@ spec:
             - --api.dashboard=false
             - --entrypoints.web.address=:8000
             - --entrypoints.websecure.address=:8443
+            - --entrypoints.processing.address=:8070
             - --providers.kubernetesIngress
             - --providers.kubernetesIngress.ingressClass=traefik
           ports:
@@ -112,6 +116,8 @@ spec:
               containerPort: 8000
             - name: websecure
               containerPort: 8443
+            - name: processing
+              containerPort: 8070
           resources:
             requests:
               cpu: 100m

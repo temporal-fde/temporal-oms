@@ -11,8 +11,8 @@ while sustained load is running — without dropping in-flight workflows.
 
 1. Confirm KinD has no existing `temporal-oms` workloads running
 2. Confirm the cloud namespaces have no active workflows:
-   - [fde-oms-apps](https://cloud.temporal.io/namespaces/fde-oms-apps.sdvdw/workflows)
-   - [fde-oms-processing](https://cloud.temporal.io/namespaces/fde-oms-processing.sdvdw/workflows)
+   - Cloud OMS Apps Namespace
+   - Cloud OMS Processing Namespace
 
 ---
 
@@ -23,7 +23,7 @@ while sustained load is running — without dropping in-flight workflows.
 3. Deploy `temporal-oms` to KinD:
    ```shell
    # from the repo root
-   ./scripts/deploy
+   ./scripts/demo-up.sh
    ```
 
 4. Open `k9s` and note the `v1` prefix in the worker `buildID` — this is the current deployment version.
@@ -45,7 +45,12 @@ while sustained load is running — without dropping in-flight workflows.
 
 **Goal:** Start the load generator so workflows are actively running during the promotion.
 
-7. Start the `WorkerVersionEnablement` workflow:
+7a. Tunnel from the host computer to the KinD cluster
+```shell
+./scripts/tunnel.sh
+```
+
+7b. Start the `WorkerVersionEnablement` workflow:
    ```shell
    temporal workflow start \
        --task-queue enablements \
@@ -63,8 +68,8 @@ while sustained load is running — without dropping in-flight workflows.
    ```
 
 8. Verify traffic is flowing in the cloud UIs:
-   - [fde-oms-apps](https://cloud.temporal.io/namespaces/fde-oms-apps.sdvdw/workflows) — confirm there is **no** `DeploymentVersion` field (unversioned)
-   - [fde-oms-processing](https://cloud.temporal.io/namespaces/fde-oms-processing.sdvdw/workflows) — confirm `DeploymentVersion` shows **`v1`**
+   - Cloud OMS Apps Namespace — confirm there is **no** `DeploymentVersion` field (unversioned)
+   - Cloud OMS Processing Namespace — confirm `DeploymentVersion` shows **`v1`**
 
 ---
 
@@ -80,8 +85,8 @@ while sustained load is running — without dropping in-flight workflows.
 
 10. In `k9s`, watch the new `processing-worker:v2-{hash}` pod come up alongside `v1`.
 
-11. In [fde-oms-processing](https://cloud.temporal.io/namespaces/fde-oms-processing.sdvdw/workflows),
-    observe `DeploymentVersion` begin to show **`v2`** on new workflows.
+11. In **Cloud OMS Processing Namespace**
+    Observe `DeploymentVersion` begin to show **`v2`** on new workflows.
     - Discuss the **`rollout: progressive`** ramp strategy — new workflows route to `v2`, existing ones stay on `v1`
     - Discuss the **`sunset`** strategy — `v1` pods remain until all pinned workflows complete
 
@@ -102,8 +107,13 @@ while sustained load is running — without dropping in-flight workflows.
         --env fde-oms-processing
     ```
 
-14. In [fde-oms-processing](https://cloud.temporal.io/namespaces/fde-oms-processing.sdvdw/workflows),
+14. In **Cloud OMS Processing Namespace**,
     confirm `support-team` now shows `DeploymentVersion` = **`v2`**.
 
 15. Back in `k9s`, observe that `processing-worker:v1-{hash}` is now **gone** — the pod was reclaimed
     once no workflows remained pinned to it.
+```yaml
+  sunset:
+    scaledownDelay: 30s
+    deleteDelay: 120s
+```
