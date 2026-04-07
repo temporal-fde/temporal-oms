@@ -94,8 +94,9 @@ Support messages
  */
 
 message InitializeSupportTeam {
-
+  repeated ManuallyValidateOrderRequest validation_requests = 1;
 }
+
 message ManuallyValidateOrderRequest {
   string customer_id = 1;
   acme.oms.v1.Order order = 2;

@@ -4,3 +4,14 @@ kind: Kustomization
 resources:
   - ../../base
   - temporal-connection.yaml
+
+patches:
+  # Local Temporal doesn't use API keys — remove the temporal-secret volume mount entirely
+  - target:
+      kind: TemporalWorkerDeployment
+      name: processing-workers
+    patch: |-
+      - op: remove
+        path: /spec/template/spec/volumes/1
+      - op: remove
+        path: /spec/template/spec/containers/0/volumeMounts/1

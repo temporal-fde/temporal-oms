@@ -9,4 +9,28 @@ package com.acme.proto.acme.processing.domain.processing.v1;
 public interface InitializeSupportTeamOrBuilder extends
     // @@protoc_insertion_point(interface_extends:acme.processing.domain.processing.v1.InitializeSupportTeam)
     com.google.protobuf.MessageOrBuilder {
+
+  /**
+   * <code>repeated .acme.processing.domain.processing.v1.ManuallyValidateOrderRequest validation_requests = 1 [json_name = "validationRequests"];</code>
+   */
+  java.util.List<com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequest> 
+      getValidationRequestsList();
+  /**
+   * <code>repeated .acme.processing.domain.processing.v1.ManuallyValidateOrderRequest validation_requests = 1 [json_name = "validationRequests"];</code>
+   */
+  com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequest getValidationRequests(int index);
+  /**
+   * <code>repeated .acme.processing.domain.processing.v1.ManuallyValidateOrderRequest validation_requests = 1 [json_name = "validationRequests"];</code>
+   */
+  int getValidationRequestsCount();
+  /**
+   * <code>repeated .acme.processing.domain.processing.v1.ManuallyValidateOrderRequest validation_requests = 1 [json_name = "validationRequests"];</code>
+   */
+  java.util.List<? extends com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequestOrBuilder> 
+      getValidationRequestsOrBuilderList();
+  /**
+   * <code>repeated .acme.processing.domain.processing.v1.ManuallyValidateOrderRequest validation_requests = 1 [json_name = "validationRequests"];</code>
+   */
+  com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequestOrBuilder getValidationRequestsOrBuilder(
+      int index);
 }

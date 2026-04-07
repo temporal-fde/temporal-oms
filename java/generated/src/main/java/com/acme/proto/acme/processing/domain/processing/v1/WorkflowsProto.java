@@ -188,30 +188,33 @@ public final class WorkflowsProto extends com.google.protobuf.GeneratedFile {
       "\ncustomerId\022(\n\005order\030\001 \001(\0132\022.acme.oms.v1" +
       ".OrderR\005order\022H\n\005items\030\003 \003(\01322.acme.proc" +
       "essing.domain.processing.v1.EnrichedItem" +
-      "R\005items\"\026\n\024FulfillOrderResponse\"\027\n\025Initi" +
-      "alizeSupportTeam\"\253\001\n\034ManuallyValidateOrd" +
-      "erRequest\022\037\n\013customer_id\030\001 \001(\tR\ncustomer" +
-      "Id\022(\n\005order\030\002 \001(\0132\022.acme.oms.v1.OrderR\005o" +
-      "rder\022\037\n\013workflow_id\030\003 \001(\tR\nworkflowId\022\037\n" +
-      "\013activity_id\030\004 \001(\tR\nactivityId\"\037\n\035Manual" +
-      "lyValidateOrderResponse\"\201\002\n\036CompleteOrde" +
-      "rValidationRequest\022q\n\022validation_request" +
-      "\030\001 \001(\0132B.acme.processing.domain.processi" +
-      "ng.v1.ManuallyValidateOrderRequestR\021vali" +
-      "dationRequest\022l\n\023validation_response\030\002 \001" +
-      "(\0132;.acme.processing.domain.processing.v" +
-      "1.ValidateOrderResponseR\022validationRespo" +
-      "nse\"\222\001\n\033GetSupportTeamStateResponse\022s\n\023v" +
-      "alidation_requests\030\001 \003(\0132B.acme.processi" +
-      "ng.domain.processing.v1.ManuallyValidate" +
-      "OrderRequestR\022validationRequestsB\372\001\n3com" +
-      ".acme.proto.acme.processing.domain.proce" +
-      "ssing.v1B\016WorkflowsProtoP\001\242\002\004APDP\252\002$Acme" +
-      ".Processing.Domain.Processing.V1\312\002$Acme\\" +
-      "Processing\\Domain\\Processing\\V1\342\0020Acme\\P" +
-      "rocessing\\Domain\\Processing\\V1\\GPBMetada" +
-      "ta\352\002(Acme::Processing::Domain::Processin" +
-      "g::V1b\006proto3"
+      "R\005items\"\026\n\024FulfillOrderResponse\"\214\001\n\025Init" +
+      "ializeSupportTeam\022s\n\023validation_requests" +
+      "\030\001 \003(\0132B.acme.processing.domain.processi" +
+      "ng.v1.ManuallyValidateOrderRequestR\022vali" +
+      "dationRequests\"\253\001\n\034ManuallyValidateOrder" +
+      "Request\022\037\n\013customer_id\030\001 \001(\tR\ncustomerId" +
+      "\022(\n\005order\030\002 \001(\0132\022.acme.oms.v1.OrderR\005ord" +
+      "er\022\037\n\013workflow_id\030\003 \001(\tR\nworkflowId\022\037\n\013a" +
+      "ctivity_id\030\004 \001(\tR\nactivityId\"\037\n\035Manually" +
+      "ValidateOrderResponse\"\201\002\n\036CompleteOrderV" +
+      "alidationRequest\022q\n\022validation_request\030\001" +
+      " \001(\0132B.acme.processing.domain.processing" +
+      ".v1.ManuallyValidateOrderRequestR\021valida" +
+      "tionRequest\022l\n\023validation_response\030\002 \001(\013" +
+      "2;.acme.processing.domain.processing.v1." +
+      "ValidateOrderResponseR\022validationRespons" +
+      "e\"\222\001\n\033GetSupportTeamStateResponse\022s\n\023val" +
+      "idation_requests\030\001 \003(\0132B.acme.processing" +
+      ".domain.processing.v1.ManuallyValidateOr" +
+      "derRequestR\022validationRequestsB\372\001\n3com.a" +
+      "cme.proto.acme.processing.domain.process" +
+      "ing.v1B\016WorkflowsProtoP\001\242\002\004APDP\252\002$Acme.P" +
+      "rocessing.Domain.Processing.V1\312\002$Acme\\Pr" +
+      "ocessing\\Domain\\Processing\\V1\342\0020Acme\\Pro" +
+      "cessing\\Domain\\Processing\\V1\\GPBMetadata" +
+      "\352\002(Acme::Processing::Domain::Processing:" +
+      ":V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -309,7 +312,7 @@ public final class WorkflowsProto extends com.google.protobuf.GeneratedFile {
     internal_static_acme_processing_domain_processing_v1_InitializeSupportTeam_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_processing_domain_processing_v1_InitializeSupportTeam_descriptor,
-        new java.lang.String[] { });
+        new java.lang.String[] { "ValidationRequests", });
     internal_static_acme_processing_domain_processing_v1_ManuallyValidateOrderRequest_descriptor =
       getDescriptor().getMessageType(15);
     internal_static_acme_processing_domain_processing_v1_ManuallyValidateOrderRequest_fieldAccessorTable = new

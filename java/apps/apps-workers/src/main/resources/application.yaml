@@ -1,6 +1,6 @@
 spring.config.import: classpath:acme.apps.yaml
 server.port: 8081
-management.server.port: 9091
+management.server.port: 9092
 spring.temporal.start-workers: true
 spring:
   application:

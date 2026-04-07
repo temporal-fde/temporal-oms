@@ -4,14 +4,14 @@ metadata:
   name: processing-api
   namespace: temporal-oms-processing
   annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.entrypoints: processing
 spec:
   ingressClassName: traefik
   rules:
   - host: localhost
     http:
       paths:
-      - path: /api/validations
+      - path: /
         pathType: Prefix
         backend:
           service:

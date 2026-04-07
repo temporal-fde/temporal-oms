@@ -144,8 +144,10 @@ class FulfillOrderResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class InitializeSupportTeam(_message.Message):
-    __slots__ = ()
-    def __init__(self) -> None: ...
+    __slots__ = ("validation_requests",)
+    VALIDATION_REQUESTS_FIELD_NUMBER: _ClassVar[int]
+    validation_requests: _containers.RepeatedCompositeFieldContainer[ManuallyValidateOrderRequest]
+    def __init__(self, validation_requests: _Optional[_Iterable[_Union[ManuallyValidateOrderRequest, _Mapping]]] = ...) -> None: ...
 
 class ManuallyValidateOrderRequest(_message.Message):
     __slots__ = ("customer_id", "order", "workflow_id", "activity_id")

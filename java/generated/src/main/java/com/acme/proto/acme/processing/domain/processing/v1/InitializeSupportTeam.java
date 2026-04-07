@@ -28,6 +28,7 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private InitializeSupportTeam() {
+    validationRequests_ = java.util.Collections.emptyList();
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
@@ -48,6 +49,47 @@ private static final long serialVersionUID = 0L;
             com.acme.proto.acme.processing.domain.processing.v1.InitializeSupportTeam.class, com.acme.proto.acme.processing.domain.processing.v1.InitializeSupportTeam.Builder.class);
   }
 
+  public static final int VALIDATION_REQUESTS_FIELD_NUMBER = 1;
+  @SuppressWarnings("serial")
+  private java.util.List<com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequest> validationRequests_;
+  /**
+   * <code>repeated .acme.processing.domain.processing.v1.ManuallyValidateOrderRequest validation_requests = 1 [json_name = "validationRequests"];</code>
+   */
+  @java.lang.Override
+  public java.util.List<com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequest> getValidationRequestsList() {
+    return validationRequests_;
+  }
+  /**
+   * <code>repeated .acme.processing.domain.processing.v1.ManuallyValidateOrderRequest validation_requests = 1 [json_name = "validationRequests"];</code>
+   */
+  @java.lang.Override
+  public java.util.List<? extends com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequestOrBuilder> 
+      getValidationRequestsOrBuilderList() {
+    return validationRequests_;
+  }
+  /**
+   * <code>repeated .acme.processing.domain.processing.v1.ManuallyValidateOrderRequest validation_requests = 1 [json_name = "validationRequests"];</code>
+   */
+  @java.lang.Override
+  public int getValidationRequestsCount() {
+    return validationRequests_.size();
+  }
+  /**
+   * <code>repeated .acme.processing.domain.processing.v1.ManuallyValidateOrderRequest validation_requests = 1 [json_name = "validationRequests"];</code>
+   */
+  @java.lang.Override
+  public com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequest getValidationRequests(int index) {
+    return validationRequests_.get(index);
+  }
+  /**
+   * <code>repeated .acme.processing.domain.processing.v1.ManuallyValidateOrderRequest validation_requests = 1 [json_name = "validationRequests"];</code>
+   */
+  @java.lang.Override
+  public com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequestOrBuilder getValidationRequestsOrBuilder(
+      int index) {
+    return validationRequests_.get(index);
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -62,6 +104,9 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    for (int i = 0; i < validationRequests_.size(); i++) {
+      output.writeMessage(1, validationRequests_.get(i));
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -71,6 +116,15 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
+
+        {
+          final int count = validationRequests_.size();
+          for (int i = 0; i < count; i++) {
+            size += com.google.protobuf.CodedOutputStream
+              .computeMessageSizeNoTag(validationRequests_.get(i));
+          }
+          size += 1 * count;
+        }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -86,6 +140,8 @@ private static final long serialVersionUID = 0L;
     }
     com.acme.proto.acme.processing.domain.processing.v1.InitializeSupportTeam other = (com.acme.proto.acme.processing.domain.processing.v1.InitializeSupportTeam) obj;
 
+    if (!getValidationRequestsList()
+        .equals(other.getValidationRequestsList())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -97,6 +153,10 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
+    if (getValidationRequestsCount() > 0) {
+      hash = (37 * hash) + VALIDATION_REQUESTS_FIELD_NUMBER;
+      hash = (53 * hash) + getValidationRequestsList().hashCode();
+    }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -227,6 +287,14 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public Builder clear() {
       super.clear();
+      bitField0_ = 0;
+      if (validationRequestsBuilder_ == null) {
+        validationRequests_ = java.util.Collections.emptyList();
+      } else {
+        validationRequests_ = null;
+        validationRequestsBuilder_.clear();
+      }
+      bitField0_ = (bitField0_ & ~0x00000001);
       return this;
     }
 
@@ -253,8 +321,26 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.acme.proto.acme.processing.domain.processing.v1.InitializeSupportTeam buildPartial() {
       com.acme.proto.acme.processing.domain.processing.v1.InitializeSupportTeam result = new com.acme.proto.acme.processing.domain.processing.v1.InitializeSupportTeam(this);
+      buildPartialRepeatedFields(result);
+      if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
+    }
+
+    private void buildPartialRepeatedFields(com.acme.proto.acme.processing.domain.processing.v1.InitializeSupportTeam result) {
+      if (validationRequestsBuilder_ == null) {
+        if (((bitField0_ & 0x00000001) != 0)) {
+          validationRequests_ = java.util.Collections.unmodifiableList(validationRequests_);
+          bitField0_ = (bitField0_ & ~0x00000001);
+        }
+        result.validationRequests_ = validationRequests_;
+      } else {
+        result.validationRequests_ = validationRequestsBuilder_.build();
+      }
+    }
+
+    private void buildPartial0(com.acme.proto.acme.processing.domain.processing.v1.InitializeSupportTeam result) {
+      int from_bitField0_ = bitField0_;
     }
 
     @java.lang.Override
@@ -269,6 +355,32 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(com.acme.proto.acme.processing.domain.processing.v1.InitializeSupportTeam other) {
       if (other == com.acme.proto.acme.processing.domain.processing.v1.InitializeSupportTeam.getDefaultInstance()) return this;
+      if (validationRequestsBuilder_ == null) {
+        if (!other.validationRequests_.isEmpty()) {
+          if (validationRequests_.isEmpty()) {
+            validationRequests_ = other.validationRequests_;
+            bitField0_ = (bitField0_ & ~0x00000001);
+          } else {
+            ensureValidationRequestsIsMutable();
+            validationRequests_.addAll(other.validationRequests_);
+          }
+          onChanged();
+        }
+      } else {
+        if (!other.validationRequests_.isEmpty()) {
+          if (validationRequestsBuilder_.isEmpty()) {
+            validationRequestsBuilder_.dispose();
+            validationRequestsBuilder_ = null;
+            validationRequests_ = other.validationRequests_;
+            bitField0_ = (bitField0_ & ~0x00000001);
+            validationRequestsBuilder_ = 
+              com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                 internalGetValidationRequestsFieldBuilder() : null;
+          } else {
+            validationRequestsBuilder_.addAllMessages(other.validationRequests_);
+          }
+        }
+      }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -295,6 +407,19 @@ private static final long serialVersionUID = 0L;
             case 0:
               done = true;
               break;
+            case 10: {
+              com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequest m =
+                  input.readMessage(
+                      com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequest.parser(),
+                      extensionRegistry);
+              if (validationRequestsBuilder_ == null) {
+                ensureValidationRequestsIsMutable();
+                validationRequests_.add(m);
+              } else {
+                validationRequestsBuilder_.addMessage(m);
+              }
+              break;
+            } // case 10
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -309,6 +434,247 @@ private static final long serialVersionUID = 0L;
         onChanged();
       } // finally
       return this;
+    }
+    private int bitField0_;
+
+    private java.util.List<com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequest> validationRequests_ =
+      java.util.Collections.emptyList();
+    private void ensureValidationRequestsIsMutable() {
+      if (!((bitField0_ & 0x00000001) != 0)) {
+        validationRequests_ = new java.util.ArrayList<com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequest>(validationRequests_);
+        bitField0_ |= 0x00000001;
+       }
+    }
+
+    private com.google.protobuf.RepeatedFieldBuilder<
+        com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequest, com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequest.Builder, com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequestOrBuilder> validationRequestsBuilder_;
+
+    /**
+     * <code>repeated .acme.processing.domain.processing.v1.ManuallyValidateOrderRequest validation_requests = 1 [json_name = "validationRequests"];</code>
+     */
+    public java.util.List<com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequest> getValidationRequestsList() {
+      if (validationRequestsBuilder_ == null) {
+        return java.util.Collections.unmodifiableList(validationRequests_);
+      } else {
+        return validationRequestsBuilder_.getMessageList();
+      }
+    }
+    /**
+     * <code>repeated .acme.processing.domain.processing.v1.ManuallyValidateOrderRequest validation_requests = 1 [json_name = "validationRequests"];</code>
+     */
+    public int getValidationRequestsCount() {
+      if (validationRequestsBuilder_ == null) {
+        return validationRequests_.size();
+      } else {
+        return validationRequestsBuilder_.getCount();
+      }
+    }
+    /**
+     * <code>repeated .acme.processing.domain.processing.v1.ManuallyValidateOrderRequest validation_requests = 1 [json_name = "validationRequests"];</code>
+     */
+    public com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequest getValidationRequests(int index) {
+      if (validationRequestsBuilder_ == null) {
+        return validationRequests_.get(index);
+      } else {
+        return validationRequestsBuilder_.getMessage(index);
+      }
+    }
+    /**
+     * <code>repeated .acme.processing.domain.processing.v1.ManuallyValidateOrderRequest validation_requests = 1 [json_name = "validationRequests"];</code>
+     */
+    public Builder setValidationRequests(
+        int index, com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequest value) {
+      if (validationRequestsBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureValidationRequestsIsMutable();
+        validationRequests_.set(index, value);
+        onChanged();
+      } else {
+        validationRequestsBuilder_.setMessage(index, value);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.processing.domain.processing.v1.ManuallyValidateOrderRequest validation_requests = 1 [json_name = "validationRequests"];</code>
+     */
+    public Builder setValidationRequests(
+        int index, com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequest.Builder builderForValue) {
+      if (validationRequestsBuilder_ == null) {
+        ensureValidationRequestsIsMutable();
+        validationRequests_.set(index, builderForValue.build());
+        onChanged();
+      } else {
+        validationRequestsBuilder_.setMessage(index, builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.processing.domain.processing.v1.ManuallyValidateOrderRequest validation_requests = 1 [json_name = "validationRequests"];</code>
+     */
+    public Builder addValidationRequests(com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequest value) {
+      if (validationRequestsBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureValidationRequestsIsMutable();
+        validationRequests_.add(value);
+        onChanged();
+      } else {
+        validationRequestsBuilder_.addMessage(value);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.processing.domain.processing.v1.ManuallyValidateOrderRequest validation_requests = 1 [json_name = "validationRequests"];</code>
+     */
+    public Builder addValidationRequests(
+        int index, com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequest value) {
+      if (validationRequestsBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureValidationRequestsIsMutable();
+        validationRequests_.add(index, value);
+        onChanged();
+      } else {
+        validationRequestsBuilder_.addMessage(index, value);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.processing.domain.processing.v1.ManuallyValidateOrderRequest validation_requests = 1 [json_name = "validationRequests"];</code>
+     */
+    public Builder addValidationRequests(
+        com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequest.Builder builderForValue) {
+      if (validationRequestsBuilder_ == null) {
+        ensureValidationRequestsIsMutable();
+        validationRequests_.add(builderForValue.build());
+        onChanged();
+      } else {
+        validationRequestsBuilder_.addMessage(builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.processing.domain.processing.v1.ManuallyValidateOrderRequest validation_requests = 1 [json_name = "validationRequests"];</code>
+     */
+    public Builder addValidationRequests(
+        int index, com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequest.Builder builderForValue) {
+      if (validationRequestsBuilder_ == null) {
+        ensureValidationRequestsIsMutable();
+        validationRequests_.add(index, builderForValue.build());
+        onChanged();
+      } else {
+        validationRequestsBuilder_.addMessage(index, builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.processing.domain.processing.v1.ManuallyValidateOrderRequest validation_requests = 1 [json_name = "validationRequests"];</code>
+     */
+    public Builder addAllValidationRequests(
+        java.lang.Iterable<? extends com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequest> values) {
+      if (validationRequestsBuilder_ == null) {
+        ensureValidationRequestsIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, validationRequests_);
+        onChanged();
+      } else {
+        validationRequestsBuilder_.addAllMessages(values);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.processing.domain.processing.v1.ManuallyValidateOrderRequest validation_requests = 1 [json_name = "validationRequests"];</code>
+     */
+    public Builder clearValidationRequests() {
+      if (validationRequestsBuilder_ == null) {
+        validationRequests_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+      } else {
+        validationRequestsBuilder_.clear();
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.processing.domain.processing.v1.ManuallyValidateOrderRequest validation_requests = 1 [json_name = "validationRequests"];</code>
+     */
+    public Builder removeValidationRequests(int index) {
+      if (validationRequestsBuilder_ == null) {
+        ensureValidationRequestsIsMutable();
+        validationRequests_.remove(index);
+        onChanged();
+      } else {
+        validationRequestsBuilder_.remove(index);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.processing.domain.processing.v1.ManuallyValidateOrderRequest validation_requests = 1 [json_name = "validationRequests"];</code>
+     */
+    public com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequest.Builder getValidationRequestsBuilder(
+        int index) {
+      return internalGetValidationRequestsFieldBuilder().getBuilder(index);
+    }
+    /**
+     * <code>repeated .acme.processing.domain.processing.v1.ManuallyValidateOrderRequest validation_requests = 1 [json_name = "validationRequests"];</code>
+     */
+    public com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequestOrBuilder getValidationRequestsOrBuilder(
+        int index) {
+      if (validationRequestsBuilder_ == null) {
+        return validationRequests_.get(index);  } else {
+        return validationRequestsBuilder_.getMessageOrBuilder(index);
+      }
+    }
+    /**
+     * <code>repeated .acme.processing.domain.processing.v1.ManuallyValidateOrderRequest validation_requests = 1 [json_name = "validationRequests"];</code>
+     */
+    public java.util.List<? extends com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequestOrBuilder> 
+         getValidationRequestsOrBuilderList() {
+      if (validationRequestsBuilder_ != null) {
+        return validationRequestsBuilder_.getMessageOrBuilderList();
+      } else {
+        return java.util.Collections.unmodifiableList(validationRequests_);
+      }
+    }
+    /**
+     * <code>repeated .acme.processing.domain.processing.v1.ManuallyValidateOrderRequest validation_requests = 1 [json_name = "validationRequests"];</code>
+     */
+    public com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequest.Builder addValidationRequestsBuilder() {
+      return internalGetValidationRequestsFieldBuilder().addBuilder(
+          com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequest.getDefaultInstance());
+    }
+    /**
+     * <code>repeated .acme.processing.domain.processing.v1.ManuallyValidateOrderRequest validation_requests = 1 [json_name = "validationRequests"];</code>
+     */
+    public com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequest.Builder addValidationRequestsBuilder(
+        int index) {
+      return internalGetValidationRequestsFieldBuilder().addBuilder(
+          index, com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequest.getDefaultInstance());
+    }
+    /**
+     * <code>repeated .acme.processing.domain.processing.v1.ManuallyValidateOrderRequest validation_requests = 1 [json_name = "validationRequests"];</code>
+     */
+    public java.util.List<com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequest.Builder> 
+         getValidationRequestsBuilderList() {
+      return internalGetValidationRequestsFieldBuilder().getBuilderList();
+    }
+    private com.google.protobuf.RepeatedFieldBuilder<
+        com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequest, com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequest.Builder, com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequestOrBuilder> 
+        internalGetValidationRequestsFieldBuilder() {
+      if (validationRequestsBuilder_ == null) {
+        validationRequestsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+            com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequest, com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequest.Builder, com.acme.proto.acme.processing.domain.processing.v1.ManuallyValidateOrderRequestOrBuilder>(
+                validationRequests_,
+                ((bitField0_ & 0x00000001) != 0),
+                getParentForChildren(),
+                isClean());
+        validationRequests_ = null;
+      }
+      return validationRequestsBuilder_;
     }
 
     // @@protoc_insertion_point(builder_scope:acme.processing.domain.processing.v1.InitializeSupportTeam)
