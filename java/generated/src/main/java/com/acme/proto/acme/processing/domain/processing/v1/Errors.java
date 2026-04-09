@@ -23,6 +23,10 @@ public enum Errors
    * <code>ERRORS_ORDER_VALIDATION_FAILED = 2;</code>
    */
   ERRORS_ORDER_VALIDATION_FAILED(2),
+  /**
+   * <code>ERRORS_KAFKA_ERROR = 3;</code>
+   */
+  ERRORS_KAFKA_ERROR(3),
   UNRECOGNIZED(-1),
   ;
 
@@ -47,6 +51,10 @@ public enum Errors
    * <code>ERRORS_ORDER_VALIDATION_FAILED = 2;</code>
    */
   public static final int ERRORS_ORDER_VALIDATION_FAILED_VALUE = 2;
+  /**
+   * <code>ERRORS_KAFKA_ERROR = 3;</code>
+   */
+  public static final int ERRORS_KAFKA_ERROR_VALUE = 3;
 
 
   public final int getNumber() {
@@ -76,6 +84,7 @@ public enum Errors
       case 0: return ERRORS_UNSPECIFIED;
       case 1: return ERRORS_INVALID_ARGUMENTS;
       case 2: return ERRORS_ORDER_VALIDATION_FAILED;
+      case 3: return ERRORS_KAFKA_ERROR;
       default: return null;
     }
   }

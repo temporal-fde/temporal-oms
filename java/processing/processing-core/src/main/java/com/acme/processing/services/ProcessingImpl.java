@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-@Component( "processing-service")
+@Component("processing-service")
 @ServiceImpl(service = Processing.class)
 public class ProcessingImpl {
     private Logger logger = LoggerFactory.getLogger(ProcessingImpl.class);

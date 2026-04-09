@@ -8,6 +8,7 @@ import com.acme.proto.acme.processing.domain.processing.v1.*;
 import io.temporal.activity.ActivityOptions;
 import io.temporal.failure.ActivityFailure;
 import io.temporal.common.VersioningBehavior;
+import io.temporal.failure.ApplicationFailure;
 import io.temporal.workflow.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,8 +97,16 @@ public class OrderImpl implements Order {
 
 
             // fulfill the order
-            this.state = this.state.toBuilder().setFulfillment(this.fulfillments.fulfillOrder(FulfillOrderRequest.newBuilder()
-                    .setOrder(request.getOrder()).addAllItems(this.state.getEnrichment().getItemsList()).build())).build();
+            try {
+                this.state = this.state.toBuilder().setFulfillment(this.fulfillments.fulfillOrder(FulfillOrderRequest.newBuilder()
+                        .setOrder(request.getOrder()).addAllItems(this.state.getEnrichment().getItemsList()).build())).build();
+            }
+            catch (ApplicationFailure e) {
+                if (e.isNonRetryable()) {
+                    // permanent failure
+                    // move this to the support workflow
+                }
+            }
         });
 
         Workflow.newTimer(Duration.ofSeconds(request.getOptions().getProcessingTimeoutSecs())).thenApply(result -> {
