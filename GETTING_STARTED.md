@@ -178,6 +178,34 @@ See `scripts/scenarios/README.md` for detailed demo instructions and talking poi
 
 ---
 
+## Review Orders Sent for Fulfillment 
+<<<<<<< HEAD
+To view orders sent to Kafka for fulfillment, navigate to:
+
+`http://localhost:8071/kafka/fulfillment/<orderId>`
+
+For example, the order fulfillment message created by the "Valid order (happy path)" scripts can be viewed by navigating to:
+
+`http://localhost:8071/kafka/fulfillment/valid-order-123`
+=======
+
+**Note:**
+
+*This feature is for diagnostic purposes.  The implementation and code should not be considered a production pattern or feature of the application.  
+It is only available when running the application using Option 3 (Everything Local w/o Kubernetes).*
+
+To view orders sent to Kafka for fulfillment, navigate to:
+
+`http://localhost:8071/admin/order-fulfillment/<orderId>`
+
+For example, the order fulfillment message created by the "Valid order (happy path)" scripts can be viewed by navigating to:
+
+`http://localhost:8071/admin/order-fulfillment/valid-order-123`
+>>>>>>> d03c50b (Changes:)
+
+
+---
+
 ## API Endpoints
 
 ### Submit Order
