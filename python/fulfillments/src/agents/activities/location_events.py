@@ -58,6 +58,13 @@ class LocationEventsActivities:
     """Temporal activity class for fetching location-based event risk data
     from the PredictHQ Events API.
 
+    Uses raw aiohttp rather than the predicthq Python SDK. The SDK is
+    synchronous (requests-based) and provides no mechanism for injecting
+    an async transport. Wrapping it in asyncio.to_thread would work but
+    consumes a thread per concurrent activity invocation — a poor fit for
+    a Temporal worker running many agent tool calls concurrently. aiohttp
+    gives true async I/O with no thread overhead.
+
     Inject an aiohttp.ClientSession at construction time so the session
     lifecycle (connection pooling, SSL context) is owned by the worker,
     not re-created per activity execution.
@@ -92,7 +99,6 @@ class LocationEventsActivities:
             "limit": "20",
         }
 
-        # TODO: Fix authorization header
         headers = {
             "Authorization": f"Bearer {os.getenv('PREDICTHQ_API_KEY', '')}",
             "Accept": "application/json",
