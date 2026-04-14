@@ -63,3 +63,11 @@ class ErrorDetails(_message.Message):
     message: str
     metadata: _containers.ScalarMap[str, str]
     def __init__(self, code: _Optional[str] = ..., message: _Optional[str] = ..., metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
+
+class Coordinate(_message.Message):
+    __slots__ = ("latitude", "longitude")
+    LATITUDE_FIELD_NUMBER: _ClassVar[int]
+    LONGITUDE_FIELD_NUMBER: _ClassVar[int]
+    latitude: float
+    longitude: float
+    def __init__(self, latitude: _Optional[float] = ..., longitude: _Optional[float] = ...) -> None: ...

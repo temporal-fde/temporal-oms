@@ -20,6 +20,11 @@ plugins:
   - remote: buf.build/protocolbuffers/pyi
     out: python/generated
 
+  # Generate Pydantic models from .proto via protobuf-to-pydantic plugin
+  # Binary lives in the python/ uv venv — path is relative to repo root
+  - local: python/.venv/bin/protoc-gen-protobuf-to-pydantic
+    out: python/generated/pydantic
+
   # TypeScript generation
   - remote: buf.build/bufbuild/es:v2.10.2
     out: web/src/lib/generated
