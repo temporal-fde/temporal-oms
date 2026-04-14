@@ -56,6 +56,11 @@ public final class ValuesProto extends com.google.protobuf.GeneratedFile {
   static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_acme_common_v1_ErrorDetails_MetadataEntry_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_acme_common_v1_Coordinate_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_acme_common_v1_Coordinate_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -81,10 +86,12 @@ public final class ValuesProto extends com.google.protobuf.GeneratedFile {
       "\022F\n\010metadata\030\003 \003(\0132*.acme.common.v1.Erro" +
       "rDetails.MetadataEntryR\010metadata\032;\n\rMeta" +
       "dataEntry\022\020\n\003key\030\001 \001(\tR\003key\022\024\n\005value\030\002 \001" +
-      "(\tR\005value:\0028\001B\206\001\n\035com.acme.proto.acme.co" +
-      "mmon.v1B\013ValuesProtoP\001\242\002\003ACX\252\002\016Acme.Comm" +
-      "on.V1\312\002\016Acme\\Common\\V1\342\002\032Acme\\Common\\V1\\" +
-      "GPBMetadata\352\002\020Acme::Common::V1b\006proto3"
+      "(\tR\005value:\0028\001\"F\n\nCoordinate\022\032\n\010latitude\030" +
+      "\001 \001(\001R\010latitude\022\034\n\tlongitude\030\002 \001(\001R\tlong" +
+      "itudeB\206\001\n\035com.acme.proto.acme.common.v1B" +
+      "\013ValuesProtoP\001\242\002\003ACX\252\002\016Acme.Common.V1\312\002\016" +
+      "Acme\\Common\\V1\342\002\032Acme\\Common\\V1\\GPBMetad" +
+      "ata\352\002\020Acme::Common::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -127,6 +134,12 @@ public final class ValuesProto extends com.google.protobuf.GeneratedFile {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_common_v1_ErrorDetails_MetadataEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
+    internal_static_acme_common_v1_Coordinate_descriptor =
+      getDescriptor().getMessageType(5);
+    internal_static_acme_common_v1_Coordinate_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_acme_common_v1_Coordinate_descriptor,
+        new java.lang.String[] { "Latitude", "Longitude", });
     descriptor.resolveAllFeaturesImmutable();
     com.google.protobuf.TimestampProto.getDescriptor();
   }

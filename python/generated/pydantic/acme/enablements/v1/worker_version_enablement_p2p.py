@@ -1,0 +1,72 @@
+# This is an automatically generated file, please do not change
+# gen by protobuf_to_pydantic[v0.3.3.1](https://github.com/so1n/protobuf_to_pydantic)
+# Protobuf Version: 6.33.6 
+# Pydantic Version: 2.13.0 
+from datetime import datetime
+from datetime import timedelta
+from enum import IntEnum
+from google.protobuf.message import Message  # type: ignore
+from protobuf_to_pydantic.util import Timedelta
+from pydantic import BaseModel
+from pydantic import BeforeValidator
+from pydantic import ConfigDict
+from pydantic import Field
+from typing_extensions import Annotated
+import typing
+
+
+class StartWorkerVersionEnablementRequest(BaseModel):
+    """
+     Start a worker versioning enablement demonstration
+    """
+
+    enablement_id: str = Field(default="")# e.g., "demo-session-2026-03-18"
+    order_count: int = Field(default=0)# How many orders to process (e.g., 20)
+    submit_rate_per_min: int = Field(default=0)# Orders per minute (e.g., 12)
+    timeout: Annotated[timedelta, BeforeValidator(Timedelta.validate)] = Field(default_factory=timedelta)# How long to run (e.g., 5 minutes)
+    order_id_seed: typing.Optional[str] = Field(default="")
+
+class DeployWorkerVersionRequest(BaseModel):
+    deployment_name: str = Field(default="")
+    build_id: str = Field(default="")
+    version: str = Field(default="")
+    replica_count: typing.Optional[int] = Field(default=0)
+
+class DeployWorkerVersionResponse(BaseModel):
+    pass
+
+class WorkerVersionEnablementState(BaseModel):
+    """
+     Current state of the worker versioning enablement demonstration
+ (Order tracking is the responsibility of the OMS application, not this workflow)
+    """
+    class DemoPhase(IntEnum):
+        """
+         Workflow execution state
+        """
+        DEMO_PHASE_UNSPECIFIED = 0
+        RUNNING_V1_ONLY = 1
+        TRANSITIONING_TO_V2 = 2
+        RUNNING_BOTH = 3
+        COMPLETE = 4
+
+    model_config = ConfigDict(validate_default=True)
+    enablement_id: str = Field(default="")
+    args: StartWorkerVersionEnablementRequest = Field(default_factory=StartWorkerVersionEnablementRequest)
+    current_phase: "WorkerVersionEnablementState.DemoPhase" = Field(default=0)
+# Activity metrics
+    orders_submitted_count: int = Field(default=0)# How many times submitOrder() was called
+    orders_per_minute: float = Field(default=0.0)# Current submission rate
+    active_versions: typing.List[str] = Field(default_factory=list)# ["v1"] or ["v1", "v2"] depending on phase
+# Versioning info
+    last_transition_at: datetime = Field(default_factory=datetime.now)# When transitionToV2 was signaled
+    deploy_requests: typing.List[DeployWorkerVersionRequest] = Field(default_factory=list)
+    deployments: typing.List[DeployWorkerVersionResponse] = Field(default_factory=list)
+
+class SubmitOrdersRequest(BaseModel):
+    enablement_id: str = Field(default="")
+    submit_rate_per_min: int = Field(default=0)
+    order_id_seed: str = Field(default="")
+
+class SubmitOrdersResponse(BaseModel):
+    orders_submitted_count: str = Field(default="")

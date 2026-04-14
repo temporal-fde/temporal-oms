@@ -1,0 +1,17 @@
+[project]
+name = "python"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "aiohttp>=3.13.5",
+    "protobuf-to-pydantic>=0.3.3.1",
+    "temporalio>=1.18.2",
+    "toml>=0.10.2",
+]
+
+[dependency-groups]
+dev = [
+    "mypy-protobuf>=5.0.0",
+]

@@ -33,3 +33,9 @@ message ErrorDetails {
   string message = 2;
   map<string, string> metadata = 3;
 }
+
+// Coordinate is a WGS-84 geographic position (longitude/latitude decimal degrees).
+message Coordinate {
+  double latitude  = 1;
+  double longitude = 2;
+}
