@@ -53,6 +53,7 @@ private static final long serialVersionUID = 0L;
             com.acme.proto.acme.common.v1.Address.class, com.acme.proto.acme.common.v1.Address.Builder.class);
   }
 
+  private int bitField0_;
   public static final int STREET_FIELD_NUMBER = 1;
   @SuppressWarnings("serial")
   private volatile java.lang.Object street_ = "";
@@ -256,6 +257,44 @@ private static final long serialVersionUID = 0L;
     }
   }
 
+  public static final int EASYPOST_ADDRESS_FIELD_NUMBER = 6;
+  private com.acme.proto.acme.common.v1.EasyPostAddress easypostAddress_;
+  /**
+   * <pre>
+   * populated after EasyPost verification
+   * </pre>
+   *
+   * <code>optional .acme.common.v1.EasyPostAddress easypost_address = 6 [json_name = "easypostAddress"];</code>
+   * @return Whether the easypostAddress field is set.
+   */
+  @java.lang.Override
+  public boolean hasEasypostAddress() {
+    return ((bitField0_ & 0x00000001) != 0);
+  }
+  /**
+   * <pre>
+   * populated after EasyPost verification
+   * </pre>
+   *
+   * <code>optional .acme.common.v1.EasyPostAddress easypost_address = 6 [json_name = "easypostAddress"];</code>
+   * @return The easypostAddress.
+   */
+  @java.lang.Override
+  public com.acme.proto.acme.common.v1.EasyPostAddress getEasypostAddress() {
+    return easypostAddress_ == null ? com.acme.proto.acme.common.v1.EasyPostAddress.getDefaultInstance() : easypostAddress_;
+  }
+  /**
+   * <pre>
+   * populated after EasyPost verification
+   * </pre>
+   *
+   * <code>optional .acme.common.v1.EasyPostAddress easypost_address = 6 [json_name = "easypostAddress"];</code>
+   */
+  @java.lang.Override
+  public com.acme.proto.acme.common.v1.EasyPostAddressOrBuilder getEasypostAddressOrBuilder() {
+    return easypostAddress_ == null ? com.acme.proto.acme.common.v1.EasyPostAddress.getDefaultInstance() : easypostAddress_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -285,6 +324,9 @@ private static final long serialVersionUID = 0L;
     if (!com.google.protobuf.GeneratedMessage.isStringEmpty(country_)) {
       com.google.protobuf.GeneratedMessage.writeString(output, 5, country_);
     }
+    if (((bitField0_ & 0x00000001) != 0)) {
+      output.writeMessage(6, getEasypostAddress());
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -308,6 +350,10 @@ private static final long serialVersionUID = 0L;
     }
     if (!com.google.protobuf.GeneratedMessage.isStringEmpty(country_)) {
       size += com.google.protobuf.GeneratedMessage.computeStringSize(5, country_);
+    }
+    if (((bitField0_ & 0x00000001) != 0)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(6, getEasypostAddress());
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -334,6 +380,11 @@ private static final long serialVersionUID = 0L;
         .equals(other.getPostalCode())) return false;
     if (!getCountry()
         .equals(other.getCountry())) return false;
+    if (hasEasypostAddress() != other.hasEasypostAddress()) return false;
+    if (hasEasypostAddress()) {
+      if (!getEasypostAddress()
+          .equals(other.getEasypostAddress())) return false;
+    }
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -355,6 +406,10 @@ private static final long serialVersionUID = 0L;
     hash = (53 * hash) + getPostalCode().hashCode();
     hash = (37 * hash) + COUNTRY_FIELD_NUMBER;
     hash = (53 * hash) + getCountry().hashCode();
+    if (hasEasypostAddress()) {
+      hash = (37 * hash) + EASYPOST_ADDRESS_FIELD_NUMBER;
+      hash = (53 * hash) + getEasypostAddress().hashCode();
+    }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -474,13 +529,19 @@ private static final long serialVersionUID = 0L;
 
     // Construct using com.acme.proto.acme.common.v1.Address.newBuilder()
     private Builder() {
-
+      maybeForceBuilderInitialization();
     }
 
     private Builder(
         com.google.protobuf.GeneratedMessage.BuilderParent parent) {
       super(parent);
-
+      maybeForceBuilderInitialization();
+    }
+    private void maybeForceBuilderInitialization() {
+      if (com.google.protobuf.GeneratedMessage
+              .alwaysUseFieldBuilders) {
+        internalGetEasypostAddressFieldBuilder();
+      }
     }
     @java.lang.Override
     public Builder clear() {
@@ -491,6 +552,11 @@ private static final long serialVersionUID = 0L;
       state_ = "";
       postalCode_ = "";
       country_ = "";
+      easypostAddress_ = null;
+      if (easypostAddressBuilder_ != null) {
+        easypostAddressBuilder_.dispose();
+        easypostAddressBuilder_ = null;
+      }
       return this;
     }
 
@@ -539,6 +605,14 @@ private static final long serialVersionUID = 0L;
       if (((from_bitField0_ & 0x00000010) != 0)) {
         result.country_ = country_;
       }
+      int to_bitField0_ = 0;
+      if (((from_bitField0_ & 0x00000020) != 0)) {
+        result.easypostAddress_ = easypostAddressBuilder_ == null
+            ? easypostAddress_
+            : easypostAddressBuilder_.build();
+        to_bitField0_ |= 0x00000001;
+      }
+      result.bitField0_ |= to_bitField0_;
     }
 
     @java.lang.Override
@@ -577,6 +651,9 @@ private static final long serialVersionUID = 0L;
         country_ = other.country_;
         bitField0_ |= 0x00000010;
         onChanged();
+      }
+      if (other.hasEasypostAddress()) {
+        mergeEasypostAddress(other.getEasypostAddress());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -629,6 +706,13 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000010;
               break;
             } // case 42
+            case 50: {
+              input.readMessage(
+                  internalGetEasypostAddressFieldBuilder().getBuilder(),
+                  extensionRegistry);
+              bitField0_ |= 0x00000020;
+              break;
+            } // case 50
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -1024,6 +1108,163 @@ private static final long serialVersionUID = 0L;
       bitField0_ |= 0x00000010;
       onChanged();
       return this;
+    }
+
+    private com.acme.proto.acme.common.v1.EasyPostAddress easypostAddress_;
+    private com.google.protobuf.SingleFieldBuilder<
+        com.acme.proto.acme.common.v1.EasyPostAddress, com.acme.proto.acme.common.v1.EasyPostAddress.Builder, com.acme.proto.acme.common.v1.EasyPostAddressOrBuilder> easypostAddressBuilder_;
+    /**
+     * <pre>
+     * populated after EasyPost verification
+     * </pre>
+     *
+     * <code>optional .acme.common.v1.EasyPostAddress easypost_address = 6 [json_name = "easypostAddress"];</code>
+     * @return Whether the easypostAddress field is set.
+     */
+    public boolean hasEasypostAddress() {
+      return ((bitField0_ & 0x00000020) != 0);
+    }
+    /**
+     * <pre>
+     * populated after EasyPost verification
+     * </pre>
+     *
+     * <code>optional .acme.common.v1.EasyPostAddress easypost_address = 6 [json_name = "easypostAddress"];</code>
+     * @return The easypostAddress.
+     */
+    public com.acme.proto.acme.common.v1.EasyPostAddress getEasypostAddress() {
+      if (easypostAddressBuilder_ == null) {
+        return easypostAddress_ == null ? com.acme.proto.acme.common.v1.EasyPostAddress.getDefaultInstance() : easypostAddress_;
+      } else {
+        return easypostAddressBuilder_.getMessage();
+      }
+    }
+    /**
+     * <pre>
+     * populated after EasyPost verification
+     * </pre>
+     *
+     * <code>optional .acme.common.v1.EasyPostAddress easypost_address = 6 [json_name = "easypostAddress"];</code>
+     */
+    public Builder setEasypostAddress(com.acme.proto.acme.common.v1.EasyPostAddress value) {
+      if (easypostAddressBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        easypostAddress_ = value;
+      } else {
+        easypostAddressBuilder_.setMessage(value);
+      }
+      bitField0_ |= 0x00000020;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * populated after EasyPost verification
+     * </pre>
+     *
+     * <code>optional .acme.common.v1.EasyPostAddress easypost_address = 6 [json_name = "easypostAddress"];</code>
+     */
+    public Builder setEasypostAddress(
+        com.acme.proto.acme.common.v1.EasyPostAddress.Builder builderForValue) {
+      if (easypostAddressBuilder_ == null) {
+        easypostAddress_ = builderForValue.build();
+      } else {
+        easypostAddressBuilder_.setMessage(builderForValue.build());
+      }
+      bitField0_ |= 0x00000020;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * populated after EasyPost verification
+     * </pre>
+     *
+     * <code>optional .acme.common.v1.EasyPostAddress easypost_address = 6 [json_name = "easypostAddress"];</code>
+     */
+    public Builder mergeEasypostAddress(com.acme.proto.acme.common.v1.EasyPostAddress value) {
+      if (easypostAddressBuilder_ == null) {
+        if (((bitField0_ & 0x00000020) != 0) &&
+          easypostAddress_ != null &&
+          easypostAddress_ != com.acme.proto.acme.common.v1.EasyPostAddress.getDefaultInstance()) {
+          getEasypostAddressBuilder().mergeFrom(value);
+        } else {
+          easypostAddress_ = value;
+        }
+      } else {
+        easypostAddressBuilder_.mergeFrom(value);
+      }
+      if (easypostAddress_ != null) {
+        bitField0_ |= 0x00000020;
+        onChanged();
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * populated after EasyPost verification
+     * </pre>
+     *
+     * <code>optional .acme.common.v1.EasyPostAddress easypost_address = 6 [json_name = "easypostAddress"];</code>
+     */
+    public Builder clearEasypostAddress() {
+      bitField0_ = (bitField0_ & ~0x00000020);
+      easypostAddress_ = null;
+      if (easypostAddressBuilder_ != null) {
+        easypostAddressBuilder_.dispose();
+        easypostAddressBuilder_ = null;
+      }
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * populated after EasyPost verification
+     * </pre>
+     *
+     * <code>optional .acme.common.v1.EasyPostAddress easypost_address = 6 [json_name = "easypostAddress"];</code>
+     */
+    public com.acme.proto.acme.common.v1.EasyPostAddress.Builder getEasypostAddressBuilder() {
+      bitField0_ |= 0x00000020;
+      onChanged();
+      return internalGetEasypostAddressFieldBuilder().getBuilder();
+    }
+    /**
+     * <pre>
+     * populated after EasyPost verification
+     * </pre>
+     *
+     * <code>optional .acme.common.v1.EasyPostAddress easypost_address = 6 [json_name = "easypostAddress"];</code>
+     */
+    public com.acme.proto.acme.common.v1.EasyPostAddressOrBuilder getEasypostAddressOrBuilder() {
+      if (easypostAddressBuilder_ != null) {
+        return easypostAddressBuilder_.getMessageOrBuilder();
+      } else {
+        return easypostAddress_ == null ?
+            com.acme.proto.acme.common.v1.EasyPostAddress.getDefaultInstance() : easypostAddress_;
+      }
+    }
+    /**
+     * <pre>
+     * populated after EasyPost verification
+     * </pre>
+     *
+     * <code>optional .acme.common.v1.EasyPostAddress easypost_address = 6 [json_name = "easypostAddress"];</code>
+     */
+    private com.google.protobuf.SingleFieldBuilder<
+        com.acme.proto.acme.common.v1.EasyPostAddress, com.acme.proto.acme.common.v1.EasyPostAddress.Builder, com.acme.proto.acme.common.v1.EasyPostAddressOrBuilder> 
+        internalGetEasypostAddressFieldBuilder() {
+      if (easypostAddressBuilder_ == null) {
+        easypostAddressBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+            com.acme.proto.acme.common.v1.EasyPostAddress, com.acme.proto.acme.common.v1.EasyPostAddress.Builder, com.acme.proto.acme.common.v1.EasyPostAddressOrBuilder>(
+                getEasypostAddress(),
+                getParentForChildren(),
+                isClean());
+        easypostAddress_ = null;
+      }
+      return easypostAddressBuilder_;
     }
 
     // @@protoc_insertion_point(builder_scope:acme.common.v1.Address)

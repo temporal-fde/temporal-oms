@@ -77,4 +77,31 @@ public interface AddressOrBuilder extends
    */
   com.google.protobuf.ByteString
       getCountryBytes();
+
+  /**
+   * <pre>
+   * populated after EasyPost verification
+   * </pre>
+   *
+   * <code>optional .acme.common.v1.EasyPostAddress easypost_address = 6 [json_name = "easypostAddress"];</code>
+   * @return Whether the easypostAddress field is set.
+   */
+  boolean hasEasypostAddress();
+  /**
+   * <pre>
+   * populated after EasyPost verification
+   * </pre>
+   *
+   * <code>optional .acme.common.v1.EasyPostAddress easypost_address = 6 [json_name = "easypostAddress"];</code>
+   * @return The easypostAddress.
+   */
+  com.acme.proto.acme.common.v1.EasyPostAddress getEasypostAddress();
+  /**
+   * <pre>
+   * populated after EasyPost verification
+   * </pre>
+   *
+   * <code>optional .acme.common.v1.EasyPostAddress easypost_address = 6 [json_name = "easypostAddress"];</code>
+   */
+  com.acme.proto.acme.common.v1.EasyPostAddressOrBuilder getEasypostAddressOrBuilder();
 }

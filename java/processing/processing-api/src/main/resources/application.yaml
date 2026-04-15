@@ -4,8 +4,7 @@ spring.temporal.start-workers: false
 
 management.server.port: 9081
 
-server:
-  port: 8070
+server.port: 8070
 
 # Swagger/OpenAPI Configuration (MANDATORY per stack-api-rest)
 springdoc:

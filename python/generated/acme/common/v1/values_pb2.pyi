@@ -17,19 +17,31 @@ class Money(_message.Message):
     units: int
     def __init__(self, currency: _Optional[str] = ..., units: _Optional[int] = ...) -> None: ...
 
+class EasyPostAddress(_message.Message):
+    __slots__ = ("id", "residential", "verified")
+    ID_FIELD_NUMBER: _ClassVar[int]
+    RESIDENTIAL_FIELD_NUMBER: _ClassVar[int]
+    VERIFIED_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    residential: bool
+    verified: bool
+    def __init__(self, id: _Optional[str] = ..., residential: _Optional[bool] = ..., verified: _Optional[bool] = ...) -> None: ...
+
 class Address(_message.Message):
-    __slots__ = ("street", "city", "state", "postal_code", "country")
+    __slots__ = ("street", "city", "state", "postal_code", "country", "easypost_address")
     STREET_FIELD_NUMBER: _ClassVar[int]
     CITY_FIELD_NUMBER: _ClassVar[int]
     STATE_FIELD_NUMBER: _ClassVar[int]
     POSTAL_CODE_FIELD_NUMBER: _ClassVar[int]
     COUNTRY_FIELD_NUMBER: _ClassVar[int]
+    EASYPOST_ADDRESS_FIELD_NUMBER: _ClassVar[int]
     street: str
     city: str
     state: str
     postal_code: str
     country: str
-    def __init__(self, street: _Optional[str] = ..., city: _Optional[str] = ..., state: _Optional[str] = ..., postal_code: _Optional[str] = ..., country: _Optional[str] = ...) -> None: ...
+    easypost_address: EasyPostAddress
+    def __init__(self, street: _Optional[str] = ..., city: _Optional[str] = ..., state: _Optional[str] = ..., postal_code: _Optional[str] = ..., country: _Optional[str] = ..., easypost_address: _Optional[_Union[EasyPostAddress, _Mapping]] = ...) -> None: ...
 
 class TimeRange(_message.Message):
     __slots__ = ("start", "end")

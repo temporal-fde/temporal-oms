@@ -5,14 +5,15 @@ oms:
       endpoints:
         #endpoints must start with A-Z or a-z and can only contain A-Z, a-z, 0-9, or -
         order-processing: oms-processing-v1
+        order-fulfillment: oms-fulfillment-v1
   processing:
     nexus:
       endpoints:
         apps: oms-apps-v1
-  risk:
+  fulfillment:
     nexus:
       endpoints:
-        rel: endpoint
+        apps: oms-apps-v1
 
 otel.sdk.disabled: true
 

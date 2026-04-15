@@ -1,0 +1,12 @@
+spring.config.import: classpath:acme.fulfillment.yaml
+spring.application.name: fulfillment-api
+spring.temporal.start-workers: false
+
+management.server.port: 9071
+
+server.port: 8060
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  show-actuator: false

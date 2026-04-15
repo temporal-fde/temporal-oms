@@ -1,0 +1,5 @@
+spring.config.import: classpath:acme.fulfillment.yaml
+spring.application.name: fulfillment-workers
+spring.temporal.start-workers: true
+management.server.port: 9072
+server.port: 8061
