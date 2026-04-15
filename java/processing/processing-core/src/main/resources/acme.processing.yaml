@@ -1,7 +1,6 @@
 spring.config.import: classpath:acme.oms.yaml
 
 spring.temporal:
-
     connection:
       # Connection settings
       target: ${TEMPORAL_ADDRESS:localhost:7233}
@@ -44,3 +43,8 @@ spring.temporal:
           default-versioning-behavior: PINNED
           deployment-name: ${TEMPORAL_DEPLOYMENT_NAME:processing}
           build-id: ${TEMPORAL_WORKER_BUILD_ID:local}
+
+spring:
+  kafka:
+    topic: "order-fulfillment"
+    groupId: "processing-service"

@@ -9,6 +9,8 @@ class Errors(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     ERRORS_UNSPECIFIED: _ClassVar[Errors]
     ERRORS_INVALID_ARGUMENTS: _ClassVar[Errors]
     ERRORS_ORDER_VALIDATION_FAILED: _ClassVar[Errors]
+    ERRORS_KAFKA_ERROR: _ClassVar[Errors]
 ERRORS_UNSPECIFIED: Errors
 ERRORS_INVALID_ARGUMENTS: Errors
 ERRORS_ORDER_VALIDATION_FAILED: Errors
+ERRORS_KAFKA_ERROR: Errors

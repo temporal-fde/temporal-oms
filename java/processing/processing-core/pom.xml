@@ -122,5 +122,22 @@
             <artifactId>assertj-core</artifactId>
             <scope>test</scope>
         </dependency>
+
+
+        <!-- embedded Kafka -->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka-test</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+
+
     </dependencies>
 </project>

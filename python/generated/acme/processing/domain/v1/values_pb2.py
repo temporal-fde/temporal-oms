@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n&acme/processing/domain/v1/values.proto\x12$acme.processing.domain.processing.v1*b\n\x06\x45rrors\x12\x16\n\x12\x45RRORS_UNSPECIFIED\x10\x00\x12\x1c\n\x18\x45RRORS_INVALID_ARGUMENTS\x10\x01\x12\"\n\x1e\x45RRORS_ORDER_VALIDATION_FAILED\x10\x02\x42\xf7\x01\n3com.acme.proto.acme.processing.domain.processing.v1B\x0bValuesProtoP\x01\xa2\x02\x04\x41PDP\xaa\x02$Acme.Processing.Domain.Processing.V1\xca\x02$Acme\\Processing\\Domain\\Processing\\V1\xe2\x02\x30\x41\x63me\\Processing\\Domain\\Processing\\V1\\GPBMetadata\xea\x02(Acme::Processing::Domain::Processing::V1b\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n&acme/processing/domain/v1/values.proto\x12$acme.processing.domain.processing.v1*z\n\x06\x45rrors\x12\x16\n\x12\x45RRORS_UNSPECIFIED\x10\x00\x12\x1c\n\x18\x45RRORS_INVALID_ARGUMENTS\x10\x01\x12\"\n\x1e\x45RRORS_ORDER_VALIDATION_FAILED\x10\x02\x12\x16\n\x12\x45RRORS_KAFKA_ERROR\x10\x03\x42\xf7\x01\n3com.acme.proto.acme.processing.domain.processing.v1B\x0bValuesProtoP\x01\xa2\x02\x04\x41PDP\xaa\x02$Acme.Processing.Domain.Processing.V1\xca\x02$Acme\\Processing\\Domain\\Processing\\V1\xe2\x02\x30\x41\x63me\\Processing\\Domain\\Processing\\V1\\GPBMetadata\xea\x02(Acme::Processing::Domain::Processing::V1b\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -33,5 +33,5 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'\n3com.acme.proto.acme.processing.domain.processing.v1B\013ValuesProtoP\001\242\002\004APDP\252\002$Acme.Processing.Domain.Processing.V1\312\002$Acme\\Processing\\Domain\\Processing\\V1\342\0020Acme\\Processing\\Domain\\Processing\\V1\\GPBMetadata\352\002(Acme::Processing::Domain::Processing::V1'
   _globals['_ERRORS']._serialized_start=80
-  _globals['_ERRORS']._serialized_end=178
+  _globals['_ERRORS']._serialized_end=202
 # @@protoc_insertion_point(module_scope)
