@@ -1,7 +1,7 @@
 # fulfillment.Order Workflow Specification
 
 **Feature Name:** `fulfillment.Order` — Durable Fulfillment Orchestration
-**Status:** Draft
+**Status:** Implementing
 **Owner:** Temporal FDE Team
 **Created:** 2026-04-15
 **Updated:** 2026-04-15
@@ -275,7 +275,7 @@ New messages alongside existing Python-era messages (avoid name conflicts; see I
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| `margin_leak` | `Double` | Delta (minor currency units) between actual shipping cost and `shipping_margin`. Set only when actual > margin. |
+| `margin_leak` | `Long` (cents integer) | Delta in minor currency units between actual shipping cost and `shipping_margin`. Set only when actual > margin. Registered as `--type Int` (Temporal's `Int` type maps to `Long` in the Java SDK). |
 
 ### Configuration / Deployment
 
@@ -315,7 +315,7 @@ Deliverables:
 - [ ] Add `EasyPostAddress` message to `proto/acme/common/v1/values.proto` and add `optional EasyPostAddress easypost_address = 6` to the existing `Address` message
 - [ ] Extend `proto/acme/fulfillment/domain/v1/workflows.proto` with all new Java fulfillment messages
 - [ ] Run `buf generate` to produce Java classes in `fulfillment-core`
-- [ ] Register `margin_leak` SearchAttribute: `temporal operator search-attribute create --namespace fulfillment --name margin_leak --type Double`
+- [ ] Register `margin_leak` SearchAttribute: `temporal operator search-attribute create --namespace fulfillment --name margin_leak --type Int`
 
 ### Phase 2: `fulfillment.Order` Workflow & Activity Interfaces
 
@@ -513,8 +513,8 @@ Deliverables:
 
 - [x] **`validateOrder` trigger in `apps.Order`:** Fires in `execute()` right before `processOrder`, after both `submitOrder` + `capturePayment` inputs are accumulated — `apps.Order` collects inputs via Update handlers before proceeding. ✅ Resolved.
 - [x] **ShippingAgent (V2):** Called via Nexus operation from `fulfillment.Order`. ShippingAgent design is a separate spec. ✅ Resolved.
-- [ ] **Fallback shipping notification:** When a fallback shipping option is used (original unavailable), should the customer be notified, or is this silent?
-- [ ] **`margin_leak` units:** `Double` (minor currency units, e.g., cents) confirmed? Or a richer Money-codec SearchAttribute?
+- [x] **Fallback shipping notification:** Silent — no customer notification when a fallback option is selected within margin. ✅ Resolved.
+- [x] **`margin_leak` units:** `Long` cents integer, registered as `--type Int`. ✅ Resolved.
 - [ ] **Inventory service contract:** Internal service or external API? Affects `Allocations` activity timeout and retry policy.
 - [x] **Address validation service:** EasyPost `AddressService.createAndVerify(Map)` — confirmed. `AddressVerificationImpl` wraps this call. ✅ Resolved.
 - [ ] **`FulfillOrderResponse` in `apps.Order` state:** Should `apps.Order` store the `FulfillOrderResponse` (tracking number, shipping selection) in `GetCompleteOrderStateResponse`?
@@ -530,7 +530,7 @@ Deliverables:
 - **Sequencing in `apps.Order`:** After `Workflow.await()` resolves (both `submitOrder` + `capturePayment` accumulated), `apps.Order` fires `validateOrder` Nexus first, then `processOrder` Nexus. Both can be launched as concurrent `Promise` instances from `execute()` — `validateOrder` starts `fulfillment.Order` and validates the address; `processOrder` drives enrichment; after `processOrder` completes, `fulfillOrder` Update closes the loop.
 - **`Workflow.getVersion()` in `processing.Order`:** Place the version branch immediately before the `fulfillments.fulfillOrder()` call. Version name: `"remove-kafka-fulfillment"`. Old path = `DEFAULT_VERSION`, new path = `1`.
 - **Proto naming:** Existing Python-era messages in `workflows.proto` use names like `FulfillOrderRequest`, `Item`, `Status`. New Java messages must not reuse these names. Consider a comment block separator in the proto file marking the Java section.
-- **`margin_leak` SearchAttribute:** Call `Workflow.upsertTypedSearchAttributes(SearchAttributeKey.forDouble("margin_leak").valueSet(delta))` only when delta > 0. Never set to 0 or a negative value.
+- **`margin_leak` SearchAttribute:** Call `Workflow.upsertTypedSearchAttributes(SearchAttributeKey.forLong("margin_leak").valueSet(delta))` only when delta > 0 (delta is cents integer). Never set to 0 or a negative value.
 - **Concurrent activities:** Use `Promise.allOf(Async.function(carriers::printShippingLabel, ...), Async.function(allocations::deductInventory, ...))`. Do NOT use `ExecutorService` — not deterministic in Temporal workflows.
 
 ---

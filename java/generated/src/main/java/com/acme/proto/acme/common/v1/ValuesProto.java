@@ -32,6 +32,11 @@ public final class ValuesProto extends com.google.protobuf.GeneratedFile {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_acme_common_v1_Money_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_acme_common_v1_EasyPostAddress_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_acme_common_v1_EasyPostAddress_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_acme_common_v1_Address_descriptor;
   static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -73,25 +78,30 @@ public final class ValuesProto extends com.google.protobuf.GeneratedFile {
       "\n\033acme/common/v1/values.proto\022\016acme.comm" +
       "on.v1\032\037google/protobuf/timestamp.proto\"9" +
       "\n\005Money\022\032\n\010currency\030\001 \001(\tR\010currency\022\024\n\005u" +
-      "nits\030\002 \001(\003R\005units\"\206\001\n\007Address\022\026\n\006street\030" +
-      "\001 \001(\tR\006street\022\022\n\004city\030\002 \001(\tR\004city\022\024\n\005sta" +
-      "te\030\003 \001(\tR\005state\022\037\n\013postal_code\030\004 \001(\tR\npo" +
-      "stalCode\022\030\n\007country\030\005 \001(\tR\007country\"k\n\tTi" +
-      "meRange\0220\n\005start\030\001 \001(\0132\032.google.protobuf" +
-      ".TimestampR\005start\022,\n\003end\030\002 \001(\0132\032.google." +
-      "protobuf.TimestampR\003end\"H\n\nPagination\022\033\n" +
-      "\tpage_size\030\001 \001(\005R\010pageSize\022\035\n\npage_token" +
-      "\030\002 \001(\tR\tpageToken\"\301\001\n\014ErrorDetails\022\022\n\004co" +
-      "de\030\001 \001(\tR\004code\022\030\n\007message\030\002 \001(\tR\007message" +
-      "\022F\n\010metadata\030\003 \003(\0132*.acme.common.v1.Erro" +
-      "rDetails.MetadataEntryR\010metadata\032;\n\rMeta" +
-      "dataEntry\022\020\n\003key\030\001 \001(\tR\003key\022\024\n\005value\030\002 \001" +
-      "(\tR\005value:\0028\001\"F\n\nCoordinate\022\032\n\010latitude\030" +
-      "\001 \001(\001R\010latitude\022\034\n\tlongitude\030\002 \001(\001R\tlong" +
-      "itudeB\206\001\n\035com.acme.proto.acme.common.v1B" +
-      "\013ValuesProtoP\001\242\002\003ACX\252\002\016Acme.Common.V1\312\002\016" +
-      "Acme\\Common\\V1\342\002\032Acme\\Common\\V1\\GPBMetad" +
-      "ata\352\002\020Acme::Common::V1b\006proto3"
+      "nits\030\002 \001(\003R\005units\"_\n\017EasyPostAddress\022\016\n\002" +
+      "id\030\001 \001(\tR\002id\022 \n\013residential\030\002 \001(\010R\013resid" +
+      "ential\022\032\n\010verified\030\003 \001(\010R\010verified\"\354\001\n\007A" +
+      "ddress\022\026\n\006street\030\001 \001(\tR\006street\022\022\n\004city\030\002" +
+      " \001(\tR\004city\022\024\n\005state\030\003 \001(\tR\005state\022\037\n\013post" +
+      "al_code\030\004 \001(\tR\npostalCode\022\030\n\007country\030\005 \001" +
+      "(\tR\007country\022O\n\020easypost_address\030\006 \001(\0132\037." +
+      "acme.common.v1.EasyPostAddressH\000R\017easypo" +
+      "stAddress\210\001\001B\023\n\021_easypost_address\"k\n\tTim" +
+      "eRange\0220\n\005start\030\001 \001(\0132\032.google.protobuf." +
+      "TimestampR\005start\022,\n\003end\030\002 \001(\0132\032.google.p" +
+      "rotobuf.TimestampR\003end\"H\n\nPagination\022\033\n\t" +
+      "page_size\030\001 \001(\005R\010pageSize\022\035\n\npage_token\030" +
+      "\002 \001(\tR\tpageToken\"\301\001\n\014ErrorDetails\022\022\n\004cod" +
+      "e\030\001 \001(\tR\004code\022\030\n\007message\030\002 \001(\tR\007message\022" +
+      "F\n\010metadata\030\003 \003(\0132*.acme.common.v1.Error" +
+      "Details.MetadataEntryR\010metadata\032;\n\rMetad" +
+      "ataEntry\022\020\n\003key\030\001 \001(\tR\003key\022\024\n\005value\030\002 \001(" +
+      "\tR\005value:\0028\001\"F\n\nCoordinate\022\032\n\010latitude\030\001" +
+      " \001(\001R\010latitude\022\034\n\tlongitude\030\002 \001(\001R\tlongi" +
+      "tudeB\206\001\n\035com.acme.proto.acme.common.v1B\013" +
+      "ValuesProtoP\001\242\002\003ACX\252\002\016Acme.Common.V1\312\002\016A" +
+      "cme\\Common\\V1\342\002\032Acme\\Common\\V1\\GPBMetada" +
+      "ta\352\002\020Acme::Common::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -104,26 +114,32 @@ public final class ValuesProto extends com.google.protobuf.GeneratedFile {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_common_v1_Money_descriptor,
         new java.lang.String[] { "Currency", "Units", });
-    internal_static_acme_common_v1_Address_descriptor =
+    internal_static_acme_common_v1_EasyPostAddress_descriptor =
       getDescriptor().getMessageType(1);
+    internal_static_acme_common_v1_EasyPostAddress_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_acme_common_v1_EasyPostAddress_descriptor,
+        new java.lang.String[] { "Id", "Residential", "Verified", });
+    internal_static_acme_common_v1_Address_descriptor =
+      getDescriptor().getMessageType(2);
     internal_static_acme_common_v1_Address_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_common_v1_Address_descriptor,
-        new java.lang.String[] { "Street", "City", "State", "PostalCode", "Country", });
+        new java.lang.String[] { "Street", "City", "State", "PostalCode", "Country", "EasypostAddress", });
     internal_static_acme_common_v1_TimeRange_descriptor =
-      getDescriptor().getMessageType(2);
+      getDescriptor().getMessageType(3);
     internal_static_acme_common_v1_TimeRange_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_common_v1_TimeRange_descriptor,
         new java.lang.String[] { "Start", "End", });
     internal_static_acme_common_v1_Pagination_descriptor =
-      getDescriptor().getMessageType(3);
+      getDescriptor().getMessageType(4);
     internal_static_acme_common_v1_Pagination_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_common_v1_Pagination_descriptor,
         new java.lang.String[] { "PageSize", "PageToken", });
     internal_static_acme_common_v1_ErrorDetails_descriptor =
-      getDescriptor().getMessageType(4);
+      getDescriptor().getMessageType(5);
     internal_static_acme_common_v1_ErrorDetails_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_common_v1_ErrorDetails_descriptor,
@@ -135,7 +151,7 @@ public final class ValuesProto extends com.google.protobuf.GeneratedFile {
         internal_static_acme_common_v1_ErrorDetails_MetadataEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
     internal_static_acme_common_v1_Coordinate_descriptor =
-      getDescriptor().getMessageType(5);
+      getDescriptor().getMessageType(6);
     internal_static_acme_common_v1_Coordinate_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_common_v1_Coordinate_descriptor,

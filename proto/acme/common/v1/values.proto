@@ -10,12 +10,21 @@ message Money {
   int64 units = 2;       // Amount in minor units (ISO 4217 exponent)
 }
 
+// EasyPostAddress holds the EasyPost-specific fields populated after address verification.
+// The id is used downstream to create EasyPost Shipments without re-verifying.
+message EasyPostAddress {
+  string id = 1;        // EasyPost address ID
+  bool residential = 2; // affects carrier rate selection
+  bool verified = 3;
+}
+
 message Address {
   string street = 1;
   string city = 2;
   string state = 3;
   string postal_code = 4;
-  string country = 5;  // ISO 3166-1 alpha-2
+  string country = 5;           // ISO 3166-1 alpha-2
+  optional EasyPostAddress easypost_address = 6; // populated after EasyPost verification
 }
 
 message TimeRange {

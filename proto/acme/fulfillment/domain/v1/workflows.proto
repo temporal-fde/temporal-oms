@@ -1,9 +1,12 @@
-// Temporal Workflow contracts for Fulfillments namespace (Python AI Agent)
+// Temporal Workflow contracts for Fulfillments namespace (Python AI Agent + Java fulfillment.Order)
 syntax = "proto3";
 
 package acme.fulfillment.domain.fulfillment.v1;
 
 import "google/protobuf/timestamp.proto";
+import "acme/common/v1/values.proto";
+import "acme/apps/domain/v1/workflows.proto";
+import "acme/processing/domain/v1/workflows.proto";
 
 // Order Fulfillment AI Agent Workflow
 message FulfillOrderRequest {
@@ -131,4 +134,247 @@ enum Status {
   STATUS_SHIPPING_SELECTED = 3;
   STATUS_COMPLETED = 4;
   STATUS_FAILED = 5;
+}
+
+// =============================================================================
+// Java fulfillment.Order workflow messages
+// Names are intentionally distinct from Python-era messages above to avoid
+// proto name conflicts within the same package.
+// Long-term: split into a separate .proto file.
+// =============================================================================
+
+// ── Workflow start ────────────────────────────────────────────────────────────
+
+// StartOrderFulfillmentRequest is the input to fulfillment.Order execute().
+// Carries the full placed order from the apps domain and the customer's
+// selected shipping option at order time.
+message StartOrderFulfillmentRequest {
+  string order_id = 1;
+  string customer_id = 2;
+  optional StartOrderFulfillmentOptions options = 3;
+  SelectedShippingOption selected_shipping = 4;
+  acme.apps.domain.apps.v1.CompleteOrderRequest placed_order = 5;
+}
+
+message StartOrderFulfillmentOptions {
+  optional int64 fulfillment_timeout_secs = 1;
+}
+
+// SelectedShippingOption is the shipping option chosen by the customer at order
+// placement time. Used as the baseline for margin comparison in fulfillOrder.
+message SelectedShippingOption {
+  string option_id = 1;
+  acme.common.v1.Money price = 2;
+  google.protobuf.Timestamp expected_ship_date = 3;
+}
+
+// ── validateOrder Update / Nexus operation ────────────────────────────────────
+
+// ValidateOrderRequest is the input to the validateOrder Update handler and
+// the Nexus validateOrder operation. Carries the order_id and the customer's
+// shipping address. If address.easypost_address is already set, the activity
+// skips EasyPost verification.
+message ValidateOrderRequest {
+  string order_id = 1;
+  acme.common.v1.Address address = 2;
+}
+
+// ValidateOrderResponse returns the same address with easypost_address populated
+// after verification. Stored in workflow state for downstream use in getCarrierRates.
+message ValidateOrderResponse {
+  acme.common.v1.Address address = 1;
+}
+
+// ── AddressVerification activity ─────────────────────────────────────────────
+
+message VerifyAddressRequest {
+  acme.common.v1.Address address = 1;
+}
+
+message VerifyAddressResponse {
+  acme.common.v1.Address address = 1; // easypost_address populated after verification
+}
+
+// ── FulfillmentOptionsLoader local activity ───────────────────────────────────
+
+message LoadFulfillmentOptionsRequest {
+  string order_id = 1;
+}
+
+// FulfillmentOptions carries policy loaded at workflow start via LocalActivity.
+// shipping_margin is the maximum acceptable shipping cost; amounts above it
+// are recorded in the margin_leak SearchAttribute.
+message FulfillmentOptions {
+  acme.common.v1.Money shipping_margin = 1;
+}
+
+// ── fulfillOrder Update ───────────────────────────────────────────────────────
+
+// OrderFulfillRequest is the input to the fulfillOrder Update handler.
+// Name is distinct from the Python-era FulfillOrderRequest in this package.
+message OrderFulfillRequest {
+  ProcessedOrder processed_order = 1;
+}
+
+// ProcessedOrder carries the result of processing.Order for use in fulfillment
+// activities (carrier rates, label printing, inventory deduction).
+message ProcessedOrder {
+  string order_id = 1;
+  string customer_id = 2;
+  acme.processing.domain.processing.v1.GetProcessOrderStateResponse state = 3;
+}
+
+// OrderFulfillResponse is returned to the fulfillOrder Update caller (apps.Order).
+// Name is distinct from the Python-era FulfillOrderResponse in this package.
+message OrderFulfillResponse {
+  string tracking_number = 1;
+  ShippingSelection shipping_selection = 2;
+}
+
+// ShippingSelection records the carrier rate chosen during fulfillOrder.
+// margin_delta_cents is the overage in minor currency units (set only when
+// actual cost exceeds shipping_margin; also written to margin_leak SearchAttribute).
+message ShippingSelection {
+  string option_id = 1;
+  string rate_id = 2;
+  string carrier = 3;
+  string service_level = 4;
+  acme.common.v1.Money actual_price = 5;
+  int64 margin_delta_cents = 6;
+  bool is_fallback = 7;
+  string fallback_reason = 8;
+}
+
+// ── cancelOrder Signal ────────────────────────────────────────────────────────
+
+message CancelFulfillmentOrderRequest {
+  string order_id = 1;
+  string reason = 2;
+}
+
+// ── notifyDeliveryStatus Signal ───────────────────────────────────────────────
+
+message DeliveryStatusNotification {
+  string order_id = 1;
+  DeliveryStatus delivery_status = 2;
+  optional string carrier_tracking_id = 3;
+  optional string failure_reason = 4;
+}
+
+enum DeliveryStatus {
+  DELIVERY_STATUS_UNSPECIFIED = 0;
+  DELIVERY_STATUS_DELIVERED = 1;
+  DELIVERY_STATUS_CANCELED = 2;
+}
+
+// ── getState Query ────────────────────────────────────────────────────────────
+
+message GetFulfillmentOrderStateResponse {
+  StartOrderFulfillmentRequest args = 1;
+  FulfillmentOptions options = 2;
+  acme.common.v1.Address validated_address = 3;
+  OrderFulfillRequest fulfillment_request = 4;
+  ShippingSelection shipping_selection = 5;
+  string tracking_number = 6;
+  FulfillmentStatus status = 7;
+  DeliveryStatus delivery_status = 8;
+  repeated string errors = 9;
+}
+
+enum FulfillmentStatus {
+  FULFILLMENT_STATUS_UNSPECIFIED = 0;
+  FULFILLMENT_STATUS_STARTED = 1;      // workflow started, awaiting validateOrder
+  FULFILLMENT_STATUS_VALIDATED = 2;    // address verified, holding inventory
+  FULFILLMENT_STATUS_FULFILLING = 3;   // fulfillOrder received
+  FULFILLMENT_STATUS_COMPLETED = 4;    // label printed, delivery awaited
+  FULFILLMENT_STATUS_DELIVERED = 5;
+  FULFILLMENT_STATUS_CANCELED = 6;
+  FULFILLMENT_STATUS_FAILED = 7;
+}
+
+// ── Allocations activity ──────────────────────────────────────────────────────
+
+// FulfillmentItem is the line-item type for fulfillment activities.
+// Name is distinct from the Python-era Item in this package.
+// warehouse_id and warehouse_location are populated after processing completes.
+message FulfillmentItem {
+  string item_id = 1;
+  string sku_id = 2;
+  string brand_code = 3;
+  int32 quantity = 4;
+  optional string warehouse_id = 5;
+  optional string warehouse_location = 6;
+}
+
+message HoldItemsRequest {
+  string order_id = 1;
+  repeated FulfillmentItem items = 2;
+}
+
+message HoldItemsResponse {
+  string hold_id = 1;
+}
+
+message ReserveItemsRequest {
+  string order_id = 1;
+  string hold_id = 2;
+  repeated FulfillmentItem items = 3;
+}
+
+message ReserveItemsResponse {
+  string reservation_id = 1;
+}
+
+message DeductInventoryRequest {
+  string order_id = 1;
+  string reservation_id = 2;
+}
+
+message DeductInventoryResponse {
+  bool success = 1;
+}
+
+message ReleaseHoldRequest {
+  string order_id = 1;
+  string hold_id = 2;
+}
+
+message ReleaseHoldResponse {
+  bool success = 1;
+}
+
+// ── DeliveryService activity ──────────────────────────────────────────────────
+
+// GetCarrierRatesRequest creates an EasyPost Shipment and retrieves available
+// carrier rates. easypost_address_id comes from state.validatedAddress.easypost_address.id.
+message GetCarrierRatesRequest {
+  string order_id = 1;
+  string easypost_address_id = 2;
+  repeated FulfillmentItem items = 3;
+}
+
+message GetCarrierRatesResponse {
+  string shipment_id = 1; // EasyPost Shipment ID, passed to printShippingLabel
+  repeated CarrierRate rates = 2;
+}
+
+message CarrierRate {
+  string rate_id = 1;
+  string carrier = 2;
+  string service_level = 3;
+  acme.common.v1.Money cost = 4;
+  int32 estimated_days = 5;
+}
+
+// ── Carriers activity ─────────────────────────────────────────────────────────
+
+message PrintShippingLabelRequest {
+  string order_id = 1;
+  string shipment_id = 2;
+  string rate_id = 3;
+}
+
+message PrintShippingLabelResponse {
+  string tracking_number = 1;
+  string label_url = 2;
 }

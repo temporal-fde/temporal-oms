@@ -90,11 +90,11 @@ Provide feedback in PROGRESS.md → Feedback Items section.
 ### 🆕 fulfillment.Order (initiative)
 
 #### fulfillment.Order Workflow
-- **Status:** Draft — Awaiting Tech Lead Review
+- **Status:** Implementing
 - **Goal:** Replace Kafka fulfillment path with durable Temporal workflow; add address validation, inventory holds, versioned shipping, delivery tracking
 - **Owner:** Temporal FDE Team
 - **Spec:** `specs/fulfillment-order/fulfillment-order-workflow/`
-- **Next:** Tech lead review; open questions in PROGRESS.md
+- **Next:** Phase 1 (proto) is unblocked; 4 open questions to resolve before Phases 3/5/6 can complete (see PROGRESS.md)
 
 #### ShippingAgent
 - **Status:** Stub — Not Started

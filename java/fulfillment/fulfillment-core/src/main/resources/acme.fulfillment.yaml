@@ -6,5 +6,18 @@ spring.temporal:
     api-key: ${TEMPORAL_API_KEY:}
   workers:
     - task-queue: fulfillment
-      workflow-classes: []
-      activity-beans: []
+      workflow-classes:
+        - com.acme.fulfillment.workflows.OrderImpl
+      activity-beans:
+        - addressVerificationActivities
+        - allocationsActivities
+        - deliveryServiceActivities
+        - carriersActivities
+        - fulfillmentOptionsLoaderActivities
+      nexus-service-beans:
+        - fulfillment-service
+      deployment-properties:
+        use-versioning: true
+        default-versioning-behavior: PINNED
+        deployment-name: ${TEMPORAL_DEPLOYMENT_NAME:fulfillment}
+        build-id: ${TEMPORAL_WORKER_BUILD_ID:local}
