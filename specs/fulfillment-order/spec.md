@@ -16,7 +16,7 @@ The `fulfillment.Order` workflow replaces the current Kafka-based fulfillment pa
 
 This workflow brings fulfillment under Temporal's durable execution guarantees. Two existing workflows are updated via **Worker Versioning** to integrate with it:
 
-- **`apps.Order` (new version):** Calls a `validateOrder` Nexus operation in the `submitOrder` Update handler — as soon as the order is submitted — which uses UpdateWithStart to kick off `fulfillment.Order` and validate the shipping address. After processing completes, `apps.Order` sends the `fulfillOrder` Update to `fulfillment.Order`.
+- **`apps.Order` (new version):** Calls a `validateOrder` Nexus operation in `execute()` right before the `processOrder` Nexus call — once both `submitOrder` and `capturePayment` inputs have been accumulated — which uses UpdateWithStart to kick off `fulfillment.Order` and validate the shipping address. After processing completes, `apps.Order` sends the `fulfillOrder` Update to `fulfillment.Order`.
 - **`processing.Order` (new version):** Removes the `Fulfillments.fulfillOrder()` activity call — fulfillment is now driven by `apps.Order` via Nexus.
 
 Worker Versioning governs the rollout in both the `apps` and `processing` namespaces. In-flight workflows on old versions complete unaffected; new workflows pick up the updated behavior.
@@ -82,14 +82,19 @@ The workflow is developed in the `fulfillment` bounded context at `https://githu
 ```
 apps.Order (apps namespace)
 │
-│  1. In submitOrder Update handler:
+│  1. In execute(), right before processOrder Nexus call
+│     (after submitOrder + capturePayment inputs accumulated):
 │     ──► validateOrder Nexus operation
 │              │
 │              └──► fulfillment.Order (fulfillment namespace)
 │                   ├── [UpdateWithStart] validateOrder Update
-│                   │   - validate shipping address
-│                   │   - load FulfillmentOptions (LocalActivity)
-│                   │   - place inventory hold
+│                   │   - AddressVerification.verifyAddress() activity
+│                   │     (if address.easypost_address absent, calls EasyPost createAndVerify)
+│                   │   - stores verified Address (with easypost_address) in workflow state
+│                   │   - returns ValidateOrderResponse
+│                   ├── [execute() continues]
+│                   │   - LoadFulfillmentOptions (LocalActivity)
+│                   │   - Allocations.holdItems()
 │                   └── [wait] for fulfillOrder Update
 │
 │  2. processOrder Nexus operation (concurrent with fulfillment start)
@@ -104,9 +109,14 @@ apps.Order (apps namespace)
 fulfillment.Order (fulfillment namespace)
 │
 │  [validateOrder Update]
-│  ├── LoadFulfillmentOptions (LocalActivity) → shipping_margin
-│  ├── Allocations.holdItems()
+│  ├── AddressVerification.verifyAddress()
+│  │   - if address.easypost_address absent → EasyPost createAndVerify()
+│  │   - store verified Address (with easypost_address) in workflow state
 │  └── return ValidateOrderResponse
+│
+│  [execute() continues after validateOrder]
+│  ├── LoadFulfillmentOptions (LocalActivity) → shipping_margin
+│  └── Allocations.holdItems()
 │
 │  [wait for fulfillOrder Update]
 │         ↑ cancelOrder Signal ──► [detached scope] Allocations.releaseHold()
@@ -114,9 +124,9 @@ fulfillment.Order (fulfillment namespace)
 │
 │  [fulfillOrder Update — carries ProcessedOrder]
 │  ├── Allocations.reserveItems()
-│  ├── Re-query shipping rates
-│  │   V1: DeliveryService.getShippingRates()
-│  │   V2: ShippingAgent Nexus / Child Workflow (TBD)
+│  ├── Re-query carrier rates (EasyPost Shipment created here)
+│  │   V1: DeliveryService.getCarrierRates(address.easypost_address.id, ProcessedOrder)
+│  │   V2: ShippingAgent via Nexus operation (separate spec)
 │  │   → set margin_leak SearchAttribute if rate > shipping_margin
 │  │   → select fallback within margin if original option unavailable
 │  ├── [concurrent] Carriers.printShippingLabel()
@@ -131,7 +141,7 @@ fulfillment.Order (fulfillment namespace)
 - **Early fulfillment start via Nexus:** `apps.Order` triggers `fulfillment.Order` as soon as order data is available, before processing completes — address validation runs concurrently with enrichment
 - **Worker Versioning-gated rollout:** Both `apps.Order` and `processing.Order` adopt new behavior via new build-ids; old in-flight workflows are unaffected
 - **Reliable inventory compensation:** Detached scope releases the hold regardless of how (cancel, timeout, error) the workflow ends before fulfillment
-- **Versioned shipping validation:** V1 (DeliveryService) and V2 (ShippingAgent) separated by `Workflow.getVersion()` — safe to replay across versions
+- **Versioned shipping validation:** V1 (DeliveryService) and V2 (ShippingAgent via Nexus) separated by `Workflow.getVersion()` — safe to replay across versions
 - **`margin_leak` observability:** Over-margin shipping cost delta is queryable in Temporal UI and reportable in downstream analytics
 - **Concurrent label print + inventory deduction:** Reduces fulfillment latency by parallelizing independent terminal activities
 - **Delivery status lifecycle:** `notifyDeliveryStatus` Signal closes the loop between the carrier and the OMS
@@ -148,7 +158,8 @@ fulfillment.Order (fulfillment namespace)
 | `validateOrder` as Nexus operation (not a direct Temporal Update across namespaces) | Nexus is the cross-namespace call primitive in Temporal; it provides typed, cancellable operations with proper error propagation | Direct SDK cross-namespace workflow stub — works but bypasses Nexus routing, harder to observe and version |
 | Worker Versioning for `apps.Order` + `processing.Order` changes | In-flight workflows must not be disrupted; versioning lets old workflows run to completion on old workers while new workflows adopt the new behavior atomically | Feature flag / config — not determinism-safe; replaying old history with new flag breaks |
 | Remove `Fulfillments.fulfillOrder()` from `processing.Order` (not just stub it out) | The activity does nothing valuable under the new model; keeping it adds noise to workflow history and replay surface area | Keep activity as a no-op — misleading in workflow history, still burns a task queue slot |
-| Inventory hold on `validateOrder` (not on `fulfillOrder`) | Order may sit in `processOrder` for minutes; holding inventory at start prevents stock-out during that window | Hold at fulfillment time — risks stock-out between validation and fulfillment |
+| Inventory hold in `execute()` after `validateOrder` (not on `fulfillOrder`) | Order may sit in `processOrder` for minutes; holding inventory after address is confirmed prevents stock-out during that window | Hold at fulfillment time — risks stock-out between address validation and fulfillment |
+| `validateOrder` calls only one activity (`AddressVerification`) | Keeps the Update handler slim and purpose-focused; address resolution is a distinct concern from options loading and inventory | Do address + options + hold in one Update — too much work in a single handler, harder to reason about Update latency |
 | Detached scope for inventory release | Main scope cancellation must not prevent compensation from executing | Catch-block compensation — cancelled before it can run if the scope itself is cancelled |
 | `shipping_margin` loaded via LocalActivity | Policy may vary per tenant/SKU; LocalActivity runs in-process (no task queue round-trip) so it is fast | Hardcode in config — couples shipping policy to deployment cycle |
 | `margin_leak` as SearchAttribute (Double) | Enables cross-workflow analytics queries in Temporal UI without fetching history; SearchAttribute API requires scalar types | `Money` proto in workflow result — requires fetching history, no native Temporal query support |
@@ -189,12 +200,22 @@ fulfillment.Order (fulfillment namespace)
   - Added: call `validateOrder` Nexus operation to `fulfillment.Order` when order data is available
   - Added: call `fulfillOrder` Update on `fulfillment.Order` after `processOrder` completes
   - Unchanged: all existing Update/Signal handlers, `processOrder` Nexus operation, compensation logic
-- **When `validateOrder` fires:** in the `submitOrder` Update handler, as soon as the order is submitted — the shipping address is available at that point and fulfillment should start as early as possible
+- **When `validateOrder` fires:** in `execute()`, right before the `processOrder` Nexus call — after the `Workflow.await()` condition is met (both `submitOrder` + `capturePayment` accumulated). The address comes from the accumulated `submitOrder` data.
 
 #### `processing.Order` — new version (Worker Versioning)
 
 - **New behavior vs. old:** Removes `Fulfillments.fulfillOrder()` activity call after enrichment
 - **Mechanism:** `Workflow.getVersion("remove-kafka-fulfillment", DEFAULT_VERSION, 1)` branch skips the activity on new executions; old in-flight workflows replay the original path
+
+#### `AddressVerification` Activity (`fulfillment-core`)
+
+- **Purpose:** Resolve and verify a shipping address via EasyPost, returning a `common.Address` with `easypost_address` populated
+- **Methods:** `verifyAddress(VerifyAddressRequest) → VerifyAddressResponse`
+- **Logic:**
+  1. If `address.easypost_address` is already set on the incoming `Address`, return it as-is
+  2. Otherwise, call EasyPost `AddressService.createAndVerify(Map<String, Object>)` with the raw address fields, then populate `easypost_address` on the returned `Address`
+- **Result stored in workflow state:** the verified `Address` (including `easypost_address.id`) is stored in `fulfillment.Order` state; `easypost_address.id` is passed to `getCarrierRates` when `fulfillOrder` arrives — the EasyPost `Shipment` is NOT created here
+- **Reference:** [`AddressService.createAndVerify(Map)`](https://easypost.github.io/easypost-java/com/easypost/service/AddressService.html#createAndVerify(java.util.Map))
 
 #### `Allocations` Activity (`fulfillment-core`)
 
@@ -202,12 +223,15 @@ fulfillment.Order (fulfillment namespace)
 
 #### `DeliveryService` Activity (`fulfillment-core`, V1)
 
-- **Methods:** `getShippingRates(GetShippingRatesRequest) → GetShippingRatesResponse`
+- **Purpose:** Query carrier shipping rates — creates the EasyPost `Shipment` using the verified `address.easypost_address.id` (stored from `validateOrder`) and the `ProcessedOrder` items
+- **Methods:** `getCarrierRates(GetCarrierRatesRequest) → GetCarrierRatesResponse`
+  - Input: `easypost_address_id` (from `state.validatedAddress.easypost_address.id`) + `ProcessedOrder` (from `fulfillOrder` Update)
 
-#### `ShippingAgent` (V2 — Nexus operation or Child Workflow, TBD)
+#### `ShippingAgent` (V2 — Nexus operation, separate spec)
 
+- **Invocation:** `fulfillment.Order` calls `ShippingAgent` via a Nexus operation in the `fulfillOrder` handler
 - **Interface:** defined in `proto/acme/fulfillment/domain/v1/shipping_agent.proto`
-- **Decision:** Nexus vs. Child Workflow to be resolved before Phase 6
+- **Scope:** `ShippingAgent` design and implementation is a separate spec; this spec only establishes that `fulfillment.Order` calls it via Nexus in the V2 path
 
 #### `Carriers` Activity (`fulfillment-core`)
 
@@ -220,115 +244,32 @@ fulfillment.Order (fulfillment namespace)
 
 ### Data Model / Schemas
 
-All new Java fulfillment messages belong in `proto/acme/fulfillment/domain/v1/workflows.proto` (alongside existing Python-era messages — avoid naming conflicts; see Implementation Notes).
+Proto definitions are the source of truth — this section describes intent and ownership only. Field-level definitions belong in the `.proto` files.
 
-```protobuf
-// ─── Workflow Start ────────────────────────────────────────────────────────
+#### `proto/acme/common/v1/values.proto` — modifications
 
-message StartOrderFulfillmentRequest {
-  string order_id = 1;
-  StartOrderFulfillmentExecutionOptions execution_options = 2;
-  SelectedShipping selected_shipping = 3;
-  string customer_id = 4;
-  acme.apps.domain.apps.v1.CompleteOrderRequest placed_order = 5;
-}
+- New `EasyPostAddress` message with the EasyPost fields our system cares about: the EasyPost address ID (used to create Shipments downstream), a residential flag (affects carrier rate selection), and a verified boolean
+- Existing `Address` message extended with an `optional EasyPostAddress easypost_address` field — populated after verification, absent otherwise; no separate validated-address type is introduced
 
-message StartOrderFulfillmentExecutionOptions {
-  optional int64 fulfillment_timeout_secs = 1;
-}
+#### `proto/acme/fulfillment/domain/v1/workflows.proto` — new Java fulfillment messages
 
-message SelectedShipping {
-  google.protobuf.Timestamp timestamp = 1;
-  acme.common.v1.Money price = 2;
-  string shipping_option_id = 3;
-  google.protobuf.Timestamp date = 4;  // expected ship date
-}
+New messages alongside existing Python-era messages (avoid name conflicts; see Implementation Notes).
 
-// ─── validateOrder Update (also the Nexus operation input/output) ──────────
+**Workflow start** — `StartOrderFulfillmentRequest` carries the `order_id`, `customer_id`, execution options (timeout), the customer's `selected_shipping` at order time (option ID, price, expected ship date), and the full `placed_order` (`CompleteOrderRequest` from the apps domain).
 
-message ValidateOrderRequest {
-  string order_id = 1;
-  acme.common.v1.Address address = 2;
-}
+**`validateOrder` Update / Nexus operation** — `ValidateOrderRequest` carries the `order_id` and a `common.Address`. If `address.easypost_address` is already populated the activity skips EasyPost. `ValidateOrderResponse` returns the same `common.Address` with `easypost_address` populated after verification.
 
-message ValidateOrderResponse {
-  string order_id = 1;
-  ValidatedAddress address = 2;
-}
+**`AddressVerification` activity** — `VerifyAddressRequest` / `VerifyAddressResponse` mirror the Update messages: in is a `common.Address`, out is the same address with `easypost_address` set.
 
-message ValidatedAddress {
-  acme.common.v1.Address normalized = 1;
-  bool is_valid = 2;
-  repeated string validation_messages = 3;
-  optional acme.common.v1.Coordinate coordinate = 4;  // for ShippingAgent V2
-}
+**`FulfillmentOptions`** — carries `shipping_margin` (`common.Money`); loaded via LocalActivity at workflow start.
 
-// ─── FulfillmentOptions (loaded via LocalActivity) ─────────────────────────
+**`fulfillOrder` Update** — `FulfillOrderRequest` carries a `ProcessedOrder` (order ID, customer ID, and the full `GetProcessOrderStateResponse` from the processing domain). `FulfillOrderResponse` carries the tracking number and the `ShippingSelection` that was made (option ID, actual price, margin delta, fallback flag and reason).
 
-message FulfillmentOptions {
-  acme.common.v1.Money shipping_margin = 1;
-}
+**`cancelOrder` Signal** — carries `order_id` and a cancellation reason string.
 
-// ─── fulfillOrder Update ───────────────────────────────────────────────────
+**`notifyDeliveryStatus` Signal** — carries `order_id`, a `DeliveryStatus` enum (`DELIVERED` or `CANCELED`), an optional carrier tracking ID, and an optional failure reason.
 
-message FulfillOrderRequest {                         // fulfillment domain version
-  ProcessedOrder processed_order = 1;
-}
-
-message FulfillOrderResponse {
-  string tracking_number = 1;
-  ShippingSelection shipping_selection = 2;
-}
-
-message ProcessedOrder {
-  string order_id = 1;
-  string customer_id = 2;
-  acme.processing.domain.processing.v1.GetProcessOrderStateResponse processing_result = 3;
-}
-
-// ─── cancelOrder Signal ────────────────────────────────────────────────────
-
-message CancelFulfillmentRequest {
-  string order_id = 1;
-  string reason = 2;
-}
-
-// ─── notifyDeliveryStatus Signal ───────────────────────────────────────────
-
-message NotifyDeliveryStatusRequest {
-  string order_id = 1;
-  DeliveryStatus status = 2;
-  optional string carrier_tracking_id = 3;
-  optional string failure_reason = 4;
-}
-
-enum DeliveryStatus {
-  DELIVERY_STATUS_UNSPECIFIED = 0;
-  DELIVERY_STATUS_DELIVERED = 1;
-  DELIVERY_STATUS_CANCELED = 2;
-}
-
-// ─── Workflow State Query ──────────────────────────────────────────────────
-
-message GetFulfillmentOrderStateResponse {
-  StartOrderFulfillmentRequest args = 1;
-  FulfillmentOptions options = 2;
-  ValidateOrderResponse validation = 3;
-  FulfillOrderRequest fulfillment_request = 4;
-  ShippingSelection shipping_selection = 5;
-  string tracking_number = 6;
-  DeliveryStatus delivery_status = 7;
-  repeated string errors = 8;
-}
-
-message ShippingSelection {
-  string shipping_option_id = 1;
-  acme.common.v1.Money actual_price = 2;
-  acme.common.v1.Money margin_delta = 3;  // positive = over margin
-  bool used_fallback = 4;
-  string fallback_reason = 5;
-}
-```
+**Workflow state query** — `GetFulfillmentOrderStateResponse` carries the original start args, loaded options, the validated address (from `validateOrder`), the fulfillment request (from `fulfillOrder`), the shipping selection, tracking number, current delivery status, and any errors.
 
 #### SearchAttributes
 
@@ -347,6 +288,7 @@ spring.temporal:
       workflow-classes:
         - com.acme.fulfillment.workflows.OrderImpl
       activity-beans:
+        - address-verification-activities
         - allocations-activities
         - delivery-service-activities
         - carriers-activities
@@ -370,6 +312,7 @@ nexus:
 ### Phase 1: Proto Schema & Core Types
 
 Deliverables:
+- [ ] Add `EasyPostAddress` message to `proto/acme/common/v1/values.proto` and add `optional EasyPostAddress easypost_address = 6` to the existing `Address` message
 - [ ] Extend `proto/acme/fulfillment/domain/v1/workflows.proto` with all new Java fulfillment messages
 - [ ] Run `buf generate` to produce Java classes in `fulfillment-core`
 - [ ] Register `margin_leak` SearchAttribute: `temporal operator search-attribute create --namespace fulfillment --name margin_leak --type Double`
@@ -378,8 +321,9 @@ Deliverables:
 
 Deliverables:
 - [ ] `fulfillment-core`: `Order` workflow interface (`execute`, `validateOrder` Update + validator, `fulfillOrder` Update + validator, `cancelOrder` Signal, `notifyDeliveryStatus` Signal, `getState` Query)
+- [ ] `fulfillment-core`: `AddressVerification` activity interface (`verifyAddress`)
 - [ ] `fulfillment-core`: `Allocations` activity interface (`holdItems`, `reserveItems`, `deductInventory`, `releaseHold`)
-- [ ] `fulfillment-core`: `DeliveryService` activity interface (`getShippingRates`)
+- [ ] `fulfillment-core`: `DeliveryService` activity interface (`getCarrierRates` — takes `address_id` + `ProcessedOrder` items, creates EasyPost Shipment)
 - [ ] `fulfillment-core`: `Carriers` activity interface (`printShippingLabel`)
 - [ ] `fulfillment-core`: `FulfillmentOptionsLoader` local activity interface (`loadOptions`)
 - [ ] `fulfillment-core`: `Fulfillment` Nexus service interface (wraps `validateOrder` as a Nexus operation)
@@ -390,8 +334,9 @@ Deliverables:
 - [ ] `fulfillment-core`: `OrderImpl`
   - `@WorkflowInit`: initialize activity stubs with appropriate timeouts
   - `execute()`: open detached compensation scope → `Workflow.await()` for fulfillOrder or cancel/timeout → fire compensation if needed
-  - `validateOrder` Update handler: `loadOptions` (LocalActivity) → `holdItems` → validate address → return `ValidateOrderResponse`
-  - `fulfillOrder` Update handler: `reserveItems` → `getShippingRates` (V1) → margin check + `margin_leak` SearchAttribute → concurrent (`printShippingLabel` + `deductInventory`) → await `notifyDeliveryStatus`
+  - `validateOrder` Update handler: `AddressVerification.verifyAddress()` → store `address_id` in state → return `ValidateOrderResponse`
+  - `execute()` body (after `validateOrder`): `loadOptions` (LocalActivity) → `holdItems` → open detached compensation scope → `Workflow.await()` for `fulfillOrder` or cancel/timeout
+  - `fulfillOrder` Update handler: `reserveItems` → `DeliveryService.getCarrierRates(address_id, ProcessedOrder)` (V1, creates EasyPost Shipment) → margin check + `margin_leak` SearchAttribute → concurrent (`printShippingLabel` + `deductInventory`) → await `notifyDeliveryStatus`
   - `cancelOrder` Signal handler: set cancellation flag
   - `notifyDeliveryStatus` Signal handler: set delivery status
   - `getState` Query: return `GetFulfillmentOrderStateResponse`
@@ -444,18 +389,19 @@ Gate new behavior behind new build-ids so existing in-flight workflows are unaff
 Implement real activity logic.
 
 Deliverables:
+- [ ] `fulfillment-workers`: `AddressVerificationImpl` — wraps EasyPost `AddressService.createAndVerify(Map)`
 - [ ] `fulfillment-workers`: `AllocationsImpl`
-- [ ] `fulfillment-workers`: `DeliveryServiceImpl` (V1 shipping rates)
-- [ ] `fulfillment-workers`: `CarriersImpl` (PrintShippingLabel)
+- [ ] `fulfillment-workers`: `DeliveryServiceImpl` — wraps EasyPost `Shipment` creation + carrier rate query (V1)
+- [ ] `fulfillment-workers`: `CarriersImpl` — `printShippingLabel` using rate selected from `getCarrierRates`
 - [ ] `fulfillment-workers`: `FulfillmentOptionsLoaderImpl`
 
-### Phase 7: V2 Shipping Path — `ShippingAgent` (Deferred)
+### Phase 7: V2 Shipping Path — `ShippingAgent` Nexus Integration (Deferred)
 
-Deferred pending Nexus vs. Child Workflow design decision for `ShippingAgent`.
+Deferred; depends on the separate `ShippingAgent` spec being approved and implemented first.
 
 Deliverables:
-- [ ] Implement `ShippingAgent` integration (Nexus or Child Workflow per decision)
-- [ ] Add `Workflow.getVersion("shipping-v2", DEFAULT_VERSION, 1)` branch in `fulfillOrder` handler
+- [ ] Wire `fulfillment.Order` `fulfillOrder` handler to call `ShippingAgent` via Nexus operation (per ShippingAgent spec)
+- [ ] Add `Workflow.getVersion("shipping-v2", DEFAULT_VERSION, 1)` branch in `fulfillOrder` handler to keep V1 path intact for in-flight workflows
 - [ ] Replay test: start with V1 history, apply V2 code — no `NonDeterminismException`
 
 ### Critical Files / Modules
@@ -463,19 +409,22 @@ Deliverables:
 **To Create:**
 - `java/fulfillment/fulfillment-core/src/main/java/com/acme/fulfillment/workflows/Order.java` — workflow interface (Phase 2)
 - `java/fulfillment/fulfillment-core/src/main/java/com/acme/fulfillment/workflows/OrderImpl.java` — workflow impl (Phase 3)
+- `java/fulfillment/fulfillment-core/src/main/java/com/acme/fulfillment/workflows/activities/AddressVerification.java` (Phase 2)
 - `java/fulfillment/fulfillment-core/src/main/java/com/acme/fulfillment/workflows/activities/Allocations.java` (Phase 2)
 - `java/fulfillment/fulfillment-core/src/main/java/com/acme/fulfillment/workflows/activities/DeliveryService.java` (Phase 2)
 - `java/fulfillment/fulfillment-core/src/main/java/com/acme/fulfillment/workflows/activities/Carriers.java` (Phase 2)
 - `java/fulfillment/fulfillment-core/src/main/java/com/acme/fulfillment/workflows/activities/FulfillmentOptionsLoader.java` (Phase 2)
 - `java/fulfillment/fulfillment-core/src/main/java/com/acme/fulfillment/nexus/Fulfillment.java` — Nexus service interface (Phase 2)
 - `java/fulfillment/fulfillment-workers/src/main/java/com/acme/fulfillment/nexus/FulfillmentNexusHandler.java` — Nexus handler (Phase 4)
+- `java/fulfillment/fulfillment-workers/src/main/java/com/acme/fulfillment/activities/AddressVerificationImpl.java` (Phase 6)
 - `java/fulfillment/fulfillment-workers/src/main/java/com/acme/fulfillment/activities/AllocationsImpl.java` (Phase 6)
 - `java/fulfillment/fulfillment-workers/src/main/java/com/acme/fulfillment/activities/DeliveryServiceImpl.java` (Phase 6)
 - `java/fulfillment/fulfillment-workers/src/main/java/com/acme/fulfillment/activities/CarriersImpl.java` (Phase 6)
 - `java/fulfillment/fulfillment-workers/src/main/java/com/acme/fulfillment/activities/FulfillmentOptionsLoaderImpl.java` (Phase 6)
 
 **To Modify:**
-- `proto/acme/fulfillment/domain/v1/workflows.proto` — add new Java messages (Phase 1)
+- `proto/acme/common/v1/values.proto` — add `EasyPostAddress` message + `optional easypost_address` field on `Address` (Phase 1)
+- `proto/acme/fulfillment/domain/v1/workflows.proto` — add new Java fulfillment messages (Phase 1)
 - `java/fulfillment/fulfillment-core/src/main/resources/acme.fulfillment.yaml` — register workflow + activity beans (Phase 3)
 - `java/apps/apps-core/src/main/java/com/acme/apps/workflows/OrderImpl.java` — add Fulfillment Nexus stub + calls (Phase 5, new build-id)
 - `java/processing/processing-core/src/main/java/com/acme/processing/workflows/OrderImpl.java` — version branch to skip `Fulfillments.fulfillOrder()` (Phase 5, new build-id)
@@ -527,7 +476,7 @@ Deliverables:
 | Detached scope for inventory compensation is easy to break in refactors | High | Medium | Dedicated unit tests for both cancel and timeout compensation paths; CI must run these |
 | Proto naming conflict: existing Python-era `FulfillOrderRequest` in same package | Low | High | New Java messages use distinct names (`StartOrderFulfillmentRequest`, not `FulfillOrderRequest`); long-term, split into separate `.proto` files |
 | `Workflow.getVersion()` branch in `processing.Order` — wrong placement causes non-determinism on replay | High | Low | Follow existing `VersioningBehavior.PINNED` pattern in `processing.OrderImpl`; write replay test before deploying new build-id |
-| `ShippingAgent` design (Nexus vs. Child WF) unresolved — V2 path has interface, no wiring | Low (for V1) | High | V2 deferred to Phase 7; V1 uses DeliveryService only; no V1 code depends on V2 being resolved |
+| `ShippingAgent` spec not yet complete — V2 Nexus integration cannot begin | Low (for V1) | High | V2 deferred to Phase 7; V1 uses DeliveryService only; no V1 code depends on ShippingAgent being ready |
 
 ---
 
@@ -554,7 +503,7 @@ Deliverables:
 - [ ] `fulfillment-workers` deployed and healthy on `fulfillment` task queue
 - [ ] `order-fulfillment` Nexus endpoint registered and accessible from `apps` namespace
 - [ ] Proto buf generation produces correct Java classes for all new messages
-- [ ] ShippingAgent design decision (Nexus vs. Child WF) — required before Phase 7 only
+- [ ] `ShippingAgent` spec approved and Nexus endpoint available — required before Phase 7 only
 
 ---
 
@@ -562,19 +511,23 @@ Deliverables:
 
 ### Questions for Tech Lead / Product
 
-- [x] **`validateOrder` trigger in `apps.Order`:** Fires in the `submitOrder` Update handler — as soon as the order is submitted. Address is available at that point; no need to wait for payment capture. ✅ Resolved.
-- [ ] **ShippingAgent (V2):** Nexus operation or Child Workflow? Decision needed before Phase 7.
+- [x] **`validateOrder` trigger in `apps.Order`:** Fires in `execute()` right before `processOrder`, after both `submitOrder` + `capturePayment` inputs are accumulated — `apps.Order` collects inputs via Update handlers before proceeding. ✅ Resolved.
+- [x] **ShippingAgent (V2):** Called via Nexus operation from `fulfillment.Order`. ShippingAgent design is a separate spec. ✅ Resolved.
 - [ ] **Fallback shipping notification:** When a fallback shipping option is used (original unavailable), should the customer be notified, or is this silent?
 - [ ] **`margin_leak` units:** `Double` (minor currency units, e.g., cents) confirmed? Or a richer Money-codec SearchAttribute?
 - [ ] **Inventory service contract:** Internal service or external API? Affects `Allocations` activity timeout and retry policy.
-- [ ] **Address validation service:** Which service backs `ValidatedAddress`? EasyPost (referenced in `shipping_agent.proto`)? A stub for now?
+- [x] **Address validation service:** EasyPost `AddressService.createAndVerify(Map)` — confirmed. `AddressVerificationImpl` wraps this call. ✅ Resolved.
 - [ ] **`FulfillOrderResponse` in `apps.Order` state:** Should `apps.Order` store the `FulfillOrderResponse` (tracking number, shipping selection) in `GetCompleteOrderStateResponse`?
 
 ### Implementation Notes
 
 - **`apps.Order` Nexus stub:** Follow the existing `Processing` Nexus service stub pattern in `OrderImpl`. The `Fulfillment` Nexus stub uses endpoint name `order-fulfillment` from OMS properties.
 - **UpdateWithStart in Nexus handler:** Use `WorkflowClient.startUpdateWithStart()` with `WorkflowIDConflictPolicy.WORKFLOW_ID_CONFLICT_POLICY_USE_EXISTING` so duplicate Nexus calls are idempotent.
-- **Sequencing in `apps.Order`:** `validateOrder` Nexus fires in `submitOrder` (before payment is even captured). `processOrder` Nexus fires later in `execute()` once both order + payment are accumulated. These are not concurrent — `validateOrder` starts the fulfillment workflow early; `processOrder` drives processing independently; `fulfillOrder` Update closes the loop after processing completes.
+- **`validateOrder` is intentionally slim:** The Update handler calls only `AddressVerification.verifyAddress()`, stores the returned `Address` (with `easypost_address` populated) in workflow state, and returns. `loadOptions` and `holdItems` run in `execute()` after the Update handler completes.
+- **`easypost_address.id` lifetime:** Set on the stored `Address` during `validateOrder`, read during `fulfillOrder` as `state.validatedAddress.easypost_address.id` when building the `GetCarrierRatesRequest`. The EasyPost `Shipment` is created inside `DeliveryService.getCarrierRates()`, not during address verification.
+- **`EasyPostAddress` lives on `common.Address`:** No separate `ValidatedAddress` type. The `easypost_address` field on `common.Address` carries only the fields our system needs (`id`, `residential`, `verified`). EasyPost is not fully abstracted — the field name is intentionally explicit.
+- **EasyPost `AddressService.createAndVerify(Map)`:** Map keys are EasyPost field names (`street1`, `city`, `state`, `zip`, `country`). Map from `acme.common.v1.Address` fields in `AddressVerificationImpl`.
+- **Sequencing in `apps.Order`:** After `Workflow.await()` resolves (both `submitOrder` + `capturePayment` accumulated), `apps.Order` fires `validateOrder` Nexus first, then `processOrder` Nexus. Both can be launched as concurrent `Promise` instances from `execute()` — `validateOrder` starts `fulfillment.Order` and validates the address; `processOrder` drives enrichment; after `processOrder` completes, `fulfillOrder` Update closes the loop.
 - **`Workflow.getVersion()` in `processing.Order`:** Place the version branch immediately before the `fulfillments.fulfillOrder()` call. Version name: `"remove-kafka-fulfillment"`. Old path = `DEFAULT_VERSION`, new path = `1`.
 - **Proto naming:** Existing Python-era messages in `workflows.proto` use names like `FulfillOrderRequest`, `Item`, `Status`. New Java messages must not reuse these names. Consider a comment block separator in the proto file marking the Java section.
 - **`margin_leak` SearchAttribute:** Call `Workflow.upsertTypedSearchAttributes(SearchAttributeKey.forDouble("margin_leak").valueSet(delta))` only when delta > 0. Never set to 0 or a negative value.
