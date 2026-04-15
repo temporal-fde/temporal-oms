@@ -4,6 +4,7 @@ import com.acme.processing.services.KafkaConsumer;
 import jakarta.annotation.PostConstruct;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.HtmlUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -28,7 +29,9 @@ public class AdminController {
     @GetMapping(value = "/order-fulfillment/{orderId}", produces = "text/html")
     public String getOrder(@PathVariable("orderId") String orderId) {
         String orderResult = kafkaConsumer.getOrder(orderId);
-        return String.format(orderTemplate, orderId, orderResult);
+        String escapedOrderId = HtmlUtils.htmlEscape(orderId);
+        String escapedOrderResult = HtmlUtils.htmlEscape(orderResult);
+        return String.format(orderTemplate, escapedOrderId, escapedOrderResult);
     }
 
 }
