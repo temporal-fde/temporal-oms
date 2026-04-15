@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package acme.fulfillment.domain.fulfillment.v1;
+
+import "google/protobuf/timestamp.proto";
+
+enum Errors {
+  ERROR_UNSPECIFIED = 0;
+  ERROR_UNAUTHORIZED = 1;
+  ERROR_FORBIDDEN = 2;
+  ERROR_BAD_REQUEST = 3;
+}
+
+// RiskLevel normalizes PredictHQ rank (0–100) into tiers the agent can reason about.
+enum RiskLevel {
+  RISK_LEVEL_UNSPECIFIED = 0;
+  RISK_LEVEL_NONE        = 1; // no notable events
+  RISK_LEVEL_LOW         = 2; // rank 1–30
+  RISK_LEVEL_MODERATE    = 3; // rank 31–60
+  RISK_LEVEL_HIGH        = 4; // rank 61–80
+  RISK_LEVEL_CRITICAL    = 5; // rank 81–100
+}
+
+// LocationEvent is a distilled event record for LLM risk reasoning.
+// Fields are chosen for semantic clarity, not API completeness.
+message LocationEvent {
+  string          id          = 1;
+  string          title       = 2;
+  optional string description = 3;
+
+  // PredictHQ category string (e.g. "severe-weather", "airport-delays", "disasters").
+  string category = 4;
+
+  // PredictHQ Rank (0–100): overall significance of the event.
+  int32          rank       = 5;
+  optional int32 local_rank = 6;
+
+  // True when the event is unscheduled/emergent:
+  // severe-weather, disasters, terror, health-warnings, airport-delays.
+  bool unscheduled = 7;
+
+  google.protobuf.Timestamp          start = 8;
+  optional google.protobuf.Timestamp end   = 9;
+}
+
+// LocationRiskSummary gives the agent a fast top-level read before
+// it reasons over individual events.
+message LocationRiskSummary {
+  RiskLevel overall_risk_level = 1;
+
+  // Rank of the single most significant event in the window (0–100).
+  int32 peak_rank = 2;
+
+  int32 total_event_count       = 3;
+  int32 unscheduled_event_count = 4;
+
+  // Count of events per PredictHQ category string
+  // (e.g. {"severe-weather": 2, "airport-delays": 1}).
+  map<string, int32> events_by_category = 5;
+}

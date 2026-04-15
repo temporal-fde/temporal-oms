@@ -1,0 +1,134 @@
+// Temporal Workflow contracts for Fulfillments namespace (Python AI Agent)
+syntax = "proto3";
+
+package acme.fulfillment.domain.fulfillment.v1;
+
+import "google/protobuf/timestamp.proto";
+
+// Order Fulfillment AI Agent Workflow
+message FulfillOrderRequest {
+  string order_id = 1;
+  string customer_id = 2;
+  repeated Item items = 3;
+  string payment_rrn = 4;
+  ShippingAddress shipping_address = 5;
+  google.protobuf.Timestamp created_at = 6;
+}
+
+message FulfillOrderResponse {
+  string order_id = 1;
+  Status status = 2;
+  ShippingDetails shipping = 3;
+  repeated AllocatedItem allocated_items = 4;
+  google.protobuf.Timestamp completed_at = 5;
+}
+
+message Item {
+  string item_id = 1;
+  string sku_id = 2;
+  string brand_code = 3;
+  int32 quantity = 4;
+}
+
+message ShippingAddress {
+  string street = 1;
+  string city = 2;
+  string state = 3;
+  string postal_code = 4;
+  string country = 5;
+}
+
+message ShippingDetails {
+  string carrier = 1;
+  string service_level = 2;
+  int64 cost_cents = 3;
+  int32 estimated_days = 4;
+  string tracking_number = 5;
+}
+
+message AllocatedItem {
+  string item_id = 1;
+  string sku_id = 2;
+  int32 quantity = 3;
+  string warehouse_id = 4;
+  string warehouse_location = 5;
+}
+
+// Activity: FindOptimalShipping (AI-powered)
+message FindOptimalShippingRequest {
+  ShippingAddress destination = 1;
+  repeated Item items = 2;
+  int32 max_cost_cents = 3;
+  int32 max_days = 4;
+}
+
+message FindOptimalShippingResponse {
+  repeated ShippingOption options = 1;
+  ShippingOption recommended = 2;  // AI-selected
+  string reasoning = 3;  // LLM explanation
+}
+
+message ShippingOption {
+  string carrier = 1;
+  string service_level = 2;
+  int64 cost_cents = 3;
+  int32 estimated_days = 4;
+  double score = 5;  // AI-computed score
+}
+
+// Activity: AllocateInventory
+message AllocateInventoryRequest {
+  repeated Item items = 1;
+  ShippingAddress destination = 2;
+}
+
+message AllocateInventoryResponse {
+  repeated AllocatedItem allocations = 1;
+  bool fully_allocated = 2;
+  repeated string warnings = 3;
+}
+
+// Activity: FindClosestWarehouse
+message FindClosestWarehouseRequest {
+  string sku_id = 1;
+  int32 quantity = 2;
+  ShippingAddress destination = 3;
+}
+
+message FindClosestWarehouseResponse {
+  string warehouse_id = 1;
+  string warehouse_location = 2;
+  int32 available_quantity = 3;
+  double distance_km = 4;
+}
+
+// Kafka Output Message
+message FulfilledOrderEvent {
+  string customer_id = 1;
+  string order_id = 2;
+  PaymentDetails payment_details = 3;
+  repeated ItemOutput items = 4;
+  ShippingDetails shipping = 5;
+  google.protobuf.Timestamp fulfilled_at = 6;
+}
+
+message PaymentDetails {
+  string rrn = 1;
+}
+
+message ItemOutput {
+  string item_id = 1;
+  string sku_id = 2;
+  string brand_code = 3;
+  int32 quantity = 4;
+  string warehouse_id = 5;
+}
+
+enum Status {
+  STATUS_UNSPECIFIED = 0;
+  STATUS_PENDING = 1;
+  STATUS_ALLOCATING = 2;
+  STATUS_SHIPPING_SELECTED = 3;
+  STATUS_COMPLETED = 4;
+  STATUS_FAILED = 5;
+}

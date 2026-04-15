@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Setup Temporal namespaces and Nexus endpoints for local development
-# Creates 'apps' and 'processing' namespaces with cross-namespace Nexus endpoints
+# Creates 'apps', 'processing', and 'fulfillment' namespaces with cross-namespace Nexus endpoints
 
 set -e
 
@@ -29,6 +29,10 @@ echo "Creating namespace: processing"
 
 temporal operator namespace create --namespace processing
 
+# Create fulfillment namespace
+echo "Creating namespace: fulfillment"
+temporal operator namespace create --namespace fulfillment
+
 echo ""
 echo "Setting 'processing' Worker Deployment to as build-id='local'"
 echo ""
@@ -37,6 +41,15 @@ temporal worker deployment set-current-version \
   --build-id local \
   --allow-no-pollers \
   --namespace processing
+
+echo ""
+echo "Setting 'fulfillment' Worker Deployment to as build-id='local'"
+echo ""
+temporal worker deployment set-current-version \
+  --deployment-name fulfillment \
+  --build-id local \
+  --allow-no-pollers \
+  --namespace fulfillment
 
 echo ""
 echo "Registering Nexus endpoints..."
@@ -73,5 +86,7 @@ echo ""
 echo "✓ Setup complete!"
 echo ""
 echo "To run workers with these namespaces:"
-echo "  export TEMPORAL_NAMESPACE=apps"
+echo "  export TEMPORAL_NAMESPACE=apps        # Java apps worker"
+echo "  export TEMPORAL_NAMESPACE=processing   # Java processing worker"
+echo "  export TEMPORAL_NAMESPACE=fulfillment # Python fulfillment worker"
 echo "  export TEMPORAL_ADDRESS=localhost:7233"

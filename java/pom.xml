@@ -18,6 +18,7 @@
         <module>apps</module>
         <module>processing</module>
         <module>enablements</module>
+        <module>fulfillment</module>
         <module>generated</module>
     </modules>
 
