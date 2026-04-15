@@ -87,7 +87,13 @@ Provide feedback in PROGRESS.md → Feedback Items section.
 
 ## Current Specs
 
-### 🆕 Worker Version Enablement
+### 🆕 fulfillment.Order Workflow
+- **Status:** Draft — Awaiting Tech Lead Review
+- **Goal:** Replace Kafka fulfillment path with durable Temporal workflow; add address validation, inventory holds, versioned shipping, delivery tracking
+- **Owner:** Engineering Team
+- **Next:** Tech lead review — resolve ShippingAgent (Nexus vs. Child WF) and open questions (see PROGRESS.md)
+
+### Worker Version Enablement
 - **Status:** Draft - Ready for Review
 - **Goal:** Generate load + deploy worker versions + validate zero failures
 - **Owner:** [Your Name]
