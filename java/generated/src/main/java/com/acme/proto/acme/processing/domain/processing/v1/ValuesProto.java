@@ -36,16 +36,17 @@ public final class ValuesProto extends com.google.protobuf.GeneratedFile {
   static {
     java.lang.String[] descriptorData = {
       "\n&acme/processing/domain/v1/values.proto" +
-      "\022$acme.processing.domain.processing.v1*b" +
+      "\022$acme.processing.domain.processing.v1*z" +
       "\n\006Errors\022\026\n\022ERRORS_UNSPECIFIED\020\000\022\034\n\030ERRO" +
       "RS_INVALID_ARGUMENTS\020\001\022\"\n\036ERRORS_ORDER_V" +
-      "ALIDATION_FAILED\020\002B\367\001\n3com.acme.proto.ac" +
-      "me.processing.domain.processing.v1B\013Valu" +
-      "esProtoP\001\242\002\004APDP\252\002$Acme.Processing.Domai" +
-      "n.Processing.V1\312\002$Acme\\Processing\\Domain" +
-      "\\Processing\\V1\342\0020Acme\\Processing\\Domain\\" +
-      "Processing\\V1\\GPBMetadata\352\002(Acme::Proces" +
-      "sing::Domain::Processing::V1b\006proto3"
+      "ALIDATION_FAILED\020\002\022\026\n\022ERRORS_KAFKA_ERROR" +
+      "\020\003B\367\001\n3com.acme.proto.acme.processing.do" +
+      "main.processing.v1B\013ValuesProtoP\001\242\002\004APDP" +
+      "\252\002$Acme.Processing.Domain.Processing.V1\312" +
+      "\002$Acme\\Processing\\Domain\\Processing\\V1\342\002" +
+      "0Acme\\Processing\\Domain\\Processing\\V1\\GP" +
+      "BMetadata\352\002(Acme::Processing::Domain::Pr" +
+      "ocessing::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
