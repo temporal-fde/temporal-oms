@@ -49,6 +49,13 @@ public class OrderImpl implements Order {
 
     }
 
+    // TODO(fulfillment-order): Adopt Worker Versioning for the 'apps' task queue.
+    // A new build-id version of this workflow will:
+    //   1. Call validateOrder Nexus operation to fulfillment.Order (in execute(), right before processOrder,
+    //      after both submitOrder + capturePayment inputs are accumulated)
+    //   2. Call fulfillOrder Update on fulfillment.Order after processOrder completes successfully
+    // K8s/worker deployment changes for this version are tracked in a separate spec.
+    // See: specs/fulfillment-order/fulfillment-order-workflow/spec.md — Phase 5
     @Override
     public void execute(CompleteOrderRequest request) {
         logger.info("Starting CompleteOrder Workflow {} - {}", request, state.hasOptions());

@@ -87,11 +87,26 @@ Provide feedback in PROGRESS.md → Feedback Items section.
 
 ## Current Specs
 
-### 🆕 fulfillment.Order Workflow
+### 🆕 fulfillment.Order (initiative)
+
+#### fulfillment.Order Workflow
 - **Status:** Draft — Awaiting Tech Lead Review
 - **Goal:** Replace Kafka fulfillment path with durable Temporal workflow; add address validation, inventory holds, versioned shipping, delivery tracking
-- **Owner:** Engineering Team
-- **Next:** Tech lead review — resolve ShippingAgent (Nexus vs. Child WF) and open questions (see PROGRESS.md)
+- **Owner:** Temporal FDE Team
+- **Spec:** `specs/fulfillment-order/fulfillment-order-workflow/`
+- **Next:** Tech lead review; open questions in PROGRESS.md
+
+#### ShippingAgent
+- **Status:** Stub — Not Started
+- **Goal:** AI-powered carrier rate selection called by `fulfillment.Order` V2 via Nexus
+- **Owner:** Temporal FDE Team
+- **Spec:** `specs/fulfillment-order/shipping-agent/`
+- **Next:** Answer open questions before writing full spec
+
+#### Deployment (k8s / Worker Versioning rollout)
+- **Status:** Not Started — follow-up spec
+- **Goal:** K8s deployment changes for `fulfillment-workers`, Worker Versioning rollout for `apps` and `processing` task queues
+- **Next:** Spec to be written after fulfillment-order-workflow spec is approved
 
 ### Worker Version Enablement
 - **Status:** Draft - Ready for Review
