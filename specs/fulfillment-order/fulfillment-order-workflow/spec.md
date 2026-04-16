@@ -33,7 +33,7 @@ The workflow is developed in the `fulfillment` bounded context at `https://githu
 - Goal 2: `apps.Order` starts `fulfillment.Order` via a `validateOrder` Nexus operation early in the order lifecycle, enabling address validation concurrent with processing
 - Goal 3: Inventory holds are placed eagerly and reliably released via a detached compensation scope on `cancelOrder` Signal or timeout
 - Goal 4: Shipping rate revalidation with margin comparison on `fulfillOrder`, with a `margin_leak` SearchAttribute for cost-over-margin reporting
-- Goal 5: V1 and V2 shipping validation paths are clearly separated by `Workflow.getVersion()` so replay safety is preserved
+- Goal 5: V1 and V2 shipping validation paths are cleanly separated by Worker Versioning build-ids — no `getVersion()` branching needed in `fulfillment.Order` because it has no pre-existing history to bridge
 - Goal 6: Worker Versioning governs the rollout in `apps` and `processing` namespaces with zero impact on in-flight workflows
 
 ### Acceptance Criteria
@@ -141,7 +141,7 @@ fulfillment.Order (fulfillment namespace)
 - **Early fulfillment start via Nexus:** `apps.Order` triggers `fulfillment.Order` as soon as order data is available, before processing completes — address validation runs concurrently with enrichment
 - **Worker Versioning-gated rollout:** Both `apps.Order` and `processing.Order` adopt new behavior via new build-ids; old in-flight workflows are unaffected
 - **Reliable inventory compensation:** Detached scope releases the hold regardless of how (cancel, timeout, error) the workflow ends before fulfillment
-- **Versioned shipping validation:** V1 (DeliveryService) and V2 (ShippingAgent via Nexus) separated by `Workflow.getVersion()` — safe to replay across versions
+- **Versioned shipping validation:** V1 (DeliveryService) and V2 (ShippingAgent via Nexus) separated by Worker Versioning build-ids — old PINNED workflows complete on V1 workers, new workflows pick up V2 behavior cleanly
 - **`margin_leak` observability:** Over-margin shipping cost delta is queryable in Temporal UI and reportable in downstream analytics
 - **Concurrent label print + inventory deduction:** Reduces fulfillment latency by parallelizing independent terminal activities
 - **Delivery status lifecycle:** `notifyDeliveryStatus` Signal closes the loop between the carrier and the OMS
@@ -401,8 +401,7 @@ Deferred; depends on the separate `ShippingAgent` spec being approved and implem
 
 Deliverables:
 - [ ] Wire `fulfillment.Order` `fulfillOrder` handler to call `ShippingAgent` via Nexus operation (per ShippingAgent spec)
-- [ ] Add `Workflow.getVersion("shipping-v2", DEFAULT_VERSION, 1)` branch in `fulfillOrder` handler to keep V1 path intact for in-flight workflows
-- [ ] Replay test: start with V1 history, apply V2 code — no `NonDeterminismException`
+- [ ] Deploy `fulfillment-workers` with new V2 build-id; mark as default via Worker Versioning — V1 PINNED workflows complete unaffected on old workers, no `getVersion()` branching needed
 
 ### Critical Files / Modules
 
@@ -453,8 +452,8 @@ Deliverables:
 
 ### Workflow Versioning Tests (Phase 7)
 
-- Replay V1 `fulfillment.Order` history with V2 code: no `NonDeterminismException`
 - `processing.Order`: replay old history (pre-version branch) with new code: old path preserved
+- `fulfillment.Order` V2: no replay test needed — PINNED V1 workflows complete on V1 workers; V2 build-id is a clean new deployment
 
 ### Validation Checklist
 

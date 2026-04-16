@@ -1,20 +1,45 @@
 # ShippingAgent — Progress Tracking
 
-**Feature:** `ShippingAgent` — AI-Powered Carrier Rate Selection
-**Status:** 📋 Stub — Not Started
+**Feature:** `ShippingAgent` — AI-Powered Shipping Rate Selection
+**Status:** 📋 Draft — Ready for Review
 **Owner:** Temporal FDE Team
 **Created:** 2026-04-15
+**Updated:** 2026-04-15
 
 ---
 
-## Current Status
+## Phase Status
 
-Spec not yet written. Blocked on open questions (see spec.md).
+| Phase | Description | Status | Blocking On |
+|-------|-------------|--------|-------------|
+| Phase 1 | Proto Schema | ⏳ Not started | — |
+| Phase 2 | Activity Implementations | ⏳ Not started | Phase 1 |
+| Phase 3 | ShippingAgent Workflow + Agentic Loop | ⏳ Not started | Phase 2 |
+| Phase 4 | Nexus Handler + `fulfillment.Order` V2 Wiring | ⏳ Not started | Phase 3 + `fulfillment.Order` Phase 3–4 complete |
+| Phase 5 | Workshop Scenarios + Demo Scripts | ⏳ Not started | Phase 4 |
 
-This spec is a dependency for `fulfillment.Order` Phase 7 (V2 shipping path).
+---
 
-## Next Steps
+## Open Questions
 
-1. Answer open questions with tech lead / product
-2. Write full spec using `specs/TEMPLATE.md`
-3. Request tech lead review
+| Question | Needed By | Status |
+|----------|-----------|--------|
+| PredictHQ `within_km` default for Workshop demos | Phase 2 | ⏳ Open (suggest 50km) |
+| Default `cache_ttl_secs` | Phase 3 | ⏳ Open (suggest 3600) |
+| `SLA_BREACH` — signal support from ShippingAgent or return to `fulfillment.Order`? | Phase 3 | ✅ Resolved: return to `fulfillment.Order`; agent recommends, caller decides |
+
+---
+
+## Dependencies
+
+- **Inventory Locations spec** — must exist before `lookup_inventory_location` has real data to query. V1 workaround: static config seed.
+- **`fulfillment.Order` Phases 3–4 complete** — required before Phase 4 (Nexus wiring into `fulfillment.Order` V2)
+
+---
+
+## Revision History
+
+| Date | Author | Change |
+|------|--------|--------|
+| 2026-04-15 | Temporal FDE Team | Initial stub |
+| 2026-04-15 | Temporal FDE Team | Full spec written; all design questions resolved |
