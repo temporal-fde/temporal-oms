@@ -24,8 +24,8 @@
 
 | Question | Needed By | Status |
 |----------|-----------|--------|
-| PredictHQ `within_km` default for Workshop demos | Phase 2 | ⏳ Open (suggest 50km) |
-| Default `cache_ttl_secs` | Phase 3 | ⏳ Open (suggest 3600) |
+| PredictHQ `within_km` default for Workshop demos | Phase 2 | ✅ Resolved: 50km |
+| Default `cache_ttl_secs` | Phase 3 | ✅ Resolved: 1800 (30 minutes) |
 | `SLA_BREACH` — signal support from ShippingAgent or return to `fulfillment.Order`? | Phase 3 | ✅ Resolved: return to `fulfillment.Order`; agent recommends, caller decides |
 
 ---

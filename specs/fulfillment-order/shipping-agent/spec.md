@@ -469,11 +469,11 @@ added in Phase 1 alongside the `shipping_agent.proto` changes.
 
 ## Open Questions
 
-All prior open questions resolved during design discussion. Remaining:
+All open questions resolved:
 
-- [ ] What is the PredictHQ `within_km` radius default for Workshop demos? (suggest 50km)
-- [ ] What is the default `cache_ttl_secs`? (suggest 3600 — 1 hour)
-- [ ] Should `SLA_BREACH` signal a support workflow directly from `ShippingAgent`, or return the outcome and let `fulfillment.Order` decide? (current design: ShippingAgent returns, `fulfillment.Order` decides — consistent with "recommends, not decides" principle)
+- [x] What is the PredictHQ `within_km` radius default for Workshop demos? **50km**
+- [x] What is the default `cache_ttl_secs`? **1800 (30 minutes)**
+- [x] Should `SLA_BREACH` signal a support workflow directly from `ShippingAgent`, or return the outcome and let `fulfillment.Order` decide? **`fulfillment.Order` handles it** — ShippingAgent returns the `SLA_BREACH` outcome; `fulfillment.Order` decides what to do (consistent with "recommends, not decides" principle)
 
 ---
 
