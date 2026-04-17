@@ -351,6 +351,20 @@ Proto definitions are the source of truth. This section describes intent only.
 **`StartShippingAgentRequest`** — extend `ShippingAgentExecutionOptions` with:
 - `cache_ttl_secs`: optional int64
 
+#### `proto/acme/common/v1/llm.proto` — new file
+
+Vendor-agnostic LLM message types shared across any service that calls an LLM. Defined in
+`common/v1` so they can be reused by future services without importing `shipping_agent.proto`.
+
+- `LlmTextBlock`: `text: string`
+- `LlmToolUseBlock`: `id: string`, `name: string`, `input: google.protobuf.Struct` (generates `Dict[str, Any]` in Pydantic)
+- `LlmToolResultBlock`: `tool_use_id: string`, `content: string`
+- `LlmContentBlock`: `type: string` (discriminator: `"text"` | `"tool_use"` | `"tool_result"`), `text: LlmTextBlock`, `tool_use: LlmToolUseBlock`, `tool_result: LlmToolResultBlock`
+  - **No `oneof`** — `protobuf-to-pydantic` assigns `default_factory` to every message field in a `oneof`, making all fields non-None and field-presence discrimination impossible. The `type` string is set explicitly by `call_llm` and checked in the agentic loop.
+- `LlmMessage`: `role: LlmRole enum (USER | ASSISTANT)`, `content: repeated LlmContentBlock`
+- `LlmResponse`: `content: repeated LlmContentBlock`, `stop_reason: LlmStopReason enum (END_TURN | TOOL_USE)`
+- `LlmToolDefinition`: `name: string`, `description: string`, `input_schema: google.protobuf.Struct` (JSON Schema as dict)
+
 #### `proto/acme/common/v1/values.proto` — extension needed
 
 `EasyPostAddress` needs a `coordinate` field (`common.Coordinate` lat/lng) — EasyPost returns
