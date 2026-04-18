@@ -7,7 +7,7 @@ package com.acme.proto.acme.fulfillment.domain.fulfillment.v1;
 
 /**
  * <pre>
- * LocationRiskSummary gives the agent a fast top-level read before
+ * LocationRiskSummary gives the agent a fast top-level read   before
  * it reasons over individual events.
  * </pre>
  *
@@ -431,7 +431,7 @@ private static final long serialVersionUID = 0L;
   }
   /**
    * <pre>
-   * LocationRiskSummary gives the agent a fast top-level read before
+   * LocationRiskSummary gives the agent a fast top-level read   before
    * it reasons over individual events.
    * </pre>
    *
