@@ -112,5 +112,12 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- EasyPost -->
+        <dependency>
+            <groupId>com.easypost</groupId>
+            <artifactId>easypost-api-client</artifactId>
+            <version>8.7.0</version>
+        </dependency>
     </dependencies>
 </project>

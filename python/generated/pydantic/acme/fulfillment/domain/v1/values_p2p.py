@@ -15,6 +15,7 @@ class Errors(IntEnum):
     ERROR_UNAUTHORIZED = 1
     ERROR_FORBIDDEN = 2
     ERROR_BAD_REQUEST = 3
+    ERROR_ADDRESS_VERIFY_FAILED = 4
 
 
 class RiskLevel(IntEnum):
@@ -50,7 +51,7 @@ class LocationEvent(BaseModel):
 
 class LocationRiskSummary(BaseModel):
     """
-     LocationRiskSummary gives the agent a fast top-level read before
+     LocationRiskSummary gives the agent a fast top-level read   before
  it reasons over individual events.
     """
 
