@@ -9,4 +9,49 @@ package com.acme.proto.acme.fulfillment.domain.fulfillment.v1;
 public interface CalculateShippingOptionsResponseOrBuilder extends
     // @@protoc_insertion_point(interface_extends:acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse)
     com.google.protobuf.MessageOrBuilder {
+
+  /**
+   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation recommendation = 1 [json_name = "recommendation"];</code>
+   * @return Whether the recommendation field is set.
+   */
+  boolean hasRecommendation();
+  /**
+   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation recommendation = 1 [json_name = "recommendation"];</code>
+   * @return The recommendation.
+   */
+  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation getRecommendation();
+  /**
+   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation recommendation = 1 [json_name = "recommendation"];</code>
+   */
+  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendationOrBuilder getRecommendationOrBuilder();
+
+  /**
+   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 2 [json_name = "options"];</code>
+   */
+  java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption> 
+      getOptionsList();
+  /**
+   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 2 [json_name = "options"];</code>
+   */
+  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption getOptions(int index);
+  /**
+   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 2 [json_name = "options"];</code>
+   */
+  int getOptionsCount();
+  /**
+   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 2 [json_name = "options"];</code>
+   */
+  java.util.List<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionOrBuilder> 
+      getOptionsOrBuilderList();
+  /**
+   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 2 [json_name = "options"];</code>
+   */
+  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionOrBuilder getOptionsOrBuilder(
+      int index);
+
+  /**
+   * <code>bool cache_hit = 3 [json_name = "cacheHit"];</code>
+   * @return The cacheHit.
+   */
+  boolean getCacheHit();
 }

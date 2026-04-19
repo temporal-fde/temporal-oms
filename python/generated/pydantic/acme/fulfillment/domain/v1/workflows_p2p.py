@@ -96,7 +96,11 @@ class FindOptimalShippingRequest(BaseModel):
     max_cost_cents: int = Field(default=0)
     max_days: int = Field(default=0)
 
-class ShippingOption(BaseModel):
+class ShippingOptionLegacy(BaseModel):
+    """
+     ShippingOptionLegacy is the Python-era shipping option; superseded by ShippingOption in shipping_agent.proto.
+    """
+
     carrier: str = Field(default="")
     service_level: str = Field(default="")
     cost_cents: int = Field(default=0)
@@ -104,8 +108,8 @@ class ShippingOption(BaseModel):
     score: float = Field(default=0.0)# AI-computed score
 
 class FindOptimalShippingResponse(BaseModel):
-    options: typing.List[ShippingOption] = Field(default_factory=list)
-    recommended: ShippingOption = Field(default_factory=ShippingOption)# AI-selected
+    options: typing.List[ShippingOptionLegacy] = Field(default_factory=list)
+    recommended: ShippingOptionLegacy = Field(default_factory=ShippingOptionLegacy)# AI-selected
     reasoning: str = Field(default="")# LLM explanation
 
 class AllocateInventoryRequest(BaseModel):

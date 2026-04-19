@@ -54,6 +54,7 @@ private static final long serialVersionUID = 0L;
             com.acme.proto.acme.common.v1.EasyPostAddress.class, com.acme.proto.acme.common.v1.EasyPostAddress.Builder.class);
   }
 
+  private int bitField0_;
   public static final int ID_FIELD_NUMBER = 1;
   @SuppressWarnings("serial")
   private volatile java.lang.Object id_ = "";
@@ -127,6 +128,44 @@ private static final long serialVersionUID = 0L;
     return verified_;
   }
 
+  public static final int COORDINATE_FIELD_NUMBER = 4;
+  private com.acme.proto.acme.common.v1.Coordinate coordinate_;
+  /**
+   * <pre>
+   * lat/lng from EasyPost verification; required by get_location_events
+   * </pre>
+   *
+   * <code>optional .acme.common.v1.Coordinate coordinate = 4 [json_name = "coordinate"];</code>
+   * @return Whether the coordinate field is set.
+   */
+  @java.lang.Override
+  public boolean hasCoordinate() {
+    return ((bitField0_ & 0x00000001) != 0);
+  }
+  /**
+   * <pre>
+   * lat/lng from EasyPost verification; required by get_location_events
+   * </pre>
+   *
+   * <code>optional .acme.common.v1.Coordinate coordinate = 4 [json_name = "coordinate"];</code>
+   * @return The coordinate.
+   */
+  @java.lang.Override
+  public com.acme.proto.acme.common.v1.Coordinate getCoordinate() {
+    return coordinate_ == null ? com.acme.proto.acme.common.v1.Coordinate.getDefaultInstance() : coordinate_;
+  }
+  /**
+   * <pre>
+   * lat/lng from EasyPost verification; required by get_location_events
+   * </pre>
+   *
+   * <code>optional .acme.common.v1.Coordinate coordinate = 4 [json_name = "coordinate"];</code>
+   */
+  @java.lang.Override
+  public com.acme.proto.acme.common.v1.CoordinateOrBuilder getCoordinateOrBuilder() {
+    return coordinate_ == null ? com.acme.proto.acme.common.v1.Coordinate.getDefaultInstance() : coordinate_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -150,6 +189,9 @@ private static final long serialVersionUID = 0L;
     if (verified_ != false) {
       output.writeBool(3, verified_);
     }
+    if (((bitField0_ & 0x00000001) != 0)) {
+      output.writeMessage(4, getCoordinate());
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -169,6 +211,10 @@ private static final long serialVersionUID = 0L;
     if (verified_ != false) {
       size += com.google.protobuf.CodedOutputStream
         .computeBoolSize(3, verified_);
+    }
+    if (((bitField0_ & 0x00000001) != 0)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(4, getCoordinate());
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -191,6 +237,11 @@ private static final long serialVersionUID = 0L;
         != other.getResidential()) return false;
     if (getVerified()
         != other.getVerified()) return false;
+    if (hasCoordinate() != other.hasCoordinate()) return false;
+    if (hasCoordinate()) {
+      if (!getCoordinate()
+          .equals(other.getCoordinate())) return false;
+    }
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -210,6 +261,10 @@ private static final long serialVersionUID = 0L;
     hash = (37 * hash) + VERIFIED_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
         getVerified());
+    if (hasCoordinate()) {
+      hash = (37 * hash) + COORDINATE_FIELD_NUMBER;
+      hash = (53 * hash) + getCoordinate().hashCode();
+    }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -334,13 +389,19 @@ private static final long serialVersionUID = 0L;
 
     // Construct using com.acme.proto.acme.common.v1.EasyPostAddress.newBuilder()
     private Builder() {
-
+      maybeForceBuilderInitialization();
     }
 
     private Builder(
         com.google.protobuf.GeneratedMessage.BuilderParent parent) {
       super(parent);
-
+      maybeForceBuilderInitialization();
+    }
+    private void maybeForceBuilderInitialization() {
+      if (com.google.protobuf.GeneratedMessage
+              .alwaysUseFieldBuilders) {
+        internalGetCoordinateFieldBuilder();
+      }
     }
     @java.lang.Override
     public Builder clear() {
@@ -349,6 +410,11 @@ private static final long serialVersionUID = 0L;
       id_ = "";
       residential_ = false;
       verified_ = false;
+      coordinate_ = null;
+      if (coordinateBuilder_ != null) {
+        coordinateBuilder_.dispose();
+        coordinateBuilder_ = null;
+      }
       return this;
     }
 
@@ -391,6 +457,14 @@ private static final long serialVersionUID = 0L;
       if (((from_bitField0_ & 0x00000004) != 0)) {
         result.verified_ = verified_;
       }
+      int to_bitField0_ = 0;
+      if (((from_bitField0_ & 0x00000008) != 0)) {
+        result.coordinate_ = coordinateBuilder_ == null
+            ? coordinate_
+            : coordinateBuilder_.build();
+        to_bitField0_ |= 0x00000001;
+      }
+      result.bitField0_ |= to_bitField0_;
     }
 
     @java.lang.Override
@@ -415,6 +489,9 @@ private static final long serialVersionUID = 0L;
       }
       if (other.getVerified() != false) {
         setVerified(other.getVerified());
+      }
+      if (other.hasCoordinate()) {
+        mergeCoordinate(other.getCoordinate());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -457,6 +534,13 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000004;
               break;
             } // case 24
+            case 34: {
+              input.readMessage(
+                  internalGetCoordinateFieldBuilder().getBuilder(),
+                  extensionRegistry);
+              bitField0_ |= 0x00000008;
+              break;
+            } // case 34
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -640,6 +724,163 @@ private static final long serialVersionUID = 0L;
       verified_ = false;
       onChanged();
       return this;
+    }
+
+    private com.acme.proto.acme.common.v1.Coordinate coordinate_;
+    private com.google.protobuf.SingleFieldBuilder<
+        com.acme.proto.acme.common.v1.Coordinate, com.acme.proto.acme.common.v1.Coordinate.Builder, com.acme.proto.acme.common.v1.CoordinateOrBuilder> coordinateBuilder_;
+    /**
+     * <pre>
+     * lat/lng from EasyPost verification; required by get_location_events
+     * </pre>
+     *
+     * <code>optional .acme.common.v1.Coordinate coordinate = 4 [json_name = "coordinate"];</code>
+     * @return Whether the coordinate field is set.
+     */
+    public boolean hasCoordinate() {
+      return ((bitField0_ & 0x00000008) != 0);
+    }
+    /**
+     * <pre>
+     * lat/lng from EasyPost verification; required by get_location_events
+     * </pre>
+     *
+     * <code>optional .acme.common.v1.Coordinate coordinate = 4 [json_name = "coordinate"];</code>
+     * @return The coordinate.
+     */
+    public com.acme.proto.acme.common.v1.Coordinate getCoordinate() {
+      if (coordinateBuilder_ == null) {
+        return coordinate_ == null ? com.acme.proto.acme.common.v1.Coordinate.getDefaultInstance() : coordinate_;
+      } else {
+        return coordinateBuilder_.getMessage();
+      }
+    }
+    /**
+     * <pre>
+     * lat/lng from EasyPost verification; required by get_location_events
+     * </pre>
+     *
+     * <code>optional .acme.common.v1.Coordinate coordinate = 4 [json_name = "coordinate"];</code>
+     */
+    public Builder setCoordinate(com.acme.proto.acme.common.v1.Coordinate value) {
+      if (coordinateBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        coordinate_ = value;
+      } else {
+        coordinateBuilder_.setMessage(value);
+      }
+      bitField0_ |= 0x00000008;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * lat/lng from EasyPost verification; required by get_location_events
+     * </pre>
+     *
+     * <code>optional .acme.common.v1.Coordinate coordinate = 4 [json_name = "coordinate"];</code>
+     */
+    public Builder setCoordinate(
+        com.acme.proto.acme.common.v1.Coordinate.Builder builderForValue) {
+      if (coordinateBuilder_ == null) {
+        coordinate_ = builderForValue.build();
+      } else {
+        coordinateBuilder_.setMessage(builderForValue.build());
+      }
+      bitField0_ |= 0x00000008;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * lat/lng from EasyPost verification; required by get_location_events
+     * </pre>
+     *
+     * <code>optional .acme.common.v1.Coordinate coordinate = 4 [json_name = "coordinate"];</code>
+     */
+    public Builder mergeCoordinate(com.acme.proto.acme.common.v1.Coordinate value) {
+      if (coordinateBuilder_ == null) {
+        if (((bitField0_ & 0x00000008) != 0) &&
+          coordinate_ != null &&
+          coordinate_ != com.acme.proto.acme.common.v1.Coordinate.getDefaultInstance()) {
+          getCoordinateBuilder().mergeFrom(value);
+        } else {
+          coordinate_ = value;
+        }
+      } else {
+        coordinateBuilder_.mergeFrom(value);
+      }
+      if (coordinate_ != null) {
+        bitField0_ |= 0x00000008;
+        onChanged();
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * lat/lng from EasyPost verification; required by get_location_events
+     * </pre>
+     *
+     * <code>optional .acme.common.v1.Coordinate coordinate = 4 [json_name = "coordinate"];</code>
+     */
+    public Builder clearCoordinate() {
+      bitField0_ = (bitField0_ & ~0x00000008);
+      coordinate_ = null;
+      if (coordinateBuilder_ != null) {
+        coordinateBuilder_.dispose();
+        coordinateBuilder_ = null;
+      }
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * lat/lng from EasyPost verification; required by get_location_events
+     * </pre>
+     *
+     * <code>optional .acme.common.v1.Coordinate coordinate = 4 [json_name = "coordinate"];</code>
+     */
+    public com.acme.proto.acme.common.v1.Coordinate.Builder getCoordinateBuilder() {
+      bitField0_ |= 0x00000008;
+      onChanged();
+      return internalGetCoordinateFieldBuilder().getBuilder();
+    }
+    /**
+     * <pre>
+     * lat/lng from EasyPost verification; required by get_location_events
+     * </pre>
+     *
+     * <code>optional .acme.common.v1.Coordinate coordinate = 4 [json_name = "coordinate"];</code>
+     */
+    public com.acme.proto.acme.common.v1.CoordinateOrBuilder getCoordinateOrBuilder() {
+      if (coordinateBuilder_ != null) {
+        return coordinateBuilder_.getMessageOrBuilder();
+      } else {
+        return coordinate_ == null ?
+            com.acme.proto.acme.common.v1.Coordinate.getDefaultInstance() : coordinate_;
+      }
+    }
+    /**
+     * <pre>
+     * lat/lng from EasyPost verification; required by get_location_events
+     * </pre>
+     *
+     * <code>optional .acme.common.v1.Coordinate coordinate = 4 [json_name = "coordinate"];</code>
+     */
+    private com.google.protobuf.SingleFieldBuilder<
+        com.acme.proto.acme.common.v1.Coordinate, com.acme.proto.acme.common.v1.Coordinate.Builder, com.acme.proto.acme.common.v1.CoordinateOrBuilder> 
+        internalGetCoordinateFieldBuilder() {
+      if (coordinateBuilder_ == null) {
+        coordinateBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+            com.acme.proto.acme.common.v1.Coordinate, com.acme.proto.acme.common.v1.Coordinate.Builder, com.acme.proto.acme.common.v1.CoordinateOrBuilder>(
+                getCoordinate(),
+                getParentForChildren(),
+                isClean());
+        coordinate_ = null;
+      }
+      return coordinateBuilder_;
     }
 
     // @@protoc_insertion_point(builder_scope:acme.common.v1.EasyPostAddress)

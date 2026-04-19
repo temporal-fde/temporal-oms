@@ -157,12 +157,12 @@ class FindOptimalShippingResponse(_message.Message):
     OPTIONS_FIELD_NUMBER: _ClassVar[int]
     RECOMMENDED_FIELD_NUMBER: _ClassVar[int]
     REASONING_FIELD_NUMBER: _ClassVar[int]
-    options: _containers.RepeatedCompositeFieldContainer[ShippingOption]
-    recommended: ShippingOption
+    options: _containers.RepeatedCompositeFieldContainer[ShippingOptionLegacy]
+    recommended: ShippingOptionLegacy
     reasoning: str
-    def __init__(self, options: _Optional[_Iterable[_Union[ShippingOption, _Mapping]]] = ..., recommended: _Optional[_Union[ShippingOption, _Mapping]] = ..., reasoning: _Optional[str] = ...) -> None: ...
+    def __init__(self, options: _Optional[_Iterable[_Union[ShippingOptionLegacy, _Mapping]]] = ..., recommended: _Optional[_Union[ShippingOptionLegacy, _Mapping]] = ..., reasoning: _Optional[str] = ...) -> None: ...
 
-class ShippingOption(_message.Message):
+class ShippingOptionLegacy(_message.Message):
     __slots__ = ("carrier", "service_level", "cost_cents", "estimated_days", "score")
     CARRIER_FIELD_NUMBER: _ClassVar[int]
     SERVICE_LEVEL_FIELD_NUMBER: _ClassVar[int]

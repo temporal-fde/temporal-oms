@@ -8,8 +8,7 @@ package com.acme.proto.acme.fulfillment.domain.fulfillment.v1;
 /**
  * <pre>
  * The Shipping Agent (Workflow) args
- * Right now, we can think of this agent as correlating to a Customer
- * but it is plausible we would get better spread out of having a WorkflowID of `Coordinate`.
+ * WorkflowID is customer_id — one long-running agent per customer, caching across calls.
  * </pre>
  *
  * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.StartShippingAgentRequest}
@@ -296,8 +295,7 @@ private static final long serialVersionUID = 0L;
   /**
    * <pre>
    * The Shipping Agent (Workflow) args
-   * Right now, we can think of this agent as correlating to a Customer
-   * but it is plausible we would get better spread out of having a WorkflowID of `Coordinate`.
+   * WorkflowID is customer_id — one long-running agent per customer, caching across calls.
    * </pre>
    *
    * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.StartShippingAgentRequest}

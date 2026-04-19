@@ -9,4 +9,23 @@ package com.acme.proto.acme.fulfillment.domain.fulfillment.v1;
 public interface ShippingAgentExecutionOptionsOrBuilder extends
     // @@protoc_insertion_point(interface_extends:acme.fulfillment.domain.fulfillment.v1.ShippingAgentExecutionOptions)
     com.google.protobuf.MessageOrBuilder {
+
+  /**
+   * <pre>
+   * default 1800 (30 minutes)
+   * </pre>
+   *
+   * <code>optional int64 cache_ttl_secs = 1 [json_name = "cacheTtlSecs"];</code>
+   * @return Whether the cacheTtlSecs field is set.
+   */
+  boolean hasCacheTtlSecs();
+  /**
+   * <pre>
+   * default 1800 (30 minutes)
+   * </pre>
+   *
+   * <code>optional int64 cache_ttl_secs = 1 [json_name = "cacheTtlSecs"];</code>
+   * @return The cacheTtlSecs.
+   */
+  long getCacheTtlSecs();
 }

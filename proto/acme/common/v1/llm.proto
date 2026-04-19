@@ -1,0 +1,73 @@
+// Vendor-agnostic LLM message types shared across any service that calls an LLM.
+// Defined in common/v1 for reuse without importing domain-specific protos.
+syntax = "proto3";
+
+package acme.common.v1;
+
+import "google/protobuf/struct.proto";
+
+// LlmRole identifies the author of a conversation message.
+enum LlmRole {
+  LLM_ROLE_UNSPECIFIED = 0;
+  LLM_ROLE_USER        = 1;
+  LLM_ROLE_ASSISTANT   = 2;
+}
+
+// LlmStopReason indicates why the model stopped generating.
+enum LlmStopReason {
+  LLM_STOP_REASON_UNSPECIFIED = 0;
+  LLM_STOP_REASON_END_TURN    = 1;
+  LLM_STOP_REASON_TOOL_USE    = 2;
+}
+
+// LlmTextBlock carries a plain text response from the model.
+message LlmTextBlock {
+  string text = 1;
+}
+
+// LlmToolUseBlock carries a single tool call issued by the model.
+// input uses google.protobuf.Struct so Pydantic generates Dict[str, Any].
+message LlmToolUseBlock {
+  string                 id    = 1;
+  string                 name  = 2;
+  google.protobuf.Struct input = 3;
+}
+
+// LlmToolResultBlock carries the result of a tool call back to the model.
+message LlmToolResultBlock {
+  string tool_use_id = 1;
+  string content     = 2;
+}
+
+// LlmContentBlock is a discriminated union of the three block types.
+//
+// type is a string discriminator set explicitly by call_llm ("text" | "tool_use" | "tool_result").
+// No oneof is used: protobuf-to-pydantic v0.3.3.1 assigns default_factory to every message
+// field inside a oneof, making all fields non-None — field-presence checks are unusable.
+// The agentic loop reads block.type to determine which nested field to access.
+message LlmContentBlock {
+  string              type       = 1; // "text" | "tool_use" | "tool_result"
+  LlmTextBlock        text       = 2;
+  LlmToolUseBlock     tool_use   = 3;
+  LlmToolResultBlock  tool_result = 4;
+}
+
+// LlmMessage is a single turn in a conversation.
+message LlmMessage {
+  LlmRole                role    = 1;
+  repeated LlmContentBlock content = 2;
+}
+
+// LlmResponse is the model's reply to a messages list.
+message LlmResponse {
+  repeated LlmContentBlock content     = 1;
+  LlmStopReason            stop_reason = 2;
+}
+
+// LlmToolDefinition describes a tool the model may call.
+// input_schema uses google.protobuf.Struct so Pydantic generates Dict[str, Any].
+message LlmToolDefinition {
+  string                 name         = 1;
+  string                 description  = 2;
+  google.protobuf.Struct input_schema = 3;
+}

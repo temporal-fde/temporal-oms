@@ -66,12 +66,13 @@ message FindOptimalShippingRequest {
 }
 
 message FindOptimalShippingResponse {
-  repeated ShippingOption options = 1;
-  ShippingOption recommended = 2;  // AI-selected
+  repeated ShippingOptionLegacy options = 1;
+  ShippingOptionLegacy recommended = 2;  // AI-selected
   string reasoning = 3;  // LLM explanation
 }
 
-message ShippingOption {
+// ShippingOptionLegacy is the Python-era shipping option; superseded by ShippingOption in shipping_agent.proto.
+message ShippingOptionLegacy {
   string carrier = 1;
   string service_level = 2;
   int64 cost_cents = 3;

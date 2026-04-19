@@ -38,18 +38,11 @@ The ShippingAgent **recommends**; `fulfillment.Order` **decides**. The response 
 the LLM's reasoning. What `fulfillment.Order` does with that recommendation is its own business
 logic.
 
-The spec covers **two call paths** served by the same workflow and the same
-`CalculateShippingOptionsRequest`:
-
-- **Fulfillment path** — called by `fulfillment.Order` V2 via Nexus during `fulfillOrder`.
-  The caller has already resolved the warehouse from `EnrichedItem` and passes a pre-resolved
-  `from_address` in the request. The LLM skips `lookup_inventory_location`.
-- **Cart/UI path** — called from the storefront to show shipping rates at checkout.
-  No warehouse is pre-resolved; `from_address` is absent. The LLM calls
-  `lookup_inventory_location` as its first action to determine origin.
-
-Both paths use identical workflow logic; the system prompt instructs the LLM to branch based on
-whether `from_address` is present.
+Both the fulfillment path (`fulfillment.Order` V2 via Nexus) and the cart/UI path (storefront
+checkout rates) use the same workflow and the same `CalculateShippingOptionsRequest`. The caller
+always provides `items` with `sku_id`; the LLM always calls `lookup_inventory_location` first
+to resolve the warehouse origin from inventory. There is no pre-resolved `from_address` in the
+request — warehouse resolution is the agent's job regardless of caller.
 
 ---
 
@@ -70,12 +63,10 @@ whether `from_address` is present.
 
 - [ ] `ShippingAgent` starts via UpdateWithStart from `fulfillment.Order`'s Nexus call
 - [ ] `calculate_shipping_options` Update triggers the agentic loop and returns a `ShippingRecommendation`
-- [ ] **Fulfillment path**: when `from_address` is present in the request, the LLM skips
-      `lookup_inventory_location` and proceeds directly to `verify_address` + `get_location_events`
-- [ ] **Cart path**: when `from_address` is absent, the LLM calls `lookup_inventory_location`
-      first, then proceeds with the resolved warehouse address
-- [ ] The LLM dispatches `verify_address`, `get_carrier_rates`, and `get_location_events`
-      (origin + destination) as Temporal activity tool calls in both paths
+- [ ] The LLM always calls `lookup_inventory_location` first, resolving the warehouse origin
+      from `sku_id`s — no `from_address` is provided in the request by either caller
+- [ ] The LLM dispatches `get_carrier_rates` and `get_location_events` (origin + destination)
+      as Temporal activity tool calls; `verify_address` is a fallback for unverified addresses only
 - [ ] `get_location_events` for origin and destination execute concurrently when Claude requests
       both in the same tool call batch
 - [ ] `get_carrier_rates` and any concurrent `get_location_events` batch execute concurrently
@@ -114,46 +105,34 @@ whether `from_address` is present.
 ### Architecture
 
 ```
- ┌─────────────────────────────────────────────────────────────────────┐
- │ FULFILLMENT PATH                      │ CART/UI PATH                │
- │ (fulfillment.Order V2 via Nexus)      │ (storefront checkout)       │
- │                                       │                             │
- │ from_address: provided (EnrichedItem) │ from_address: absent        │
- └───────────────────────┬───────────────┴──────────────┬──────────────┘
-                         │                              │
-                         └──────────────┬───────────────┘
-                                        │
-                                        ▼
-                          calculateShippingOptions Nexus op
-                                        │
-                                        ▼
-                    ShippingAgent (Python, fulfillment namespace)
-                    WorkflowID: customer_id
-                    │
-                    ├── Cache hit? → return cached ShippingOptionsResult
-                    │
-                    └── Cache miss → agentic loop:
-                        │
-                        ├── from_address absent? (cart path only)
-                        │   └── LLM turn 1: lookup_inventory_location(sku_ids)
-                        │                  → location_id + raw warehouse Address
-                        │
-                        ├── LLM turn (1 fulfillment / 2 cart): [concurrent]
-                        │   ├── verify_address(warehouse raw address)
-                        │   │   → easypost_id + coordinate
-                        │   └── get_location_events(to_address.coordinate)
-                        │       → destination SCRM snapshot
-                        │
-                        ├── LLM next turn: [concurrent]
-                        │   ├── get_carrier_rates(from_easypost_id, to_easypost_id, items)
-                        │   │   → carrier rates + shipment_id
-                        │   └── get_location_events(from_address.coordinate)
-                        │       → origin SCRM snapshot
-                        │
-                        └── LLM final turn: reason across rates + SCRM (origin + dest)
-                            → ShippingRecommendation
-                            → cache result (keyed by location_id + items + destination)
-                            → return CalculateShippingOptionsResponse
+fulfillment.Order V2 (Nexus)          Cart/UI (storefront)
+items: [{sku_id, qty}]                items: [{sku_id, qty}]
+to_address: (pre-verified)            to_address: (from user input)
+        │                                     │
+        └──────────────┬──────────────────────┘
+                       │  calculateShippingOptions Update
+                       ▼
+       ShippingAgent (Python, fulfillment namespace)
+       WorkflowID: customer_id
+       │
+       ├── Cache hit? → return cached ShippingOptionsResult
+       │
+       └── Cache miss → agentic loop:
+           │
+           ├── LLM turn 1: lookup_inventory_location(sku_ids)
+           │              → [{address (easypost pre-verified), items}]  (1 group in V1)
+           │              → cache check now possible; return hit if valid
+           │
+           ├── LLM turn 2: [concurrent — one get_carrier_rates per warehouse group]
+           │   ├── get_carrier_rates(group1.from_easypost_id, to_easypost_id, group1.items)
+           │   │   → carrier rates
+           │   ├── get_location_events(group1.address.coordinate)   ← origin SCRM
+           │   └── get_location_events(to_address.coordinate)       ← destination SCRM
+           │
+           └── LLM final turn: reason across rates + SCRM (origin + dest)
+               → ShippingRecommendation
+               → cache result (keyed by from_easypost_id + items + destination)
+               → return CalculateShippingOptionsResponse
 
 fulfillment.Order applies recommendation (selects rate, sets margin_leak SA, etc.)
 ```
@@ -162,14 +141,15 @@ fulfillment.Order applies recommendation (selects rate, sets margin_leak SA, etc
 
 The workflow runs a standard hand-rolled agentic loop:
 
-1. Check cache — return immediately on hit
+1. Check cache — return immediately on hit (requires `from_easypost_id`; skipped on first
+   call since the warehouse is not known until `lookup_inventory_location` returns)
 2. Build system prompt including:
    - Business rules: margin threshold, SLA targets, recommendation logic
    - Concurrency instruction: "call multiple tools in a single response when there are no
      dependencies between them"
-   - Path instruction: "If `from_address` is provided in the request, use it directly as the
-     warehouse origin — do not call `lookup_inventory_location`. If `from_address` is absent,
-     call `lookup_inventory_location` first to resolve the warehouse address."
+   - Sequence instruction: "Always call `lookup_inventory_location` first. Once you have the
+     warehouse address, call `get_carrier_rates`, `get_location_events(origin)`, and
+     `get_location_events(destination)` concurrently in a single response."
 3. Build tool definitions for the four registered activities
 4. Iterate:
    a. Call Claude (via `call_llm` activity — Anthropic API)
@@ -194,11 +174,12 @@ these outcomes and a `recommended_option_id`.
 
 ### Caching
 
-Cache key: `fn(locationId, sorted([(skuId, qty)]), destinationPostalCode, destinationCountry)` → SHA-256 hash
+Cache key: `fn(sorted(from_easypost_ids), sorted([(skuId, qty)]), destinationPostalCode, destinationCountry)` → SHA-256 hash
 
-- `locationId`: provided in the request (`location_id` field) in the fulfillment path; resolved
-  from `lookup_inventory_location` in the cart path — always a stable warehouse identifier
-  regardless of how it was resolved
+- `from_easypost_ids`: sorted list of `easypost_address.id` from all warehouse groups returned
+  by `lookup_inventory_location`. Sorting makes the key stable regardless of group order.
+  Always resolved by the LLM via the activity — never provided by the caller. Cache check is
+  deferred until after the first tool result.
 - Sorting skuId+qty pairs makes the key order-independent
 - Postal code + country is sufficient for rate zone resolution (street address does not change rates)
 - Cache entries store: `ShippingOptionsResult` (rates + SCRM snapshots + recommendation) + `cached_at` timestamp
@@ -219,6 +200,7 @@ Cache key: `fn(locationId, sorted([(skuId, qty)]), destinationPostalCode, destin
 | LLM dispatches tools (not pre-fetched) | Shows students the LLM making real decisions about what to call and when; more interesting for teaching | Pre-fetch SCRM + rates before LLM — skips the agentic reasoning the workshop is designed to show |
 | Concurrency from multi-tool LLM responses | Claude returns multiple `tool_use` blocks in one response when it recognizes no dependency; implementation dispatches them as concurrent activities | Sequential tool dispatch — loses latency benefit, doesn't demonstrate Temporal's concurrent activity pattern |
 | ShippingAgent recommends, `fulfillment.Order` decides | Keeps the agent focused on logistics reasoning; business rules (margin policy, SLA enforcement) stay in `fulfillment.Order` | Agent makes the final selection — couples business rules to the Python agent |
+| `lookup_inventory_location` always called; no `from_address` in request | Caller provides `sku_id`s — warehouse resolution is the agent's responsibility regardless of whether the caller is `fulfillment.Order` (EnrichedItem skus) or cart (cart item skus). Avoids a two-path design where callers must know about warehouse assignment. | Pre-resolve warehouse in caller and pass `from_address` — couples callers to inventory logic and creates a split path with different LLM behaviour |
 | Separate `fulfillment-easypost` (5 rps) and `fulfillment-predicthq` (50 rps) task queues | EasyPost and PredictHQ limits differ by 10×; sharing one queue forces both to the 5 rps floor, wasting 45 rps of PredictHQ capacity | Single shared queue — simpler setup but throttles PredictHQ to EasyPost's limit |
 | Worker Versioning (new build-id) for V2 cutover | `fulfillment.Order` is PINNED and has no history to bridge; old workflows complete on V1 workers, new ones pick up V2 cleanly | `Workflow.getVersion()` — unnecessary for a new workflow with no pre-existing history |
 
@@ -275,23 +257,27 @@ to its designated task queue via `ActivityOptions(task_queue=...)`.
 
 **`lookup_inventory_location`**
 - **Task Queue:** `fulfillment`
-- Input: `[{sku_id, quantity}]`, optional `location_id` override
-- Output: warehouse `location_id`, raw warehouse `Address`
-- Note: Called by the LLM in the **cart path** only (when `from_address` is absent in the
-  request). In the fulfillment path the caller provides `from_address` pre-resolved from
-  `EnrichedItem`, so the LLM skips this tool. V1 uses a static config lookup; later versions
-  query the Inventory Locations service.
+- Input: `[{sku_id, quantity}]`
+- Output: `[{address: Address, items: [{sku_id, quantity}]}]` — items grouped by warehouse.
+  Each group's `address.easypost_address` is pre-populated from seed data; `easypost_address.id`
+  is ready to use as carrier origin and cache key component.
+- Note: **Always the first tool call** in every agentic loop execution. The agent calls
+  `get_carrier_rates` once per returned group (concurrently if multiple). The agent is
+  naturally plurality-aware — no agent changes needed when the inventory service returns more
+  groups. V1 inventory service (static TOML seed) returns a single group; future Inventory
+  Locations service may return multiple.
 
 **`verify_address`**
 - **Task Queue:** `fulfillment-easypost` (5 rps)
 - Input: raw `Address`
 - Output: `EasyPostAddress` (id, residential, verified) + `Coordinate` (lat/lng from EasyPost)
 - Wraps `EasyPost AddressService.createAndVerify()`
-- Note: `to_address` is already verified by `fulfillment.Order`'s `validateOrder`; the agent
-  uses the passed-in `easypost_address.id` for the destination. `verify_address` is called for
-  the warehouse origin in both paths: in the fulfillment path on the provided `from_address`
-  (skipping `lookup_inventory_location`); in the cart path on the address returned by
-  `lookup_inventory_location`.
+- Note: Fallback only in normal operation. `to_address` is pre-verified by `fulfillment.Order`
+  `validateOrder`; the warehouse address returned by `lookup_inventory_location` is
+  pre-verified from seed data. Both already carry `easypost_address.id`. The system prompt
+  instructs the LLM to skip `verify_address` when `easypost_address` is already set. Retained
+  as a tool for addresses that arrive unverified (e.g. storefront-supplied `to_address` in the
+  cart path before EasyPost verification).
 
 **`get_carrier_rates`**
 - **Task Queue:** `fulfillment-easypost` (5 rps)
@@ -322,15 +308,11 @@ Proto definitions are the source of truth. This section describes intent only.
 
 **`CalculateShippingOptionsRequest`** — replaces current stub. Carries:
 - `order_id`, `customer_id`
-- `to_address` (`common.Address` with `easypost_address` already populated from `fulfillment.Order` `validateOrder`)
-- `items`: `[{sku_id, quantity}]`
-- `from_address`: optional `common.Address` — pre-resolved warehouse origin. The fulfillment
-  path populates this from `EnrichedItem` warehouse data. The cart/UI path omits it; the LLM
-  calls `lookup_inventory_location` to resolve it.
-- `location_id`: optional string — warehouse identifier for cache keying. The fulfillment path
-  provides this alongside `from_address` (e.g., `EnrichedItem.warehouse_id`). The cart path
-  leaves it absent; the value is resolved by `lookup_inventory_location` before the cache key
-  is computed.
+- `to_address` (`common.Address` with `easypost_address` already populated from `fulfillment.Order`
+  `validateOrder` in the fulfillment path; raw address in the cart path — LLM may call
+  `verify_address` if `easypost_address` is absent)
+- `items`: `[{sku_id, quantity}]` — the LLM calls `lookup_inventory_location` with these to
+  resolve the warehouse origin; no `from_address` is provided by the caller
 - `selected_shipping_option_id`: optional string (the customer's original selection, for comparison)
 - `customer_paid_price`: optional `common.Money`
 - `transit_days_sla`: optional int32 (days)
@@ -394,7 +376,7 @@ added in Phase 1 alongside the `shipping_agent.proto` changes.
 
 ### Phase 2 — Activity Implementations
 
-- [ ] `lookup_inventory_location` — V1: static config lookup by `location_id` or first matching warehouse for sku_ids
+- [ ] `lookup_inventory_location` — returns `[{address, items}]` groups; V1 static TOML config returns one group (all items → single warehouse); agent handles any number of groups without changes
 - [ ] `verify_address` — EasyPost `AddressService.createAndVerify()`; populate `coordinate` from response
 - [ ] `get_carrier_rates` — EasyPost Shipment creation + rate retrieval (already exists as `DeliveryService` in Java; Python version needed)
 - [ ] `get_location_events` — PredictHQ Events API (already has proto definition; implement Python activity)
@@ -408,10 +390,11 @@ added in Phase 1 alongside the `shipping_agent.proto` changes.
 
 - [ ] `ShippingAgent` workflow class: `@workflow.defn`, WorkflowID = `customer_id`
 - [ ] `calculate_shipping_options` Update handler:
-  - [ ] Compute cache key (requires `location_id` to be resolved first — from request if present,
-        otherwise after `lookup_inventory_location` returns); return cached result if hit and within TTL
+  - [ ] Compute cache key after `lookup_inventory_location` returns (warehouse `easypost_address.id`
+        not known until then); return cached result if hit and within TTL
   - [ ] Build system prompt with margin threshold, SLA rules, concurrency instruction, and
-        path instruction (use provided `from_address` or call `lookup_inventory_location`)
+        sequence instruction (always call `lookup_inventory_location` first; then concurrent
+        `get_carrier_rates` + both `get_location_events` calls)
   - [ ] Build tool definitions from the four activity signatures
   - [ ] Agentic loop: call LLM → dispatch concurrent activities for all tool_use blocks → append results → repeat
   - [ ] Parse `ShippingRecommendation` from final text response
@@ -419,10 +402,9 @@ added in Phase 1 alongside the `shipping_agent.proto` changes.
   - [ ] Return `CalculateShippingOptionsResponse`
 - [ ] `get_options` Query handler: return current cache state
 - [ ] Unit tests:
-  - [ ] Cache hit — LLM not called
-  - [ ] Fulfillment path — `from_address` provided; `lookup_inventory_location` not dispatched
-  - [ ] Cart path — `from_address` absent; `lookup_inventory_location` dispatched as first tool call
-  - [ ] Cache miss + single tool call per turn (sequential path)
+  - [ ] Cache hit — LLM not called (after `lookup_inventory_location` resolves the key)
+  - [ ] Cache miss — `lookup_inventory_location` always dispatched as first tool call
+  - [ ] Cache miss + multi-tool response (concurrent activity dispatch for turn 2)
   - [ ] Cache miss + multi-tool response (concurrent activity dispatch)
   - [ ] `PROCEED` outcome
   - [ ] `MARGIN_SPIKE` outcome
@@ -440,15 +422,12 @@ added in Phase 1 alongside the `shipping_agent.proto` changes.
 
 ### Phase 5 — Workshop Scenarios
 
-- [ ] Demo script: fulfillment path happy path — `from_address` provided, LLM skips
-      `lookup_inventory_location`, returns `PROCEED`
-- [ ] Demo script: cart path — `from_address` absent, LLM calls `lookup_inventory_location`
-      first, then proceeds; shows the additional tool call turn in workflow history
+- [ ] Demo script: happy path — `lookup_inventory_location` → concurrent rates + SCRM → `PROCEED`
 - [ ] Demo script: margin spike (`MARGIN_SPIKE` → fallback selected, `margin_leak` visible in Temporal UI)
-- [ ] Demo script: concurrent tool dispatch visible in workflow history
-- [ ] Demo script: cache hit (second call with same inputs is instant, regardless of path)
-- [ ] Slide / README: before (V1 dumb rate fetch) vs after (ShippingAgent) contrast;
-      fulfillment path vs cart path call flows
+- [ ] Demo script: concurrent tool dispatch — turn 2 shows `get_carrier_rates` + both
+      `get_location_events` as parallel activities in workflow history
+- [ ] Demo script: cache hit — second call with same items resolves warehouse, hits cache, returns instantly
+- [ ] Slide / README: before (V1 dumb rate fetch) vs after (ShippingAgent) contrast
 
 ---
 

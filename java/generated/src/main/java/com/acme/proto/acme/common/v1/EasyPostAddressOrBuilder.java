@@ -45,4 +45,31 @@ public interface EasyPostAddressOrBuilder extends
    * @return The verified.
    */
   boolean getVerified();
+
+  /**
+   * <pre>
+   * lat/lng from EasyPost verification; required by get_location_events
+   * </pre>
+   *
+   * <code>optional .acme.common.v1.Coordinate coordinate = 4 [json_name = "coordinate"];</code>
+   * @return Whether the coordinate field is set.
+   */
+  boolean hasCoordinate();
+  /**
+   * <pre>
+   * lat/lng from EasyPost verification; required by get_location_events
+   * </pre>
+   *
+   * <code>optional .acme.common.v1.Coordinate coordinate = 4 [json_name = "coordinate"];</code>
+   * @return The coordinate.
+   */
+  com.acme.proto.acme.common.v1.Coordinate getCoordinate();
+  /**
+   * <pre>
+   * lat/lng from EasyPost verification; required by get_location_events
+   * </pre>
+   *
+   * <code>optional .acme.common.v1.Coordinate coordinate = 4 [json_name = "coordinate"];</code>
+   */
+  com.acme.proto.acme.common.v1.CoordinateOrBuilder getCoordinateOrBuilder();
 }

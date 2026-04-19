@@ -18,14 +18,16 @@ class Money(_message.Message):
     def __init__(self, currency: _Optional[str] = ..., units: _Optional[int] = ...) -> None: ...
 
 class EasyPostAddress(_message.Message):
-    __slots__ = ("id", "residential", "verified")
+    __slots__ = ("id", "residential", "verified", "coordinate")
     ID_FIELD_NUMBER: _ClassVar[int]
     RESIDENTIAL_FIELD_NUMBER: _ClassVar[int]
     VERIFIED_FIELD_NUMBER: _ClassVar[int]
+    COORDINATE_FIELD_NUMBER: _ClassVar[int]
     id: str
     residential: bool
     verified: bool
-    def __init__(self, id: _Optional[str] = ..., residential: _Optional[bool] = ..., verified: _Optional[bool] = ...) -> None: ...
+    coordinate: Coordinate
+    def __init__(self, id: _Optional[str] = ..., residential: _Optional[bool] = ..., verified: _Optional[bool] = ..., coordinate: _Optional[_Union[Coordinate, _Mapping]] = ...) -> None: ...
 
 class Address(_message.Message):
     __slots__ = ("street", "city", "state", "postal_code", "country", "easypost_address")

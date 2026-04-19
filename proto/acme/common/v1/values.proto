@@ -16,6 +16,7 @@ message EasyPostAddress {
   string id = 1;        // EasyPost address ID
   bool residential = 2; // affects carrier rate selection
   bool verified = 3;
+  optional Coordinate coordinate = 4; // lat/lng from EasyPost verification; required by get_location_events
 }
 
 message Address {
