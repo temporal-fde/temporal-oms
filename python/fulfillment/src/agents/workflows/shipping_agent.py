@@ -41,6 +41,7 @@ with workflow.unsafe.imports_passed_through():
     from src.agents.activities.easypost import EasyPostActivities
     from src.agents.activities.inventory import LookupInventoryActivities
     from src.agents.activities.location_events import LocationEventsActivities
+    from src.agents.dispatch import activity_name, activity_tool, ToolSpecs
 
 _DEFAULT_CACHE_TTL_SECS = 1800
 _ACTIVITY_TIMEOUT = timedelta(seconds=30)
@@ -48,46 +49,52 @@ _LLM_TIMEOUT = timedelta(seconds=120)
 _ACTIVITY_RETRY = RetryPolicy(maximum_attempts=3)
 
 
-def _activity_name(method) -> str:
-    """Return the Temporal-registered name for an @activity.defn class method.
-
-    Reads __temporal_activity_definition set by the decorator so the name is
-    always derived from the activity definition — renaming the method or
-    changing the explicit name= kwarg propagates automatically.
-    """
-    defn = getattr(method, "__temporal_activity_definition", None)
-    return defn.name if defn else method.__name__
-
-
-# Dispatch table: registered activity name → (unbound method, request type, result type, task queue)
-# Add new LLM tools here — the if/elif chain in _dispatch_tool and the tool definitions
-# both derive from this single source of truth.
-_TOOL_SPECS: dict[str, tuple] = {
-    _activity_name(LookupInventoryActivities.lookup_inventory_location): (
+_TOOLS = ToolSpecs(
+    activity_tool(
+        activity_name(LookupInventoryActivities.lookup_inventory_location),
+        "Resolve sku_ids to a warehouse location and address. "
+        "Call this first when from_address is not provided.",
         LookupInventoryActivities.lookup_inventory_location,
         LookupInventoryLocationRequest,
         LookupInventoryLocationResponse,
-        "fulfillment",
+        task_queue="fulfillment",
+        start_to_close_timeout=_ACTIVITY_TIMEOUT,
+        retry_policy=_ACTIVITY_RETRY,
     ),
-    _activity_name(EasyPostActivities.verify_address): (
+    activity_tool(
+        activity_name(EasyPostActivities.verify_address),
+        "Verify a raw shipping address via EasyPost. "
+        "Returns an EasyPost address ID and lat/lng coordinates required for get_location_events.",
         EasyPostActivities.verify_address,
         VerifyAddressRequest,
         VerifyAddressResponse,
-        "fulfillment-easypost",
+        task_queue="fulfillment-easypost",
+        start_to_close_timeout=_ACTIVITY_TIMEOUT,
+        retry_policy=_ACTIVITY_RETRY,
     ),
-    _activity_name(EasyPostActivities.get_carrier_rates): (
+    activity_tool(
+        activity_name(EasyPostActivities.get_carrier_rates),
+        "Create an EasyPost shipment and retrieve available carrier rates.",
         EasyPostActivities.get_carrier_rates,
         GetShippingRatesRequest,
         GetShippingRatesResponse,
-        "fulfillment-easypost",
+        task_queue="fulfillment-easypost",
+        start_to_close_timeout=_ACTIVITY_TIMEOUT,
+        retry_policy=_ACTIVITY_RETRY,
     ),
-    _activity_name(LocationEventsActivities.get_location_events): (
+    activity_tool(
+        activity_name(LocationEventsActivities.get_location_events),
+        "Query PredictHQ for supply chain risk events near a coordinate "
+        "(severe weather, disasters, airport delays, etc.) within the ship-to-delivery window. "
+        "Call for BOTH origin and destination to get full risk context.",
         LocationEventsActivities.get_location_events,
         GetLocationEventsRequest,
         GetLocationEventsResponse,
-        "fulfillment-predicthq",
+        task_queue="fulfillment-predicthq",
+        start_to_close_timeout=_ACTIVITY_TIMEOUT,
+        retry_policy=_ACTIVITY_RETRY,
     ),
-}
+)
 
 
 def _cache_key(
@@ -172,64 +179,8 @@ def _build_system_prompt(request: CalculateShippingOptionsRequest) -> str:
     ])
 
 
-# Resolved once at import time — used for tool-result post-processing in the agentic loop.
-_NAME_LOOKUP = _activity_name(LookupInventoryActivities.lookup_inventory_location)
-_NAME_RATES  = _activity_name(EasyPostActivities.get_carrier_rates)
-
-# LLM-facing descriptions for each tool — keyed by the same activity name used in _TOOL_SPECS.
-_TOOL_DESCRIPTIONS: dict[str, str] = {
-    _activity_name(LookupInventoryActivities.lookup_inventory_location): (
-        "Resolve sku_ids to a warehouse location and address. "
-        "Call this first when from_address is not provided."
-    ),
-    _activity_name(EasyPostActivities.verify_address): (
-        "Verify a raw shipping address via EasyPost. "
-        "Returns an EasyPost address ID and lat/lng coordinates required for get_location_events."
-    ),
-    _activity_name(EasyPostActivities.get_carrier_rates): (
-        "Create an EasyPost shipment and retrieve available carrier rates."
-    ),
-    _activity_name(LocationEventsActivities.get_location_events): (
-        "Query PredictHQ for supply chain risk events near a coordinate "
-        "(severe weather, disasters, airport delays, etc.) within the ship-to-delivery window. "
-        "Call for BOTH origin and destination to get full risk context."
-    ),
-}
-
-
-def _build_tool_definitions() -> list[LlmToolDefinition]:
-    return [
-        LlmToolDefinition(
-            name=name,
-            description=_TOOL_DESCRIPTIONS[name],
-            input_schema=req_type.model_json_schema(),
-        )
-        for name, (_, req_type, _, _) in _TOOL_SPECS.items()
-    ]
-
-
-async def _dispatch_tool(block: LlmContentBlock) -> str:
-    """Dispatch a single tool_use block to its Temporal activity and return JSON result.
-
-    Tool name → activity method, request/result types, and task queue all come from
-    _TOOL_SPECS — derived from @activity.defn metadata, not hardcoded strings.
-    """
-    name = block.tool_use.name
-    spec = _TOOL_SPECS.get(name)
-    if spec is None:
-        raise ApplicationError(f"Unknown tool: {name!r}", non_retryable=True)
-
-    method, req_type, result_type, task_queue = spec
-    req = req_type(**block.tool_use.input)
-    result = await workflow.execute_activity(
-        method,
-        args=[req],
-        result_type=result_type,
-        task_queue=task_queue,
-        start_to_close_timeout=_ACTIVITY_TIMEOUT,
-        retry_policy=_ACTIVITY_RETRY,
-    )
-    return result.model_dump_json()
+_NAME_LOOKUP = activity_name(LookupInventoryActivities.lookup_inventory_location)
+_NAME_RATES  = activity_name(EasyPostActivities.get_carrier_rates)
 
 
 @workflow.defn(name="ShippingAgent")
@@ -282,7 +233,7 @@ class ShippingAgent:
                 )
 
         system_prompt = _build_system_prompt(request)
-        tools = _build_tool_definitions()
+        tools = _TOOLS.definitions()
 
         # Initial user message
         has_from = bool(request.from_address and request.from_address.street)
@@ -347,7 +298,7 @@ class ShippingAgent:
 
                 # Dispatch all tool calls in this batch concurrently
                 tool_results: list[str] = list(await asyncio.gather(
-                    *[_dispatch_tool(b) for b in tool_blocks]
+                    *[_TOOLS.dispatch(b) for b in tool_blocks]
                 ))
 
                 # Extract easypost_address.id from lookup_inventory_location (cart path)

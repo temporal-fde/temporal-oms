@@ -86,74 +86,44 @@ public interface CalculateShippingOptionsRequestOrBuilder extends
       int index);
 
   /**
-   * <pre>
-   * from_address: warehouse origin with easypost_address populated (fulfillment path);
-   * absent in cart path — LLM resolves via lookup_inventory_location.
-   * </pre>
-   *
-   * <code>optional .acme.common.v1.Address from_address = 5 [json_name = "fromAddress"];</code>
-   * @return Whether the fromAddress field is set.
-   */
-  boolean hasFromAddress();
-  /**
-   * <pre>
-   * from_address: warehouse origin with easypost_address populated (fulfillment path);
-   * absent in cart path — LLM resolves via lookup_inventory_location.
-   * </pre>
-   *
-   * <code>optional .acme.common.v1.Address from_address = 5 [json_name = "fromAddress"];</code>
-   * @return The fromAddress.
-   */
-  com.acme.proto.acme.common.v1.Address getFromAddress();
-  /**
-   * <pre>
-   * from_address: warehouse origin with easypost_address populated (fulfillment path);
-   * absent in cart path — LLM resolves via lookup_inventory_location.
-   * </pre>
-   *
-   * <code>optional .acme.common.v1.Address from_address = 5 [json_name = "fromAddress"];</code>
-   */
-  com.acme.proto.acme.common.v1.AddressOrBuilder getFromAddressOrBuilder();
-
-  /**
-   * <code>optional string selected_shipping_option_id = 6 [json_name = "selectedShippingOptionId"];</code>
+   * <code>optional string selected_shipping_option_id = 5 [json_name = "selectedShippingOptionId"];</code>
    * @return Whether the selectedShippingOptionId field is set.
    */
   boolean hasSelectedShippingOptionId();
   /**
-   * <code>optional string selected_shipping_option_id = 6 [json_name = "selectedShippingOptionId"];</code>
+   * <code>optional string selected_shipping_option_id = 5 [json_name = "selectedShippingOptionId"];</code>
    * @return The selectedShippingOptionId.
    */
   java.lang.String getSelectedShippingOptionId();
   /**
-   * <code>optional string selected_shipping_option_id = 6 [json_name = "selectedShippingOptionId"];</code>
+   * <code>optional string selected_shipping_option_id = 5 [json_name = "selectedShippingOptionId"];</code>
    * @return The bytes for selectedShippingOptionId.
    */
   com.google.protobuf.ByteString
       getSelectedShippingOptionIdBytes();
 
   /**
-   * <code>optional .acme.common.v1.Money customer_paid_price = 7 [json_name = "customerPaidPrice"];</code>
+   * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
    * @return Whether the customerPaidPrice field is set.
    */
   boolean hasCustomerPaidPrice();
   /**
-   * <code>optional .acme.common.v1.Money customer_paid_price = 7 [json_name = "customerPaidPrice"];</code>
+   * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
    * @return The customerPaidPrice.
    */
   com.acme.proto.acme.common.v1.Money getCustomerPaidPrice();
   /**
-   * <code>optional .acme.common.v1.Money customer_paid_price = 7 [json_name = "customerPaidPrice"];</code>
+   * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
    */
   com.acme.proto.acme.common.v1.MoneyOrBuilder getCustomerPaidPriceOrBuilder();
 
   /**
-   * <code>optional int32 transit_days_sla = 8 [json_name = "transitDaysSla"];</code>
+   * <code>optional int32 transit_days_sla = 7 [json_name = "transitDaysSla"];</code>
    * @return Whether the transitDaysSla field is set.
    */
   boolean hasTransitDaysSla();
   /**
-   * <code>optional int32 transit_days_sla = 8 [json_name = "transitDaysSla"];</code>
+   * <code>optional int32 transit_days_sla = 7 [json_name = "transitDaysSla"];</code>
    * @return The transitDaysSla.
    */
   int getTransitDaysSla();

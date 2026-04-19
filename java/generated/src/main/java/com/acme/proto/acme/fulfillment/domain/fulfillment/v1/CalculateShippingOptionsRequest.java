@@ -8,13 +8,12 @@ package com.acme.proto.acme.fulfillment.domain.fulfillment.v1;
 /**
  * <pre>
  * CalculateShippingOptionsRequest is the Update input for the ShippingAgent agentic loop.
- * Two call paths use the same message:
- * Fulfillment path: from_address is provided with easypost_address already populated
- * (pre-resolved from EnrichedItem; warehouse addresses are pre-verified).
- * Cart/UI path: from_address absent; LLM calls lookup_inventory_location, which returns
- * an Address with easypost_address pre-populated from seed data.
- * Cache key is derived from from_address.easypost_address.id in both paths — symmetric
- * with to_address, which also carries easypost_address from fulfillment.Order validateOrder.
+ * The caller provides items with sku_id; the LLM always calls lookup_inventory_location
+ * first to resolve the warehouse origin from inventory. Both the fulfillment path
+ * (EnrichedItem sku_ids) and the cart path (cart item sku_ids) use the same flow.
+ * Cache key is derived from the resolved from_address.easypost_address.id (set after
+ * lookup_inventory_location returns) and to_address.easypost_address.id (pre-populated
+ * by fulfillment.Order validateOrder).
  * </pre>
  *
  * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest}
@@ -221,60 +220,19 @@ private static final long serialVersionUID = 0L;
     return items_.get(index);
   }
 
-  public static final int FROM_ADDRESS_FIELD_NUMBER = 5;
-  private com.acme.proto.acme.common.v1.Address fromAddress_;
-  /**
-   * <pre>
-   * from_address: warehouse origin with easypost_address populated (fulfillment path);
-   * absent in cart path — LLM resolves via lookup_inventory_location.
-   * </pre>
-   *
-   * <code>optional .acme.common.v1.Address from_address = 5 [json_name = "fromAddress"];</code>
-   * @return Whether the fromAddress field is set.
-   */
-  @java.lang.Override
-  public boolean hasFromAddress() {
-    return ((bitField0_ & 0x00000002) != 0);
-  }
-  /**
-   * <pre>
-   * from_address: warehouse origin with easypost_address populated (fulfillment path);
-   * absent in cart path — LLM resolves via lookup_inventory_location.
-   * </pre>
-   *
-   * <code>optional .acme.common.v1.Address from_address = 5 [json_name = "fromAddress"];</code>
-   * @return The fromAddress.
-   */
-  @java.lang.Override
-  public com.acme.proto.acme.common.v1.Address getFromAddress() {
-    return fromAddress_ == null ? com.acme.proto.acme.common.v1.Address.getDefaultInstance() : fromAddress_;
-  }
-  /**
-   * <pre>
-   * from_address: warehouse origin with easypost_address populated (fulfillment path);
-   * absent in cart path — LLM resolves via lookup_inventory_location.
-   * </pre>
-   *
-   * <code>optional .acme.common.v1.Address from_address = 5 [json_name = "fromAddress"];</code>
-   */
-  @java.lang.Override
-  public com.acme.proto.acme.common.v1.AddressOrBuilder getFromAddressOrBuilder() {
-    return fromAddress_ == null ? com.acme.proto.acme.common.v1.Address.getDefaultInstance() : fromAddress_;
-  }
-
-  public static final int SELECTED_SHIPPING_OPTION_ID_FIELD_NUMBER = 6;
+  public static final int SELECTED_SHIPPING_OPTION_ID_FIELD_NUMBER = 5;
   @SuppressWarnings("serial")
   private volatile java.lang.Object selectedShippingOptionId_ = "";
   /**
-   * <code>optional string selected_shipping_option_id = 6 [json_name = "selectedShippingOptionId"];</code>
+   * <code>optional string selected_shipping_option_id = 5 [json_name = "selectedShippingOptionId"];</code>
    * @return Whether the selectedShippingOptionId field is set.
    */
   @java.lang.Override
   public boolean hasSelectedShippingOptionId() {
-    return ((bitField0_ & 0x00000004) != 0);
+    return ((bitField0_ & 0x00000002) != 0);
   }
   /**
-   * <code>optional string selected_shipping_option_id = 6 [json_name = "selectedShippingOptionId"];</code>
+   * <code>optional string selected_shipping_option_id = 5 [json_name = "selectedShippingOptionId"];</code>
    * @return The selectedShippingOptionId.
    */
   @java.lang.Override
@@ -291,7 +249,7 @@ private static final long serialVersionUID = 0L;
     }
   }
   /**
-   * <code>optional string selected_shipping_option_id = 6 [json_name = "selectedShippingOptionId"];</code>
+   * <code>optional string selected_shipping_option_id = 5 [json_name = "selectedShippingOptionId"];</code>
    * @return The bytes for selectedShippingOptionId.
    */
   @java.lang.Override
@@ -309,18 +267,18 @@ private static final long serialVersionUID = 0L;
     }
   }
 
-  public static final int CUSTOMER_PAID_PRICE_FIELD_NUMBER = 7;
+  public static final int CUSTOMER_PAID_PRICE_FIELD_NUMBER = 6;
   private com.acme.proto.acme.common.v1.Money customerPaidPrice_;
   /**
-   * <code>optional .acme.common.v1.Money customer_paid_price = 7 [json_name = "customerPaidPrice"];</code>
+   * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
    * @return Whether the customerPaidPrice field is set.
    */
   @java.lang.Override
   public boolean hasCustomerPaidPrice() {
-    return ((bitField0_ & 0x00000008) != 0);
+    return ((bitField0_ & 0x00000004) != 0);
   }
   /**
-   * <code>optional .acme.common.v1.Money customer_paid_price = 7 [json_name = "customerPaidPrice"];</code>
+   * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
    * @return The customerPaidPrice.
    */
   @java.lang.Override
@@ -328,25 +286,25 @@ private static final long serialVersionUID = 0L;
     return customerPaidPrice_ == null ? com.acme.proto.acme.common.v1.Money.getDefaultInstance() : customerPaidPrice_;
   }
   /**
-   * <code>optional .acme.common.v1.Money customer_paid_price = 7 [json_name = "customerPaidPrice"];</code>
+   * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
    */
   @java.lang.Override
   public com.acme.proto.acme.common.v1.MoneyOrBuilder getCustomerPaidPriceOrBuilder() {
     return customerPaidPrice_ == null ? com.acme.proto.acme.common.v1.Money.getDefaultInstance() : customerPaidPrice_;
   }
 
-  public static final int TRANSIT_DAYS_SLA_FIELD_NUMBER = 8;
+  public static final int TRANSIT_DAYS_SLA_FIELD_NUMBER = 7;
   private int transitDaysSla_ = 0;
   /**
-   * <code>optional int32 transit_days_sla = 8 [json_name = "transitDaysSla"];</code>
+   * <code>optional int32 transit_days_sla = 7 [json_name = "transitDaysSla"];</code>
    * @return Whether the transitDaysSla field is set.
    */
   @java.lang.Override
   public boolean hasTransitDaysSla() {
-    return ((bitField0_ & 0x00000010) != 0);
+    return ((bitField0_ & 0x00000008) != 0);
   }
   /**
-   * <code>optional int32 transit_days_sla = 8 [json_name = "transitDaysSla"];</code>
+   * <code>optional int32 transit_days_sla = 7 [json_name = "transitDaysSla"];</code>
    * @return The transitDaysSla.
    */
   @java.lang.Override
@@ -381,16 +339,13 @@ private static final long serialVersionUID = 0L;
       output.writeMessage(4, items_.get(i));
     }
     if (((bitField0_ & 0x00000002) != 0)) {
-      output.writeMessage(5, getFromAddress());
+      com.google.protobuf.GeneratedMessage.writeString(output, 5, selectedShippingOptionId_);
     }
     if (((bitField0_ & 0x00000004) != 0)) {
-      com.google.protobuf.GeneratedMessage.writeString(output, 6, selectedShippingOptionId_);
+      output.writeMessage(6, getCustomerPaidPrice());
     }
     if (((bitField0_ & 0x00000008) != 0)) {
-      output.writeMessage(7, getCustomerPaidPrice());
-    }
-    if (((bitField0_ & 0x00000010) != 0)) {
-      output.writeInt32(8, transitDaysSla_);
+      output.writeInt32(7, transitDaysSla_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -421,19 +376,15 @@ private static final long serialVersionUID = 0L;
           size += 1 * count;
         }
     if (((bitField0_ & 0x00000002) != 0)) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(5, getFromAddress());
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(5, selectedShippingOptionId_);
     }
     if (((bitField0_ & 0x00000004) != 0)) {
-      size += com.google.protobuf.GeneratedMessage.computeStringSize(6, selectedShippingOptionId_);
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(6, getCustomerPaidPrice());
     }
     if (((bitField0_ & 0x00000008) != 0)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(7, getCustomerPaidPrice());
-    }
-    if (((bitField0_ & 0x00000010) != 0)) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeInt32Size(8, transitDaysSla_);
+        .computeInt32Size(7, transitDaysSla_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -461,11 +412,6 @@ private static final long serialVersionUID = 0L;
     }
     if (!getItemsList()
         .equals(other.getItemsList())) return false;
-    if (hasFromAddress() != other.hasFromAddress()) return false;
-    if (hasFromAddress()) {
-      if (!getFromAddress()
-          .equals(other.getFromAddress())) return false;
-    }
     if (hasSelectedShippingOptionId() != other.hasSelectedShippingOptionId()) return false;
     if (hasSelectedShippingOptionId()) {
       if (!getSelectedShippingOptionId()
@@ -503,10 +449,6 @@ private static final long serialVersionUID = 0L;
     if (getItemsCount() > 0) {
       hash = (37 * hash) + ITEMS_FIELD_NUMBER;
       hash = (53 * hash) + getItemsList().hashCode();
-    }
-    if (hasFromAddress()) {
-      hash = (37 * hash) + FROM_ADDRESS_FIELD_NUMBER;
-      hash = (53 * hash) + getFromAddress().hashCode();
     }
     if (hasSelectedShippingOptionId()) {
       hash = (37 * hash) + SELECTED_SHIPPING_OPTION_ID_FIELD_NUMBER;
@@ -620,13 +562,12 @@ private static final long serialVersionUID = 0L;
   /**
    * <pre>
    * CalculateShippingOptionsRequest is the Update input for the ShippingAgent agentic loop.
-   * Two call paths use the same message:
-   * Fulfillment path: from_address is provided with easypost_address already populated
-   * (pre-resolved from EnrichedItem; warehouse addresses are pre-verified).
-   * Cart/UI path: from_address absent; LLM calls lookup_inventory_location, which returns
-   * an Address with easypost_address pre-populated from seed data.
-   * Cache key is derived from from_address.easypost_address.id in both paths — symmetric
-   * with to_address, which also carries easypost_address from fulfillment.Order validateOrder.
+   * The caller provides items with sku_id; the LLM always calls lookup_inventory_location
+   * first to resolve the warehouse origin from inventory. Both the fulfillment path
+   * (EnrichedItem sku_ids) and the cart path (cart item sku_ids) use the same flow.
+   * Cache key is derived from the resolved from_address.easypost_address.id (set after
+   * lookup_inventory_location returns) and to_address.easypost_address.id (pre-populated
+   * by fulfillment.Order validateOrder).
    * </pre>
    *
    * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest}
@@ -663,7 +604,6 @@ private static final long serialVersionUID = 0L;
               .alwaysUseFieldBuilders) {
         internalGetToAddressFieldBuilder();
         internalGetItemsFieldBuilder();
-        internalGetFromAddressFieldBuilder();
         internalGetCustomerPaidPriceFieldBuilder();
       }
     }
@@ -685,11 +625,6 @@ private static final long serialVersionUID = 0L;
         itemsBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000008);
-      fromAddress_ = null;
-      if (fromAddressBuilder_ != null) {
-        fromAddressBuilder_.dispose();
-        fromAddressBuilder_ = null;
-      }
       selectedShippingOptionId_ = "";
       customerPaidPrice_ = null;
       if (customerPaidPriceBuilder_ != null) {
@@ -757,24 +692,18 @@ private static final long serialVersionUID = 0L;
         to_bitField0_ |= 0x00000001;
       }
       if (((from_bitField0_ & 0x00000010) != 0)) {
-        result.fromAddress_ = fromAddressBuilder_ == null
-            ? fromAddress_
-            : fromAddressBuilder_.build();
+        result.selectedShippingOptionId_ = selectedShippingOptionId_;
         to_bitField0_ |= 0x00000002;
       }
       if (((from_bitField0_ & 0x00000020) != 0)) {
-        result.selectedShippingOptionId_ = selectedShippingOptionId_;
-        to_bitField0_ |= 0x00000004;
-      }
-      if (((from_bitField0_ & 0x00000040) != 0)) {
         result.customerPaidPrice_ = customerPaidPriceBuilder_ == null
             ? customerPaidPrice_
             : customerPaidPriceBuilder_.build();
-        to_bitField0_ |= 0x00000008;
+        to_bitField0_ |= 0x00000004;
       }
-      if (((from_bitField0_ & 0x00000080) != 0)) {
+      if (((from_bitField0_ & 0x00000040) != 0)) {
         result.transitDaysSla_ = transitDaysSla_;
-        to_bitField0_ |= 0x00000010;
+        to_bitField0_ |= 0x00000008;
       }
       result.bitField0_ |= to_bitField0_;
     }
@@ -830,12 +759,9 @@ private static final long serialVersionUID = 0L;
           }
         }
       }
-      if (other.hasFromAddress()) {
-        mergeFromAddress(other.getFromAddress());
-      }
       if (other.hasSelectedShippingOptionId()) {
         selectedShippingOptionId_ = other.selectedShippingOptionId_;
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000010;
         onChanged();
       }
       if (other.hasCustomerPaidPrice()) {
@@ -901,29 +827,22 @@ private static final long serialVersionUID = 0L;
               break;
             } // case 34
             case 42: {
-              input.readMessage(
-                  internalGetFromAddressFieldBuilder().getBuilder(),
-                  extensionRegistry);
+              selectedShippingOptionId_ = input.readStringRequireUtf8();
               bitField0_ |= 0x00000010;
               break;
             } // case 42
             case 50: {
-              selectedShippingOptionId_ = input.readStringRequireUtf8();
-              bitField0_ |= 0x00000020;
-              break;
-            } // case 50
-            case 58: {
               input.readMessage(
                   internalGetCustomerPaidPriceFieldBuilder().getBuilder(),
                   extensionRegistry);
+              bitField0_ |= 0x00000020;
+              break;
+            } // case 50
+            case 56: {
+              transitDaysSla_ = input.readInt32();
               bitField0_ |= 0x00000040;
               break;
-            } // case 58
-            case 64: {
-              transitDaysSla_ = input.readInt32();
-              bitField0_ |= 0x00000080;
-              break;
-            } // case 64
+            } // case 56
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -1482,182 +1401,16 @@ private static final long serialVersionUID = 0L;
       return itemsBuilder_;
     }
 
-    private com.acme.proto.acme.common.v1.Address fromAddress_;
-    private com.google.protobuf.SingleFieldBuilder<
-        com.acme.proto.acme.common.v1.Address, com.acme.proto.acme.common.v1.Address.Builder, com.acme.proto.acme.common.v1.AddressOrBuilder> fromAddressBuilder_;
-    /**
-     * <pre>
-     * from_address: warehouse origin with easypost_address populated (fulfillment path);
-     * absent in cart path — LLM resolves via lookup_inventory_location.
-     * </pre>
-     *
-     * <code>optional .acme.common.v1.Address from_address = 5 [json_name = "fromAddress"];</code>
-     * @return Whether the fromAddress field is set.
-     */
-    public boolean hasFromAddress() {
-      return ((bitField0_ & 0x00000010) != 0);
-    }
-    /**
-     * <pre>
-     * from_address: warehouse origin with easypost_address populated (fulfillment path);
-     * absent in cart path — LLM resolves via lookup_inventory_location.
-     * </pre>
-     *
-     * <code>optional .acme.common.v1.Address from_address = 5 [json_name = "fromAddress"];</code>
-     * @return The fromAddress.
-     */
-    public com.acme.proto.acme.common.v1.Address getFromAddress() {
-      if (fromAddressBuilder_ == null) {
-        return fromAddress_ == null ? com.acme.proto.acme.common.v1.Address.getDefaultInstance() : fromAddress_;
-      } else {
-        return fromAddressBuilder_.getMessage();
-      }
-    }
-    /**
-     * <pre>
-     * from_address: warehouse origin with easypost_address populated (fulfillment path);
-     * absent in cart path — LLM resolves via lookup_inventory_location.
-     * </pre>
-     *
-     * <code>optional .acme.common.v1.Address from_address = 5 [json_name = "fromAddress"];</code>
-     */
-    public Builder setFromAddress(com.acme.proto.acme.common.v1.Address value) {
-      if (fromAddressBuilder_ == null) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        fromAddress_ = value;
-      } else {
-        fromAddressBuilder_.setMessage(value);
-      }
-      bitField0_ |= 0x00000010;
-      onChanged();
-      return this;
-    }
-    /**
-     * <pre>
-     * from_address: warehouse origin with easypost_address populated (fulfillment path);
-     * absent in cart path — LLM resolves via lookup_inventory_location.
-     * </pre>
-     *
-     * <code>optional .acme.common.v1.Address from_address = 5 [json_name = "fromAddress"];</code>
-     */
-    public Builder setFromAddress(
-        com.acme.proto.acme.common.v1.Address.Builder builderForValue) {
-      if (fromAddressBuilder_ == null) {
-        fromAddress_ = builderForValue.build();
-      } else {
-        fromAddressBuilder_.setMessage(builderForValue.build());
-      }
-      bitField0_ |= 0x00000010;
-      onChanged();
-      return this;
-    }
-    /**
-     * <pre>
-     * from_address: warehouse origin with easypost_address populated (fulfillment path);
-     * absent in cart path — LLM resolves via lookup_inventory_location.
-     * </pre>
-     *
-     * <code>optional .acme.common.v1.Address from_address = 5 [json_name = "fromAddress"];</code>
-     */
-    public Builder mergeFromAddress(com.acme.proto.acme.common.v1.Address value) {
-      if (fromAddressBuilder_ == null) {
-        if (((bitField0_ & 0x00000010) != 0) &&
-          fromAddress_ != null &&
-          fromAddress_ != com.acme.proto.acme.common.v1.Address.getDefaultInstance()) {
-          getFromAddressBuilder().mergeFrom(value);
-        } else {
-          fromAddress_ = value;
-        }
-      } else {
-        fromAddressBuilder_.mergeFrom(value);
-      }
-      if (fromAddress_ != null) {
-        bitField0_ |= 0x00000010;
-        onChanged();
-      }
-      return this;
-    }
-    /**
-     * <pre>
-     * from_address: warehouse origin with easypost_address populated (fulfillment path);
-     * absent in cart path — LLM resolves via lookup_inventory_location.
-     * </pre>
-     *
-     * <code>optional .acme.common.v1.Address from_address = 5 [json_name = "fromAddress"];</code>
-     */
-    public Builder clearFromAddress() {
-      bitField0_ = (bitField0_ & ~0x00000010);
-      fromAddress_ = null;
-      if (fromAddressBuilder_ != null) {
-        fromAddressBuilder_.dispose();
-        fromAddressBuilder_ = null;
-      }
-      onChanged();
-      return this;
-    }
-    /**
-     * <pre>
-     * from_address: warehouse origin with easypost_address populated (fulfillment path);
-     * absent in cart path — LLM resolves via lookup_inventory_location.
-     * </pre>
-     *
-     * <code>optional .acme.common.v1.Address from_address = 5 [json_name = "fromAddress"];</code>
-     */
-    public com.acme.proto.acme.common.v1.Address.Builder getFromAddressBuilder() {
-      bitField0_ |= 0x00000010;
-      onChanged();
-      return internalGetFromAddressFieldBuilder().getBuilder();
-    }
-    /**
-     * <pre>
-     * from_address: warehouse origin with easypost_address populated (fulfillment path);
-     * absent in cart path — LLM resolves via lookup_inventory_location.
-     * </pre>
-     *
-     * <code>optional .acme.common.v1.Address from_address = 5 [json_name = "fromAddress"];</code>
-     */
-    public com.acme.proto.acme.common.v1.AddressOrBuilder getFromAddressOrBuilder() {
-      if (fromAddressBuilder_ != null) {
-        return fromAddressBuilder_.getMessageOrBuilder();
-      } else {
-        return fromAddress_ == null ?
-            com.acme.proto.acme.common.v1.Address.getDefaultInstance() : fromAddress_;
-      }
-    }
-    /**
-     * <pre>
-     * from_address: warehouse origin with easypost_address populated (fulfillment path);
-     * absent in cart path — LLM resolves via lookup_inventory_location.
-     * </pre>
-     *
-     * <code>optional .acme.common.v1.Address from_address = 5 [json_name = "fromAddress"];</code>
-     */
-    private com.google.protobuf.SingleFieldBuilder<
-        com.acme.proto.acme.common.v1.Address, com.acme.proto.acme.common.v1.Address.Builder, com.acme.proto.acme.common.v1.AddressOrBuilder> 
-        internalGetFromAddressFieldBuilder() {
-      if (fromAddressBuilder_ == null) {
-        fromAddressBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-            com.acme.proto.acme.common.v1.Address, com.acme.proto.acme.common.v1.Address.Builder, com.acme.proto.acme.common.v1.AddressOrBuilder>(
-                getFromAddress(),
-                getParentForChildren(),
-                isClean());
-        fromAddress_ = null;
-      }
-      return fromAddressBuilder_;
-    }
-
     private java.lang.Object selectedShippingOptionId_ = "";
     /**
-     * <code>optional string selected_shipping_option_id = 6 [json_name = "selectedShippingOptionId"];</code>
+     * <code>optional string selected_shipping_option_id = 5 [json_name = "selectedShippingOptionId"];</code>
      * @return Whether the selectedShippingOptionId field is set.
      */
     public boolean hasSelectedShippingOptionId() {
-      return ((bitField0_ & 0x00000020) != 0);
+      return ((bitField0_ & 0x00000010) != 0);
     }
     /**
-     * <code>optional string selected_shipping_option_id = 6 [json_name = "selectedShippingOptionId"];</code>
+     * <code>optional string selected_shipping_option_id = 5 [json_name = "selectedShippingOptionId"];</code>
      * @return The selectedShippingOptionId.
      */
     public java.lang.String getSelectedShippingOptionId() {
@@ -1673,7 +1426,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>optional string selected_shipping_option_id = 6 [json_name = "selectedShippingOptionId"];</code>
+     * <code>optional string selected_shipping_option_id = 5 [json_name = "selectedShippingOptionId"];</code>
      * @return The bytes for selectedShippingOptionId.
      */
     public com.google.protobuf.ByteString
@@ -1690,7 +1443,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>optional string selected_shipping_option_id = 6 [json_name = "selectedShippingOptionId"];</code>
+     * <code>optional string selected_shipping_option_id = 5 [json_name = "selectedShippingOptionId"];</code>
      * @param value The selectedShippingOptionId to set.
      * @return This builder for chaining.
      */
@@ -1698,22 +1451,22 @@ private static final long serialVersionUID = 0L;
         java.lang.String value) {
       if (value == null) { throw new NullPointerException(); }
       selectedShippingOptionId_ = value;
-      bitField0_ |= 0x00000020;
+      bitField0_ |= 0x00000010;
       onChanged();
       return this;
     }
     /**
-     * <code>optional string selected_shipping_option_id = 6 [json_name = "selectedShippingOptionId"];</code>
+     * <code>optional string selected_shipping_option_id = 5 [json_name = "selectedShippingOptionId"];</code>
      * @return This builder for chaining.
      */
     public Builder clearSelectedShippingOptionId() {
       selectedShippingOptionId_ = getDefaultInstance().getSelectedShippingOptionId();
-      bitField0_ = (bitField0_ & ~0x00000020);
+      bitField0_ = (bitField0_ & ~0x00000010);
       onChanged();
       return this;
     }
     /**
-     * <code>optional string selected_shipping_option_id = 6 [json_name = "selectedShippingOptionId"];</code>
+     * <code>optional string selected_shipping_option_id = 5 [json_name = "selectedShippingOptionId"];</code>
      * @param value The bytes for selectedShippingOptionId to set.
      * @return This builder for chaining.
      */
@@ -1722,7 +1475,7 @@ private static final long serialVersionUID = 0L;
       if (value == null) { throw new NullPointerException(); }
       checkByteStringIsUtf8(value);
       selectedShippingOptionId_ = value;
-      bitField0_ |= 0x00000020;
+      bitField0_ |= 0x00000010;
       onChanged();
       return this;
     }
@@ -1731,14 +1484,14 @@ private static final long serialVersionUID = 0L;
     private com.google.protobuf.SingleFieldBuilder<
         com.acme.proto.acme.common.v1.Money, com.acme.proto.acme.common.v1.Money.Builder, com.acme.proto.acme.common.v1.MoneyOrBuilder> customerPaidPriceBuilder_;
     /**
-     * <code>optional .acme.common.v1.Money customer_paid_price = 7 [json_name = "customerPaidPrice"];</code>
+     * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
      * @return Whether the customerPaidPrice field is set.
      */
     public boolean hasCustomerPaidPrice() {
-      return ((bitField0_ & 0x00000040) != 0);
+      return ((bitField0_ & 0x00000020) != 0);
     }
     /**
-     * <code>optional .acme.common.v1.Money customer_paid_price = 7 [json_name = "customerPaidPrice"];</code>
+     * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
      * @return The customerPaidPrice.
      */
     public com.acme.proto.acme.common.v1.Money getCustomerPaidPrice() {
@@ -1749,7 +1502,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>optional .acme.common.v1.Money customer_paid_price = 7 [json_name = "customerPaidPrice"];</code>
+     * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
      */
     public Builder setCustomerPaidPrice(com.acme.proto.acme.common.v1.Money value) {
       if (customerPaidPriceBuilder_ == null) {
@@ -1760,12 +1513,12 @@ private static final long serialVersionUID = 0L;
       } else {
         customerPaidPriceBuilder_.setMessage(value);
       }
-      bitField0_ |= 0x00000040;
+      bitField0_ |= 0x00000020;
       onChanged();
       return this;
     }
     /**
-     * <code>optional .acme.common.v1.Money customer_paid_price = 7 [json_name = "customerPaidPrice"];</code>
+     * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
      */
     public Builder setCustomerPaidPrice(
         com.acme.proto.acme.common.v1.Money.Builder builderForValue) {
@@ -1774,16 +1527,16 @@ private static final long serialVersionUID = 0L;
       } else {
         customerPaidPriceBuilder_.setMessage(builderForValue.build());
       }
-      bitField0_ |= 0x00000040;
+      bitField0_ |= 0x00000020;
       onChanged();
       return this;
     }
     /**
-     * <code>optional .acme.common.v1.Money customer_paid_price = 7 [json_name = "customerPaidPrice"];</code>
+     * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
      */
     public Builder mergeCustomerPaidPrice(com.acme.proto.acme.common.v1.Money value) {
       if (customerPaidPriceBuilder_ == null) {
-        if (((bitField0_ & 0x00000040) != 0) &&
+        if (((bitField0_ & 0x00000020) != 0) &&
           customerPaidPrice_ != null &&
           customerPaidPrice_ != com.acme.proto.acme.common.v1.Money.getDefaultInstance()) {
           getCustomerPaidPriceBuilder().mergeFrom(value);
@@ -1794,16 +1547,16 @@ private static final long serialVersionUID = 0L;
         customerPaidPriceBuilder_.mergeFrom(value);
       }
       if (customerPaidPrice_ != null) {
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000020;
         onChanged();
       }
       return this;
     }
     /**
-     * <code>optional .acme.common.v1.Money customer_paid_price = 7 [json_name = "customerPaidPrice"];</code>
+     * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
      */
     public Builder clearCustomerPaidPrice() {
-      bitField0_ = (bitField0_ & ~0x00000040);
+      bitField0_ = (bitField0_ & ~0x00000020);
       customerPaidPrice_ = null;
       if (customerPaidPriceBuilder_ != null) {
         customerPaidPriceBuilder_.dispose();
@@ -1813,15 +1566,15 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>optional .acme.common.v1.Money customer_paid_price = 7 [json_name = "customerPaidPrice"];</code>
+     * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
      */
     public com.acme.proto.acme.common.v1.Money.Builder getCustomerPaidPriceBuilder() {
-      bitField0_ |= 0x00000040;
+      bitField0_ |= 0x00000020;
       onChanged();
       return internalGetCustomerPaidPriceFieldBuilder().getBuilder();
     }
     /**
-     * <code>optional .acme.common.v1.Money customer_paid_price = 7 [json_name = "customerPaidPrice"];</code>
+     * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
      */
     public com.acme.proto.acme.common.v1.MoneyOrBuilder getCustomerPaidPriceOrBuilder() {
       if (customerPaidPriceBuilder_ != null) {
@@ -1832,7 +1585,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>optional .acme.common.v1.Money customer_paid_price = 7 [json_name = "customerPaidPrice"];</code>
+     * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
      */
     private com.google.protobuf.SingleFieldBuilder<
         com.acme.proto.acme.common.v1.Money, com.acme.proto.acme.common.v1.Money.Builder, com.acme.proto.acme.common.v1.MoneyOrBuilder> 
@@ -1850,15 +1603,15 @@ private static final long serialVersionUID = 0L;
 
     private int transitDaysSla_ ;
     /**
-     * <code>optional int32 transit_days_sla = 8 [json_name = "transitDaysSla"];</code>
+     * <code>optional int32 transit_days_sla = 7 [json_name = "transitDaysSla"];</code>
      * @return Whether the transitDaysSla field is set.
      */
     @java.lang.Override
     public boolean hasTransitDaysSla() {
-      return ((bitField0_ & 0x00000080) != 0);
+      return ((bitField0_ & 0x00000040) != 0);
     }
     /**
-     * <code>optional int32 transit_days_sla = 8 [json_name = "transitDaysSla"];</code>
+     * <code>optional int32 transit_days_sla = 7 [json_name = "transitDaysSla"];</code>
      * @return The transitDaysSla.
      */
     @java.lang.Override
@@ -1866,23 +1619,23 @@ private static final long serialVersionUID = 0L;
       return transitDaysSla_;
     }
     /**
-     * <code>optional int32 transit_days_sla = 8 [json_name = "transitDaysSla"];</code>
+     * <code>optional int32 transit_days_sla = 7 [json_name = "transitDaysSla"];</code>
      * @param value The transitDaysSla to set.
      * @return This builder for chaining.
      */
     public Builder setTransitDaysSla(int value) {
 
       transitDaysSla_ = value;
-      bitField0_ |= 0x00000080;
+      bitField0_ |= 0x00000040;
       onChanged();
       return this;
     }
     /**
-     * <code>optional int32 transit_days_sla = 8 [json_name = "transitDaysSla"];</code>
+     * <code>optional int32 transit_days_sla = 7 [json_name = "transitDaysSla"];</code>
      * @return This builder for chaining.
      */
     public Builder clearTransitDaysSla() {
-      bitField0_ = (bitField0_ & ~0x00000080);
+      bitField0_ = (bitField0_ & ~0x00000040);
       transitDaysSla_ = 0;
       onChanged();
       return this;

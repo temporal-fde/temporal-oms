@@ -110,12 +110,11 @@ class ShippingAgentExecutionOptions(_message.Message):
     def __init__(self, cache_ttl_secs: _Optional[int] = ...) -> None: ...
 
 class CalculateShippingOptionsRequest(_message.Message):
-    __slots__ = ("order_id", "customer_id", "to_address", "items", "from_address", "selected_shipping_option_id", "customer_paid_price", "transit_days_sla")
+    __slots__ = ("order_id", "customer_id", "to_address", "items", "selected_shipping_option_id", "customer_paid_price", "transit_days_sla")
     ORDER_ID_FIELD_NUMBER: _ClassVar[int]
     CUSTOMER_ID_FIELD_NUMBER: _ClassVar[int]
     TO_ADDRESS_FIELD_NUMBER: _ClassVar[int]
     ITEMS_FIELD_NUMBER: _ClassVar[int]
-    FROM_ADDRESS_FIELD_NUMBER: _ClassVar[int]
     SELECTED_SHIPPING_OPTION_ID_FIELD_NUMBER: _ClassVar[int]
     CUSTOMER_PAID_PRICE_FIELD_NUMBER: _ClassVar[int]
     TRANSIT_DAYS_SLA_FIELD_NUMBER: _ClassVar[int]
@@ -123,11 +122,10 @@ class CalculateShippingOptionsRequest(_message.Message):
     customer_id: str
     to_address: _values_pb2_1.Address
     items: _containers.RepeatedCompositeFieldContainer[ShippingLineItem]
-    from_address: _values_pb2_1.Address
     selected_shipping_option_id: str
     customer_paid_price: _values_pb2_1.Money
     transit_days_sla: int
-    def __init__(self, order_id: _Optional[str] = ..., customer_id: _Optional[str] = ..., to_address: _Optional[_Union[_values_pb2_1.Address, _Mapping]] = ..., items: _Optional[_Iterable[_Union[ShippingLineItem, _Mapping]]] = ..., from_address: _Optional[_Union[_values_pb2_1.Address, _Mapping]] = ..., selected_shipping_option_id: _Optional[str] = ..., customer_paid_price: _Optional[_Union[_values_pb2_1.Money, _Mapping]] = ..., transit_days_sla: _Optional[int] = ...) -> None: ...
+    def __init__(self, order_id: _Optional[str] = ..., customer_id: _Optional[str] = ..., to_address: _Optional[_Union[_values_pb2_1.Address, _Mapping]] = ..., items: _Optional[_Iterable[_Union[ShippingLineItem, _Mapping]]] = ..., selected_shipping_option_id: _Optional[str] = ..., customer_paid_price: _Optional[_Union[_values_pb2_1.Money, _Mapping]] = ..., transit_days_sla: _Optional[int] = ...) -> None: ...
 
 class CalculateShippingOptionsResponse(_message.Message):
     __slots__ = ("recommendation", "options", "cache_hit")

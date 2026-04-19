@@ -110,13 +110,12 @@ class StartShippingAgentRequest(BaseModel):
 class CalculateShippingOptionsRequest(BaseModel):
     """
      CalculateShippingOptionsRequest is the Update input for the ShippingAgent agentic loop.
- Two call paths use the same message:
-   Fulfillment path: from_address is provided with easypost_address already populated
-                     (pre-resolved from EnrichedItem; warehouse addresses are pre-verified).
-   Cart/UI path: from_address absent; LLM calls lookup_inventory_location, which returns
-                 an Address with easypost_address pre-populated from seed data.
- Cache key is derived from from_address.easypost_address.id in both paths — symmetric
- with to_address, which also carries easypost_address from fulfillment.Order validateOrder.
+ The caller provides items with sku_id; the LLM always calls lookup_inventory_location
+ first to resolve the warehouse origin from inventory. Both the fulfillment path
+ (EnrichedItem sku_ids) and the cart path (cart item sku_ids) use the same flow.
+ Cache key is derived from the resolved from_address.easypost_address.id (set after
+ lookup_inventory_location returns) and to_address.easypost_address.id (pre-populated
+ by fulfillment.Order validateOrder).
     """
 
     order_id: str = Field(default="")
@@ -124,9 +123,6 @@ class CalculateShippingOptionsRequest(BaseModel):
 # to_address: easypost_address pre-populated by fulfillment.Order validateOrder.
     to_address: Address = Field(default_factory=Address)
     items: typing.List[ShippingLineItem] = Field(default_factory=list)
-# from_address: warehouse origin with easypost_address populated (fulfillment path);
-# absent in cart path — LLM resolves via lookup_inventory_location.
-    from_address: typing.Optional[Address] = Field(default_factory=Address)
     selected_shipping_option_id: typing.Optional[str] = Field(default="")
     customer_paid_price: typing.Optional[Money] = Field(default_factory=Money)
     transit_days_sla: typing.Optional[int] = Field(default=0)
