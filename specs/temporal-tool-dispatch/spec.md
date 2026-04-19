@@ -150,7 +150,8 @@ ShippingAgent (consumer — worked example)
 | `ToolSpecs.dispatch` returns `str` (serialized JSON) | The agentic loop appends tool results to LLM messages as JSON strings; deserializing after dispatch would be wasteful. `str` keeps the method signature stable regardless of result type. | Return `BaseModel` — the caller always serializes to JSON, so this pushes boilerplate into every loop |
 | `activity_name(method)` exported from the module | General-purpose utility for extracting Temporal-registered names; prevents silent breakage from `name=` kwarg changes on `@activity.defn` | Private `_activity_name` per workflow — already the problem this module solves |
 | Static registration only — `ToolSpecs` is constructed at module level, not at runtime | Static registration produces a deterministic, replay-safe dispatch table. The full list is known at workflow definition time. Temporal workflow code must be deterministic. | Dynamic tool discovery (e.g. listing activity registrations from the worker at runtime) — violates Temporal determinism; also conflates "what is registered" with "what the LLM should see" |
-| Execution options captured at builder call time | Builders close over `task_queue`, `timeout`, `retry_policy`. `ToolSpecs.dispatch` passes no execution options. | Passing options to `ToolSpecs.dispatch` at call time — couples the loop to per-tool configuration |
+| Builder execution options forwarded via `**kwargs`, not a custom options dataclass | The Temporal SDK already defines the valid options for each primitive (`execute_activity`, `execute_local_activity`, etc.). Replicating those fields into our own dataclasses would create a parallel type that diverges from the SDK over time. Instead each builder accepts `**execute_kwargs` and passes them through verbatim — the SDK function's own signature is the source of truth for valid options. | Custom `ActivityOptions` dataclass per primitive — duplicates SDK fields, must be maintained as the SDK evolves, adds a type the caller must learn |
+| Execution options captured at builder call time | Builders close over `**execute_kwargs` at construction. `ToolSpecs.dispatch` passes no options. | Passing options to `ToolSpecs.dispatch` at call time — couples the loop to per-tool configuration |
 
 ### Component Design
 
@@ -170,26 +171,30 @@ ShippingAgent (consumer — worked example)
 - **Mechanism:** Reads `__temporal_activity_definition.name` set by the decorator; falls back to `method.__name__`
 - **When to use:** Whenever a workflow registers an activity as a tool — using the registered name ensures that renaming the method or changing the `name=` kwarg to `@activity.defn` propagates automatically to the tool dict key
 
-#### `activity_tool(name, description, method, req_type, result_type, task_queue, start_to_close_timeout, retry_policy=None, schedule_to_close_timeout=None) -> ToolSpec`
+#### `activity_tool(name, description, method, req_type, result_type, **execute_kwargs) -> ToolSpec`
 
-- **Dispatch behavior:** `workflow.execute_activity(method, args=[req], result_type=result_type, task_queue=task_queue, start_to_close_timeout=..., retry_policy=...)`
+- **`execute_kwargs`:** All keyword arguments accepted by `workflow.execute_activity` except `args` and `result_type` (those are provided by the builder). Typically includes `task_queue`, `start_to_close_timeout`, `schedule_to_close_timeout`, `retry_policy`, `heartbeat_timeout`, `cancellation_type`. The SDK function is the authoritative list — the builder forwards them verbatim.
+- **Dispatch behavior:** `workflow.execute_activity(method, args=[req], result_type=result_type, **execute_kwargs)`
 - **When to use:** The tool calls an external API, reads a database, or performs I/O that may fail and should be retried. Produces a separate event in workflow history. Task-queue rate limiting is available.
 
-#### `local_activity_tool(name, description, method, req_type, result_type, start_to_close_timeout, retry_policy=None) -> ToolSpec`
+#### `local_activity_tool(name, description, method, req_type, result_type, **execute_kwargs) -> ToolSpec`
 
-- **Dispatch behavior:** `workflow.execute_local_activity(method, args=[req], result_type=result_type, start_to_close_timeout=..., retry_policy=...)`
-- **When to use:** The tool is fast and cheap (seconds, not minutes), runs in-process, and does not need a separate history event. Examples: lightweight in-memory lookups, short JSON transforms, deterministic calculations. **Not appropriate** for external API calls that may time out or fail at external service boundaries — use `activity_tool` for those.
+- **`execute_kwargs`:** All keyword arguments accepted by `workflow.execute_local_activity` except `args` and `result_type`. Typically includes `start_to_close_timeout`, `schedule_to_close_timeout`, `retry_policy`, `local_retry_threshold`, `cancellation_type`.
+- **Dispatch behavior:** `workflow.execute_local_activity(method, args=[req], result_type=result_type, **execute_kwargs)`
+- **When to use:** The tool is fast and cheap (seconds, not minutes), runs in-process, and does not need a separate history event. Examples: lightweight in-memory lookups, short JSON transforms, deterministic calculations. **Not appropriate** for external API calls — use `activity_tool` for those.
 
-#### `nexus_tool(name, description, endpoint, operation, req_type, result_type, schedule_to_close_timeout) -> ToolSpec`
+#### `nexus_tool(name, description, endpoint, operation, req_type, result_type, **execute_kwargs) -> ToolSpec`
 
-- **Dispatch behavior:** Execute the Nexus operation via the Temporal Python SDK's Nexus client. The exact SDK call depends on the current Python SDK API for Nexus (to be confirmed during implementation — see Open Questions).
-- **When to use:** The capability is owned by another team or service in a different Temporal namespace. The caller sees only the endpoint name and operation contract — the implementation (activity, workflow, external API) is invisible to the dispatch side.
+- **`execute_kwargs`:** All keyword arguments accepted by the Temporal Python SDK's Nexus operation call, minus the operation input. Exact set to be confirmed against the SDK during implementation (see Open Questions).
+- **Dispatch behavior:** Execute the Nexus operation via the Temporal Python SDK's Nexus client, forwarding `**execute_kwargs`. Stub with `raise NotImplementedError` until the Python SDK Nexus dispatch API is confirmed.
+- **When to use:** The capability is owned by another team or service in a different Temporal namespace. The caller sees only the endpoint name and operation contract.
 
-#### `child_workflow_tool(name, description, workflow_type, req_type, result_type, task_queue, execution_timeout=None, id_fn=None) -> ToolSpec`
+#### `child_workflow_tool(name, description, workflow_type, req_type, result_type, id_fn=None, **execute_kwargs) -> ToolSpec`
 
-- **Dispatch behavior:** `workflow.execute_child_workflow(workflow_type, args=[req], task_queue=task_queue, execution_timeout=..., id=id_fn(req) if id_fn else None)`
-- **`id_fn`:** Optional callable `(req: BaseModel) -> str`; constructs a deterministic workflow ID from the request. Use when the child workflow should be idempotent on a business key (e.g. `lambda req: f"tool-call-{req.order_id}`).
-- **When to use:** The work triggered by the tool is itself long-running (minutes to hours), benefits from its own checkpoint history, or may need to be queried or cancelled independently. A Child Workflow can run indefinitely; it checkpoints independently of the parent.
+- **`id_fn`:** Optional callable `(req: BaseModel) -> str`; constructs a deterministic workflow ID from the request. This is the one builder-level convenience that has no direct SDK equivalent — all other options go in `**execute_kwargs`.
+- **`execute_kwargs`:** All keyword arguments accepted by `workflow.execute_child_workflow` except `args` and `result_type`. Typically includes `task_queue`, `execution_timeout`, `run_timeout`, `task_timeout`, `id_reuse_policy`, `retry_policy`, `cancellation_type`, `versioning_intent`.
+- **Dispatch behavior:** `workflow.execute_child_workflow(workflow_type, args=[req], result_type=result_type, id=id_fn(req) if id_fn else None, **execute_kwargs)`
+- **When to use:** The work triggered by the tool is itself long-running (minutes to hours), benefits from its own checkpoint history, or may need to be queried or cancelled independently.
 
 #### `ToolSpecs` container
 
@@ -261,7 +266,7 @@ To Modify:
 
 - `activity_name` with an `@activity.defn` method returns the Temporal-registered name, not `__name__`
 - `activity_name` with a plain function falls back to `__name__`
-- `activity_tool` dispatch calls `workflow.execute_activity` with the exact `method`, `task_queue`, `start_to_close_timeout`, `retry_policy` provided at builder time
+- `activity_tool` dispatch calls `workflow.execute_activity` with the exact `method`, `result_type`, and all `**execute_kwargs` provided at builder time — no kwargs are dropped or added
 - `local_activity_tool` dispatch calls `workflow.execute_local_activity` (mock)
 - `nexus_tool` dispatch calls the Nexus SDK (mock)
 - `child_workflow_tool` dispatch calls `workflow.execute_child_workflow` with correct `id` when `id_fn` is provided, and `None` id when omitted
@@ -325,6 +330,7 @@ None — the module has no infrastructure dependencies and can be written and te
 - Builder functions must return an `async def` inner function for `dispatch`, not a `lambda`. `workflow.execute_activity` and `workflow.execute_child_workflow` are coroutines; a `lambda` cannot `await` them.
 - `ToolSpecs.dispatch` must be declared `async` and awaited inside `asyncio.gather` in the agentic loop.
 - The module must not import activity implementation classes at the module level. Activity imports belong in the workflow file that calls the builders. The module only imports from `temporalio` and `pydantic`.
+- Builder `**execute_kwargs` are captured at construction time and forwarded verbatim to the SDK call inside `dispatch`. The builder does not inspect or validate them — invalid kwargs surface as `TypeError` at dispatch time, which is acceptable: a misconfigured `ToolSpec` is a programming error caught in testing, not a runtime tool failure.
 - `ToolSpec.dispatch` (the per-spec coroutine field) and `ToolSpecs.dispatch` (the container's routing method) are distinct: the former is the primitive-specific callable set by a builder; the latter is the public method that does name lookup, deserialization, and serialization around it.
 - Workflows that need to inspect a specific tool's result after dispatch (e.g. ShippingAgent extracting `easypost_address.id` from `lookup_inventory_location`) do so by checking `block.tool_use.name == activity_name(LookupInventoryActivities.lookup_inventory_location)`. This is workflow-specific post-processing, not part of the module.
 

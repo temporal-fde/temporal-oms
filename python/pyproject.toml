@@ -3,7 +3,7 @@ name = "python"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "aiohttp>=3.13.5",
     "anthropic>=0.96.0",
