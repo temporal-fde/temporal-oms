@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 import asyncio
-import hashlib
 import json
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from temporalio import workflow
 from temporalio.common import RetryPolicy
@@ -17,7 +16,6 @@ with workflow.unsafe.imports_passed_through():
         LlmRole,
         LlmStopReason,
         LlmTextBlock,
-        LlmToolDefinition,
         LlmToolResultBlock,
     )
     from acme.fulfillment.domain.v1.shipping_agent_p2p import (
@@ -30,10 +28,7 @@ with workflow.unsafe.imports_passed_through():
         LookupInventoryLocationRequest,
         LookupInventoryLocationResponse,
         RecommendationOutcome,
-        ShippingLineItem,
         ShippingOption,
-        ShippingOptionsCache,
-        ShippingOptionsResult,
         ShippingRecommendation,
         StartShippingAgentRequest,
     )
@@ -43,7 +38,6 @@ with workflow.unsafe.imports_passed_through():
     from src.agents.activities.location_events import LocationEventsActivities
     from src.agents.dispatch import activity_name, activity_tool, ToolSpecs
 
-_DEFAULT_CACHE_TTL_SECS = 1800
 _ACTIVITY_TIMEOUT = timedelta(seconds=30)
 _LLM_TIMEOUT = timedelta(seconds=120)
 _ACTIVITY_RETRY = RetryPolicy(maximum_attempts=3)
@@ -95,20 +89,6 @@ _TOOLS = ToolSpecs(
         retry_policy=_ACTIVITY_RETRY,
     ),
 )
-
-
-def _cache_key(
-    easypost_address_id: str,
-    items: list[ShippingLineItem],
-    postal_code: str,
-    country: str,
-) -> str:
-    sorted_items = sorted(
-        [(item.sku_id, item.quantity) for item in items],
-        key=lambda x: x[0],
-    )
-    raw = f"{easypost_address_id}:{sorted_items}:{postal_code}:{country}"
-    return hashlib.sha256(raw.encode()).hexdigest()
 
 
 def _parse_recommendation(text: str) -> ShippingRecommendation:
@@ -188,54 +168,25 @@ class ShippingAgent:
     """Long-running per-customer shipping advisor workflow.
 
     WorkflowID: customer_id
-    Caches shipping rate calculations by content hash with a configurable TTL.
     """
-
-    def __init__(self) -> None:
-        self._cache: dict[str, ShippingOptionsResult] = {}
-        self._cache_meta: dict[str, datetime] = {}
-        self._cache_ttl_secs: int = _DEFAULT_CACHE_TTL_SECS
 
     @workflow.run
     async def run(self, request: StartShippingAgentRequest) -> None:
-        if request.execution_options and request.execution_options.cache_ttl_secs:
-            self._cache_ttl_secs = int(request.execution_options.cache_ttl_secs)
-        # Long-running agent: never exits on its own
         await workflow.wait_condition(lambda: False)
-
-    @workflow.query
-    def get_options(self) -> ShippingOptionsCache:
-        return ShippingOptionsCache(results=dict(self._cache))
 
     @workflow.update
     async def calculate_shipping_options(
         self, request: CalculateShippingOptionsRequest
     ) -> CalculateShippingOptionsResponse:
-        # Fulfillment path early cache check — from_address with easypost_address.id present
-        from_ep_id = (
-            request.from_address.easypost_address.id
-            if (request.from_address and request.from_address.easypost_address)
-            else ""
-        )
-        if from_ep_id:
-            key = _cache_key(
-                from_ep_id,
-                list(request.items),
-                request.to_address.postal_code,
-                request.to_address.country,
-            )
-            if self._is_cache_valid(key):
-                cached = self._cache[key]
-                return CalculateShippingOptionsResponse(
-                    recommendation=cached.recommendation,
-                    options=list(cached.options),
-                    cache_hit=True,
-                )
+        return await self._run_react_loop(request)
 
+    async def _run_react_loop(
+        self,
+        request: CalculateShippingOptionsRequest,
+    ) -> CalculateShippingOptionsResponse:
         system_prompt = _build_system_prompt(request)
         tools = _TOOLS.definitions()
 
-        # Initial user message
         has_from = bool(request.from_address and request.from_address.street)
         from_desc = (
             f"{request.from_address.street}, {request.from_address.city}, "
@@ -267,11 +218,10 @@ class ShippingAgent:
             )
         ]
 
-        resolved_ep_id: str = from_ep_id  # populated from cart path lookup_inventory_location result
-        all_options: list[ShippingOption] = []
         recommendation: ShippingRecommendation | None = None
 
         while True:
+            # ReAct: Reason — LLM evaluates state and decides next action (tool calls or final answer)
             llm_response: LlmResponse = await workflow.execute_activity(
                 "call_llm",
                 args=[messages, tools],
@@ -296,43 +246,10 @@ class ShippingAgent:
             if llm_response.stop_reason == LlmStopReason.LLM_STOP_REASON_TOOL_USE:
                 tool_blocks = [b for b in llm_response.content if b.type == "tool_use"]
 
-                # Dispatch all tool calls in this batch concurrently
+                # ReAct: Act — dispatch tool calls concurrently, block until all resolve
                 tool_results: list[str] = list(await asyncio.gather(
                     *[_TOOLS.dispatch(b) for b in tool_blocks]
                 ))
-
-                # Extract easypost_address.id from lookup_inventory_location (cart path)
-                # and options from get_carrier_rates for cache storage.
-                for block, result_json in zip(tool_blocks, tool_results):
-                    if block.tool_use.name == _NAME_LOOKUP and not resolved_ep_id:
-                        try:
-                            data = json.loads(result_json)
-                            ep = (data.get("address") or {}).get("easypost_address") or {}
-                            resolved_ep_id = ep.get("id", "")
-                        except json.JSONDecodeError:
-                            pass
-                    if block.tool_use.name == _NAME_RATES:
-                        try:
-                            data = json.loads(result_json)
-                            all_options = [ShippingOption(**o) for o in data.get("options", [])]
-                        except Exception:
-                            pass
-
-                # Cart path post-location cache check (once easypost_address.id is resolved)
-                if resolved_ep_id and not from_ep_id:
-                    key = _cache_key(
-                        resolved_ep_id,
-                        list(request.items),
-                        request.to_address.postal_code,
-                        request.to_address.country,
-                    )
-                    if self._is_cache_valid(key):
-                        cached = self._cache[key]
-                        return CalculateShippingOptionsResponse(
-                            recommendation=cached.recommendation,
-                            options=list(cached.options),
-                            cache_hit=True,
-                        )
 
                 messages.append(LlmMessage(
                     role=LlmRole.LLM_ROLE_USER,
@@ -351,25 +268,37 @@ class ShippingAgent:
         if recommendation is None:
             raise ApplicationError("LLM did not produce a recommendation", non_retryable=False)
 
-        final_key = _cache_key(
-            resolved_ep_id or "unknown",
-            list(request.items),
-            request.to_address.postal_code,
-            request.to_address.country,
-        )
-        now = workflow.now()
-        self._cache[final_key] = ShippingOptionsResult(
-            recommendation=recommendation,
-            options=all_options,
-            cached_at=now,
-        )
-        self._cache_meta[final_key] = now
-
         return CalculateShippingOptionsResponse(
             recommendation=recommendation,
-            options=all_options,
+            options=[],
             cache_hit=False,
         )
+
+    def _apply_tool_results(
+        self,
+        request: CalculateShippingOptionsRequest,
+        tool_blocks: list[LlmContentBlock],
+        tool_results: list[str],
+        resolved_ep_id: str,
+        from_ep_id: str,
+        all_options: list[ShippingOption],
+    ) -> tuple[str, list[ShippingOption], CalculateShippingOptionsResponse | None]:
+        for block, result_json in zip(tool_blocks, tool_results):
+            if block.tool_use.name == _NAME_LOOKUP and not resolved_ep_id:
+                try:
+                    data = json.loads(result_json)
+                    ep = (data.get("address") or {}).get("easypost_address") or {}
+                    resolved_ep_id = ep.get("id", "")
+                except json.JSONDecodeError:
+                    pass
+            if block.tool_use.name == _NAME_RATES:
+                try:
+                    data = json.loads(result_json)
+                    all_options = [ShippingOption(**o) for o in data.get("options", [])]
+                except Exception:
+                    pass
+
+        return resolved_ep_id, all_options, None
 
     @calculate_shipping_options.validator
     def validate_calculate_shipping_options(
@@ -383,8 +312,3 @@ class ShippingAgent:
             raise ValueError("to_address is required")
         if not request.items:
             raise ValueError("at least one item is required")
-
-    def _is_cache_valid(self, key: str) -> bool:
-        if key not in self._cache_meta:
-            return False
-        return workflow.now() - self._cache_meta[key] <= timedelta(seconds=self._cache_ttl_secs)
