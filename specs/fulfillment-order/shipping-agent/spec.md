@@ -241,13 +241,9 @@ Worker configuration for each queue sets `max_activities_per_second` on the work
 `maxTaskQueueActivitiesPerSecond` server-side) to enforce the limit. Activity options in the
 agentic loop dispatch each tool call to its designated task queue.
 
-> **V1 limitation:** Worker-level rate limiting governs only that worker's poll rate. If the
-> `fulfillment-easypost` worker is ever scaled to multiple instances, each will independently
-> do 5 rps and the aggregate will exceed EasyPost's limit. The correct long-term solution is
-> an `EasyPostGateway` workflow: a long-running workflow that accepts EasyPost operations via
-> Updates, queues them in-process, and drains at the rate limit — a single durable serializer
-> across all callers. This also gives Temporal UI visibility into the EasyPost backlog. Deferred
-> to a follow-up spec.
+> **V1 limitation:** Worker-level rate limiting only governs that worker's poll rate — multiple
+> `fulfillment-easypost` worker instances each do 5 rps and the aggregate exceeds EasyPost's
+> limit. See **Deferred Work — EasyPostGateway workflow**.
 
 #### Activities (LLM Tools)
 
@@ -467,6 +463,58 @@ All open questions resolved:
 - [x] What is the PredictHQ `within_km` radius default for Workshop demos? **50km**
 - [x] What is the default `cache_ttl_secs`? **1800 (30 minutes)**
 - [x] Should `SLA_BREACH` signal a support workflow directly from `ShippingAgent`, or return the outcome and let `fulfillment.Order` decide? **`fulfillment.Order` handles it** — ShippingAgent returns the `SLA_BREACH` outcome; `fulfillment.Order` decides what to do (consistent with "recommends, not decides" principle)
+
+---
+
+## Deferred Work
+
+Items that were considered during design or implementation and deliberately excluded from V1.
+Each is a candidate for a follow-up spec or Workshop extension exercise.
+
+### Warehouse address caching in workflow state
+
+**What:** Cache the `LookupInventoryLocationResponse` in workflow state after the first
+`lookup_inventory_location` call. On subsequent `calculate_shipping_options` updates, skip
+the activity entirely and inject the resolved warehouse address directly into the task context
+— removing it from the tool definitions so the LLM never has to call it.
+
+**Why deferred:** Warehouse-to-SKU assignment is stable in V1 (static TOML seed data), so
+every call pays the lookup cost unnecessarily. The optimization is safe to defer because the
+activity is cheap and in-process for the Workshop. Promotes naturally once a real Inventory
+Locations service is behind it.
+
+**Consideration for production:** If SKU-to-warehouse assignment changes (new warehouse, SKU
+migration), the cached address becomes stale for the lifetime of the workflow. A cache
+invalidation Signal or a TTL would be needed before enabling this in production.
+
+---
+
+### Shipping options cache
+
+**What:** An in-workflow `dict` cache keyed by a content hash of
+`(from_easypost_id, items, destination_postal_code, destination_country)` that short-circuits
+the full agentic loop on repeated requests with identical inputs, returning the cached
+`ShippingRecommendation` directly.
+
+**Why deferred:** The cache was removed during implementation to reduce complexity and keep
+the agentic loop as the clear teaching path. For the Workshop, every call going through the
+full loop is a feature — students see every step every time. Re-enabling it is a natural
+extension exercise: add the `_cache` dict, compute the key after `lookup_inventory_location`
+resolves the warehouse, store the result, and short-circuit on hit.
+
+---
+
+### EasyPostGateway workflow
+
+**What:** A long-running workflow that accepts EasyPost operations via Updates, queues them
+in-process, and drains at the documented rate limit — a single durable serializer across all
+callers. Gives Temporal UI visibility into the EasyPost backlog.
+
+**Why deferred:** Worker-level `max_activities_per_second` is sufficient when the
+`fulfillment-easypost` worker runs as a single instance (Workshop scale). The gap only opens
+if the worker is scaled horizontally — each instance independently enforces 5 rps and the
+aggregate exceeds EasyPost's limit. The gateway pattern is a strong Temporal teaching example
+in its own right and warrants a dedicated spec.
 
 ---
 
