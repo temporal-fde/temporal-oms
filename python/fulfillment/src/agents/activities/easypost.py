@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-import os
-
 import easypost
 from temporalio import activity
 
+from src.config import settings
 from acme.common.v1.values_p2p import Address, Coordinate, EasyPostAddress, Money
 from acme.fulfillment.domain.v1.shipping_agent_p2p import (
     GetShippingRatesRequest,
@@ -21,7 +20,7 @@ _DEFAULT_PARCEL = {"weight": 16, "length": 6, "width": 6, "height": 4}
 
 
 def _get_client() -> easypost.EasyPostClient:
-    return easypost.EasyPostClient(os.environ["EASYPOST_API_KEY"])
+    return easypost.EasyPostClient(settings.easypost_api_key)
 
 
 class EasyPostActivities:

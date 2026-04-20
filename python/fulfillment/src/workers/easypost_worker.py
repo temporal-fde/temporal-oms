@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-import os
-
 from temporalio.client import Client
 from temporalio.worker import Worker
 
+from src.config import settings
 from src.agents.activities.easypost import EasyPostActivities
 
 _TASK_QUEUE = "fulfillment-easypost"
@@ -13,7 +12,7 @@ _NAMESPACE = "fulfillment"
 
 async def build_easypost_worker() -> Worker:
     client = await Client.connect(
-        os.environ.get("TEMPORAL_ADDRESS", "localhost:7233"),
+        settings.temporal_address,
         namespace=_NAMESPACE,
     )
     easypost_activities = EasyPostActivities()

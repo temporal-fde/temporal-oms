@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-import os
-
 import anthropic
 from temporalio import activity
 
+from src.config import settings
 from acme.fulfillment.domain.v1.shipping_agent_p2p import (
     BuildSystemPromptRequest,
     BuildSystemPromptResponse,
@@ -84,7 +83,7 @@ class LlmActivities:
 
     def __init__(self) -> None:
         self._client = anthropic.AsyncAnthropic(
-            api_key=os.environ["ANTHROPIC_API_KEY"],
+            api_key=settings.anthropic_api_key,
         )
 
     @activity.defn

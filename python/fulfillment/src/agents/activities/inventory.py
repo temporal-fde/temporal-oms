@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 import toml
 from temporalio import activity
+
+from src.config import settings
 
 from acme.fulfillment.domain.v1.shipping_agent_p2p import (
     LookupInventoryLocationRequest,
@@ -18,7 +19,7 @@ _DEFAULT_WAREHOUSE_CONFIG_PATH = (
 
 
 def _load_warehouses() -> list[dict]:
-    path = os.getenv("WAREHOUSE_CONFIG_PATH", str(_DEFAULT_WAREHOUSE_CONFIG_PATH))
+    path = settings.warehouse_config_path or str(_DEFAULT_WAREHOUSE_CONFIG_PATH)
     data = toml.load(path)
     return data.get("warehouses", [])
 

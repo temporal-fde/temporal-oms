@@ -1,4 +1,4 @@
-spring.config.import: classpath:acme.fulfillment.yaml
+spring.config.import: classpath:acme.fulfillment.yaml,optional:dotenv:.env.local
 spring.application.name: fulfillment-api
 spring.temporal.start-workers: false
 

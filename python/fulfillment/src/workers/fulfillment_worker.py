@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-import os
-
 from temporalio.client import Client
 from temporalio.worker import Worker
 
+from src.config import settings
 from src.agents.activities.inventory import LookupInventoryActivities
 from src.agents.activities.llm import LlmActivities
 from src.agents.workflows.shipping_agent import ShippingAgent
@@ -15,7 +14,7 @@ _NAMESPACE = "fulfillment"
 
 async def build_fulfillment_worker() -> Worker:
     client = await Client.connect(
-        os.environ.get("TEMPORAL_ADDRESS", "localhost:7233"),
+        settings.temporal_address,
         namespace=_NAMESPACE,
     )
     inventory_activities = LookupInventoryActivities()

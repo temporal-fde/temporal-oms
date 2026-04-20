@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-import os
-
 import aiohttp
 from temporalio.client import Client
 from temporalio.worker import Worker
 
+from src.config import settings
 from src.agents.activities.location_events import LocationEventsActivities
 
 _TASK_QUEUE = "fulfillment-predicthq"
@@ -14,7 +13,7 @@ _NAMESPACE = "fulfillment"
 
 async def build_predicthq_worker() -> Worker:
     client = await Client.connect(
-        os.environ.get("TEMPORAL_ADDRESS", "localhost:7233"),
+        settings.temporal_address,
         namespace=_NAMESPACE,
     )
     http_client = aiohttp.ClientSession()
