@@ -19,6 +19,8 @@ with workflow.unsafe.imports_passed_through():
         LlmToolResultBlock,
     )
     from acme.fulfillment.domain.v1.shipping_agent_p2p import (
+        BuildSystemPromptRequest,
+        BuildSystemPromptResponse,
         CalculateShippingOptionsRequest,
         CalculateShippingOptionsResponse,
         GetLocationEventsRequest,
@@ -35,6 +37,7 @@ with workflow.unsafe.imports_passed_through():
     from acme.fulfillment.domain.v1.workflows_p2p import VerifyAddressRequest, VerifyAddressResponse
     from src.agents.activities.easypost import EasyPostActivities
     from src.agents.activities.inventory import LookupInventoryActivities
+    from src.agents.activities.llm import LlmActivities
     from src.agents.activities.location_events import LocationEventsActivities
     from src.agents.dispatch import activity_name, activity_tool, ToolSpecs
 
@@ -116,48 +119,6 @@ def _parse_recommendation(text: str) -> ShippingRecommendation:
     )
 
 
-def _build_system_prompt(request: CalculateShippingOptionsRequest) -> str:
-    margin_rule = (
-        f"MARGIN RULE: If any available rate cost exceeds the customer paid price "
-        f"({request.customer_paid_price.units} {request.customer_paid_price.currency} "
-        f"in minor currency units), outcome MUST be MARGIN_SPIKE; "
-        f"set margin_delta_cents to the overage."
-        if (request.customer_paid_price and request.customer_paid_price.units > 0)
-        else "MARGIN RULE: No customer paid price — skip margin spike logic."
-    )
-
-    sla_rule = (
-        f"SLA RULE: If no rate delivers within {request.transit_days_sla} days, outcome MUST be SLA_BREACH."
-        if (request.transit_days_sla and request.transit_days_sla > 0)
-        else "SLA RULE: No transit SLA specified."
-    )
-
-    return "\n\n".join([
-        "You are a shipping advisor for an e-commerce fulfillment system.",
-        margin_rule,
-        sla_rule,
-        (
-            "PATH RULE: Warehouse addresses are pre-verified — easypost_address.id is already set. "
-            "If from_address is present in the request, use its easypost_address.id directly — "
-            "do NOT call lookup_inventory_location or verify_address for the origin. "
-            "If from_address is absent, call lookup_inventory_location first; the returned address "
-            "will also have easypost_address.id pre-populated — skip verify_address. "
-            "Only call verify_address for an address that explicitly lacks easypost_address."
-        ),
-        (
-            "CONCURRENCY: Call multiple tools in a single response when there are no dependencies "
-            "between them (e.g. verify_address for origin AND get_location_events for destination)."
-        ),
-        (
-            "FINAL RESPONSE: When you have all data, respond with ONLY a JSON object:\n"
-            '{"outcome":"<PROCEED|CHEAPER_AVAILABLE|FASTER_AVAILABLE|MARGIN_SPIKE|SLA_BREACH>",'
-            '"recommended_option_id":"<id>","reasoning":"<text>",'
-            '"margin_delta_cents":<int>,'
-            '"origin_risk_level":"<RISK_LEVEL_NONE|RISK_LEVEL_LOW|RISK_LEVEL_MODERATE|RISK_LEVEL_HIGH|RISK_LEVEL_CRITICAL>",'
-            '"destination_risk_level":"<RISK_LEVEL_NONE|RISK_LEVEL_LOW|RISK_LEVEL_MODERATE|RISK_LEVEL_HIGH|RISK_LEVEL_CRITICAL>"}'
-        ),
-    ])
-
 
 _NAME_LOOKUP = activity_name(LookupInventoryActivities.lookup_inventory_location)
 _NAME_RATES  = activity_name(EasyPostActivities.get_carrier_rates)
@@ -184,7 +145,13 @@ class ShippingAgent:
         self,
         request: CalculateShippingOptionsRequest,
     ) -> CalculateShippingOptionsResponse:
-        system_prompt = _build_system_prompt(request)
+        prompt_response: BuildSystemPromptResponse = await workflow.execute_local_activity(
+            LlmActivities.build_system_prompt,
+            BuildSystemPromptRequest(request=request),
+            result_type=BuildSystemPromptResponse,
+            start_to_close_timeout=timedelta(seconds=5),
+        )
+        system_prompt = prompt_response.system_prompt
         tools = _TOOLS.definitions()
 
         has_from = bool(request.from_address and request.from_address.street)

@@ -185,3 +185,17 @@ class GetShippingRatesRequest(BaseModel):
 class GetShippingRatesResponse(BaseModel):
     shipment_id: str = Field(default="")
     options: typing.List[ShippingOption] = Field(default_factory=list)
+
+class BuildSystemPromptRequest(BaseModel):
+    """
+     BuildSystemPromptRequest is the LocalActivity input for computing the LLM system prompt.
+    """
+
+    request: CalculateShippingOptionsRequest = Field(default_factory=CalculateShippingOptionsRequest)
+
+class BuildSystemPromptResponse(BaseModel):
+    """
+     BuildSystemPromptResponse carries the rendered system prompt string.
+    """
+
+    system_prompt: str = Field(default="")

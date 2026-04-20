@@ -207,8 +207,15 @@ Identified during planning; all resolved.
   - Return `False` if `key` not in `_cache_meta`
   - Return `False` if `workflow.now() - _cache_meta[key] > timedelta(seconds=cache_ttl_secs)`
 
-- [x] System prompt builder `_build_system_prompt(request: CalculateShippingOptionsRequest_p2p) -> str`
-  - Include: margin spike rule ("if any available rate cost exceeds `customer_paid_price`, outcome is `MARGIN_SPIKE`"), SLA rule from `request.transit_days_sla`, path instruction ("if `from_address` is present, use it directly as warehouse origin — do not call `lookup_inventory_location`; if absent, call `lookup_inventory_location` first"), concurrency instruction ("call multiple tools in a single response when there are no dependencies between them"), final turn format instruction (output a JSON object matching `ShippingRecommendation` schema: outcome, recommended_option_id, reasoning, margin_delta_cents, origin_risk_level, destination_risk_level)
+- [x] System prompt builder `_build_system_prompt(request: CalculateShippingOptionsRequest_p2p) -> str` *(implemented as inline helper — see refactor task below)*
+  - Include: margin spike rule, SLA rule from `request.transit_days_sla`, path instruction, concurrency instruction, final JSON output format
+
+- [ ] **Refactor**: move system prompt computation into a `build_system_prompt` LocalActivity
+  - Replace the inline `_build_system_prompt(request)` call in `_run_react_loop` with `await workflow.execute_local_activity("build_system_prompt", args=[request], result_type=str, start_to_close_timeout=timedelta(seconds=5))`
+  - Implement `build_system_prompt` as a `@activity.defn` on `LlmActivities` (or a new `ShippingAgentActivities` class) — same logic as the current inline helper, no `ToolSpecs` used
+  - Register the activity on the `fulfillment` worker
+  - Delete the `_build_system_prompt` module-level function from `shipping_agent.py`
+  - **Rationale**: LocalActivity result is memoized in event history; prompt changes do not affect replay of in-flight workflows and do not require a build-id bump
 
 - [x] Tool definitions builder `_build_tool_definitions() -> list[LlmToolDefinition_p2p]`
   - One entry per activity tool: `lookup_inventory_location`, `verify_address`, `get_carrier_rates`, `get_location_events`
@@ -271,3 +278,4 @@ All tests use Temporal Python test framework (`temporalio.testing.WorkflowEnviro
 | 2026-04-17 | Temporal FDE Team | Planning complete; detailed task breakdown added for Phases 1–3 |
 | 2026-04-17 | Temporal FDE Team | All 9 planning open questions resolved; task breakdown updated (Q6: removed `VerifyShippingAddressRequest/Response` proto tasks; Q9: removed `continue_as_new` task; Q7: added cross-dependency to fulfillment-order Phase 6) |
 | 2026-04-17 | Mike Nichols | Phases 1–3 implemented: proto schema + buf generate, 3 activity classes, 3 worker modules, worker entry point, ShippingAgent workflow with agentic loop, 9 passing unit tests. Notes: (1) temporalio pinned to >=1.26.0 for `@update.validator` API; (2) ShippingOptionLegacy rename in workflows.proto to resolve name conflict; (3) broken unqualified imports fixed in 3 generated _p2p files (codegen bug); (4) system prompt embedded in first user message since call_llm signature is locked to (messages, tools). |
+| 2026-04-20 | Mike Nichols | Spec updated: refactor `_build_system_prompt` from inline workflow function to `build_system_prompt` LocalActivity so prompt changes can be shipped without bumping the workflow build-id. Task added to Phase 3 task list. Design Decisions table updated with rationale. |

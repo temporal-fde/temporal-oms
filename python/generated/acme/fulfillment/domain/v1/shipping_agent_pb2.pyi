@@ -191,3 +191,15 @@ class GetShippingRatesResponse(_message.Message):
     shipment_id: str
     options: _containers.RepeatedCompositeFieldContainer[ShippingOption]
     def __init__(self, shipment_id: _Optional[str] = ..., options: _Optional[_Iterable[_Union[ShippingOption, _Mapping]]] = ...) -> None: ...
+
+class BuildSystemPromptRequest(_message.Message):
+    __slots__ = ("request",)
+    REQUEST_FIELD_NUMBER: _ClassVar[int]
+    request: CalculateShippingOptionsRequest
+    def __init__(self, request: _Optional[_Union[CalculateShippingOptionsRequest, _Mapping]] = ...) -> None: ...
+
+class BuildSystemPromptResponse(_message.Message):
+    __slots__ = ("system_prompt",)
+    SYSTEM_PROMPT_FIELD_NUMBER: _ClassVar[int]
+    system_prompt: str
+    def __init__(self, system_prompt: _Optional[str] = ...) -> None: ...

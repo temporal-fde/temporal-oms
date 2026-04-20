@@ -106,6 +106,16 @@ public final class ShippingAgentProto extends com.google.protobuf.GeneratedFile 
   static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_acme_fulfillment_domain_fulfillment_v1_GetShippingRatesResponse_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_acme_fulfillment_domain_fulfillment_v1_BuildSystemPromptRequest_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_acme_fulfillment_domain_fulfillment_v1_BuildSystemPromptRequest_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_acme_fulfillment_domain_fulfillment_v1_BuildSystemPromptResponse_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_acme_fulfillment_domain_fulfillment_v1_BuildSystemPromptResponse_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -206,18 +216,23 @@ public final class ShippingAgentProto extends com.google.protobuf.GeneratedFile 
       "eItemR\005items\"\215\001\n\030GetShippingRatesRespons" +
       "e\022\037\n\013shipment_id\030\001 \001(\tR\nshipmentId\022P\n\007op" +
       "tions\030\002 \003(\01326.acme.fulfillment.domain.fu" +
-      "lfillment.v1.ShippingOptionR\007options*\233\001\n" +
-      "\025RecommendationOutcome\022&\n\"RECOMMENDATION" +
-      "_OUTCOME_UNSPECIFIED\020\000\022\013\n\007PROCEED\020\001\022\025\n\021C" +
-      "HEAPER_AVAILABLE\020\002\022\024\n\020FASTER_AVAILABLE\020\003" +
-      "\022\020\n\014MARGIN_SPIKE\020\004\022\016\n\nSLA_BREACH\020\005B\210\002\n5c" +
-      "om.acme.proto.acme.fulfillment.domain.fu" +
-      "lfillment.v1B\022ShippingAgentProtoP\001\242\002\004AFD" +
-      "F\252\002&Acme.Fulfillment.Domain.Fulfillment." +
-      "V1\312\002&Acme\\Fulfillment\\Domain\\Fulfillment" +
-      "\\V1\342\0022Acme\\Fulfillment\\Domain\\Fulfillmen" +
-      "t\\V1\\GPBMetadata\352\002*Acme::Fulfillment::Do" +
-      "main::Fulfillment::V1b\006proto3"
+      "lfillment.v1.ShippingOptionR\007options\"}\n\030" +
+      "BuildSystemPromptRequest\022a\n\007request\030\001 \001(" +
+      "\0132G.acme.fulfillment.domain.fulfillment." +
+      "v1.CalculateShippingOptionsRequestR\007requ" +
+      "est\"@\n\031BuildSystemPromptResponse\022#\n\rsyst" +
+      "em_prompt\030\001 \001(\tR\014systemPrompt*\233\001\n\025Recomm" +
+      "endationOutcome\022&\n\"RECOMMENDATION_OUTCOM" +
+      "E_UNSPECIFIED\020\000\022\013\n\007PROCEED\020\001\022\025\n\021CHEAPER_" +
+      "AVAILABLE\020\002\022\024\n\020FASTER_AVAILABLE\020\003\022\020\n\014MAR" +
+      "GIN_SPIKE\020\004\022\016\n\nSLA_BREACH\020\005B\210\002\n5com.acme" +
+      ".proto.acme.fulfillment.domain.fulfillme" +
+      "nt.v1B\022ShippingAgentProtoP\001\242\002\004AFDF\252\002&Acm" +
+      "e.Fulfillment.Domain.Fulfillment.V1\312\002&Ac" +
+      "me\\Fulfillment\\Domain\\Fulfillment\\V1\342\0022A" +
+      "cme\\Fulfillment\\Domain\\Fulfillment\\V1\\GP" +
+      "BMetadata\352\002*Acme::Fulfillment::Domain::F" +
+      "ulfillment::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -322,6 +337,18 @@ public final class ShippingAgentProto extends com.google.protobuf.GeneratedFile 
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_GetShippingRatesResponse_descriptor,
         new java.lang.String[] { "ShipmentId", "Options", });
+    internal_static_acme_fulfillment_domain_fulfillment_v1_BuildSystemPromptRequest_descriptor =
+      getDescriptor().getMessageType(15);
+    internal_static_acme_fulfillment_domain_fulfillment_v1_BuildSystemPromptRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_acme_fulfillment_domain_fulfillment_v1_BuildSystemPromptRequest_descriptor,
+        new java.lang.String[] { "Request", });
+    internal_static_acme_fulfillment_domain_fulfillment_v1_BuildSystemPromptResponse_descriptor =
+      getDescriptor().getMessageType(16);
+    internal_static_acme_fulfillment_domain_fulfillment_v1_BuildSystemPromptResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_acme_fulfillment_domain_fulfillment_v1_BuildSystemPromptResponse_descriptor,
+        new java.lang.String[] { "SystemPrompt", });
     descriptor.resolveAllFeaturesImmutable();
     com.google.protobuf.TimestampProto.getDescriptor();
     com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ValuesProto.getDescriptor();

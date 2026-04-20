@@ -157,3 +157,13 @@ message GetShippingRatesResponse {
   string                  shipment_id = 1;
   repeated ShippingOption options     = 2;
 }
+
+// BuildSystemPromptRequest is the LocalActivity input for computing the LLM system prompt.
+message BuildSystemPromptRequest {
+  CalculateShippingOptionsRequest request = 1;
+}
+
+// BuildSystemPromptResponse carries the rendered system prompt string.
+message BuildSystemPromptResponse {
+  string system_prompt = 1;
+}

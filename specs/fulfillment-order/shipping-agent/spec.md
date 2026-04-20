@@ -143,13 +143,12 @@ The workflow runs a standard hand-rolled agentic loop:
 
 1. Check cache — return immediately on hit (requires `from_easypost_id`; skipped on first
    call since the warehouse is not known until `lookup_inventory_location` returns)
-2. Build system prompt including:
-   - Business rules: margin threshold, SLA targets, recommendation logic
-   - Concurrency instruction: "call multiple tools in a single response when there are no
-     dependencies between them"
-   - Sequence instruction: "Always call `lookup_inventory_location` first. Once you have the
-     warehouse address, call `get_carrier_rates`, `get_location_events(origin)`, and
-     `get_location_events(destination)` concurrently in a single response."
+2. Build system prompt via `build_system_prompt` LocalActivity — result is memoized in event
+   history so prompt changes do not affect replay of in-flight workflows and do not require a
+   build-id bump. The activity receives the full `CalculateShippingOptionsRequest` and returns
+   the system prompt string. Includes: margin threshold rule, SLA rule, path instruction
+   (warehouse resolution vs. pre-verified `from_address`), concurrency instruction, and final
+   JSON output format.
 3. Build tool definitions for the four registered activities
 4. Iterate:
    a. Call Claude (via `call_llm` activity — Anthropic API)
@@ -203,6 +202,7 @@ Cache key: `fn(sorted(from_easypost_ids), sorted([(skuId, qty)]), destinationPos
 | `lookup_inventory_location` always called; no `from_address` in request | Caller provides `sku_id`s — warehouse resolution is the agent's responsibility regardless of whether the caller is `fulfillment.Order` (EnrichedItem skus) or cart (cart item skus). Avoids a two-path design where callers must know about warehouse assignment. | Pre-resolve warehouse in caller and pass `from_address` — couples callers to inventory logic and creates a split path with different LLM behaviour |
 | Separate `fulfillment-easypost` (5 rps) and `fulfillment-predicthq` (50 rps) task queues | EasyPost and PredictHQ limits differ by 10×; sharing one queue forces both to the 5 rps floor, wasting 45 rps of PredictHQ capacity | Single shared queue — simpler setup but throttles PredictHQ to EasyPost's limit |
 | Worker Versioning (new build-id) for V2 cutover | `fulfillment.Order` is PINNED and has no history to bridge; old workflows complete on V1 workers, new ones pick up V2 cleanly | `Workflow.getVersion()` — unnecessary for a new workflow with no pre-existing history |
+| System prompt built in `build_system_prompt` LocalActivity (not inline workflow code) | LocalActivity result is memoized in event history; on replay, Temporal returns the memoized value and ignores the current implementation. Prompt text can be updated and redeployed without a build-id bump — in-flight workflows replay against the original prompt from history. Inline function: any text change produces different `call_llm` args than history → non-determinism error on replay. | Inline `_build_system_prompt` function — simple but couples prompt iteration to build-id lifecycle |
 
 ### Component Design
 
@@ -392,9 +392,9 @@ added in Phase 1 alongside the `shipping_agent.proto` changes.
 - [ ] `calculate_shipping_options` Update handler:
   - [ ] Compute cache key after `lookup_inventory_location` returns (warehouse `easypost_address.id`
         not known until then); return cached result if hit and within TTL
-  - [ ] Build system prompt with margin threshold, SLA rules, concurrency instruction, and
-        sequence instruction (always call `lookup_inventory_location` first; then concurrent
-        `get_carrier_rates` + both `get_location_events` calls)
+  - [ ] Call `build_system_prompt` LocalActivity to compute the system prompt string before
+        the agentic loop — result is memoized in history; prompt changes do not require a
+        build-id bump (see Design Decisions)
   - [ ] Build tool definitions from the four activity signatures
   - [ ] Agentic loop: call LLM → dispatch concurrent activities for all tool_use blocks → append results → repeat
   - [ ] Parse `ShippingRecommendation` from final text response
