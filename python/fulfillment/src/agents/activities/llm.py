@@ -22,8 +22,8 @@ from acme.common.v1.llm_p2p import (
     LlmToolUseBlock,
 )
 
-_MODEL = "claude-sonnet-4-6"
-
+# _MODEL = "claude-sonnet-4-6"
+_MODEL = "claude-haiku-4-5"
 
 def _to_message_param(msg: LlmMessage) -> anthropic.types.MessageParam:
     content: list[anthropic.types.ContentBlockParam] = []
@@ -152,6 +152,7 @@ class LlmActivities:
         resp = await self._client.messages.create(
             model=_MODEL,
             max_tokens=4096,
+            thinking={"type": "disabled"},
             messages=message_params,
             tools=tool_params,
         )
