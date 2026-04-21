@@ -9,13 +9,13 @@ from src.agents.activities.llm import LlmActivities
 from src.agents.workflows.shipping_agent import ShippingAgent
 
 _TASK_QUEUE = "fulfillment"
-_NAMESPACE = "fulfillment"
 
 
 async def build_fulfillment_worker() -> Worker:
     client = await Client.connect(
-        settings.temporal_address,
-        namespace=_NAMESPACE,
+        settings.temporal_fulfillment_address,
+        namespace=settings.temporal_fulfillment_namespace,
+        api_key=settings.temporal_fulfillment_api_key or None,
     )
     inventory_activities = LookupInventoryActivities()
     llm_activities = LlmActivities()

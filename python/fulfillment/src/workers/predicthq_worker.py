@@ -8,13 +8,13 @@ from src.config import settings
 from src.agents.activities.location_events import LocationEventsActivities
 
 _TASK_QUEUE = "fulfillment-predicthq"
-_NAMESPACE = "fulfillment"
 
 
 async def build_predicthq_worker() -> Worker:
     client = await Client.connect(
-        settings.temporal_address,
-        namespace=_NAMESPACE,
+        settings.temporal_fulfillment_address,
+        namespace=settings.temporal_fulfillment_namespace,
+        api_key=settings.temporal_fulfillment_api_key or None,
     )
     http_client = aiohttp.ClientSession()
     location_activities = LocationEventsActivities(http_client=http_client)

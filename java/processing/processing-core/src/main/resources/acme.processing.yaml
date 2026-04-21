@@ -2,13 +2,9 @@ spring.config.import: classpath:acme.oms.yaml
 
 spring.temporal:
     connection:
-      # Connection settings
-      target: ${TEMPORAL_ADDRESS:localhost:7233}
-
-      # API Key for Temporal Cloud
-      api-key: ${TEMPORAL_API_KEY:}
-
-    namespace: ${TEMPORAL_NAMESPACE:processing}
+      target: ${TEMPORAL_PROCESSING_ADDRESS:localhost:7233}
+      api-key: ${TEMPORAL_PROCESSING_API_KEY:}
+    namespace: ${TEMPORAL_PROCESSING_NAMESPACE:processing}
     workers:
       - task-queue: processing
         workflow-classes:

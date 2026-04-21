@@ -7,13 +7,13 @@ from src.config import settings
 from src.agents.activities.easypost import EasyPostActivities
 
 _TASK_QUEUE = "fulfillment-easypost"
-_NAMESPACE = "fulfillment"
 
 
 async def build_easypost_worker() -> Worker:
     client = await Client.connect(
-        settings.temporal_address,
-        namespace=_NAMESPACE,
+        settings.temporal_fulfillment_address,
+        namespace=settings.temporal_fulfillment_namespace,
+        api_key=settings.temporal_fulfillment_api_key or None,
     )
     easypost_activities = EasyPostActivities()
     return Worker(

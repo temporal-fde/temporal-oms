@@ -10,7 +10,9 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    temporal_address: str = "localhost:7233"
+    temporal_fulfillment_address: str = "localhost:7233"
+    temporal_fulfillment_api_key: str = ""
+    temporal_fulfillment_namespace: str = "fulfillment"
     anthropic_api_key: str = ""
     easypost_api_key: str = ""
     predicthq_api_key: str = ""

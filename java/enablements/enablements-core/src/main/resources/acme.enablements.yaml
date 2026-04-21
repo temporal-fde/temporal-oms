@@ -21,13 +21,9 @@ enablements:
 
 spring.temporal:
     connection:
-      # Connection settings
-      target: ${TEMPORAL_ADDRESS:localhost:7233}
-
-      # API Key for Temporal Cloud
-      api-key: ${TEMPORAL_API_KEY:}
-
-    namespace: ${TEMPORAL_NAMESPACE:default}
+      target: ${TEMPORAL_ENABLEMENTS_ADDRESS:localhost:7233}
+      api-key: ${TEMPORAL_ENABLEMENTS_API_KEY:}
+    namespace: ${TEMPORAL_ENABLEMENTS_NAMESPACE:default}
     workers:
       - task-queue: enablements
         workflow-classes:
