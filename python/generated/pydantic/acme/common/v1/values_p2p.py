@@ -28,17 +28,17 @@ class EasyPostAddress(BaseModel):
     """
 
     id: str = Field(default="")# EasyPost address ID
-    residential: bool = Field(default=False)# affects carrier rate selection
-    verified: bool = Field(default=False)
+    street1: str = Field(default="")
+    street2: str = Field(default="")
+    city: str = Field(default="")
+    state: str = Field(default="")
+    zip: str = Field(default="")
+    country: str = Field(default="")
+    residential: typing.Optional[bool] = Field(default=False)# affects carrier rate selection
     coordinate: typing.Optional[Coordinate] = Field(default_factory=Coordinate)# lat/lng from EasyPost verification; required by get_location_events
 
 class Address(BaseModel):
-    street: str = Field(default="")
-    city: str = Field(default="")
-    state: str = Field(default="")
-    postal_code: str = Field(default="")
-    country: str = Field(default="")# ISO 3166-1 alpha-2
-    easypost_address: typing.Optional[EasyPostAddress] = Field(default_factory=EasyPostAddress)# populated after EasyPost verification
+    easypost: typing.Optional[EasyPostAddress] = Field(default_factory=EasyPostAddress)# populated after EasyPost verification
 
 class TimeRange(BaseModel):
     start: datetime = Field(default_factory=datetime.now)

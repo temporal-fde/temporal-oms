@@ -3,7 +3,7 @@ package com.acme.enablements.activities;
 import com.acme.proto.acme.apps.api.orders.v1.MakePaymentRequest;
 import com.acme.proto.acme.apps.api.orders.v1.Metadata;
 import com.acme.proto.acme.apps.api.orders.v1.Order;
-import com.acme.proto.acme.apps.api.orders.v1.ShippingAddress;
+import com.acme.proto.acme.common.v1.Address;
 import com.acme.proto.acme.apps.api.orders.v1.SubmitOrderRequest;
 import com.acme.proto.acme.enablements.v1.SubmitOrdersRequest;
 import com.acme.proto.acme.enablements.v1.SubmitOrdersResponse;
@@ -96,12 +96,13 @@ public class OrderActivitiesImpl implements OrderActivities {
     }
 
     private void callOrderEndpoint(String orderId) {
-        var shippingAddress = ShippingAddress.newBuilder()
-                .setStreet(orderId + "-street-" + UUID.randomUUID())
-                .setCity(orderId + "-city-" + UUID.randomUUID().toString().substring(0, 8))
-                .setState(orderId + "-state")
-                .setPostalCode(orderId + "-" + System.currentTimeMillis())
-                .setCountry("US")
+        var shippingAddress = Address.newBuilder()
+                .setEasypost(com.acme.proto.acme.common.v1.EasyPostAddress.newBuilder()
+                        .setStreet1(orderId + "-street-" + UUID.randomUUID())
+                        .setCity(orderId + "-city-" + UUID.randomUUID().toString().substring(0, 8))
+                        .setState(orderId + "-state")
+                        .setZip(orderId + "-" + System.currentTimeMillis())
+                        .setCountry("US"))
                 .build();
 
         var item = com.acme.proto.acme.apps.api.orders.v1.Item.newBuilder()

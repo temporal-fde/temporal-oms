@@ -18,32 +18,32 @@ class Money(_message.Message):
     def __init__(self, currency: _Optional[str] = ..., units: _Optional[int] = ...) -> None: ...
 
 class EasyPostAddress(_message.Message):
-    __slots__ = ("id", "residential", "verified", "coordinate")
+    __slots__ = ("id", "street1", "street2", "city", "state", "zip", "country", "residential", "coordinate")
     ID_FIELD_NUMBER: _ClassVar[int]
-    RESIDENTIAL_FIELD_NUMBER: _ClassVar[int]
-    VERIFIED_FIELD_NUMBER: _ClassVar[int]
-    COORDINATE_FIELD_NUMBER: _ClassVar[int]
-    id: str
-    residential: bool
-    verified: bool
-    coordinate: Coordinate
-    def __init__(self, id: _Optional[str] = ..., residential: _Optional[bool] = ..., verified: _Optional[bool] = ..., coordinate: _Optional[_Union[Coordinate, _Mapping]] = ...) -> None: ...
-
-class Address(_message.Message):
-    __slots__ = ("street", "city", "state", "postal_code", "country", "easypost_address")
-    STREET_FIELD_NUMBER: _ClassVar[int]
+    STREET1_FIELD_NUMBER: _ClassVar[int]
+    STREET2_FIELD_NUMBER: _ClassVar[int]
     CITY_FIELD_NUMBER: _ClassVar[int]
     STATE_FIELD_NUMBER: _ClassVar[int]
-    POSTAL_CODE_FIELD_NUMBER: _ClassVar[int]
+    ZIP_FIELD_NUMBER: _ClassVar[int]
     COUNTRY_FIELD_NUMBER: _ClassVar[int]
-    EASYPOST_ADDRESS_FIELD_NUMBER: _ClassVar[int]
-    street: str
+    RESIDENTIAL_FIELD_NUMBER: _ClassVar[int]
+    COORDINATE_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    street1: str
+    street2: str
     city: str
     state: str
-    postal_code: str
+    zip: str
     country: str
-    easypost_address: EasyPostAddress
-    def __init__(self, street: _Optional[str] = ..., city: _Optional[str] = ..., state: _Optional[str] = ..., postal_code: _Optional[str] = ..., country: _Optional[str] = ..., easypost_address: _Optional[_Union[EasyPostAddress, _Mapping]] = ...) -> None: ...
+    residential: bool
+    coordinate: Coordinate
+    def __init__(self, id: _Optional[str] = ..., street1: _Optional[str] = ..., street2: _Optional[str] = ..., city: _Optional[str] = ..., state: _Optional[str] = ..., zip: _Optional[str] = ..., country: _Optional[str] = ..., residential: _Optional[bool] = ..., coordinate: _Optional[_Union[Coordinate, _Mapping]] = ...) -> None: ...
+
+class Address(_message.Message):
+    __slots__ = ("easypost",)
+    EASYPOST_FIELD_NUMBER: _ClassVar[int]
+    easypost: EasyPostAddress
+    def __init__(self, easypost: _Optional[_Union[EasyPostAddress, _Mapping]] = ...) -> None: ...
 
 class TimeRange(_message.Message):
     __slots__ = ("start", "end")

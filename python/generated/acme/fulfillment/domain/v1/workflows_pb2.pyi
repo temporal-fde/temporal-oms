@@ -68,9 +68,9 @@ class FulfillOrderRequest(_message.Message):
     customer_id: str
     items: _containers.RepeatedCompositeFieldContainer[Item]
     payment_rrn: str
-    shipping_address: ShippingAddress
+    shipping_address: _values_pb2.Address
     created_at: _timestamp_pb2.Timestamp
-    def __init__(self, order_id: _Optional[str] = ..., customer_id: _Optional[str] = ..., items: _Optional[_Iterable[_Union[Item, _Mapping]]] = ..., payment_rrn: _Optional[str] = ..., shipping_address: _Optional[_Union[ShippingAddress, _Mapping]] = ..., created_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
+    def __init__(self, order_id: _Optional[str] = ..., customer_id: _Optional[str] = ..., items: _Optional[_Iterable[_Union[Item, _Mapping]]] = ..., payment_rrn: _Optional[str] = ..., shipping_address: _Optional[_Union[_values_pb2.Address, _Mapping]] = ..., created_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class FulfillOrderResponse(_message.Message):
     __slots__ = ("order_id", "status", "shipping", "allocated_items", "completed_at")
@@ -97,20 +97,6 @@ class Item(_message.Message):
     brand_code: str
     quantity: int
     def __init__(self, item_id: _Optional[str] = ..., sku_id: _Optional[str] = ..., brand_code: _Optional[str] = ..., quantity: _Optional[int] = ...) -> None: ...
-
-class ShippingAddress(_message.Message):
-    __slots__ = ("street", "city", "state", "postal_code", "country")
-    STREET_FIELD_NUMBER: _ClassVar[int]
-    CITY_FIELD_NUMBER: _ClassVar[int]
-    STATE_FIELD_NUMBER: _ClassVar[int]
-    POSTAL_CODE_FIELD_NUMBER: _ClassVar[int]
-    COUNTRY_FIELD_NUMBER: _ClassVar[int]
-    street: str
-    city: str
-    state: str
-    postal_code: str
-    country: str
-    def __init__(self, street: _Optional[str] = ..., city: _Optional[str] = ..., state: _Optional[str] = ..., postal_code: _Optional[str] = ..., country: _Optional[str] = ...) -> None: ...
 
 class ShippingDetails(_message.Message):
     __slots__ = ("carrier", "service_level", "cost_cents", "estimated_days", "tracking_number")
@@ -146,11 +132,11 @@ class FindOptimalShippingRequest(_message.Message):
     ITEMS_FIELD_NUMBER: _ClassVar[int]
     MAX_COST_CENTS_FIELD_NUMBER: _ClassVar[int]
     MAX_DAYS_FIELD_NUMBER: _ClassVar[int]
-    destination: ShippingAddress
+    destination: _values_pb2.Address
     items: _containers.RepeatedCompositeFieldContainer[Item]
     max_cost_cents: int
     max_days: int
-    def __init__(self, destination: _Optional[_Union[ShippingAddress, _Mapping]] = ..., items: _Optional[_Iterable[_Union[Item, _Mapping]]] = ..., max_cost_cents: _Optional[int] = ..., max_days: _Optional[int] = ...) -> None: ...
+    def __init__(self, destination: _Optional[_Union[_values_pb2.Address, _Mapping]] = ..., items: _Optional[_Iterable[_Union[Item, _Mapping]]] = ..., max_cost_cents: _Optional[int] = ..., max_days: _Optional[int] = ...) -> None: ...
 
 class FindOptimalShippingResponse(_message.Message):
     __slots__ = ("options", "recommended", "reasoning")
@@ -181,8 +167,8 @@ class AllocateInventoryRequest(_message.Message):
     ITEMS_FIELD_NUMBER: _ClassVar[int]
     DESTINATION_FIELD_NUMBER: _ClassVar[int]
     items: _containers.RepeatedCompositeFieldContainer[Item]
-    destination: ShippingAddress
-    def __init__(self, items: _Optional[_Iterable[_Union[Item, _Mapping]]] = ..., destination: _Optional[_Union[ShippingAddress, _Mapping]] = ...) -> None: ...
+    destination: _values_pb2.Address
+    def __init__(self, items: _Optional[_Iterable[_Union[Item, _Mapping]]] = ..., destination: _Optional[_Union[_values_pb2.Address, _Mapping]] = ...) -> None: ...
 
 class AllocateInventoryResponse(_message.Message):
     __slots__ = ("allocations", "fully_allocated", "warnings")
@@ -201,8 +187,8 @@ class FindClosestWarehouseRequest(_message.Message):
     DESTINATION_FIELD_NUMBER: _ClassVar[int]
     sku_id: str
     quantity: int
-    destination: ShippingAddress
-    def __init__(self, sku_id: _Optional[str] = ..., quantity: _Optional[int] = ..., destination: _Optional[_Union[ShippingAddress, _Mapping]] = ...) -> None: ...
+    destination: _values_pb2.Address
+    def __init__(self, sku_id: _Optional[str] = ..., quantity: _Optional[int] = ..., destination: _Optional[_Union[_values_pb2.Address, _Mapping]] = ...) -> None: ...
 
 class FindClosestWarehouseResponse(_message.Message):
     __slots__ = ("warehouse_id", "warehouse_location", "available_quantity", "distance_km")

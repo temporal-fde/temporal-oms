@@ -34,6 +34,12 @@ private static final long serialVersionUID = 0L;
   }
   private EasyPostAddress() {
     id_ = "";
+    street1_ = "";
+    street2_ = "";
+    city_ = "";
+    state_ = "";
+    zip_ = "";
+    country_ = "";
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
@@ -102,14 +108,260 @@ private static final long serialVersionUID = 0L;
     }
   }
 
-  public static final int RESIDENTIAL_FIELD_NUMBER = 2;
+  public static final int STREET1_FIELD_NUMBER = 2;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object street1_ = "";
+  /**
+   * <code>string street1 = 2 [json_name = "street1"];</code>
+   * @return The street1.
+   */
+  @java.lang.Override
+  public java.lang.String getStreet1() {
+    java.lang.Object ref = street1_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      street1_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string street1 = 2 [json_name = "street1"];</code>
+   * @return The bytes for street1.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getStreet1Bytes() {
+    java.lang.Object ref = street1_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      street1_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  public static final int STREET2_FIELD_NUMBER = 3;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object street2_ = "";
+  /**
+   * <code>string street2 = 3 [json_name = "street2"];</code>
+   * @return The street2.
+   */
+  @java.lang.Override
+  public java.lang.String getStreet2() {
+    java.lang.Object ref = street2_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      street2_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string street2 = 3 [json_name = "street2"];</code>
+   * @return The bytes for street2.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getStreet2Bytes() {
+    java.lang.Object ref = street2_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      street2_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  public static final int CITY_FIELD_NUMBER = 4;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object city_ = "";
+  /**
+   * <code>string city = 4 [json_name = "city"];</code>
+   * @return The city.
+   */
+  @java.lang.Override
+  public java.lang.String getCity() {
+    java.lang.Object ref = city_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      city_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string city = 4 [json_name = "city"];</code>
+   * @return The bytes for city.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getCityBytes() {
+    java.lang.Object ref = city_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      city_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  public static final int STATE_FIELD_NUMBER = 5;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object state_ = "";
+  /**
+   * <code>string state = 5 [json_name = "state"];</code>
+   * @return The state.
+   */
+  @java.lang.Override
+  public java.lang.String getState() {
+    java.lang.Object ref = state_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      state_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string state = 5 [json_name = "state"];</code>
+   * @return The bytes for state.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getStateBytes() {
+    java.lang.Object ref = state_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      state_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  public static final int ZIP_FIELD_NUMBER = 6;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object zip_ = "";
+  /**
+   * <code>string zip = 6 [json_name = "zip"];</code>
+   * @return The zip.
+   */
+  @java.lang.Override
+  public java.lang.String getZip() {
+    java.lang.Object ref = zip_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      zip_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string zip = 6 [json_name = "zip"];</code>
+   * @return The bytes for zip.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getZipBytes() {
+    java.lang.Object ref = zip_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      zip_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  public static final int COUNTRY_FIELD_NUMBER = 7;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object country_ = "";
+  /**
+   * <code>string country = 7 [json_name = "country"];</code>
+   * @return The country.
+   */
+  @java.lang.Override
+  public java.lang.String getCountry() {
+    java.lang.Object ref = country_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      country_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string country = 7 [json_name = "country"];</code>
+   * @return The bytes for country.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getCountryBytes() {
+    java.lang.Object ref = country_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      country_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  public static final int RESIDENTIAL_FIELD_NUMBER = 8;
   private boolean residential_ = false;
   /**
    * <pre>
    * affects carrier rate selection
    * </pre>
    *
-   * <code>bool residential = 2 [json_name = "residential"];</code>
+   * <code>optional bool residential = 8 [json_name = "residential"];</code>
+   * @return Whether the residential field is set.
+   */
+  @java.lang.Override
+  public boolean hasResidential() {
+    return ((bitField0_ & 0x00000001) != 0);
+  }
+  /**
+   * <pre>
+   * affects carrier rate selection
+   * </pre>
+   *
+   * <code>optional bool residential = 8 [json_name = "residential"];</code>
    * @return The residential.
    */
   @java.lang.Override
@@ -117,37 +369,26 @@ private static final long serialVersionUID = 0L;
     return residential_;
   }
 
-  public static final int VERIFIED_FIELD_NUMBER = 3;
-  private boolean verified_ = false;
-  /**
-   * <code>bool verified = 3 [json_name = "verified"];</code>
-   * @return The verified.
-   */
-  @java.lang.Override
-  public boolean getVerified() {
-    return verified_;
-  }
-
-  public static final int COORDINATE_FIELD_NUMBER = 4;
+  public static final int COORDINATE_FIELD_NUMBER = 9;
   private com.acme.proto.acme.common.v1.Coordinate coordinate_;
   /**
    * <pre>
    * lat/lng from EasyPost verification; required by get_location_events
    * </pre>
    *
-   * <code>optional .acme.common.v1.Coordinate coordinate = 4 [json_name = "coordinate"];</code>
+   * <code>optional .acme.common.v1.Coordinate coordinate = 9 [json_name = "coordinate"];</code>
    * @return Whether the coordinate field is set.
    */
   @java.lang.Override
   public boolean hasCoordinate() {
-    return ((bitField0_ & 0x00000001) != 0);
+    return ((bitField0_ & 0x00000002) != 0);
   }
   /**
    * <pre>
    * lat/lng from EasyPost verification; required by get_location_events
    * </pre>
    *
-   * <code>optional .acme.common.v1.Coordinate coordinate = 4 [json_name = "coordinate"];</code>
+   * <code>optional .acme.common.v1.Coordinate coordinate = 9 [json_name = "coordinate"];</code>
    * @return The coordinate.
    */
   @java.lang.Override
@@ -159,7 +400,7 @@ private static final long serialVersionUID = 0L;
    * lat/lng from EasyPost verification; required by get_location_events
    * </pre>
    *
-   * <code>optional .acme.common.v1.Coordinate coordinate = 4 [json_name = "coordinate"];</code>
+   * <code>optional .acme.common.v1.Coordinate coordinate = 9 [json_name = "coordinate"];</code>
    */
   @java.lang.Override
   public com.acme.proto.acme.common.v1.CoordinateOrBuilder getCoordinateOrBuilder() {
@@ -183,14 +424,29 @@ private static final long serialVersionUID = 0L;
     if (!com.google.protobuf.GeneratedMessage.isStringEmpty(id_)) {
       com.google.protobuf.GeneratedMessage.writeString(output, 1, id_);
     }
-    if (residential_ != false) {
-      output.writeBool(2, residential_);
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(street1_)) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 2, street1_);
     }
-    if (verified_ != false) {
-      output.writeBool(3, verified_);
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(street2_)) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 3, street2_);
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(city_)) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 4, city_);
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(state_)) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 5, state_);
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(zip_)) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 6, zip_);
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(country_)) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 7, country_);
     }
     if (((bitField0_ & 0x00000001) != 0)) {
-      output.writeMessage(4, getCoordinate());
+      output.writeBool(8, residential_);
+    }
+    if (((bitField0_ & 0x00000002) != 0)) {
+      output.writeMessage(9, getCoordinate());
     }
     getUnknownFields().writeTo(output);
   }
@@ -204,17 +460,31 @@ private static final long serialVersionUID = 0L;
     if (!com.google.protobuf.GeneratedMessage.isStringEmpty(id_)) {
       size += com.google.protobuf.GeneratedMessage.computeStringSize(1, id_);
     }
-    if (residential_ != false) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeBoolSize(2, residential_);
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(street1_)) {
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(2, street1_);
     }
-    if (verified_ != false) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeBoolSize(3, verified_);
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(street2_)) {
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(3, street2_);
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(city_)) {
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(4, city_);
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(state_)) {
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(5, state_);
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(zip_)) {
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(6, zip_);
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(country_)) {
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(7, country_);
     }
     if (((bitField0_ & 0x00000001) != 0)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(4, getCoordinate());
+        .computeBoolSize(8, residential_);
+    }
+    if (((bitField0_ & 0x00000002) != 0)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(9, getCoordinate());
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -233,10 +503,23 @@ private static final long serialVersionUID = 0L;
 
     if (!getId()
         .equals(other.getId())) return false;
-    if (getResidential()
-        != other.getResidential()) return false;
-    if (getVerified()
-        != other.getVerified()) return false;
+    if (!getStreet1()
+        .equals(other.getStreet1())) return false;
+    if (!getStreet2()
+        .equals(other.getStreet2())) return false;
+    if (!getCity()
+        .equals(other.getCity())) return false;
+    if (!getState()
+        .equals(other.getState())) return false;
+    if (!getZip()
+        .equals(other.getZip())) return false;
+    if (!getCountry()
+        .equals(other.getCountry())) return false;
+    if (hasResidential() != other.hasResidential()) return false;
+    if (hasResidential()) {
+      if (getResidential()
+          != other.getResidential()) return false;
+    }
     if (hasCoordinate() != other.hasCoordinate()) return false;
     if (hasCoordinate()) {
       if (!getCoordinate()
@@ -255,12 +538,23 @@ private static final long serialVersionUID = 0L;
     hash = (19 * hash) + getDescriptor().hashCode();
     hash = (37 * hash) + ID_FIELD_NUMBER;
     hash = (53 * hash) + getId().hashCode();
-    hash = (37 * hash) + RESIDENTIAL_FIELD_NUMBER;
-    hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-        getResidential());
-    hash = (37 * hash) + VERIFIED_FIELD_NUMBER;
-    hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-        getVerified());
+    hash = (37 * hash) + STREET1_FIELD_NUMBER;
+    hash = (53 * hash) + getStreet1().hashCode();
+    hash = (37 * hash) + STREET2_FIELD_NUMBER;
+    hash = (53 * hash) + getStreet2().hashCode();
+    hash = (37 * hash) + CITY_FIELD_NUMBER;
+    hash = (53 * hash) + getCity().hashCode();
+    hash = (37 * hash) + STATE_FIELD_NUMBER;
+    hash = (53 * hash) + getState().hashCode();
+    hash = (37 * hash) + ZIP_FIELD_NUMBER;
+    hash = (53 * hash) + getZip().hashCode();
+    hash = (37 * hash) + COUNTRY_FIELD_NUMBER;
+    hash = (53 * hash) + getCountry().hashCode();
+    if (hasResidential()) {
+      hash = (37 * hash) + RESIDENTIAL_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getResidential());
+    }
     if (hasCoordinate()) {
       hash = (37 * hash) + COORDINATE_FIELD_NUMBER;
       hash = (53 * hash) + getCoordinate().hashCode();
@@ -408,8 +702,13 @@ private static final long serialVersionUID = 0L;
       super.clear();
       bitField0_ = 0;
       id_ = "";
+      street1_ = "";
+      street2_ = "";
+      city_ = "";
+      state_ = "";
+      zip_ = "";
+      country_ = "";
       residential_ = false;
-      verified_ = false;
       coordinate_ = null;
       if (coordinateBuilder_ != null) {
         coordinateBuilder_.dispose();
@@ -452,17 +751,33 @@ private static final long serialVersionUID = 0L;
         result.id_ = id_;
       }
       if (((from_bitField0_ & 0x00000002) != 0)) {
-        result.residential_ = residential_;
+        result.street1_ = street1_;
       }
       if (((from_bitField0_ & 0x00000004) != 0)) {
-        result.verified_ = verified_;
+        result.street2_ = street2_;
+      }
+      if (((from_bitField0_ & 0x00000008) != 0)) {
+        result.city_ = city_;
+      }
+      if (((from_bitField0_ & 0x00000010) != 0)) {
+        result.state_ = state_;
+      }
+      if (((from_bitField0_ & 0x00000020) != 0)) {
+        result.zip_ = zip_;
+      }
+      if (((from_bitField0_ & 0x00000040) != 0)) {
+        result.country_ = country_;
       }
       int to_bitField0_ = 0;
-      if (((from_bitField0_ & 0x00000008) != 0)) {
+      if (((from_bitField0_ & 0x00000080) != 0)) {
+        result.residential_ = residential_;
+        to_bitField0_ |= 0x00000001;
+      }
+      if (((from_bitField0_ & 0x00000100) != 0)) {
         result.coordinate_ = coordinateBuilder_ == null
             ? coordinate_
             : coordinateBuilder_.build();
-        to_bitField0_ |= 0x00000001;
+        to_bitField0_ |= 0x00000002;
       }
       result.bitField0_ |= to_bitField0_;
     }
@@ -484,11 +799,38 @@ private static final long serialVersionUID = 0L;
         bitField0_ |= 0x00000001;
         onChanged();
       }
-      if (other.getResidential() != false) {
-        setResidential(other.getResidential());
+      if (!other.getStreet1().isEmpty()) {
+        street1_ = other.street1_;
+        bitField0_ |= 0x00000002;
+        onChanged();
       }
-      if (other.getVerified() != false) {
-        setVerified(other.getVerified());
+      if (!other.getStreet2().isEmpty()) {
+        street2_ = other.street2_;
+        bitField0_ |= 0x00000004;
+        onChanged();
+      }
+      if (!other.getCity().isEmpty()) {
+        city_ = other.city_;
+        bitField0_ |= 0x00000008;
+        onChanged();
+      }
+      if (!other.getState().isEmpty()) {
+        state_ = other.state_;
+        bitField0_ |= 0x00000010;
+        onChanged();
+      }
+      if (!other.getZip().isEmpty()) {
+        zip_ = other.zip_;
+        bitField0_ |= 0x00000020;
+        onChanged();
+      }
+      if (!other.getCountry().isEmpty()) {
+        country_ = other.country_;
+        bitField0_ |= 0x00000040;
+        onChanged();
+      }
+      if (other.hasResidential()) {
+        setResidential(other.getResidential());
       }
       if (other.hasCoordinate()) {
         mergeCoordinate(other.getCoordinate());
@@ -524,23 +866,48 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000001;
               break;
             } // case 10
-            case 16: {
-              residential_ = input.readBool();
+            case 18: {
+              street1_ = input.readStringRequireUtf8();
               bitField0_ |= 0x00000002;
               break;
-            } // case 16
-            case 24: {
-              verified_ = input.readBool();
+            } // case 18
+            case 26: {
+              street2_ = input.readStringRequireUtf8();
               bitField0_ |= 0x00000004;
               break;
-            } // case 24
+            } // case 26
             case 34: {
-              input.readMessage(
-                  internalGetCoordinateFieldBuilder().getBuilder(),
-                  extensionRegistry);
+              city_ = input.readStringRequireUtf8();
               bitField0_ |= 0x00000008;
               break;
             } // case 34
+            case 42: {
+              state_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000010;
+              break;
+            } // case 42
+            case 50: {
+              zip_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000020;
+              break;
+            } // case 50
+            case 58: {
+              country_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000040;
+              break;
+            } // case 58
+            case 64: {
+              residential_ = input.readBool();
+              bitField0_ |= 0x00000080;
+              break;
+            } // case 64
+            case 74: {
+              input.readMessage(
+                  internalGetCoordinateFieldBuilder().getBuilder(),
+                  extensionRegistry);
+              bitField0_ |= 0x00000100;
+              break;
+            } // case 74
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -650,13 +1017,457 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
+    private java.lang.Object street1_ = "";
+    /**
+     * <code>string street1 = 2 [json_name = "street1"];</code>
+     * @return The street1.
+     */
+    public java.lang.String getStreet1() {
+      java.lang.Object ref = street1_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        street1_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string street1 = 2 [json_name = "street1"];</code>
+     * @return The bytes for street1.
+     */
+    public com.google.protobuf.ByteString
+        getStreet1Bytes() {
+      java.lang.Object ref = street1_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        street1_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string street1 = 2 [json_name = "street1"];</code>
+     * @param value The street1 to set.
+     * @return This builder for chaining.
+     */
+    public Builder setStreet1(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      street1_ = value;
+      bitField0_ |= 0x00000002;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string street1 = 2 [json_name = "street1"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearStreet1() {
+      street1_ = getDefaultInstance().getStreet1();
+      bitField0_ = (bitField0_ & ~0x00000002);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string street1 = 2 [json_name = "street1"];</code>
+     * @param value The bytes for street1 to set.
+     * @return This builder for chaining.
+     */
+    public Builder setStreet1Bytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      street1_ = value;
+      bitField0_ |= 0x00000002;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object street2_ = "";
+    /**
+     * <code>string street2 = 3 [json_name = "street2"];</code>
+     * @return The street2.
+     */
+    public java.lang.String getStreet2() {
+      java.lang.Object ref = street2_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        street2_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string street2 = 3 [json_name = "street2"];</code>
+     * @return The bytes for street2.
+     */
+    public com.google.protobuf.ByteString
+        getStreet2Bytes() {
+      java.lang.Object ref = street2_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        street2_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string street2 = 3 [json_name = "street2"];</code>
+     * @param value The street2 to set.
+     * @return This builder for chaining.
+     */
+    public Builder setStreet2(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      street2_ = value;
+      bitField0_ |= 0x00000004;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string street2 = 3 [json_name = "street2"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearStreet2() {
+      street2_ = getDefaultInstance().getStreet2();
+      bitField0_ = (bitField0_ & ~0x00000004);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string street2 = 3 [json_name = "street2"];</code>
+     * @param value The bytes for street2 to set.
+     * @return This builder for chaining.
+     */
+    public Builder setStreet2Bytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      street2_ = value;
+      bitField0_ |= 0x00000004;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object city_ = "";
+    /**
+     * <code>string city = 4 [json_name = "city"];</code>
+     * @return The city.
+     */
+    public java.lang.String getCity() {
+      java.lang.Object ref = city_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        city_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string city = 4 [json_name = "city"];</code>
+     * @return The bytes for city.
+     */
+    public com.google.protobuf.ByteString
+        getCityBytes() {
+      java.lang.Object ref = city_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        city_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string city = 4 [json_name = "city"];</code>
+     * @param value The city to set.
+     * @return This builder for chaining.
+     */
+    public Builder setCity(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      city_ = value;
+      bitField0_ |= 0x00000008;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string city = 4 [json_name = "city"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearCity() {
+      city_ = getDefaultInstance().getCity();
+      bitField0_ = (bitField0_ & ~0x00000008);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string city = 4 [json_name = "city"];</code>
+     * @param value The bytes for city to set.
+     * @return This builder for chaining.
+     */
+    public Builder setCityBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      city_ = value;
+      bitField0_ |= 0x00000008;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object state_ = "";
+    /**
+     * <code>string state = 5 [json_name = "state"];</code>
+     * @return The state.
+     */
+    public java.lang.String getState() {
+      java.lang.Object ref = state_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        state_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string state = 5 [json_name = "state"];</code>
+     * @return The bytes for state.
+     */
+    public com.google.protobuf.ByteString
+        getStateBytes() {
+      java.lang.Object ref = state_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        state_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string state = 5 [json_name = "state"];</code>
+     * @param value The state to set.
+     * @return This builder for chaining.
+     */
+    public Builder setState(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      state_ = value;
+      bitField0_ |= 0x00000010;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string state = 5 [json_name = "state"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearState() {
+      state_ = getDefaultInstance().getState();
+      bitField0_ = (bitField0_ & ~0x00000010);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string state = 5 [json_name = "state"];</code>
+     * @param value The bytes for state to set.
+     * @return This builder for chaining.
+     */
+    public Builder setStateBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      state_ = value;
+      bitField0_ |= 0x00000010;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object zip_ = "";
+    /**
+     * <code>string zip = 6 [json_name = "zip"];</code>
+     * @return The zip.
+     */
+    public java.lang.String getZip() {
+      java.lang.Object ref = zip_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        zip_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string zip = 6 [json_name = "zip"];</code>
+     * @return The bytes for zip.
+     */
+    public com.google.protobuf.ByteString
+        getZipBytes() {
+      java.lang.Object ref = zip_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        zip_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string zip = 6 [json_name = "zip"];</code>
+     * @param value The zip to set.
+     * @return This builder for chaining.
+     */
+    public Builder setZip(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      zip_ = value;
+      bitField0_ |= 0x00000020;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string zip = 6 [json_name = "zip"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearZip() {
+      zip_ = getDefaultInstance().getZip();
+      bitField0_ = (bitField0_ & ~0x00000020);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string zip = 6 [json_name = "zip"];</code>
+     * @param value The bytes for zip to set.
+     * @return This builder for chaining.
+     */
+    public Builder setZipBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      zip_ = value;
+      bitField0_ |= 0x00000020;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object country_ = "";
+    /**
+     * <code>string country = 7 [json_name = "country"];</code>
+     * @return The country.
+     */
+    public java.lang.String getCountry() {
+      java.lang.Object ref = country_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        country_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string country = 7 [json_name = "country"];</code>
+     * @return The bytes for country.
+     */
+    public com.google.protobuf.ByteString
+        getCountryBytes() {
+      java.lang.Object ref = country_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        country_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string country = 7 [json_name = "country"];</code>
+     * @param value The country to set.
+     * @return This builder for chaining.
+     */
+    public Builder setCountry(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      country_ = value;
+      bitField0_ |= 0x00000040;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string country = 7 [json_name = "country"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearCountry() {
+      country_ = getDefaultInstance().getCountry();
+      bitField0_ = (bitField0_ & ~0x00000040);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string country = 7 [json_name = "country"];</code>
+     * @param value The bytes for country to set.
+     * @return This builder for chaining.
+     */
+    public Builder setCountryBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      country_ = value;
+      bitField0_ |= 0x00000040;
+      onChanged();
+      return this;
+    }
+
     private boolean residential_ ;
     /**
      * <pre>
      * affects carrier rate selection
      * </pre>
      *
-     * <code>bool residential = 2 [json_name = "residential"];</code>
+     * <code>optional bool residential = 8 [json_name = "residential"];</code>
+     * @return Whether the residential field is set.
+     */
+    @java.lang.Override
+    public boolean hasResidential() {
+      return ((bitField0_ & 0x00000080) != 0);
+    }
+    /**
+     * <pre>
+     * affects carrier rate selection
+     * </pre>
+     *
+     * <code>optional bool residential = 8 [json_name = "residential"];</code>
      * @return The residential.
      */
     @java.lang.Override
@@ -668,14 +1479,14 @@ private static final long serialVersionUID = 0L;
      * affects carrier rate selection
      * </pre>
      *
-     * <code>bool residential = 2 [json_name = "residential"];</code>
+     * <code>optional bool residential = 8 [json_name = "residential"];</code>
      * @param value The residential to set.
      * @return This builder for chaining.
      */
     public Builder setResidential(boolean value) {
 
       residential_ = value;
-      bitField0_ |= 0x00000002;
+      bitField0_ |= 0x00000080;
       onChanged();
       return this;
     }
@@ -684,44 +1495,12 @@ private static final long serialVersionUID = 0L;
      * affects carrier rate selection
      * </pre>
      *
-     * <code>bool residential = 2 [json_name = "residential"];</code>
+     * <code>optional bool residential = 8 [json_name = "residential"];</code>
      * @return This builder for chaining.
      */
     public Builder clearResidential() {
-      bitField0_ = (bitField0_ & ~0x00000002);
+      bitField0_ = (bitField0_ & ~0x00000080);
       residential_ = false;
-      onChanged();
-      return this;
-    }
-
-    private boolean verified_ ;
-    /**
-     * <code>bool verified = 3 [json_name = "verified"];</code>
-     * @return The verified.
-     */
-    @java.lang.Override
-    public boolean getVerified() {
-      return verified_;
-    }
-    /**
-     * <code>bool verified = 3 [json_name = "verified"];</code>
-     * @param value The verified to set.
-     * @return This builder for chaining.
-     */
-    public Builder setVerified(boolean value) {
-
-      verified_ = value;
-      bitField0_ |= 0x00000004;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>bool verified = 3 [json_name = "verified"];</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearVerified() {
-      bitField0_ = (bitField0_ & ~0x00000004);
-      verified_ = false;
       onChanged();
       return this;
     }
@@ -734,18 +1513,18 @@ private static final long serialVersionUID = 0L;
      * lat/lng from EasyPost verification; required by get_location_events
      * </pre>
      *
-     * <code>optional .acme.common.v1.Coordinate coordinate = 4 [json_name = "coordinate"];</code>
+     * <code>optional .acme.common.v1.Coordinate coordinate = 9 [json_name = "coordinate"];</code>
      * @return Whether the coordinate field is set.
      */
     public boolean hasCoordinate() {
-      return ((bitField0_ & 0x00000008) != 0);
+      return ((bitField0_ & 0x00000100) != 0);
     }
     /**
      * <pre>
      * lat/lng from EasyPost verification; required by get_location_events
      * </pre>
      *
-     * <code>optional .acme.common.v1.Coordinate coordinate = 4 [json_name = "coordinate"];</code>
+     * <code>optional .acme.common.v1.Coordinate coordinate = 9 [json_name = "coordinate"];</code>
      * @return The coordinate.
      */
     public com.acme.proto.acme.common.v1.Coordinate getCoordinate() {
@@ -760,7 +1539,7 @@ private static final long serialVersionUID = 0L;
      * lat/lng from EasyPost verification; required by get_location_events
      * </pre>
      *
-     * <code>optional .acme.common.v1.Coordinate coordinate = 4 [json_name = "coordinate"];</code>
+     * <code>optional .acme.common.v1.Coordinate coordinate = 9 [json_name = "coordinate"];</code>
      */
     public Builder setCoordinate(com.acme.proto.acme.common.v1.Coordinate value) {
       if (coordinateBuilder_ == null) {
@@ -771,7 +1550,7 @@ private static final long serialVersionUID = 0L;
       } else {
         coordinateBuilder_.setMessage(value);
       }
-      bitField0_ |= 0x00000008;
+      bitField0_ |= 0x00000100;
       onChanged();
       return this;
     }
@@ -780,7 +1559,7 @@ private static final long serialVersionUID = 0L;
      * lat/lng from EasyPost verification; required by get_location_events
      * </pre>
      *
-     * <code>optional .acme.common.v1.Coordinate coordinate = 4 [json_name = "coordinate"];</code>
+     * <code>optional .acme.common.v1.Coordinate coordinate = 9 [json_name = "coordinate"];</code>
      */
     public Builder setCoordinate(
         com.acme.proto.acme.common.v1.Coordinate.Builder builderForValue) {
@@ -789,7 +1568,7 @@ private static final long serialVersionUID = 0L;
       } else {
         coordinateBuilder_.setMessage(builderForValue.build());
       }
-      bitField0_ |= 0x00000008;
+      bitField0_ |= 0x00000100;
       onChanged();
       return this;
     }
@@ -798,11 +1577,11 @@ private static final long serialVersionUID = 0L;
      * lat/lng from EasyPost verification; required by get_location_events
      * </pre>
      *
-     * <code>optional .acme.common.v1.Coordinate coordinate = 4 [json_name = "coordinate"];</code>
+     * <code>optional .acme.common.v1.Coordinate coordinate = 9 [json_name = "coordinate"];</code>
      */
     public Builder mergeCoordinate(com.acme.proto.acme.common.v1.Coordinate value) {
       if (coordinateBuilder_ == null) {
-        if (((bitField0_ & 0x00000008) != 0) &&
+        if (((bitField0_ & 0x00000100) != 0) &&
           coordinate_ != null &&
           coordinate_ != com.acme.proto.acme.common.v1.Coordinate.getDefaultInstance()) {
           getCoordinateBuilder().mergeFrom(value);
@@ -813,7 +1592,7 @@ private static final long serialVersionUID = 0L;
         coordinateBuilder_.mergeFrom(value);
       }
       if (coordinate_ != null) {
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000100;
         onChanged();
       }
       return this;
@@ -823,10 +1602,10 @@ private static final long serialVersionUID = 0L;
      * lat/lng from EasyPost verification; required by get_location_events
      * </pre>
      *
-     * <code>optional .acme.common.v1.Coordinate coordinate = 4 [json_name = "coordinate"];</code>
+     * <code>optional .acme.common.v1.Coordinate coordinate = 9 [json_name = "coordinate"];</code>
      */
     public Builder clearCoordinate() {
-      bitField0_ = (bitField0_ & ~0x00000008);
+      bitField0_ = (bitField0_ & ~0x00000100);
       coordinate_ = null;
       if (coordinateBuilder_ != null) {
         coordinateBuilder_.dispose();
@@ -840,10 +1619,10 @@ private static final long serialVersionUID = 0L;
      * lat/lng from EasyPost verification; required by get_location_events
      * </pre>
      *
-     * <code>optional .acme.common.v1.Coordinate coordinate = 4 [json_name = "coordinate"];</code>
+     * <code>optional .acme.common.v1.Coordinate coordinate = 9 [json_name = "coordinate"];</code>
      */
     public com.acme.proto.acme.common.v1.Coordinate.Builder getCoordinateBuilder() {
-      bitField0_ |= 0x00000008;
+      bitField0_ |= 0x00000100;
       onChanged();
       return internalGetCoordinateFieldBuilder().getBuilder();
     }
@@ -852,7 +1631,7 @@ private static final long serialVersionUID = 0L;
      * lat/lng from EasyPost verification; required by get_location_events
      * </pre>
      *
-     * <code>optional .acme.common.v1.Coordinate coordinate = 4 [json_name = "coordinate"];</code>
+     * <code>optional .acme.common.v1.Coordinate coordinate = 9 [json_name = "coordinate"];</code>
      */
     public com.acme.proto.acme.common.v1.CoordinateOrBuilder getCoordinateOrBuilder() {
       if (coordinateBuilder_ != null) {
@@ -867,7 +1646,7 @@ private static final long serialVersionUID = 0L;
      * lat/lng from EasyPost verification; required by get_location_events
      * </pre>
      *
-     * <code>optional .acme.common.v1.Coordinate coordinate = 4 [json_name = "coordinate"];</code>
+     * <code>optional .acme.common.v1.Coordinate coordinate = 9 [json_name = "coordinate"];</code>
      */
     private com.google.protobuf.SingleFieldBuilder<
         com.acme.proto.acme.common.v1.Coordinate, com.acme.proto.acme.common.v1.Coordinate.Builder, com.acme.proto.acme.common.v1.CoordinateOrBuilder> 

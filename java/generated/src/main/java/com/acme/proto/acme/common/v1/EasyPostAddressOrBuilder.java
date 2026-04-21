@@ -31,27 +31,102 @@ public interface EasyPostAddressOrBuilder extends
       getIdBytes();
 
   /**
+   * <code>string street1 = 2 [json_name = "street1"];</code>
+   * @return The street1.
+   */
+  java.lang.String getStreet1();
+  /**
+   * <code>string street1 = 2 [json_name = "street1"];</code>
+   * @return The bytes for street1.
+   */
+  com.google.protobuf.ByteString
+      getStreet1Bytes();
+
+  /**
+   * <code>string street2 = 3 [json_name = "street2"];</code>
+   * @return The street2.
+   */
+  java.lang.String getStreet2();
+  /**
+   * <code>string street2 = 3 [json_name = "street2"];</code>
+   * @return The bytes for street2.
+   */
+  com.google.protobuf.ByteString
+      getStreet2Bytes();
+
+  /**
+   * <code>string city = 4 [json_name = "city"];</code>
+   * @return The city.
+   */
+  java.lang.String getCity();
+  /**
+   * <code>string city = 4 [json_name = "city"];</code>
+   * @return The bytes for city.
+   */
+  com.google.protobuf.ByteString
+      getCityBytes();
+
+  /**
+   * <code>string state = 5 [json_name = "state"];</code>
+   * @return The state.
+   */
+  java.lang.String getState();
+  /**
+   * <code>string state = 5 [json_name = "state"];</code>
+   * @return The bytes for state.
+   */
+  com.google.protobuf.ByteString
+      getStateBytes();
+
+  /**
+   * <code>string zip = 6 [json_name = "zip"];</code>
+   * @return The zip.
+   */
+  java.lang.String getZip();
+  /**
+   * <code>string zip = 6 [json_name = "zip"];</code>
+   * @return The bytes for zip.
+   */
+  com.google.protobuf.ByteString
+      getZipBytes();
+
+  /**
+   * <code>string country = 7 [json_name = "country"];</code>
+   * @return The country.
+   */
+  java.lang.String getCountry();
+  /**
+   * <code>string country = 7 [json_name = "country"];</code>
+   * @return The bytes for country.
+   */
+  com.google.protobuf.ByteString
+      getCountryBytes();
+
+  /**
    * <pre>
    * affects carrier rate selection
    * </pre>
    *
-   * <code>bool residential = 2 [json_name = "residential"];</code>
+   * <code>optional bool residential = 8 [json_name = "residential"];</code>
+   * @return Whether the residential field is set.
+   */
+  boolean hasResidential();
+  /**
+   * <pre>
+   * affects carrier rate selection
+   * </pre>
+   *
+   * <code>optional bool residential = 8 [json_name = "residential"];</code>
    * @return The residential.
    */
   boolean getResidential();
-
-  /**
-   * <code>bool verified = 3 [json_name = "verified"];</code>
-   * @return The verified.
-   */
-  boolean getVerified();
 
   /**
    * <pre>
    * lat/lng from EasyPost verification; required by get_location_events
    * </pre>
    *
-   * <code>optional .acme.common.v1.Coordinate coordinate = 4 [json_name = "coordinate"];</code>
+   * <code>optional .acme.common.v1.Coordinate coordinate = 9 [json_name = "coordinate"];</code>
    * @return Whether the coordinate field is set.
    */
   boolean hasCoordinate();
@@ -60,7 +135,7 @@ public interface EasyPostAddressOrBuilder extends
    * lat/lng from EasyPost verification; required by get_location_events
    * </pre>
    *
-   * <code>optional .acme.common.v1.Coordinate coordinate = 4 [json_name = "coordinate"];</code>
+   * <code>optional .acme.common.v1.Coordinate coordinate = 9 [json_name = "coordinate"];</code>
    * @return The coordinate.
    */
   com.acme.proto.acme.common.v1.Coordinate getCoordinate();
@@ -69,7 +144,7 @@ public interface EasyPostAddressOrBuilder extends
    * lat/lng from EasyPost verification; required by get_location_events
    * </pre>
    *
-   * <code>optional .acme.common.v1.Coordinate coordinate = 4 [json_name = "coordinate"];</code>
+   * <code>optional .acme.common.v1.Coordinate coordinate = 9 [json_name = "coordinate"];</code>
    */
   com.acme.proto.acme.common.v1.CoordinateOrBuilder getCoordinateOrBuilder();
 }

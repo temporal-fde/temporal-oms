@@ -8,7 +8,14 @@ Starts all three Temporal workers in a single process concurrently:
 from __future__ import annotations
 
 import asyncio
+import logging
 import signal
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)-8s %(name)s %(message)s",
+    datefmt="%Y-%m-%dT%H:%M:%S",
+)
 
 from src.workers.easypost_worker import build_easypost_worker
 from src.workers.fulfillment_worker import build_fulfillment_worker

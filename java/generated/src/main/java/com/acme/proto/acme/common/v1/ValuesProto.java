@@ -78,32 +78,32 @@ public final class ValuesProto extends com.google.protobuf.GeneratedFile {
       "\n\033acme/common/v1/values.proto\022\016acme.comm" +
       "on.v1\032\037google/protobuf/timestamp.proto\"9" +
       "\n\005Money\022\032\n\010currency\030\001 \001(\tR\010currency\022\024\n\005u" +
-      "nits\030\002 \001(\003R\005units\"\257\001\n\017EasyPostAddress\022\016\n" +
-      "\002id\030\001 \001(\tR\002id\022 \n\013residential\030\002 \001(\010R\013resi" +
-      "dential\022\032\n\010verified\030\003 \001(\010R\010verified\022?\n\nc" +
-      "oordinate\030\004 \001(\0132\032.acme.common.v1.Coordin" +
-      "ateH\000R\ncoordinate\210\001\001B\r\n\013_coordinate\"\354\001\n\007" +
-      "Address\022\026\n\006street\030\001 \001(\tR\006street\022\022\n\004city\030" +
-      "\002 \001(\tR\004city\022\024\n\005state\030\003 \001(\tR\005state\022\037\n\013pos" +
-      "tal_code\030\004 \001(\tR\npostalCode\022\030\n\007country\030\005 " +
-      "\001(\tR\007country\022O\n\020easypost_address\030\006 \001(\0132\037" +
-      ".acme.common.v1.EasyPostAddressH\000R\017easyp" +
-      "ostAddress\210\001\001B\023\n\021_easypost_address\"k\n\tTi" +
-      "meRange\0220\n\005start\030\001 \001(\0132\032.google.protobuf" +
-      ".TimestampR\005start\022,\n\003end\030\002 \001(\0132\032.google." +
-      "protobuf.TimestampR\003end\"H\n\nPagination\022\033\n" +
-      "\tpage_size\030\001 \001(\005R\010pageSize\022\035\n\npage_token" +
-      "\030\002 \001(\tR\tpageToken\"\301\001\n\014ErrorDetails\022\022\n\004co" +
-      "de\030\001 \001(\tR\004code\022\030\n\007message\030\002 \001(\tR\007message" +
-      "\022F\n\010metadata\030\003 \003(\0132*.acme.common.v1.Erro" +
-      "rDetails.MetadataEntryR\010metadata\032;\n\rMeta" +
-      "dataEntry\022\020\n\003key\030\001 \001(\tR\003key\022\024\n\005value\030\002 \001" +
-      "(\tR\005value:\0028\001\"F\n\nCoordinate\022\032\n\010latitude\030" +
-      "\001 \001(\001R\010latitude\022\034\n\tlongitude\030\002 \001(\001R\tlong" +
-      "itudeB\206\001\n\035com.acme.proto.acme.common.v1B" +
-      "\013ValuesProtoP\001\242\002\003ACX\252\002\016Acme.Common.V1\312\002\016" +
-      "Acme\\Common\\V1\342\002\032Acme\\Common\\V1\\GPBMetad" +
-      "ata\352\002\020Acme::Common::V1b\006proto3"
+      "nits\030\002 \001(\003R\005units\"\262\002\n\017EasyPostAddress\022\016\n" +
+      "\002id\030\001 \001(\tR\002id\022\030\n\007street1\030\002 \001(\tR\007street1\022" +
+      "\030\n\007street2\030\003 \001(\tR\007street2\022\022\n\004city\030\004 \001(\tR" +
+      "\004city\022\024\n\005state\030\005 \001(\tR\005state\022\020\n\003zip\030\006 \001(\t" +
+      "R\003zip\022\030\n\007country\030\007 \001(\tR\007country\022%\n\013resid" +
+      "ential\030\010 \001(\010H\000R\013residential\210\001\001\022?\n\ncoordi" +
+      "nate\030\t \001(\0132\032.acme.common.v1.CoordinateH\001" +
+      "R\ncoordinate\210\001\001B\016\n\014_residentialB\r\n\013_coor" +
+      "dinate\"X\n\007Address\022@\n\010easypost\030\007 \001(\0132\037.ac" +
+      "me.common.v1.EasyPostAddressH\000R\010easypost" +
+      "\210\001\001B\013\n\t_easypost\"k\n\tTimeRange\0220\n\005start\030\001" +
+      " \001(\0132\032.google.protobuf.TimestampR\005start\022" +
+      ",\n\003end\030\002 \001(\0132\032.google.protobuf.Timestamp" +
+      "R\003end\"H\n\nPagination\022\033\n\tpage_size\030\001 \001(\005R\010" +
+      "pageSize\022\035\n\npage_token\030\002 \001(\tR\tpageToken\"" +
+      "\301\001\n\014ErrorDetails\022\022\n\004code\030\001 \001(\tR\004code\022\030\n\007" +
+      "message\030\002 \001(\tR\007message\022F\n\010metadata\030\003 \003(\013" +
+      "2*.acme.common.v1.ErrorDetails.MetadataE" +
+      "ntryR\010metadata\032;\n\rMetadataEntry\022\020\n\003key\030\001" +
+      " \001(\tR\003key\022\024\n\005value\030\002 \001(\tR\005value:\0028\001\"F\n\nC" +
+      "oordinate\022\032\n\010latitude\030\001 \001(\001R\010latitude\022\034\n" +
+      "\tlongitude\030\002 \001(\001R\tlongitudeB\206\001\n\035com.acme" +
+      ".proto.acme.common.v1B\013ValuesProtoP\001\242\002\003A" +
+      "CX\252\002\016Acme.Common.V1\312\002\016Acme\\Common\\V1\342\002\032A" +
+      "cme\\Common\\V1\\GPBMetadata\352\002\020Acme::Common" +
+      "::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -121,13 +121,13 @@ public final class ValuesProto extends com.google.protobuf.GeneratedFile {
     internal_static_acme_common_v1_EasyPostAddress_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_common_v1_EasyPostAddress_descriptor,
-        new java.lang.String[] { "Id", "Residential", "Verified", "Coordinate", });
+        new java.lang.String[] { "Id", "Street1", "Street2", "City", "State", "Zip", "Country", "Residential", "Coordinate", });
     internal_static_acme_common_v1_Address_descriptor =
       getDescriptor().getMessageType(2);
     internal_static_acme_common_v1_Address_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_common_v1_Address_descriptor,
-        new java.lang.String[] { "Street", "City", "State", "PostalCode", "Country", "EasypostAddress", });
+        new java.lang.String[] { "Easypost", });
     internal_static_acme_common_v1_TimeRange_descriptor =
       getDescriptor().getMessageType(3);
     internal_static_acme_common_v1_TimeRange_fieldAccessorTable = new

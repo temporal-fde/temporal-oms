@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+
 import anthropic
 from temporalio import activity
 
@@ -53,6 +55,11 @@ def _to_tool_param(tool: LlmToolDefinition) -> anthropic.types.ToolParam:
     }
 
 
+def _extract_text(text: str) -> str:
+    match = re.search(r"```(?:json)?\s*\n(.*?)\n\s*```", text, re.DOTALL)
+    return match.group(1).strip() if match else text
+
+
 def _to_llm_response(resp: anthropic.types.Message) -> LlmResponse:
     stop_reason = (
         LlmStopReason.LLM_STOP_REASON_TOOL_USE
@@ -61,16 +68,20 @@ def _to_llm_response(resp: anthropic.types.Message) -> LlmResponse:
     )
     blocks: list[LlmContentBlock] = []
     for block_obj in resp.content:
-        block = LlmContentBlock(type=block_obj.type)
         if block_obj.type == "text":
-            block.text = LlmTextBlock(text=block_obj.text)
+            blocks.append(LlmContentBlock(
+                type="text",
+                text=LlmTextBlock(text=_extract_text(block_obj.text)),
+            ))
         elif block_obj.type == "tool_use":
-            block.tool_use = LlmToolUseBlock(
-                id=block_obj.id,
-                name=block_obj.name,
-                input=dict(block_obj.input),
-            )
-        blocks.append(block)
+            blocks.append(LlmContentBlock(
+                type="tool_use",
+                tool_use=LlmToolUseBlock(
+                    id=block_obj.id,
+                    name=block_obj.name,
+                    input=dict(block_obj.input),
+                ),
+            ))
     return LlmResponse(content=blocks, stop_reason=stop_reason)
 
 
@@ -87,7 +98,7 @@ class LlmActivities:
         )
 
     @activity.defn
-    def build_system_prompt(self, req: BuildSystemPromptRequest) -> BuildSystemPromptResponse:
+    async def build_system_prompt(self, req: BuildSystemPromptRequest) -> BuildSystemPromptResponse:
         r = req.request
         margin_rule = (
             f"MARGIN RULE: If any available rate cost exceeds the customer paid price "

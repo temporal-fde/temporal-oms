@@ -95,13 +95,7 @@ _TOOLS = ToolSpecs(
 
 
 def _parse_recommendation(text: str) -> ShippingRecommendation:
-    stripped = text.strip()
-    if stripped.startswith("```"):
-        lines = stripped.split("\n")
-        inner = lines[1:-1] if lines[-1].strip() == "```" else lines[1:]
-        stripped = "\n".join(inner).strip()
-
-    data = json.loads(stripped)
+    data = json.loads(text)
     outcome_str = data.get("outcome", "RECOMMENDATION_OUTCOME_UNSPECIFIED")
     try:
         outcome = RecommendationOutcome[outcome_str]
@@ -154,25 +148,19 @@ class ShippingAgent:
         system_prompt = prompt_response.system_prompt
         tools = _TOOLS.definitions()
 
-        has_from = bool(request.from_address and request.from_address.street)
-        from_desc = (
-            f"{request.from_address.street}, {request.from_address.city}, "
-            f"{request.from_address.state} {request.from_address.postal_code} {request.from_address.country}"
-            if has_from
-            else "NOT PROVIDED — call lookup_inventory_location first"
-        )
         items_desc = ", ".join(f"{i.sku_id}×{i.quantity}" for i in request.items)
+        ep = request.to_address.easypost
         ep_note = (
-            f"\nto_address easypost_id (already verified): {request.to_address.easypost_address.id}"
-            if (request.to_address.easypost_address and request.to_address.easypost_address.id)
+            f"\nto_address easypost_id (already verified): {ep.id}"
+            if (ep and ep.id)
             else ""
         )
         task_text = (
             f"Calculate shipping options for order {request.order_id}.\n"
-            f"to_address: {request.to_address.street}, {request.to_address.city}, "
-            f"{request.to_address.state} {request.to_address.postal_code} {request.to_address.country}"
+            f"to_address: {ep.street1 if ep else ''}, {ep.city if ep else ''}, "
+            f"{ep.state if ep else ''} {ep.zip if ep else ''} {ep.country if ep else ''}"
             f"{ep_note}\n"
-            f"from_address: {from_desc}\n"
+            f"from_address: NOT PROVIDED — call lookup_inventory_location first\n"
             f"items: {items_desc}\n"
         )
         # System instructions are embedded in the first user message (call_llm has no system param)

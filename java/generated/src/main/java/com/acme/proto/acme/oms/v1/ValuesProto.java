@@ -41,11 +41,6 @@ public final class ValuesProto extends com.google.protobuf.GeneratedFile {
   static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_acme_oms_v1_Item_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_acme_oms_v1_ShippingAddress_descriptor;
-  static final 
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_acme_oms_v1_ShippingAddress_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -56,21 +51,17 @@ public final class ValuesProto extends com.google.protobuf.GeneratedFile {
   static {
     java.lang.String[] descriptorData = {
       "\n\030acme/oms/v1/values.proto\022\013acme.oms.v1\032" +
-      "\033acme/common/v1/values.proto\"\224\001\n\005Order\022\031" +
+      "\033acme/common/v1/values.proto\"\217\001\n\005Order\022\031" +
       "\n\010order_id\030\001 \001(\tR\007orderId\022\'\n\005items\030\002 \003(\013" +
-      "2\021.acme.oms.v1.ItemR\005items\022G\n\020shipping_a" +
-      "ddress\030\003 \001(\0132\034.acme.oms.v1.ShippingAddre" +
-      "ssR\017shippingAddress\"J\n\007Payment\022\020\n\003rrn\030\001 " +
-      "\001(\tR\003rrn\022-\n\006amount\030\002 \001(\0132\025.acme.common.v" +
-      "1.MoneyR\006amount\";\n\004Item\022\027\n\007item_id\030\001 \001(\t" +
-      "R\006itemId\022\032\n\010quantity\030\002 \001(\005R\010quantity\"\216\001\n" +
-      "\017ShippingAddress\022\026\n\006street\030\001 \001(\tR\006street" +
-      "\022\022\n\004city\030\002 \001(\tR\004city\022\024\n\005state\030\003 \001(\tR\005sta" +
-      "te\022\037\n\013postal_code\030\004 \001(\tR\npostalCode\022\030\n\007c" +
-      "ountry\030\005 \001(\tR\007countryBw\n\032com.acme.proto." +
-      "acme.oms.v1B\013ValuesProtoP\001\242\002\003AOX\252\002\013Acme." +
-      "Oms.V1\312\002\013Acme\\Oms\\V1\342\002\027Acme\\Oms\\V1\\GPBMe" +
-      "tadata\352\002\rAcme::Oms::V1b\006proto3"
+      "2\021.acme.oms.v1.ItemR\005items\022B\n\020shipping_a" +
+      "ddress\030\003 \001(\0132\027.acme.common.v1.AddressR\017s" +
+      "hippingAddress\"J\n\007Payment\022\020\n\003rrn\030\001 \001(\tR\003" +
+      "rrn\022-\n\006amount\030\002 \001(\0132\025.acme.common.v1.Mon" +
+      "eyR\006amount\";\n\004Item\022\027\n\007item_id\030\001 \001(\tR\006ite" +
+      "mId\022\032\n\010quantity\030\002 \001(\005R\010quantityBw\n\032com.a" +
+      "cme.proto.acme.oms.v1B\013ValuesProtoP\001\242\002\003A" +
+      "OX\252\002\013Acme.Oms.V1\312\002\013Acme\\Oms\\V1\342\002\027Acme\\Om" +
+      "s\\V1\\GPBMetadata\352\002\rAcme::Oms::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -95,12 +86,6 @@ public final class ValuesProto extends com.google.protobuf.GeneratedFile {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_oms_v1_Item_descriptor,
         new java.lang.String[] { "ItemId", "Quantity", });
-    internal_static_acme_oms_v1_ShippingAddress_descriptor =
-      getDescriptor().getMessageType(3);
-    internal_static_acme_oms_v1_ShippingAddress_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_acme_oms_v1_ShippingAddress_descriptor,
-        new java.lang.String[] { "Street", "City", "State", "PostalCode", "Country", });
     descriptor.resolveAllFeaturesImmutable();
     com.acme.proto.acme.common.v1.ValuesProto.getDescriptor();
   }

@@ -216,9 +216,9 @@ private static final long serialVersionUID = 0L;
   }
 
   public static final int SHIPPING_ADDRESS_FIELD_NUMBER = 5;
-  private com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAddress shippingAddress_;
+  private com.acme.proto.acme.common.v1.Address shippingAddress_;
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingAddress shipping_address = 5 [json_name = "shippingAddress"];</code>
+   * <code>.acme.common.v1.Address shipping_address = 5 [json_name = "shippingAddress"];</code>
    * @return Whether the shippingAddress field is set.
    */
   @java.lang.Override
@@ -226,19 +226,19 @@ private static final long serialVersionUID = 0L;
     return ((bitField0_ & 0x00000001) != 0);
   }
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingAddress shipping_address = 5 [json_name = "shippingAddress"];</code>
+   * <code>.acme.common.v1.Address shipping_address = 5 [json_name = "shippingAddress"];</code>
    * @return The shippingAddress.
    */
   @java.lang.Override
-  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAddress getShippingAddress() {
-    return shippingAddress_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAddress.getDefaultInstance() : shippingAddress_;
+  public com.acme.proto.acme.common.v1.Address getShippingAddress() {
+    return shippingAddress_ == null ? com.acme.proto.acme.common.v1.Address.getDefaultInstance() : shippingAddress_;
   }
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingAddress shipping_address = 5 [json_name = "shippingAddress"];</code>
+   * <code>.acme.common.v1.Address shipping_address = 5 [json_name = "shippingAddress"];</code>
    */
   @java.lang.Override
-  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAddressOrBuilder getShippingAddressOrBuilder() {
-    return shippingAddress_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAddress.getDefaultInstance() : shippingAddress_;
+  public com.acme.proto.acme.common.v1.AddressOrBuilder getShippingAddressOrBuilder() {
+    return shippingAddress_ == null ? com.acme.proto.acme.common.v1.Address.getDefaultInstance() : shippingAddress_;
   }
 
   public static final int CREATED_AT_FIELD_NUMBER = 6;
@@ -1230,31 +1230,31 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    private com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAddress shippingAddress_;
+    private com.acme.proto.acme.common.v1.Address shippingAddress_;
     private com.google.protobuf.SingleFieldBuilder<
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAddress, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAddress.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAddressOrBuilder> shippingAddressBuilder_;
+        com.acme.proto.acme.common.v1.Address, com.acme.proto.acme.common.v1.Address.Builder, com.acme.proto.acme.common.v1.AddressOrBuilder> shippingAddressBuilder_;
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingAddress shipping_address = 5 [json_name = "shippingAddress"];</code>
+     * <code>.acme.common.v1.Address shipping_address = 5 [json_name = "shippingAddress"];</code>
      * @return Whether the shippingAddress field is set.
      */
     public boolean hasShippingAddress() {
       return ((bitField0_ & 0x00000010) != 0);
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingAddress shipping_address = 5 [json_name = "shippingAddress"];</code>
+     * <code>.acme.common.v1.Address shipping_address = 5 [json_name = "shippingAddress"];</code>
      * @return The shippingAddress.
      */
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAddress getShippingAddress() {
+    public com.acme.proto.acme.common.v1.Address getShippingAddress() {
       if (shippingAddressBuilder_ == null) {
-        return shippingAddress_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAddress.getDefaultInstance() : shippingAddress_;
+        return shippingAddress_ == null ? com.acme.proto.acme.common.v1.Address.getDefaultInstance() : shippingAddress_;
       } else {
         return shippingAddressBuilder_.getMessage();
       }
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingAddress shipping_address = 5 [json_name = "shippingAddress"];</code>
+     * <code>.acme.common.v1.Address shipping_address = 5 [json_name = "shippingAddress"];</code>
      */
-    public Builder setShippingAddress(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAddress value) {
+    public Builder setShippingAddress(com.acme.proto.acme.common.v1.Address value) {
       if (shippingAddressBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
@@ -1268,10 +1268,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingAddress shipping_address = 5 [json_name = "shippingAddress"];</code>
+     * <code>.acme.common.v1.Address shipping_address = 5 [json_name = "shippingAddress"];</code>
      */
     public Builder setShippingAddress(
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAddress.Builder builderForValue) {
+        com.acme.proto.acme.common.v1.Address.Builder builderForValue) {
       if (shippingAddressBuilder_ == null) {
         shippingAddress_ = builderForValue.build();
       } else {
@@ -1282,13 +1282,13 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingAddress shipping_address = 5 [json_name = "shippingAddress"];</code>
+     * <code>.acme.common.v1.Address shipping_address = 5 [json_name = "shippingAddress"];</code>
      */
-    public Builder mergeShippingAddress(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAddress value) {
+    public Builder mergeShippingAddress(com.acme.proto.acme.common.v1.Address value) {
       if (shippingAddressBuilder_ == null) {
         if (((bitField0_ & 0x00000010) != 0) &&
           shippingAddress_ != null &&
-          shippingAddress_ != com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAddress.getDefaultInstance()) {
+          shippingAddress_ != com.acme.proto.acme.common.v1.Address.getDefaultInstance()) {
           getShippingAddressBuilder().mergeFrom(value);
         } else {
           shippingAddress_ = value;
@@ -1303,7 +1303,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingAddress shipping_address = 5 [json_name = "shippingAddress"];</code>
+     * <code>.acme.common.v1.Address shipping_address = 5 [json_name = "shippingAddress"];</code>
      */
     public Builder clearShippingAddress() {
       bitField0_ = (bitField0_ & ~0x00000010);
@@ -1316,33 +1316,33 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingAddress shipping_address = 5 [json_name = "shippingAddress"];</code>
+     * <code>.acme.common.v1.Address shipping_address = 5 [json_name = "shippingAddress"];</code>
      */
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAddress.Builder getShippingAddressBuilder() {
+    public com.acme.proto.acme.common.v1.Address.Builder getShippingAddressBuilder() {
       bitField0_ |= 0x00000010;
       onChanged();
       return internalGetShippingAddressFieldBuilder().getBuilder();
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingAddress shipping_address = 5 [json_name = "shippingAddress"];</code>
+     * <code>.acme.common.v1.Address shipping_address = 5 [json_name = "shippingAddress"];</code>
      */
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAddressOrBuilder getShippingAddressOrBuilder() {
+    public com.acme.proto.acme.common.v1.AddressOrBuilder getShippingAddressOrBuilder() {
       if (shippingAddressBuilder_ != null) {
         return shippingAddressBuilder_.getMessageOrBuilder();
       } else {
         return shippingAddress_ == null ?
-            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAddress.getDefaultInstance() : shippingAddress_;
+            com.acme.proto.acme.common.v1.Address.getDefaultInstance() : shippingAddress_;
       }
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingAddress shipping_address = 5 [json_name = "shippingAddress"];</code>
+     * <code>.acme.common.v1.Address shipping_address = 5 [json_name = "shippingAddress"];</code>
      */
     private com.google.protobuf.SingleFieldBuilder<
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAddress, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAddress.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAddressOrBuilder> 
+        com.acme.proto.acme.common.v1.Address, com.acme.proto.acme.common.v1.Address.Builder, com.acme.proto.acme.common.v1.AddressOrBuilder> 
         internalGetShippingAddressFieldBuilder() {
       if (shippingAddressBuilder_ == null) {
         shippingAddressBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAddress, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAddress.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAddressOrBuilder>(
+            com.acme.proto.acme.common.v1.Address, com.acme.proto.acme.common.v1.Address.Builder, com.acme.proto.acme.common.v1.AddressOrBuilder>(
                 getShippingAddress(),
                 getParentForChildren(),
                 isClean());

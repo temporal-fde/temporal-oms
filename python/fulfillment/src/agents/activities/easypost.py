@@ -19,6 +19,32 @@ from acme.fulfillment.domain.v1.workflows_p2p import (
 _DEFAULT_PARCEL = {"weight": 16, "length": 6, "width": 6, "height": 4}
 
 
+def _ep_get(obj: object, key: str) -> object:
+    """Get a field from an EasyPost SDK object, which may be a dict or an attribute-style object."""
+    if obj is None:
+        return None
+    if isinstance(obj, dict):
+        return obj.get(key)
+    return getattr(obj, key, None)
+
+
+def _extract_coordinate(ep_addr: object) -> Coordinate | None:
+    lat = _ep_get(ep_addr, "latitude")
+    lng = _ep_get(ep_addr, "longitude")
+    if not lat:
+        verifications = _ep_get(ep_addr, "verifications")
+        for key in ("delivery", "zip4"):
+            details = _ep_get(_ep_get(verifications, key), "details")
+            if details:
+                lat = _ep_get(details, "latitude")
+                lng = _ep_get(details, "longitude")
+                if lat:
+                    break
+    if not lat:
+        return None
+    return Coordinate(latitude=float(lat), longitude=float(lng) if lng else 0.0)  # type: ignore[arg-type]
+
+
 def _get_client() -> easypost.EasyPostClient:
     return easypost.EasyPostClient(settings.easypost_api_key)
 
@@ -30,44 +56,44 @@ class EasyPostActivities:
     """
 
     @activity.defn
-    async def verify_address(
+    def verify_address(
         self,
         request: VerifyAddressRequest,
     ) -> VerifyAddressResponse:
         client = _get_client()
-        addr = request.address
+        ep = request.address.easypost or EasyPostAddress()
+
+        activity.logger.info(f"Verifying address: {ep}")
 
         ep_addr = client.address.create_and_verify(
-            street1=addr.street,
-            city=addr.city,
-            state=addr.state,
-            zip=addr.postal_code,
-            country=addr.country,
+            street1=ep.street1,
+            street2=ep.street2,
+            city=ep.city,
+            state=ep.state,
+            zip=ep.zip,
+            country=ep.country or "US",
         )
+        activity.logger.info(f"Verified address: {ep_addr}")
+        coordinate = _extract_coordinate(ep_addr)
 
-        lat = getattr(ep_addr, "latitude", None)
-        lng = getattr(ep_addr, "longitude", None)
-        coordinate = Coordinate(latitude=lat or 0.0, longitude=lng or 0.0) if lat else None
-
-        easypost_address = EasyPostAddress(
-            id=ep_addr.id,
-            residential=bool(getattr(ep_addr, "residential", False)),
-            verified=True,
-            coordinate=coordinate,
+        return VerifyAddressResponse(
+            address=Address(
+                easypost=EasyPostAddress(
+                    id=ep_addr.id,
+                    street1=getattr(ep_addr, "street1", ep.street1),
+                    street2=getattr(ep_addr, "street2", ep.street2),
+                    city=getattr(ep_addr, "city", ep.city),
+                    state=getattr(ep_addr, "state", ep.state),
+                    zip=getattr(ep_addr, "zip", ep.zip),
+                    country=getattr(ep_addr, "country", ep.country),
+                    residential=bool(getattr(ep_addr, "residential", False)),
+                    coordinate=coordinate,
+                ),
+            ),
         )
-
-        verified_address = Address(
-            street=getattr(ep_addr, "street1", addr.street),
-            city=getattr(ep_addr, "city", addr.city),
-            state=getattr(ep_addr, "state", addr.state),
-            postal_code=getattr(ep_addr, "zip", addr.postal_code),
-            country=getattr(ep_addr, "country", addr.country),
-            easypost_address=easypost_address,
-        )
-        return VerifyAddressResponse(address=verified_address)
 
     @activity.defn
-    async def get_carrier_rates(
+    def get_carrier_rates(
         self,
         request: GetShippingRatesRequest,
     ) -> GetShippingRatesResponse:

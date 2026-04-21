@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from temporalio.client import Client
+from temporalio.contrib.pydantic import pydantic_data_converter
 from temporalio.worker import Worker
 
 from src.config import settings
@@ -16,6 +17,7 @@ async def build_fulfillment_worker() -> Worker:
         settings.temporal_fulfillment_address,
         namespace=settings.temporal_fulfillment_namespace,
         api_key=settings.temporal_fulfillment_api_key or None,
+        data_converter=pydantic_data_converter,
     )
     inventory_activities = LookupInventoryActivities()
     llm_activities = LlmActivities()

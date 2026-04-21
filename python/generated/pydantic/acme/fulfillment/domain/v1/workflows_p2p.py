@@ -10,8 +10,8 @@ from google.protobuf.message import Message  # type: ignore
 from pydantic import BaseModel
 from pydantic import ConfigDict
 from pydantic import Field
-from workflows_p2p import CompleteOrderRequest
-from workflows_p2p import GetProcessOrderStateResponse
+from ....apps.domain.v1.workflows_p2p import CompleteOrderRequest
+from ....processing.domain.v1.workflows_p2p import GetProcessOrderStateResponse
 import typing
 
 class Status(IntEnum):
@@ -45,13 +45,6 @@ class Item(BaseModel):
     brand_code: str = Field(default="")
     quantity: int = Field(default=0)
 
-class ShippingAddress(BaseModel):
-    street: str = Field(default="")
-    city: str = Field(default="")
-    state: str = Field(default="")
-    postal_code: str = Field(default="")
-    country: str = Field(default="")
-
 class FulfillOrderRequest(BaseModel):
     """
      Order Fulfillment AI Agent Workflow
@@ -61,7 +54,7 @@ class FulfillOrderRequest(BaseModel):
     customer_id: str = Field(default="")
     items: typing.List[Item] = Field(default_factory=list)
     payment_rrn: str = Field(default="")
-    shipping_address: ShippingAddress = Field(default_factory=ShippingAddress)
+    shipping_address: Address = Field(default_factory=Address)
     created_at: datetime = Field(default_factory=datetime.now)
 
 class ShippingDetails(BaseModel):
@@ -91,7 +84,7 @@ class FindOptimalShippingRequest(BaseModel):
      Activity: FindOptimalShipping (AI-powered)
     """
 
-    destination: ShippingAddress = Field(default_factory=ShippingAddress)
+    destination: Address = Field(default_factory=Address)
     items: typing.List[Item] = Field(default_factory=list)
     max_cost_cents: int = Field(default=0)
     max_days: int = Field(default=0)
@@ -118,7 +111,7 @@ class AllocateInventoryRequest(BaseModel):
     """
 
     items: typing.List[Item] = Field(default_factory=list)
-    destination: ShippingAddress = Field(default_factory=ShippingAddress)
+    destination: Address = Field(default_factory=Address)
 
 class AllocateInventoryResponse(BaseModel):
     allocations: typing.List[AllocatedItem] = Field(default_factory=list)
@@ -132,7 +125,7 @@ class FindClosestWarehouseRequest(BaseModel):
 
     sku_id: str = Field(default="")
     quantity: int = Field(default=0)
-    destination: ShippingAddress = Field(default_factory=ShippingAddress)
+    destination: Address = Field(default_factory=Address)
 
 class FindClosestWarehouseResponse(BaseModel):
     warehouse_id: str = Field(default="")

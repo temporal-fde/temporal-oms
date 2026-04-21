@@ -11,97 +11,29 @@ public interface AddressOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>string street = 1 [json_name = "street"];</code>
-   * @return The street.
-   */
-  java.lang.String getStreet();
-  /**
-   * <code>string street = 1 [json_name = "street"];</code>
-   * @return The bytes for street.
-   */
-  com.google.protobuf.ByteString
-      getStreetBytes();
-
-  /**
-   * <code>string city = 2 [json_name = "city"];</code>
-   * @return The city.
-   */
-  java.lang.String getCity();
-  /**
-   * <code>string city = 2 [json_name = "city"];</code>
-   * @return The bytes for city.
-   */
-  com.google.protobuf.ByteString
-      getCityBytes();
-
-  /**
-   * <code>string state = 3 [json_name = "state"];</code>
-   * @return The state.
-   */
-  java.lang.String getState();
-  /**
-   * <code>string state = 3 [json_name = "state"];</code>
-   * @return The bytes for state.
-   */
-  com.google.protobuf.ByteString
-      getStateBytes();
-
-  /**
-   * <code>string postal_code = 4 [json_name = "postalCode"];</code>
-   * @return The postalCode.
-   */
-  java.lang.String getPostalCode();
-  /**
-   * <code>string postal_code = 4 [json_name = "postalCode"];</code>
-   * @return The bytes for postalCode.
-   */
-  com.google.protobuf.ByteString
-      getPostalCodeBytes();
-
-  /**
    * <pre>
-   * ISO 3166-1 alpha-2
+   * populated after EasyPost verification
    * </pre>
    *
-   * <code>string country = 5 [json_name = "country"];</code>
-   * @return The country.
+   * <code>optional .acme.common.v1.EasyPostAddress easypost = 7 [json_name = "easypost"];</code>
+   * @return Whether the easypost field is set.
    */
-  java.lang.String getCountry();
-  /**
-   * <pre>
-   * ISO 3166-1 alpha-2
-   * </pre>
-   *
-   * <code>string country = 5 [json_name = "country"];</code>
-   * @return The bytes for country.
-   */
-  com.google.protobuf.ByteString
-      getCountryBytes();
-
+  boolean hasEasypost();
   /**
    * <pre>
    * populated after EasyPost verification
    * </pre>
    *
-   * <code>optional .acme.common.v1.EasyPostAddress easypost_address = 6 [json_name = "easypostAddress"];</code>
-   * @return Whether the easypostAddress field is set.
+   * <code>optional .acme.common.v1.EasyPostAddress easypost = 7 [json_name = "easypost"];</code>
+   * @return The easypost.
    */
-  boolean hasEasypostAddress();
+  com.acme.proto.acme.common.v1.EasyPostAddress getEasypost();
   /**
    * <pre>
    * populated after EasyPost verification
    * </pre>
    *
-   * <code>optional .acme.common.v1.EasyPostAddress easypost_address = 6 [json_name = "easypostAddress"];</code>
-   * @return The easypostAddress.
+   * <code>optional .acme.common.v1.EasyPostAddress easypost = 7 [json_name = "easypost"];</code>
    */
-  com.acme.proto.acme.common.v1.EasyPostAddress getEasypostAddress();
-  /**
-   * <pre>
-   * populated after EasyPost verification
-   * </pre>
-   *
-   * <code>optional .acme.common.v1.EasyPostAddress easypost_address = 6 [json_name = "easypostAddress"];</code>
-   */
-  com.acme.proto.acme.common.v1.EasyPostAddressOrBuilder getEasypostAddressOrBuilder();
+  com.acme.proto.acme.common.v1.EasyPostAddressOrBuilder getEasypostOrBuilder();
 }

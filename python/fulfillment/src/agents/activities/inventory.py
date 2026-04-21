@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 import toml
 from temporalio import activity
 
@@ -11,26 +9,24 @@ from acme.fulfillment.domain.v1.shipping_agent_p2p import (
     LookupInventoryLocationRequest,
     LookupInventoryLocationResponse,
 )
-from acme.common.v1.values_p2p import Address
-
-_DEFAULT_WAREHOUSE_CONFIG_PATH = (
-    Path(__file__).parent.parent.parent.parent / "config" / "warehouses.toml"
-)
-
+from acme.common.v1.values_p2p import Address, EasyPostAddress
 
 def _load_warehouses() -> list[dict]:
-    path = settings.warehouse_config_path or str(_DEFAULT_WAREHOUSE_CONFIG_PATH)
+    path = settings.warehouse_config_path
     data = toml.load(path)
     return data.get("warehouses", [])
 
 
 def _warehouse_to_address(w: dict) -> Address:
     return Address(
-        street=w["street"],
-        city=w["city"],
-        state=w["state"],
-        postal_code=w["postal_code"],
-        country=w["country"],
+        easypost=EasyPostAddress(
+            street1=w["street1"],
+            street2=w.get("street2", ""),
+            city=w["city"],
+            state=w["state"],
+            zip=w["zip"],
+            country=w["country"],
+        ),
     )
 
 
