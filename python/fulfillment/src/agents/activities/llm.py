@@ -118,12 +118,9 @@ class LlmActivities:
             margin_rule,
             sla_rule,
             (
-                "PATH RULE: Warehouse addresses are pre-verified — easypost_address.id is already set. "
-                "If from_address is present in the request, use its easypost_address.id directly — "
-                "do NOT call lookup_inventory_location or verify_address for the origin. "
-                "If from_address is absent, call lookup_inventory_location first; the returned address "
-                "will also have easypost_address.id pre-populated — skip verify_address. "
-                "Only call verify_address for an address that explicitly lacks easypost_address."
+                "PATH RULE: The origin and destination addresses are pre-resolved and provided in the task "
+                "with their easypost_ids and coordinates. Use them directly for get_carrier_rates and "
+                "get_location_events. Only call verify_address if an address shows easypost_id=(unverified)."
             ),
             (
                 "CONCURRENCY: Call multiple tools in a single response when there are no dependencies "

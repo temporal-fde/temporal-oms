@@ -148,21 +148,64 @@ class ShippingAgent:
         system_prompt = prompt_response.system_prompt
         tools = _TOOLS.definitions()
 
+        # Pre-fetch origin and destination in parallel before the LLM loop.
+        # Results are embedded directly in the task prompt so the LLM can call
+        # get_carrier_rates + get_location_events concurrently on its first turn.
+        to_ep = request.to_address.easypost if request.to_address else None
+        needs_verify = not (to_ep and to_ep.id)
+
+        if needs_verify:
+            lookup_result, verify_result = await asyncio.gather(
+                workflow.execute_activity(
+                    "lookup_inventory_location",
+                    args=[LookupInventoryLocationRequest(items=request.items)],
+                    result_type=LookupInventoryLocationResponse,
+                    task_queue="fulfillment",
+                    start_to_close_timeout=_ACTIVITY_TIMEOUT,
+                    retry_policy=_ACTIVITY_RETRY,
+                ),
+                workflow.execute_activity(
+                    "verify_address",
+                    args=[VerifyAddressRequest(address=request.to_address)],
+                    result_type=VerifyAddressResponse,
+                    task_queue="fulfillment-easypost",
+                    start_to_close_timeout=_ACTIVITY_TIMEOUT,
+                    retry_policy=_ACTIVITY_RETRY,
+                ),
+            )
+            dest_ep = verify_result.address.easypost
+        else:
+            lookup_result = await workflow.execute_activity(
+                "lookup_inventory_location",
+                args=[LookupInventoryLocationRequest(items=request.items)],
+                result_type=LookupInventoryLocationResponse,
+                task_queue="fulfillment",
+                start_to_close_timeout=_ACTIVITY_TIMEOUT,
+                retry_policy=_ACTIVITY_RETRY,
+            )
+            dest_ep = to_ep
+
+        origin_ep = lookup_result.address.easypost if lookup_result.address else None
+
+        def _addr_line(ep) -> str:
+            if not ep:
+                return "(unknown)"
+            coord = (
+                f"  lat={ep.coordinate.latitude} lng={ep.coordinate.longitude}"
+                if (ep.coordinate and (ep.coordinate.latitude or ep.coordinate.longitude))
+                else ""
+            )
+            ep_id = ep.id if ep.id else "(unverified — call verify_address if needed)"
+            return f"{ep.street1}, {ep.city}, {ep.state} {ep.zip}  easypost_id={ep_id}{coord}"
+
         items_desc = ", ".join(f"{i.sku_id}×{i.quantity}" for i in request.items)
-        ep = request.to_address.easypost
-        ep_note = (
-            f"\nto_address easypost_id (already verified): {ep.id}"
-            if (ep and ep.id)
-            else ""
-        )
         task_text = (
             f"Calculate shipping options for order {request.order_id}.\n"
-            f"to_address: {ep.street1 if ep else ''}, {ep.city if ep else ''}, "
-            f"{ep.state if ep else ''} {ep.zip if ep else ''} {ep.country if ep else ''}"
-            f"{ep_note}\n"
-            f"from_address: NOT PROVIDED — call lookup_inventory_location first\n"
+            f"destination: {_addr_line(dest_ep)}\n"
+            f"origin (resolved from inventory): {_addr_line(origin_ep)}\n"
             f"items: {items_desc}\n"
         )
+
         # System instructions are embedded in the first user message (call_llm has no system param)
         user_text = system_prompt + "\n\n---\n\n" + task_text
 
