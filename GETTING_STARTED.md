@@ -83,6 +83,7 @@ Create Temporal namespaces and Nexus endpoints for cross-namespace communication
 This creates:
 - ✅ `apps` namespace — Order orchestration and data collection
 - ✅ `processing` namespace — Order validation, enrichment, fulfillment
+- ✅ `fulfillment` namespace — Order fulfillment
 - ✅ Nexus endpoints for Apps → Processing communication
 - ✅ Sets the current worker version for the `processing` deployment
 
@@ -142,6 +143,13 @@ export TEMPORAL_NAMESPACE=processing
 mvn spring-boot:run
 ```
 
+**Terminal 4 — Fulfillment Worker**:
+```bash
+cd java/fulfillment/fulfillment-workers
+export TEMPORAL_NAMESPACE=processing
+export EASYPOST_API_KEY=<your_easypost_api_key>
+mvn spring-boot:run
+```
 All services are now ready:
 - ✅ Apps API running on `http://localhost:8080`
 - ✅ Apps Worker connected to `apps` namespace
@@ -178,22 +186,7 @@ See `scripts/scenarios/README.md` for detailed demo instructions and talking poi
 
 ---
 
-## Review Orders Sent for Fulfillment 
-<<<<<<< HEAD
-To view orders sent to Kafka for fulfillment, navigate to:
-
-`http://localhost:8071/kafka/fulfillment/<orderId>`
-
-For example, the order fulfillment message created by the "Valid order (happy path)" scripts can be viewed by navigating to:
-
-`http://localhost:8071/kafka/fulfillment/valid-order-123`
-=======
-
-**Note:**
-
-*This feature is for diagnostic purposes.  The implementation and code should not be considered a production pattern or feature of the application.  
-It is only available when running the application using Option 3 (Everything Local w/o Kubernetes).*
-
+## Review Orders Sent for Fulfillment
 To view orders sent to Kafka for fulfillment, navigate to:
 
 `http://localhost:8071/admin/order-fulfillment/<orderId>`
@@ -201,9 +194,9 @@ To view orders sent to Kafka for fulfillment, navigate to:
 For example, the order fulfillment message created by the "Valid order (happy path)" scripts can be viewed by navigating to:
 
 `http://localhost:8071/admin/order-fulfillment/valid-order-123`
->>>>>>> d03c50b (Changes:)
 
-
+**Note:**
+This is only for demonstration purposes and not for production. It shows the fulfillment message was added to the Kafka topic.  At this time, it is only available when running the application locally (Level 1 - No Kubernetes, No Cloud).  
 ---
 
 ## API Endpoints
