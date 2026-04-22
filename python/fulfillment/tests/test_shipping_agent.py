@@ -31,8 +31,12 @@ from acme.common.v1.llm_p2p import (
 )
 from acme.common.v1.values_p2p import Address, Coordinate, EasyPostAddress, Money
 from acme.fulfillment.domain.v1.shipping_agent_p2p import (
+    BuildSystemPromptRequest,
+    BuildSystemPromptResponse,
     CalculateShippingOptionsRequest,
     CalculateShippingOptionsResponse,
+    FindAlternateWarehouseRequest,
+    FindAlternateWarehouseResponse,
     GetLocationEventsRequest,
     GetLocationEventsResponse,
     GetShippingRatesRequest,
@@ -60,25 +64,27 @@ _WF_TASK_QUEUE = "fulfillment"
 _CUSTOMER_ID = "customer-test-1"
 _ORDER_ID = "order-test-1"
 _TO_ADDRESS = Address(
-    street="123 Main St",
-    city="New York",
-    state="NY",
-    postal_code="10001",
-    country="US",
-    easypost_address=EasyPostAddress(
+    easypost=EasyPostAddress(
         id="adr_dest",
+        street1="123 Main St",
+        city="New York",
+        state="NY",
+        zip="10001",
+        country="US",
         residential=True,
-        verified=True,
         coordinate=Coordinate(latitude=40.712, longitude=-74.006),
     ),
 )
 
 _FROM_ADDRESS = Address(
-    street="100 Commerce Drive",
-    city="Newark",
-    state="NJ",
-    postal_code="07102",
-    country="US",
+    easypost=EasyPostAddress(
+        id="adr_wh_east_01",
+        street1="100 Commerce Drive",
+        city="Newark",
+        state="NJ",
+        zip="07102",
+        country="US",
+    ),
 )
 
 _ITEMS = [ShippingLineItem(sku_id="ELEC-001", quantity=2)]
@@ -176,15 +182,14 @@ _LOOKUP_RESULT = LookupInventoryAddressResponse(
 
 _VERIFY_RESULT = VerifyAddressResponse(
     address=Address(
-        street=_FROM_ADDRESS.street,
-        city=_FROM_ADDRESS.city,
-        state=_FROM_ADDRESS.state,
-        postal_code=_FROM_ADDRESS.postal_code,
-        country=_FROM_ADDRESS.country,
-        easypost_address=EasyPostAddress(
+        easypost=EasyPostAddress(
             id="adr_origin",
+            street1=_FROM_ADDRESS.easypost.street1,
+            city=_FROM_ADDRESS.easypost.city,
+            state=_FROM_ADDRESS.easypost.state,
+            zip=_FROM_ADDRESS.easypost.zip,
+            country=_FROM_ADDRESS.easypost.country,
             residential=False,
-            verified=True,
             coordinate=Coordinate(latitude=40.734, longitude=-74.172),
         ),
     )
@@ -235,6 +240,18 @@ async def mock_get_location_events(req: GetLocationEventsRequest) -> GetLocation
     )
 
 
+@activity.defn(name="build_system_prompt")
+async def mock_build_system_prompt(req: BuildSystemPromptRequest) -> BuildSystemPromptResponse:
+    return BuildSystemPromptResponse(system_prompt="You are a shipping advisor.")
+
+
+@activity.defn(name="find_alternate_warehouse")
+async def mock_find_alternate_warehouse(
+    req: FindAlternateWarehouseRequest,
+) -> FindAlternateWarehouseResponse:
+    return FindAlternateWarehouseResponse()
+
+
 def _make_workers(
     client: Client,
     call_llm_impl,
@@ -242,6 +259,8 @@ def _make_workers(
     """Create one worker per task queue, all with the same mocked activities."""
     common_activities = [
         mock_lookup_inventory_address,
+        mock_find_alternate_warehouse,
+        mock_build_system_prompt,
         mock_verify_address,
         mock_get_carrier_rates,
         mock_get_location_events,
@@ -302,8 +321,8 @@ async def test_cache_hit_skips_llm() -> None:
 
 
 @pytest.mark.asyncio
-async def test_fulfillment_path_skips_lookup() -> None:
-    """When from_address and location_id are provided, lookup_inventory_address is never called."""
+async def test_lookup_always_called() -> None:
+    """lookup_inventory_address is always called to resolve the origin warehouse."""
     lookup_called = False
 
     @activity.defn(name="lookup_inventory_address")
@@ -317,8 +336,8 @@ async def test_fulfillment_path_skips_lookup() -> None:
         return _end_turn_response(_PROCEED_JSON)
 
     async with await WorkflowEnvironment.start_time_skipping() as env:
-        common = [tracking_lookup, mock_verify_address, mock_get_carrier_rates,
-                  mock_get_location_events, simple_llm]
+        common = [tracking_lookup, mock_find_alternate_warehouse, mock_build_system_prompt,
+                  mock_verify_address, mock_get_carrier_rates, mock_get_location_events, simple_llm]
         async with (
             Worker(env.client, task_queue="fulfillment", workflows=[ShippingAgent],
                    activities=common, workflow_failure_exception_types=[Exception]),
@@ -327,10 +346,9 @@ async def test_fulfillment_path_skips_lookup() -> None:
         ):
             handle = await _start_agent(env.client)
             req = _base_request()
-            resp = await handle.execute_update(ShippingAgent.calculate_shipping_options, req)
+            await handle.execute_update(ShippingAgent.calculate_shipping_options, req)
 
-    assert resp.cache_hit is False
-    assert not lookup_called
+    assert lookup_called
 
 
 @pytest.mark.asyncio
@@ -356,8 +374,8 @@ async def test_cart_path_calls_lookup() -> None:
         return _end_turn_response(_PROCEED_JSON)
 
     async with await WorkflowEnvironment.start_time_skipping() as env:
-        common = [tracking_lookup, mock_verify_address, mock_get_carrier_rates,
-                  mock_get_location_events, cart_llm]
+        common = [tracking_lookup, mock_find_alternate_warehouse, mock_build_system_prompt,
+                  mock_verify_address, mock_get_carrier_rates, mock_get_location_events, cart_llm]
         async with (
             Worker(env.client, task_queue="fulfillment", workflows=[ShippingAgent],
                    activities=common, workflow_failure_exception_types=[Exception]),
@@ -379,10 +397,10 @@ async def test_sequential_tool_dispatch() -> None:
     call_order: list[str] = []
     turn = 0
 
-    @activity.defn(name="verify_address")
-    async def tracking_verify(req: VerifyAddressRequest) -> VerifyAddressResponse:
-        call_order.append("verify_address")
-        return _VERIFY_RESULT
+    @activity.defn(name="find_alternate_warehouse")
+    async def tracking_alternate(req: FindAlternateWarehouseRequest) -> FindAlternateWarehouseResponse:
+        call_order.append("find_alternate_warehouse")
+        return FindAlternateWarehouseResponse()
 
     @activity.defn(name="get_carrier_rates")
     async def tracking_rates(req: GetShippingRatesRequest) -> GetShippingRatesResponse:
@@ -394,16 +412,20 @@ async def test_sequential_tool_dispatch() -> None:
         nonlocal turn
         turn += 1
         if turn == 1:
-            return _tool_use_response([("tu_1", "verify_address", {"address": {}})])
+            return _tool_use_response([
+                ("tu_1", "find_alternate_warehouse",
+                 {"items": [{"sku_id": "ELEC-001", "quantity": 1}], "current_address_id": "adr_wh_east_01"}),
+            ])
         if turn == 2:
-            return _tool_use_response([("tu_2", "get_carrier_rates",
-                                        {"from_easypost_id": "adr_origin", "to_easypost_id": "adr_dest",
-                                         "items": []})])
+            return _tool_use_response([
+                ("tu_2", "get_carrier_rates",
+                 {"from_easypost_id": "adr_wh_cent_01", "to_easypost_id": "adr_dest", "items": []}),
+            ])
         return _end_turn_response(_PROCEED_JSON)
 
     async with await WorkflowEnvironment.start_time_skipping() as env:
-        common = [mock_lookup_inventory_address, tracking_verify, tracking_rates,
-                  mock_get_location_events, sequential_llm]
+        common = [mock_lookup_inventory_address, tracking_alternate, mock_build_system_prompt,
+                  mock_verify_address, tracking_rates, mock_get_location_events, sequential_llm]
         async with (
             Worker(env.client, task_queue="fulfillment", workflows=[ShippingAgent],
                    activities=common, workflow_failure_exception_types=[Exception]),
@@ -414,7 +436,7 @@ async def test_sequential_tool_dispatch() -> None:
             req = _base_request()
             await handle.execute_update(ShippingAgent.calculate_shipping_options, req)
 
-    assert call_order == ["verify_address", "get_carrier_rates"]
+    assert call_order == ["find_alternate_warehouse", "get_carrier_rates"]
 
 
 @pytest.mark.asyncio
@@ -460,8 +482,8 @@ async def test_concurrent_activity_dispatch() -> None:
         return _end_turn_response(_PROCEED_JSON)
 
     async with await WorkflowEnvironment.start_time_skipping() as env:
-        common = [mock_lookup_inventory_address, mock_verify_address, mock_get_carrier_rates,
-                  tracking_events, concurrent_llm]
+        common = [mock_lookup_inventory_address, mock_find_alternate_warehouse, mock_build_system_prompt,
+                  mock_verify_address, mock_get_carrier_rates, tracking_events, concurrent_llm]
         async with (
             Worker(env.client, task_queue="fulfillment", workflows=[ShippingAgent],
                    activities=common, workflow_failure_exception_types=[Exception]),

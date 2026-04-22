@@ -23,6 +23,8 @@ with workflow.unsafe.imports_passed_through():
         BuildSystemPromptResponse,
         CalculateShippingOptionsRequest,
         CalculateShippingOptionsResponse,
+        FindAlternateWarehouseRequest,
+        FindAlternateWarehouseResponse,
         GetLocationEventsRequest,
         GetLocationEventsResponse,
         GetShippingRatesRequest,
@@ -77,6 +79,18 @@ _TOOLS = ToolSpecs(
         GetLocationEventsRequest,
         GetLocationEventsResponse,
         task_queue="fulfillment-predicthq",
+        start_to_close_timeout=_ACTIVITY_TIMEOUT,
+        retry_policy=_ACTIVITY_RETRY,
+    ),
+    activity_tool(
+        activity_name(LookupInventoryActivities.find_alternate_warehouse),
+        "Find a warehouse that can fulfill the given items from a different address than "
+        "the one already tried. Call before returning MARGIN_SPIKE or SLA_BREACH — a closer "
+        "warehouse may offer cheaper or faster rates. Returns empty address if none available.",
+        LookupInventoryActivities.find_alternate_warehouse,
+        FindAlternateWarehouseRequest,
+        FindAlternateWarehouseResponse,
+        task_queue="fulfillment",
         start_to_close_timeout=_ACTIVITY_TIMEOUT,
         retry_policy=_ACTIVITY_RETRY,
     ),

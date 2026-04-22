@@ -27,6 +27,7 @@ async def build_fulfillment_worker() -> Worker:
         workflows=[ShippingAgent],
         activities=[
             inventory_activities.lookup_inventory_address,
+            inventory_activities.find_alternate_warehouse,
             llm_activities.build_system_prompt,
             llm_activities.call_llm,
         ],

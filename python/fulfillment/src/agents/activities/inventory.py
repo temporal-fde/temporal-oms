@@ -6,6 +6,8 @@ from temporalio import activity
 from src.config import settings
 
 from acme.fulfillment.domain.v1.shipping_agent_p2p import (
+    FindAlternateWarehouseRequest,
+    FindAlternateWarehouseResponse,
     LookupInventoryAddressRequest,
     LookupInventoryAddressResponse,
 )
@@ -20,6 +22,7 @@ def _load_warehouses() -> list[dict]:
 def _warehouse_to_address(w: dict) -> Address:
     return Address(
         easypost=EasyPostAddress(
+            id=w.get("easypost_id", ""),
             street1=w["street1"],
             street2=w.get("street2", ""),
             city=w["city"],
@@ -69,3 +72,21 @@ class LookupInventoryActivities:
             )
 
         raise RuntimeError("No warehouses configured")
+
+    @activity.defn
+    async def find_alternate_warehouse(
+        self,
+        request: FindAlternateWarehouseRequest,
+    ) -> FindAlternateWarehouseResponse:
+        # TODO: persist the SKU→alternate routing decision for a time window so
+        # subsequent orders don't redundantly re-discover the same alternate.
+        # A per-SKU Temporal workflow (SkuAvailabilityAgent) is the natural home for this state.
+        item_skus = [item.sku_id for item in request.items]
+        for w in self._warehouses:
+            if w.get("easypost_id", "") == request.current_address_id:
+                continue
+            prefixes = w.get("sku_prefixes", [])
+            # empty sku_prefixes = catch-all warehouse
+            if not prefixes or any(sku.startswith(tuple(prefixes)) for sku in item_skus):
+                return FindAlternateWarehouseResponse(address=_warehouse_to_address(w))
+        return FindAlternateWarehouseResponse()

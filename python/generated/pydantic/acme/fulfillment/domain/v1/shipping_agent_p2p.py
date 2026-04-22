@@ -171,6 +171,26 @@ class LookupInventoryAddressResponse(BaseModel):
 
     address: Address = Field(default_factory=Address)
 
+class FindAlternateWarehouseRequest(BaseModel):
+    """
+     FindAlternateWarehouseRequest asks for a warehouse that can fulfill the given
+ items from a different address than the one already tried.
+ V1: static config lookup; future: query Inventory Locations service and rank by proximity.
+    """
+
+    items: typing.List[ShippingLineItem] = Field(default_factory=list)
+    current_address_id: str = Field(default="")# easypost_id of the origin already tried — excluded from results
+    to_address_id: typing.Optional[str] = Field(default="")# destination easypost_id; V1 ignores, future ranks by proximity
+
+class FindAlternateWarehouseResponse(BaseModel):
+    """
+     FindAlternateWarehouseResponse returns the best alternate warehouse address,
+ or an empty address if no alternate is available.
+ address.easypost_address is pre-populated so the agent can call get_carrier_rates directly.
+    """
+
+    address: typing.Optional[Address] = Field(default_factory=Address)# unset when no alternate warehouse exists
+
 class GetShippingRatesRequest(BaseModel):
     """
      GetShippingRatesRequest creates an EasyPost Shipment and retrieves available carrier rates.
