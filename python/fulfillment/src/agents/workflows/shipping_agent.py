@@ -217,6 +217,7 @@ class ShippingAgent:
         ]
 
         recommendation: ShippingRecommendation | None = None
+        all_options: list[ShippingOption] = []
 
         while True:
             # ReAct: Reason — LLM evaluates state and decides next action (tool calls or final answer)
@@ -249,6 +250,14 @@ class ShippingAgent:
                     *[_TOOLS.dispatch(b) for b in tool_blocks]
                 ))
 
+                for block, result_json in zip(tool_blocks, tool_results):
+                    if block.tool_use.name == _NAME_RATES:
+                        try:
+                            data = json.loads(result_json)
+                            all_options = [ShippingOption(**o) for o in data.get("options", [])]
+                        except Exception:
+                            pass
+
                 messages.append(LlmMessage(
                     role=LlmRole.LLM_ROLE_USER,
                     content=[
@@ -268,35 +277,9 @@ class ShippingAgent:
 
         return CalculateShippingOptionsResponse(
             recommendation=recommendation,
-            options=[],
+            options=all_options,
             cache_hit=False,
         )
-
-    def _apply_tool_results(
-        self,
-        request: CalculateShippingOptionsRequest,
-        tool_blocks: list[LlmContentBlock],
-        tool_results: list[str],
-        resolved_ep_id: str,
-        from_ep_id: str,
-        all_options: list[ShippingOption],
-    ) -> tuple[str, list[ShippingOption], CalculateShippingOptionsResponse | None]:
-        for block, result_json in zip(tool_blocks, tool_results):
-            if block.tool_use.name == _NAME_LOOKUP and not resolved_ep_id:
-                try:
-                    data = json.loads(result_json)
-                    ep = (data.get("address") or {}).get("easypost_address") or {}
-                    resolved_ep_id = ep.get("id", "")
-                except json.JSONDecodeError:
-                    pass
-            if block.tool_use.name == _NAME_RATES:
-                try:
-                    data = json.loads(result_json)
-                    all_options = [ShippingOption(**o) for o in data.get("options", [])]
-                except Exception:
-                    pass
-
-        return resolved_ep_id, all_options, None
 
     @calculate_shipping_options.validator
     def validate_calculate_shipping_options(
