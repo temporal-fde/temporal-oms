@@ -11,32 +11,120 @@ public interface CalculateShippingOptionsRequestOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>optional .acme.common.v1.Address address = 1 [json_name = "address"];</code>
-   * @return Whether the address field is set.
+   * <code>string order_id = 1 [json_name = "orderId"];</code>
+   * @return The orderId.
    */
-  boolean hasAddress();
+  java.lang.String getOrderId();
   /**
-   * <code>optional .acme.common.v1.Address address = 1 [json_name = "address"];</code>
-   * @return The address.
+   * <code>string order_id = 1 [json_name = "orderId"];</code>
+   * @return The bytes for orderId.
    */
-  com.acme.proto.acme.common.v1.Address getAddress();
-  /**
-   * <code>optional .acme.common.v1.Address address = 1 [json_name = "address"];</code>
-   */
-  com.acme.proto.acme.common.v1.AddressOrBuilder getAddressOrBuilder();
+  com.google.protobuf.ByteString
+      getOrderIdBytes();
 
   /**
-   * <code>optional .acme.common.v1.Coordinate coordinate = 2 [json_name = "coordinate"];</code>
-   * @return Whether the coordinate field is set.
+   * <code>string customer_id = 2 [json_name = "customerId"];</code>
+   * @return The customerId.
    */
-  boolean hasCoordinate();
+  java.lang.String getCustomerId();
   /**
-   * <code>optional .acme.common.v1.Coordinate coordinate = 2 [json_name = "coordinate"];</code>
-   * @return The coordinate.
+   * <code>string customer_id = 2 [json_name = "customerId"];</code>
+   * @return The bytes for customerId.
    */
-  com.acme.proto.acme.common.v1.Coordinate getCoordinate();
+  com.google.protobuf.ByteString
+      getCustomerIdBytes();
+
   /**
-   * <code>optional .acme.common.v1.Coordinate coordinate = 2 [json_name = "coordinate"];</code>
+   * <pre>
+   * to_address: easypost_address pre-populated by fulfillment.Order validateOrder.
+   * </pre>
+   *
+   * <code>.acme.common.v1.Address to_address = 3 [json_name = "toAddress"];</code>
+   * @return Whether the toAddress field is set.
    */
-  com.acme.proto.acme.common.v1.CoordinateOrBuilder getCoordinateOrBuilder();
+  boolean hasToAddress();
+  /**
+   * <pre>
+   * to_address: easypost_address pre-populated by fulfillment.Order validateOrder.
+   * </pre>
+   *
+   * <code>.acme.common.v1.Address to_address = 3 [json_name = "toAddress"];</code>
+   * @return The toAddress.
+   */
+  com.acme.proto.acme.common.v1.Address getToAddress();
+  /**
+   * <pre>
+   * to_address: easypost_address pre-populated by fulfillment.Order validateOrder.
+   * </pre>
+   *
+   * <code>.acme.common.v1.Address to_address = 3 [json_name = "toAddress"];</code>
+   */
+  com.acme.proto.acme.common.v1.AddressOrBuilder getToAddressOrBuilder();
+
+  /**
+   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingLineItem items = 4 [json_name = "items"];</code>
+   */
+  java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItem> 
+      getItemsList();
+  /**
+   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingLineItem items = 4 [json_name = "items"];</code>
+   */
+  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItem getItems(int index);
+  /**
+   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingLineItem items = 4 [json_name = "items"];</code>
+   */
+  int getItemsCount();
+  /**
+   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingLineItem items = 4 [json_name = "items"];</code>
+   */
+  java.util.List<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItemOrBuilder> 
+      getItemsOrBuilderList();
+  /**
+   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingLineItem items = 4 [json_name = "items"];</code>
+   */
+  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItemOrBuilder getItemsOrBuilder(
+      int index);
+
+  /**
+   * <code>optional string selected_shipping_option_id = 5 [json_name = "selectedShippingOptionId"];</code>
+   * @return Whether the selectedShippingOptionId field is set.
+   */
+  boolean hasSelectedShippingOptionId();
+  /**
+   * <code>optional string selected_shipping_option_id = 5 [json_name = "selectedShippingOptionId"];</code>
+   * @return The selectedShippingOptionId.
+   */
+  java.lang.String getSelectedShippingOptionId();
+  /**
+   * <code>optional string selected_shipping_option_id = 5 [json_name = "selectedShippingOptionId"];</code>
+   * @return The bytes for selectedShippingOptionId.
+   */
+  com.google.protobuf.ByteString
+      getSelectedShippingOptionIdBytes();
+
+  /**
+   * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
+   * @return Whether the customerPaidPrice field is set.
+   */
+  boolean hasCustomerPaidPrice();
+  /**
+   * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
+   * @return The customerPaidPrice.
+   */
+  com.acme.proto.acme.common.v1.Money getCustomerPaidPrice();
+  /**
+   * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
+   */
+  com.acme.proto.acme.common.v1.MoneyOrBuilder getCustomerPaidPriceOrBuilder();
+
+  /**
+   * <code>optional int32 transit_days_sla = 7 [json_name = "transitDaysSla"];</code>
+   * @return Whether the transitDaysSla field is set.
+   */
+  boolean hasTransitDaysSla();
+  /**
+   * <code>optional int32 transit_days_sla = 7 [json_name = "transitDaysSla"];</code>
+   * @return The transitDaysSla.
+   */
+  int getTransitDaysSla();
 }

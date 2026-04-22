@@ -48,6 +48,34 @@ private static final long serialVersionUID = 0L;
             com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentExecutionOptions.class, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentExecutionOptions.Builder.class);
   }
 
+  private int bitField0_;
+  public static final int CACHE_TTL_SECS_FIELD_NUMBER = 1;
+  private long cacheTtlSecs_ = 0L;
+  /**
+   * <pre>
+   * default 1800 (30 minutes)
+   * </pre>
+   *
+   * <code>optional int64 cache_ttl_secs = 1 [json_name = "cacheTtlSecs"];</code>
+   * @return Whether the cacheTtlSecs field is set.
+   */
+  @java.lang.Override
+  public boolean hasCacheTtlSecs() {
+    return ((bitField0_ & 0x00000001) != 0);
+  }
+  /**
+   * <pre>
+   * default 1800 (30 minutes)
+   * </pre>
+   *
+   * <code>optional int64 cache_ttl_secs = 1 [json_name = "cacheTtlSecs"];</code>
+   * @return The cacheTtlSecs.
+   */
+  @java.lang.Override
+  public long getCacheTtlSecs() {
+    return cacheTtlSecs_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -62,6 +90,9 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    if (((bitField0_ & 0x00000001) != 0)) {
+      output.writeInt64(1, cacheTtlSecs_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -71,6 +102,10 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
+    if (((bitField0_ & 0x00000001) != 0)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt64Size(1, cacheTtlSecs_);
+    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -86,6 +121,11 @@ private static final long serialVersionUID = 0L;
     }
     com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentExecutionOptions other = (com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentExecutionOptions) obj;
 
+    if (hasCacheTtlSecs() != other.hasCacheTtlSecs()) return false;
+    if (hasCacheTtlSecs()) {
+      if (getCacheTtlSecs()
+          != other.getCacheTtlSecs()) return false;
+    }
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -97,6 +137,11 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
+    if (hasCacheTtlSecs()) {
+      hash = (37 * hash) + CACHE_TTL_SECS_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getCacheTtlSecs());
+    }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -227,6 +272,8 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public Builder clear() {
       super.clear();
+      bitField0_ = 0;
+      cacheTtlSecs_ = 0L;
       return this;
     }
 
@@ -253,8 +300,19 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentExecutionOptions buildPartial() {
       com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentExecutionOptions result = new com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentExecutionOptions(this);
+      if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
+    }
+
+    private void buildPartial0(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentExecutionOptions result) {
+      int from_bitField0_ = bitField0_;
+      int to_bitField0_ = 0;
+      if (((from_bitField0_ & 0x00000001) != 0)) {
+        result.cacheTtlSecs_ = cacheTtlSecs_;
+        to_bitField0_ |= 0x00000001;
+      }
+      result.bitField0_ |= to_bitField0_;
     }
 
     @java.lang.Override
@@ -269,6 +327,9 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentExecutionOptions other) {
       if (other == com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentExecutionOptions.getDefaultInstance()) return this;
+      if (other.hasCacheTtlSecs()) {
+        setCacheTtlSecs(other.getCacheTtlSecs());
+      }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -295,6 +356,11 @@ private static final long serialVersionUID = 0L;
             case 0:
               done = true;
               break;
+            case 8: {
+              cacheTtlSecs_ = input.readInt64();
+              bitField0_ |= 0x00000001;
+              break;
+            } // case 8
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -308,6 +374,63 @@ private static final long serialVersionUID = 0L;
       } finally {
         onChanged();
       } // finally
+      return this;
+    }
+    private int bitField0_;
+
+    private long cacheTtlSecs_ ;
+    /**
+     * <pre>
+     * default 1800 (30 minutes)
+     * </pre>
+     *
+     * <code>optional int64 cache_ttl_secs = 1 [json_name = "cacheTtlSecs"];</code>
+     * @return Whether the cacheTtlSecs field is set.
+     */
+    @java.lang.Override
+    public boolean hasCacheTtlSecs() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <pre>
+     * default 1800 (30 minutes)
+     * </pre>
+     *
+     * <code>optional int64 cache_ttl_secs = 1 [json_name = "cacheTtlSecs"];</code>
+     * @return The cacheTtlSecs.
+     */
+    @java.lang.Override
+    public long getCacheTtlSecs() {
+      return cacheTtlSecs_;
+    }
+    /**
+     * <pre>
+     * default 1800 (30 minutes)
+     * </pre>
+     *
+     * <code>optional int64 cache_ttl_secs = 1 [json_name = "cacheTtlSecs"];</code>
+     * @param value The cacheTtlSecs to set.
+     * @return This builder for chaining.
+     */
+    public Builder setCacheTtlSecs(long value) {
+
+      cacheTtlSecs_ = value;
+      bitField0_ |= 0x00000001;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * default 1800 (30 minutes)
+     * </pre>
+     *
+     * <code>optional int64 cache_ttl_secs = 1 [json_name = "cacheTtlSecs"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearCacheTtlSecs() {
+      bitField0_ = (bitField0_ & ~0x00000001);
+      cacheTtlSecs_ = 0L;
+      onChanged();
       return this;
     }
 

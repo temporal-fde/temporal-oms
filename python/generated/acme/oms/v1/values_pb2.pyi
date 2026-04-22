@@ -14,8 +14,8 @@ class Order(_message.Message):
     SHIPPING_ADDRESS_FIELD_NUMBER: _ClassVar[int]
     order_id: str
     items: _containers.RepeatedCompositeFieldContainer[Item]
-    shipping_address: ShippingAddress
-    def __init__(self, order_id: _Optional[str] = ..., items: _Optional[_Iterable[_Union[Item, _Mapping]]] = ..., shipping_address: _Optional[_Union[ShippingAddress, _Mapping]] = ...) -> None: ...
+    shipping_address: _values_pb2.Address
+    def __init__(self, order_id: _Optional[str] = ..., items: _Optional[_Iterable[_Union[Item, _Mapping]]] = ..., shipping_address: _Optional[_Union[_values_pb2.Address, _Mapping]] = ...) -> None: ...
 
 class Payment(_message.Message):
     __slots__ = ("rrn", "amount")
@@ -32,17 +32,3 @@ class Item(_message.Message):
     item_id: str
     quantity: int
     def __init__(self, item_id: _Optional[str] = ..., quantity: _Optional[int] = ...) -> None: ...
-
-class ShippingAddress(_message.Message):
-    __slots__ = ("street", "city", "state", "postal_code", "country")
-    STREET_FIELD_NUMBER: _ClassVar[int]
-    CITY_FIELD_NUMBER: _ClassVar[int]
-    STATE_FIELD_NUMBER: _ClassVar[int]
-    POSTAL_CODE_FIELD_NUMBER: _ClassVar[int]
-    COUNTRY_FIELD_NUMBER: _ClassVar[int]
-    street: str
-    city: str
-    state: str
-    postal_code: str
-    country: str
-    def __init__(self, street: _Optional[str] = ..., city: _Optional[str] = ..., state: _Optional[str] = ..., postal_code: _Optional[str] = ..., country: _Optional[str] = ...) -> None: ...

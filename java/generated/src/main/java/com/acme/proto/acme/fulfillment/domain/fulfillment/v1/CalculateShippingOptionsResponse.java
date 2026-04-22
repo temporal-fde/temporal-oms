@@ -7,7 +7,7 @@ package com.acme.proto.acme.fulfillment.domain.fulfillment.v1;
 
 /**
  * <pre>
- * TBD after EasyPost has landed
+ * CalculateShippingOptionsResponse is the Update response from the ShippingAgent.
  * </pre>
  *
  * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse}
@@ -32,6 +32,7 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private CalculateShippingOptionsResponse() {
+    options_ = java.util.Collections.emptyList();
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
@@ -52,6 +53,85 @@ private static final long serialVersionUID = 0L;
             com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse.class, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse.Builder.class);
   }
 
+  private int bitField0_;
+  public static final int RECOMMENDATION_FIELD_NUMBER = 1;
+  private com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation recommendation_;
+  /**
+   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation recommendation = 1 [json_name = "recommendation"];</code>
+   * @return Whether the recommendation field is set.
+   */
+  @java.lang.Override
+  public boolean hasRecommendation() {
+    return ((bitField0_ & 0x00000001) != 0);
+  }
+  /**
+   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation recommendation = 1 [json_name = "recommendation"];</code>
+   * @return The recommendation.
+   */
+  @java.lang.Override
+  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation getRecommendation() {
+    return recommendation_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation.getDefaultInstance() : recommendation_;
+  }
+  /**
+   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation recommendation = 1 [json_name = "recommendation"];</code>
+   */
+  @java.lang.Override
+  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendationOrBuilder getRecommendationOrBuilder() {
+    return recommendation_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation.getDefaultInstance() : recommendation_;
+  }
+
+  public static final int OPTIONS_FIELD_NUMBER = 2;
+  @SuppressWarnings("serial")
+  private java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption> options_;
+  /**
+   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 2 [json_name = "options"];</code>
+   */
+  @java.lang.Override
+  public java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption> getOptionsList() {
+    return options_;
+  }
+  /**
+   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 2 [json_name = "options"];</code>
+   */
+  @java.lang.Override
+  public java.util.List<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionOrBuilder> 
+      getOptionsOrBuilderList() {
+    return options_;
+  }
+  /**
+   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 2 [json_name = "options"];</code>
+   */
+  @java.lang.Override
+  public int getOptionsCount() {
+    return options_.size();
+  }
+  /**
+   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 2 [json_name = "options"];</code>
+   */
+  @java.lang.Override
+  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption getOptions(int index) {
+    return options_.get(index);
+  }
+  /**
+   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 2 [json_name = "options"];</code>
+   */
+  @java.lang.Override
+  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionOrBuilder getOptionsOrBuilder(
+      int index) {
+    return options_.get(index);
+  }
+
+  public static final int CACHE_HIT_FIELD_NUMBER = 3;
+  private boolean cacheHit_ = false;
+  /**
+   * <code>bool cache_hit = 3 [json_name = "cacheHit"];</code>
+   * @return The cacheHit.
+   */
+  @java.lang.Override
+  public boolean getCacheHit() {
+    return cacheHit_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -66,6 +146,15 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    if (((bitField0_ & 0x00000001) != 0)) {
+      output.writeMessage(1, getRecommendation());
+    }
+    for (int i = 0; i < options_.size(); i++) {
+      output.writeMessage(2, options_.get(i));
+    }
+    if (cacheHit_ != false) {
+      output.writeBool(3, cacheHit_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -75,6 +164,23 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
+    if (((bitField0_ & 0x00000001) != 0)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(1, getRecommendation());
+    }
+
+        {
+          final int count = options_.size();
+          for (int i = 0; i < count; i++) {
+            size += com.google.protobuf.CodedOutputStream
+              .computeMessageSizeNoTag(options_.get(i));
+          }
+          size += 1 * count;
+        }
+    if (cacheHit_ != false) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBoolSize(3, cacheHit_);
+    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -90,6 +196,15 @@ private static final long serialVersionUID = 0L;
     }
     com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse other = (com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse) obj;
 
+    if (hasRecommendation() != other.hasRecommendation()) return false;
+    if (hasRecommendation()) {
+      if (!getRecommendation()
+          .equals(other.getRecommendation())) return false;
+    }
+    if (!getOptionsList()
+        .equals(other.getOptionsList())) return false;
+    if (getCacheHit()
+        != other.getCacheHit()) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -101,6 +216,17 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
+    if (hasRecommendation()) {
+      hash = (37 * hash) + RECOMMENDATION_FIELD_NUMBER;
+      hash = (53 * hash) + getRecommendation().hashCode();
+    }
+    if (getOptionsCount() > 0) {
+      hash = (37 * hash) + OPTIONS_FIELD_NUMBER;
+      hash = (53 * hash) + getOptionsList().hashCode();
+    }
+    hash = (37 * hash) + CACHE_HIT_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+        getCacheHit());
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -200,7 +326,7 @@ private static final long serialVersionUID = 0L;
   }
   /**
    * <pre>
-   * TBD after EasyPost has landed
+   * CalculateShippingOptionsResponse is the Update response from the ShippingAgent.
    * </pre>
    *
    * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse}
@@ -224,17 +350,38 @@ private static final long serialVersionUID = 0L;
 
     // Construct using com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse.newBuilder()
     private Builder() {
-
+      maybeForceBuilderInitialization();
     }
 
     private Builder(
         com.google.protobuf.GeneratedMessage.BuilderParent parent) {
       super(parent);
-
+      maybeForceBuilderInitialization();
+    }
+    private void maybeForceBuilderInitialization() {
+      if (com.google.protobuf.GeneratedMessage
+              .alwaysUseFieldBuilders) {
+        internalGetRecommendationFieldBuilder();
+        internalGetOptionsFieldBuilder();
+      }
     }
     @java.lang.Override
     public Builder clear() {
       super.clear();
+      bitField0_ = 0;
+      recommendation_ = null;
+      if (recommendationBuilder_ != null) {
+        recommendationBuilder_.dispose();
+        recommendationBuilder_ = null;
+      }
+      if (optionsBuilder_ == null) {
+        options_ = java.util.Collections.emptyList();
+      } else {
+        options_ = null;
+        optionsBuilder_.clear();
+      }
+      bitField0_ = (bitField0_ & ~0x00000002);
+      cacheHit_ = false;
       return this;
     }
 
@@ -261,8 +408,37 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse buildPartial() {
       com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse result = new com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse(this);
+      buildPartialRepeatedFields(result);
+      if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
+    }
+
+    private void buildPartialRepeatedFields(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse result) {
+      if (optionsBuilder_ == null) {
+        if (((bitField0_ & 0x00000002) != 0)) {
+          options_ = java.util.Collections.unmodifiableList(options_);
+          bitField0_ = (bitField0_ & ~0x00000002);
+        }
+        result.options_ = options_;
+      } else {
+        result.options_ = optionsBuilder_.build();
+      }
+    }
+
+    private void buildPartial0(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse result) {
+      int from_bitField0_ = bitField0_;
+      int to_bitField0_ = 0;
+      if (((from_bitField0_ & 0x00000001) != 0)) {
+        result.recommendation_ = recommendationBuilder_ == null
+            ? recommendation_
+            : recommendationBuilder_.build();
+        to_bitField0_ |= 0x00000001;
+      }
+      if (((from_bitField0_ & 0x00000004) != 0)) {
+        result.cacheHit_ = cacheHit_;
+      }
+      result.bitField0_ |= to_bitField0_;
     }
 
     @java.lang.Override
@@ -277,6 +453,38 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse other) {
       if (other == com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse.getDefaultInstance()) return this;
+      if (other.hasRecommendation()) {
+        mergeRecommendation(other.getRecommendation());
+      }
+      if (optionsBuilder_ == null) {
+        if (!other.options_.isEmpty()) {
+          if (options_.isEmpty()) {
+            options_ = other.options_;
+            bitField0_ = (bitField0_ & ~0x00000002);
+          } else {
+            ensureOptionsIsMutable();
+            options_.addAll(other.options_);
+          }
+          onChanged();
+        }
+      } else {
+        if (!other.options_.isEmpty()) {
+          if (optionsBuilder_.isEmpty()) {
+            optionsBuilder_.dispose();
+            optionsBuilder_ = null;
+            options_ = other.options_;
+            bitField0_ = (bitField0_ & ~0x00000002);
+            optionsBuilder_ = 
+              com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                 internalGetOptionsFieldBuilder() : null;
+          } else {
+            optionsBuilder_.addAllMessages(other.options_);
+          }
+        }
+      }
+      if (other.getCacheHit() != false) {
+        setCacheHit(other.getCacheHit());
+      }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -303,6 +511,31 @@ private static final long serialVersionUID = 0L;
             case 0:
               done = true;
               break;
+            case 10: {
+              input.readMessage(
+                  internalGetRecommendationFieldBuilder().getBuilder(),
+                  extensionRegistry);
+              bitField0_ |= 0x00000001;
+              break;
+            } // case 10
+            case 18: {
+              com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption m =
+                  input.readMessage(
+                      com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.parser(),
+                      extensionRegistry);
+              if (optionsBuilder_ == null) {
+                ensureOptionsIsMutable();
+                options_.add(m);
+              } else {
+                optionsBuilder_.addMessage(m);
+              }
+              break;
+            } // case 18
+            case 24: {
+              cacheHit_ = input.readBool();
+              bitField0_ |= 0x00000004;
+              break;
+            } // case 24
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -316,6 +549,400 @@ private static final long serialVersionUID = 0L;
       } finally {
         onChanged();
       } // finally
+      return this;
+    }
+    private int bitField0_;
+
+    private com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation recommendation_;
+    private com.google.protobuf.SingleFieldBuilder<
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendationOrBuilder> recommendationBuilder_;
+    /**
+     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation recommendation = 1 [json_name = "recommendation"];</code>
+     * @return Whether the recommendation field is set.
+     */
+    public boolean hasRecommendation() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation recommendation = 1 [json_name = "recommendation"];</code>
+     * @return The recommendation.
+     */
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation getRecommendation() {
+      if (recommendationBuilder_ == null) {
+        return recommendation_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation.getDefaultInstance() : recommendation_;
+      } else {
+        return recommendationBuilder_.getMessage();
+      }
+    }
+    /**
+     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation recommendation = 1 [json_name = "recommendation"];</code>
+     */
+    public Builder setRecommendation(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation value) {
+      if (recommendationBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        recommendation_ = value;
+      } else {
+        recommendationBuilder_.setMessage(value);
+      }
+      bitField0_ |= 0x00000001;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation recommendation = 1 [json_name = "recommendation"];</code>
+     */
+    public Builder setRecommendation(
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation.Builder builderForValue) {
+      if (recommendationBuilder_ == null) {
+        recommendation_ = builderForValue.build();
+      } else {
+        recommendationBuilder_.setMessage(builderForValue.build());
+      }
+      bitField0_ |= 0x00000001;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation recommendation = 1 [json_name = "recommendation"];</code>
+     */
+    public Builder mergeRecommendation(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation value) {
+      if (recommendationBuilder_ == null) {
+        if (((bitField0_ & 0x00000001) != 0) &&
+          recommendation_ != null &&
+          recommendation_ != com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation.getDefaultInstance()) {
+          getRecommendationBuilder().mergeFrom(value);
+        } else {
+          recommendation_ = value;
+        }
+      } else {
+        recommendationBuilder_.mergeFrom(value);
+      }
+      if (recommendation_ != null) {
+        bitField0_ |= 0x00000001;
+        onChanged();
+      }
+      return this;
+    }
+    /**
+     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation recommendation = 1 [json_name = "recommendation"];</code>
+     */
+    public Builder clearRecommendation() {
+      bitField0_ = (bitField0_ & ~0x00000001);
+      recommendation_ = null;
+      if (recommendationBuilder_ != null) {
+        recommendationBuilder_.dispose();
+        recommendationBuilder_ = null;
+      }
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation recommendation = 1 [json_name = "recommendation"];</code>
+     */
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation.Builder getRecommendationBuilder() {
+      bitField0_ |= 0x00000001;
+      onChanged();
+      return internalGetRecommendationFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation recommendation = 1 [json_name = "recommendation"];</code>
+     */
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendationOrBuilder getRecommendationOrBuilder() {
+      if (recommendationBuilder_ != null) {
+        return recommendationBuilder_.getMessageOrBuilder();
+      } else {
+        return recommendation_ == null ?
+            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation.getDefaultInstance() : recommendation_;
+      }
+    }
+    /**
+     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation recommendation = 1 [json_name = "recommendation"];</code>
+     */
+    private com.google.protobuf.SingleFieldBuilder<
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendationOrBuilder> 
+        internalGetRecommendationFieldBuilder() {
+      if (recommendationBuilder_ == null) {
+        recommendationBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendation.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingRecommendationOrBuilder>(
+                getRecommendation(),
+                getParentForChildren(),
+                isClean());
+        recommendation_ = null;
+      }
+      return recommendationBuilder_;
+    }
+
+    private java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption> options_ =
+      java.util.Collections.emptyList();
+    private void ensureOptionsIsMutable() {
+      if (!((bitField0_ & 0x00000002) != 0)) {
+        options_ = new java.util.ArrayList<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption>(options_);
+        bitField0_ |= 0x00000002;
+       }
+    }
+
+    private com.google.protobuf.RepeatedFieldBuilder<
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionOrBuilder> optionsBuilder_;
+
+    /**
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 2 [json_name = "options"];</code>
+     */
+    public java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption> getOptionsList() {
+      if (optionsBuilder_ == null) {
+        return java.util.Collections.unmodifiableList(options_);
+      } else {
+        return optionsBuilder_.getMessageList();
+      }
+    }
+    /**
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 2 [json_name = "options"];</code>
+     */
+    public int getOptionsCount() {
+      if (optionsBuilder_ == null) {
+        return options_.size();
+      } else {
+        return optionsBuilder_.getCount();
+      }
+    }
+    /**
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 2 [json_name = "options"];</code>
+     */
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption getOptions(int index) {
+      if (optionsBuilder_ == null) {
+        return options_.get(index);
+      } else {
+        return optionsBuilder_.getMessage(index);
+      }
+    }
+    /**
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 2 [json_name = "options"];</code>
+     */
+    public Builder setOptions(
+        int index, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption value) {
+      if (optionsBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureOptionsIsMutable();
+        options_.set(index, value);
+        onChanged();
+      } else {
+        optionsBuilder_.setMessage(index, value);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 2 [json_name = "options"];</code>
+     */
+    public Builder setOptions(
+        int index, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.Builder builderForValue) {
+      if (optionsBuilder_ == null) {
+        ensureOptionsIsMutable();
+        options_.set(index, builderForValue.build());
+        onChanged();
+      } else {
+        optionsBuilder_.setMessage(index, builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 2 [json_name = "options"];</code>
+     */
+    public Builder addOptions(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption value) {
+      if (optionsBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureOptionsIsMutable();
+        options_.add(value);
+        onChanged();
+      } else {
+        optionsBuilder_.addMessage(value);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 2 [json_name = "options"];</code>
+     */
+    public Builder addOptions(
+        int index, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption value) {
+      if (optionsBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureOptionsIsMutable();
+        options_.add(index, value);
+        onChanged();
+      } else {
+        optionsBuilder_.addMessage(index, value);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 2 [json_name = "options"];</code>
+     */
+    public Builder addOptions(
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.Builder builderForValue) {
+      if (optionsBuilder_ == null) {
+        ensureOptionsIsMutable();
+        options_.add(builderForValue.build());
+        onChanged();
+      } else {
+        optionsBuilder_.addMessage(builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 2 [json_name = "options"];</code>
+     */
+    public Builder addOptions(
+        int index, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.Builder builderForValue) {
+      if (optionsBuilder_ == null) {
+        ensureOptionsIsMutable();
+        options_.add(index, builderForValue.build());
+        onChanged();
+      } else {
+        optionsBuilder_.addMessage(index, builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 2 [json_name = "options"];</code>
+     */
+    public Builder addAllOptions(
+        java.lang.Iterable<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption> values) {
+      if (optionsBuilder_ == null) {
+        ensureOptionsIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, options_);
+        onChanged();
+      } else {
+        optionsBuilder_.addAllMessages(values);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 2 [json_name = "options"];</code>
+     */
+    public Builder clearOptions() {
+      if (optionsBuilder_ == null) {
+        options_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000002);
+        onChanged();
+      } else {
+        optionsBuilder_.clear();
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 2 [json_name = "options"];</code>
+     */
+    public Builder removeOptions(int index) {
+      if (optionsBuilder_ == null) {
+        ensureOptionsIsMutable();
+        options_.remove(index);
+        onChanged();
+      } else {
+        optionsBuilder_.remove(index);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 2 [json_name = "options"];</code>
+     */
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.Builder getOptionsBuilder(
+        int index) {
+      return internalGetOptionsFieldBuilder().getBuilder(index);
+    }
+    /**
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 2 [json_name = "options"];</code>
+     */
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionOrBuilder getOptionsOrBuilder(
+        int index) {
+      if (optionsBuilder_ == null) {
+        return options_.get(index);  } else {
+        return optionsBuilder_.getMessageOrBuilder(index);
+      }
+    }
+    /**
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 2 [json_name = "options"];</code>
+     */
+    public java.util.List<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionOrBuilder> 
+         getOptionsOrBuilderList() {
+      if (optionsBuilder_ != null) {
+        return optionsBuilder_.getMessageOrBuilderList();
+      } else {
+        return java.util.Collections.unmodifiableList(options_);
+      }
+    }
+    /**
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 2 [json_name = "options"];</code>
+     */
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.Builder addOptionsBuilder() {
+      return internalGetOptionsFieldBuilder().addBuilder(
+          com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.getDefaultInstance());
+    }
+    /**
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 2 [json_name = "options"];</code>
+     */
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.Builder addOptionsBuilder(
+        int index) {
+      return internalGetOptionsFieldBuilder().addBuilder(
+          index, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.getDefaultInstance());
+    }
+    /**
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 2 [json_name = "options"];</code>
+     */
+    public java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.Builder> 
+         getOptionsBuilderList() {
+      return internalGetOptionsFieldBuilder().getBuilderList();
+    }
+    private com.google.protobuf.RepeatedFieldBuilder<
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionOrBuilder> 
+        internalGetOptionsFieldBuilder() {
+      if (optionsBuilder_ == null) {
+        optionsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionOrBuilder>(
+                options_,
+                ((bitField0_ & 0x00000002) != 0),
+                getParentForChildren(),
+                isClean());
+        options_ = null;
+      }
+      return optionsBuilder_;
+    }
+
+    private boolean cacheHit_ ;
+    /**
+     * <code>bool cache_hit = 3 [json_name = "cacheHit"];</code>
+     * @return The cacheHit.
+     */
+    @java.lang.Override
+    public boolean getCacheHit() {
+      return cacheHit_;
+    }
+    /**
+     * <code>bool cache_hit = 3 [json_name = "cacheHit"];</code>
+     * @param value The cacheHit to set.
+     * @return This builder for chaining.
+     */
+    public Builder setCacheHit(boolean value) {
+
+      cacheHit_ = value;
+      bitField0_ |= 0x00000004;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>bool cache_hit = 3 [json_name = "cacheHit"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearCacheHit() {
+      bitField0_ = (bitField0_ & ~0x00000004);
+      cacheHit_ = false;
+      onChanged();
       return this;
     }
 

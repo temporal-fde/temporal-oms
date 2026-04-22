@@ -35,17 +35,17 @@ public interface AllocateInventoryRequestOrBuilder extends
       int index);
 
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingAddress destination = 2 [json_name = "destination"];</code>
+   * <code>.acme.common.v1.Address destination = 2 [json_name = "destination"];</code>
    * @return Whether the destination field is set.
    */
   boolean hasDestination();
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingAddress destination = 2 [json_name = "destination"];</code>
+   * <code>.acme.common.v1.Address destination = 2 [json_name = "destination"];</code>
    * @return The destination.
    */
-  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAddress getDestination();
+  com.acme.proto.acme.common.v1.Address getDestination();
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingAddress destination = 2 [json_name = "destination"];</code>
+   * <code>.acme.common.v1.Address destination = 2 [json_name = "destination"];</code>
    */
-  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAddressOrBuilder getDestinationOrBuilder();
+  com.acme.proto.acme.common.v1.AddressOrBuilder getDestinationOrBuilder();
 }

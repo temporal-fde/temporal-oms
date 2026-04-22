@@ -38,22 +38,150 @@ message GetLocationEventsResponse {
   string                    timezone    = 5;
 }
 
+// ShippingLineItem is a sku/quantity pair for shipping rate calculation.
+// Simpler than FulfillmentItem (which carries warehouse/brand fields irrelevant to rate calculation).
+message ShippingLineItem {
+  string sku_id    = 1;
+  int32  quantity  = 2;
+}
+
+// ShippingOption is a single carrier rate returned by get_carrier_rates.
+// id is set to rate_id so the LLM can cross-reference recommended_option_id back to the rate.
+message ShippingOption {
+  string              id             = 1;
+  string              carrier        = 2;
+  string              service_level  = 3;
+  acme.common.v1.Money cost          = 4;
+  int32               estimated_days = 5;
+  string              rate_id        = 6;
+}
+
+// RecommendationOutcome is the LLM's decision about the shipping situation.
+enum RecommendationOutcome {
+  RECOMMENDATION_OUTCOME_UNSPECIFIED = 0;
+  PROCEED                            = 1;
+  CHEAPER_AVAILABLE                  = 2;
+  FASTER_AVAILABLE                   = 3;
+  MARGIN_SPIKE                       = 4;
+  SLA_BREACH                         = 5;
+}
+
+// ShippingRecommendation is the structured output from the ShippingAgent agentic loop.
+// The agent recommends; fulfillment.Order decides what to do with the recommendation.
+message ShippingRecommendation {
+  RecommendationOutcome outcome               = 1;
+  string                recommended_option_id = 2;
+  string                reasoning             = 3; // LLM explanation for logging and support visibility
+  int64                 margin_delta_cents    = 4; // positive = over margin, negative = savings
+  RiskLevel             origin_risk_level     = 5;
+  RiskLevel             destination_risk_level = 6;
+}
+
 // The Shipping Agent (Workflow) args
-// Right now, we can think of this agent as correlating to a Customer
-// but it is plausible we would get better spread out of having a WorkflowID of `Coordinate`.
+// WorkflowID is customer_id — one long-running agent per customer, caching across calls.
 message StartShippingAgentRequest {
   optional ShippingAgentExecutionOptions execution_options = 1;
   string customer_id = 2;
 }
+
 message ShippingAgentExecutionOptions {
-
+  optional int64 cache_ttl_secs = 1; // default 1800 (30 minutes)
 }
 
-// Update-as-a-Query
+// CalculateShippingOptionsRequest is the Update input for the ShippingAgent agentic loop.
+// The caller provides items with sku_id; the LLM always calls lookup_inventory_location
+// first to resolve the warehouse origin from inventory. Both the fulfillment path
+// (EnrichedItem sku_ids) and the cart path (cart item sku_ids) use the same flow.
+// Cache key is derived from the resolved from_address.easypost_address.id (set after
+// lookup_inventory_location returns) and to_address.easypost_address.id (pre-populated
+// by fulfillment.Order validateOrder).
 message CalculateShippingOptionsRequest {
-  optional acme.common.v1.Address address = 1;
-  optional acme.common.v1.Coordinate coordinate = 2;
+  string order_id    = 1;
+  string customer_id = 2;
+  // to_address: easypost_address pre-populated by fulfillment.Order validateOrder.
+  acme.common.v1.Address    to_address   = 3;
+  repeated ShippingLineItem items        = 4;
+  optional string           selected_shipping_option_id = 5;
+  optional acme.common.v1.Money   customer_paid_price   = 6;
+  optional int32                  transit_days_sla      = 7;
 }
+
+// CalculateShippingOptionsResponse is the Update response from the ShippingAgent.
 message CalculateShippingOptionsResponse {
-// TBD after EasyPost has landed
+  ShippingRecommendation  recommendation = 1;
+  repeated ShippingOption options        = 2;
+  bool                    cache_hit      = 3;
+}
+
+// ShippingOptionsResult is a single cached calculation result.
+message ShippingOptionsResult {
+  ShippingRecommendation  recommendation = 1;
+  repeated ShippingOption options        = 2;
+  google.protobuf.Timestamp cached_at   = 3;
+}
+
+// ShippingOptionsCache is the get_options Query return type.
+// Keyed by content hash of (from_address.easypost_address.id, sorted items, postal_code, country).
+message ShippingOptionsCache {
+  map<string, ShippingOptionsResult> results = 1;
+}
+
+// ── Activity: lookup_inventory_address ───────────────────────────────────────
+
+// LookupInventoryAddressRequest resolves sku_ids to a warehouse address.
+// V1: static config lookup; future: Inventory Locations service.
+message LookupInventoryAddressRequest {
+  repeated ShippingLineItem items      = 1;
+  optional string           address_id = 2; // if present, return matching warehouse directly
+}
+
+// LookupInventoryAddressResponse returns the resolved warehouse address.
+// address.easypost_address is pre-populated from inventory seed data — warehouse addresses
+// are pre-verified so the LLM can use easypost_address.id directly without calling verify_address.
+message LookupInventoryAddressResponse {
+  acme.common.v1.Address address = 1;
+}
+
+// ── Activity: find_alternate_warehouse ───────────────────────────────────────
+
+// FindAlternateWarehouseRequest asks for a warehouse that can fulfill the given
+// items from a different address than the one already tried.
+// V1: static config lookup; future: query Inventory Locations service and rank by proximity.
+message FindAlternateWarehouseRequest {
+  repeated ShippingLineItem items             = 1;
+  string                    current_address_id = 2; // easypost_id of the origin already tried — excluded from results
+  optional string           to_address_id      = 3; // destination easypost_id; V1 ignores, future ranks by proximity
+}
+
+// FindAlternateWarehouseResponse returns the best alternate warehouse address,
+// or an empty address if no alternate is available.
+// address.easypost_address is pre-populated so the agent can call get_carrier_rates directly.
+message FindAlternateWarehouseResponse {
+  optional acme.common.v1.Address address = 1; // unset when no alternate warehouse exists
+}
+
+// ── Activity: get_carrier_rates (fulfillment-easypost task queue) ─────────────
+
+// GetShippingRatesRequest creates an EasyPost Shipment and retrieves available carrier rates.
+// Distinct from Java's GetCarrierRatesRequest — no parcel fields (V1 hardcodes default parcel
+// in the activity: 1 lb, 6×6×4 in).
+message GetShippingRatesRequest {
+  string from_easypost_id             = 1;
+  string to_easypost_id               = 2;
+  repeated ShippingLineItem items     = 3;
+}
+
+message GetShippingRatesResponse {
+  string                  shipment_id = 1;
+  repeated ShippingOption options     = 2;
+}
+
+// BuildSystemPromptRequest is the LocalActivity input for computing the LLM system prompt.
+message BuildSystemPromptRequest {
+  CalculateShippingOptionsRequest request = 1;
+}
+
+// BuildSystemPromptResponse carries the rendered system prompt string.
+message BuildSystemPromptResponse {
+  string system_prompt = 1;
 }

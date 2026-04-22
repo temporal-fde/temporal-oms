@@ -7,7 +7,7 @@ package acme.oms.v1;
 message Order {
   string order_id = 1;
   repeated Item items = 2;
-  ShippingAddress shipping_address = 3;
+  acme.common.v1.Address shipping_address = 3;
 }
 message Payment {
   string rrn = 1;
@@ -19,10 +19,3 @@ message Item {
   int32 quantity = 2;
 }
 
-message ShippingAddress {
-  string street = 1;
-  string city = 2;
-  string state = 3;
-  string postal_code = 4;
-  string country = 5;
-}

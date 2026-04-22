@@ -97,11 +97,11 @@ Provide feedback in PROGRESS.md → Feedback Items section.
 - **Next:** Phase 1 (proto) is unblocked; 4 open questions to resolve before Phases 3/5/6 can complete (see PROGRESS.md)
 
 #### ShippingAgent
-- **Status:** Stub — Not Started
-- **Goal:** AI-powered carrier rate selection called by `fulfillment.Order` V2 via Nexus
+- **Status:** Approved — Ready for Planning
+- **Goal:** LLM-driven shipping advisor (Claude + 4 activity tools) called by `fulfillment.Order` V2 via Nexus; long-running per-customer workflow with content-hashed rate caching
 - **Owner:** Temporal FDE Team
 - **Spec:** `specs/fulfillment-order/shipping-agent/`
-- **Next:** Answer open questions before writing full spec
+- **Next:** Planning phase — break into detailed tasks; unblock Inventory Locations spec for `lookup_inventory_location`
 
 #### Deployment (k8s / Worker Versioning rollout)
 - **Status:** Not Started — follow-up spec

@@ -13,6 +13,14 @@ class Money(BaseModel):
     currency: str = Field(default="")# ISO 4217 currency code (USD, EUR, JPY, etc.)
     units: int = Field(default=0)# Amount in minor units (ISO 4217 exponent)
 
+class Coordinate(BaseModel):
+    """
+     Coordinate is a WGS-84 geographic position (longitude/latitude decimal degrees).
+    """
+
+    latitude: float = Field(default=0.0)
+    longitude: float = Field(default=0.0)
+
 class EasyPostAddress(BaseModel):
     """
      EasyPostAddress holds the EasyPost-specific fields populated after address verification.
@@ -20,16 +28,17 @@ class EasyPostAddress(BaseModel):
     """
 
     id: str = Field(default="")# EasyPost address ID
-    residential: bool = Field(default=False)# affects carrier rate selection
-    verified: bool = Field(default=False)
-
-class Address(BaseModel):
-    street: str = Field(default="")
+    street1: str = Field(default="")
+    street2: str = Field(default="")
     city: str = Field(default="")
     state: str = Field(default="")
-    postal_code: str = Field(default="")
-    country: str = Field(default="")# ISO 3166-1 alpha-2
-    easypost_address: typing.Optional[EasyPostAddress] = Field(default_factory=EasyPostAddress)# populated after EasyPost verification
+    zip: str = Field(default="")
+    country: str = Field(default="")
+    residential: typing.Optional[bool] = Field(default=False)# affects carrier rate selection
+    coordinate: typing.Optional[Coordinate] = Field(default_factory=Coordinate)# lat/lng from EasyPost verification; required by get_location_events
+
+class Address(BaseModel):
+    easypost: typing.Optional[EasyPostAddress] = Field(default_factory=EasyPostAddress)# populated after EasyPost verification
 
 class TimeRange(BaseModel):
     start: datetime = Field(default_factory=datetime.now)
@@ -43,11 +52,3 @@ class ErrorDetails(BaseModel):
     code: str = Field(default="")
     message: str = Field(default="")
     metadata: "typing.Dict[str, str]" = Field(default_factory=dict)
-
-class Coordinate(BaseModel):
-    """
-     Coordinate is a WGS-84 geographic position (longitude/latitude decimal degrees).
-    """
-
-    latitude: float = Field(default=0.0)
-    longitude: float = Field(default=0.0)

@@ -11,27 +11,27 @@ public interface FindOptimalShippingResponseOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 1 [json_name = "options"];</code>
+   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy options = 1 [json_name = "options"];</code>
    */
-  java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption> 
+  java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy> 
       getOptionsList();
   /**
-   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 1 [json_name = "options"];</code>
+   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy options = 1 [json_name = "options"];</code>
    */
-  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption getOptions(int index);
+  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy getOptions(int index);
   /**
-   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 1 [json_name = "options"];</code>
+   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy options = 1 [json_name = "options"];</code>
    */
   int getOptionsCount();
   /**
-   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 1 [json_name = "options"];</code>
+   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy options = 1 [json_name = "options"];</code>
    */
-  java.util.List<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionOrBuilder> 
+  java.util.List<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacyOrBuilder> 
       getOptionsOrBuilderList();
   /**
-   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 1 [json_name = "options"];</code>
+   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy options = 1 [json_name = "options"];</code>
    */
-  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionOrBuilder getOptionsOrBuilder(
+  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacyOrBuilder getOptionsOrBuilder(
       int index);
 
   /**
@@ -39,7 +39,7 @@ public interface FindOptimalShippingResponseOrBuilder extends
    * AI-selected
    * </pre>
    *
-   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingOption recommended = 2 [json_name = "recommended"];</code>
+   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy recommended = 2 [json_name = "recommended"];</code>
    * @return Whether the recommended field is set.
    */
   boolean hasRecommended();
@@ -48,18 +48,18 @@ public interface FindOptimalShippingResponseOrBuilder extends
    * AI-selected
    * </pre>
    *
-   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingOption recommended = 2 [json_name = "recommended"];</code>
+   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy recommended = 2 [json_name = "recommended"];</code>
    * @return The recommended.
    */
-  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption getRecommended();
+  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy getRecommended();
   /**
    * <pre>
    * AI-selected
    * </pre>
    *
-   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingOption recommended = 2 [json_name = "recommended"];</code>
+   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy recommended = 2 [json_name = "recommended"];</code>
    */
-  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionOrBuilder getRecommendedOrBuilder();
+  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacyOrBuilder getRecommendedOrBuilder();
 
   /**
    * <pre>

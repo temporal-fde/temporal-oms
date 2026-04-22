@@ -71,19 +71,19 @@ public interface FulfillOrderRequestOrBuilder extends
       getPaymentRrnBytes();
 
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingAddress shipping_address = 5 [json_name = "shippingAddress"];</code>
+   * <code>.acme.common.v1.Address shipping_address = 5 [json_name = "shippingAddress"];</code>
    * @return Whether the shippingAddress field is set.
    */
   boolean hasShippingAddress();
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingAddress shipping_address = 5 [json_name = "shippingAddress"];</code>
+   * <code>.acme.common.v1.Address shipping_address = 5 [json_name = "shippingAddress"];</code>
    * @return The shippingAddress.
    */
-  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAddress getShippingAddress();
+  com.acme.proto.acme.common.v1.Address getShippingAddress();
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingAddress shipping_address = 5 [json_name = "shippingAddress"];</code>
+   * <code>.acme.common.v1.Address shipping_address = 5 [json_name = "shippingAddress"];</code>
    */
-  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAddressOrBuilder getShippingAddressOrBuilder();
+  com.acme.proto.acme.common.v1.AddressOrBuilder getShippingAddressOrBuilder();
 
   /**
    * <code>.google.protobuf.Timestamp created_at = 6 [json_name = "createdAt"];</code>

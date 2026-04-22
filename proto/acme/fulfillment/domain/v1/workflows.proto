@@ -14,7 +14,7 @@ message FulfillOrderRequest {
   string customer_id = 2;
   repeated Item items = 3;
   string payment_rrn = 4;
-  ShippingAddress shipping_address = 5;
+  acme.common.v1.Address shipping_address = 5;
   google.protobuf.Timestamp created_at = 6;
 }
 
@@ -31,14 +31,6 @@ message Item {
   string sku_id = 2;
   string brand_code = 3;
   int32 quantity = 4;
-}
-
-message ShippingAddress {
-  string street = 1;
-  string city = 2;
-  string state = 3;
-  string postal_code = 4;
-  string country = 5;
 }
 
 message ShippingDetails {
@@ -59,19 +51,20 @@ message AllocatedItem {
 
 // Activity: FindOptimalShipping (AI-powered)
 message FindOptimalShippingRequest {
-  ShippingAddress destination = 1;
+  acme.common.v1.Address destination = 1;
   repeated Item items = 2;
   int32 max_cost_cents = 3;
   int32 max_days = 4;
 }
 
 message FindOptimalShippingResponse {
-  repeated ShippingOption options = 1;
-  ShippingOption recommended = 2;  // AI-selected
+  repeated ShippingOptionLegacy options = 1;
+  ShippingOptionLegacy recommended = 2;  // AI-selected
   string reasoning = 3;  // LLM explanation
 }
 
-message ShippingOption {
+// ShippingOptionLegacy is the Python-era shipping option; superseded by ShippingOption in shipping_agent.proto.
+message ShippingOptionLegacy {
   string carrier = 1;
   string service_level = 2;
   int64 cost_cents = 3;
@@ -82,7 +75,7 @@ message ShippingOption {
 // Activity: AllocateInventory
 message AllocateInventoryRequest {
   repeated Item items = 1;
-  ShippingAddress destination = 2;
+  acme.common.v1.Address destination = 2;
 }
 
 message AllocateInventoryResponse {
@@ -95,7 +88,7 @@ message AllocateInventoryResponse {
 message FindClosestWarehouseRequest {
   string sku_id = 1;
   int32 quantity = 2;
-  ShippingAddress destination = 3;
+  acme.common.v1.Address destination = 3;
 }
 
 message FindClosestWarehouseResponse {

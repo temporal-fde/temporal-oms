@@ -2,6 +2,7 @@
 # gen by protobuf_to_pydantic[v0.3.3.1](https://github.com/so1n/protobuf_to_pydantic)
 # Protobuf Version: 6.33.6 
 # Pydantic Version: 2.13.0 
+from ....common.v1.values_p2p import Address
 from datetime import datetime
 from google.protobuf.message import Message  # type: ignore
 from pydantic import BaseModel
@@ -13,17 +14,10 @@ class Item(BaseModel):
     item_id: str = Field(default="")
     quantity: int = Field(default=0)
 
-class ShippingAddress(BaseModel):
-    street: str = Field(default="")
-    city: str = Field(default="")
-    state: str = Field(default="")
-    postal_code: str = Field(default="")
-    country: str = Field(default="")
-
 class Order(BaseModel):
     order_id: str = Field(default="")
     items: typing.List[Item] = Field(default_factory=list)
-    shipping_address: ShippingAddress = Field(default_factory=ShippingAddress)
+    shipping_address: Address = Field(default_factory=Address)
 
 class SubmitOrderRequest(BaseModel):
     """

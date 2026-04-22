@@ -42,11 +42,6 @@ public final class MessageProto extends com.google.protobuf.GeneratedFile {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_acme_apps_api_orders_v1_Item_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_acme_apps_api_orders_v1_ShippingAddress_descriptor;
-  static final 
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_acme_apps_api_orders_v1_ShippingAddress_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_acme_apps_api_orders_v1_SubmitOrderResponse_descriptor;
   static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -107,59 +102,57 @@ public final class MessageProto extends com.google.protobuf.GeneratedFile {
     java.lang.String[] descriptorData = {
       "\n\036acme/apps/api/v1/message.proto\022\027acme.a" +
       "pps.api.orders.v1\032\037google/protobuf/times" +
-      "tamp.proto\"k\n\022SubmitOrderRequest\022\037\n\013cust" +
-      "omer_id\030\001 \001(\tR\ncustomerId\0224\n\005order\030\002 \001(\013" +
-      "2\036.acme.apps.api.orders.v1.OrderR\005order\"" +
-      "\254\001\n\005Order\022\031\n\010order_id\030\001 \001(\tR\007orderId\0223\n\005" +
-      "items\030\002 \003(\0132\035.acme.apps.api.orders.v1.It" +
-      "emR\005items\022S\n\020shipping_address\030\003 \001(\0132(.ac" +
-      "me.apps.api.orders.v1.ShippingAddressR\017s" +
-      "hippingAddress\";\n\004Item\022\027\n\007item_id\030\001 \001(\tR" +
-      "\006itemId\022\032\n\010quantity\030\002 \001(\005R\010quantity\"\216\001\n\017" +
-      "ShippingAddress\022\026\n\006street\030\001 \001(\tR\006street\022" +
-      "\022\n\004city\030\002 \001(\tR\004city\022\024\n\005state\030\003 \001(\tR\005stat" +
-      "e\022\037\n\013postal_code\030\004 \001(\tR\npostalCode\022\030\n\007co" +
-      "untry\030\005 \001(\tR\007country\"\203\001\n\023SubmitOrderResp" +
-      "onse\022\031\n\010order_id\030\001 \001(\tR\007orderId\022\026\n\006statu" +
-      "s\030\002 \001(\tR\006status\0229\n\ncreated_at\030\003 \001(\0132\032.go" +
-      "ogle.protobuf.TimestampR\tcreatedAt\"\251\001\n\022M" +
-      "akePaymentRequest\022\037\n\013customer_id\030\001 \001(\tR\n" +
-      "customerId\022\020\n\003rrn\030\002 \001(\tR\003rrn\022!\n\014amount_c" +
-      "ents\030\003 \001(\003R\013amountCents\022=\n\010metadata\030\004 \001(" +
-      "\0132!.acme.apps.api.orders.v1.MetadataR\010me" +
-      "tadata\"%\n\010Metadata\022\031\n\010order_id\030\001 \001(\tR\007or" +
-      "derId\"\207\001\n\023MakePaymentResponse\022\031\n\010order_i" +
-      "d\030\001 \001(\tR\007orderId\022\026\n\006status\030\002 \001(\tR\006status" +
-      "\022=\n\014processed_at\030\003 \001(\0132\032.google.protobuf" +
-      ".TimestampR\013processedAt\"p\n\021ListOrdersReq" +
-      "uest\022\037\n\013customer_id\030\001 \001(\tR\ncustomerId\022\033\n" +
-      "\tpage_size\030\002 \001(\005R\010pageSize\022\035\n\npage_token" +
-      "\030\003 \001(\tR\tpageToken\"{\n\022ListOrdersResponse\022" +
-      "=\n\006orders\030\001 \003(\0132%.acme.apps.api.orders.v" +
-      "1.OrderSummaryR\006orders\022&\n\017next_page_toke" +
-      "n\030\002 \001(\tR\rnextPageToken\"\313\001\n\014OrderSummary\022" +
-      "\031\n\010order_id\030\001 \001(\tR\007orderId\022\037\n\013customer_i" +
-      "d\030\002 \001(\tR\ncustomerId\022\026\n\006status\030\003 \001(\tR\006sta" +
-      "tus\022,\n\022total_amount_cents\030\004 \001(\003R\020totalAm" +
-      "ountCents\0229\n\ncreated_at\030\005 \001(\0132\032.google.p" +
-      "rotobuf.TimestampR\tcreatedAt\"+\n\023ListProd" +
-      "uctsRequest\022\024\n\005limit\030\001 \001(\005R\005limit\"N\n\024Lis" +
-      "tProductsResponse\0226\n\005items\030\001 \003(\0132 .acme." +
-      "apps.api.orders.v1.ProductR\005items\"\226\001\n\007Pr" +
-      "oduct\022\027\n\007item_id\030\001 \001(\tR\006itemId\022\022\n\004name\030\002" +
-      " \001(\tR\004name\022 \n\013description\030\003 \001(\tR\013descrip" +
-      "tion\022\037\n\013price_cents\030\004 \001(\003R\npriceCents\022\033\n" +
-      "\timage_url\030\005 \001(\tR\010imageUrlB\267\001\n&com.acme." +
-      "proto.acme.apps.api.orders.v1B\014MessagePr" +
-      "otoP\001\242\002\004AAAO\252\002\027Acme.Apps.Api.Orders.V1\312\002" +
-      "\027Acme\\Apps\\Api\\Orders\\V1\342\002#Acme\\Apps\\Api" +
-      "\\Orders\\V1\\GPBMetadata\352\002\033Acme::Apps::Api" +
-      "::Orders::V1b\006proto3"
+      "tamp.proto\032\033acme/common/v1/values.proto\"" +
+      "k\n\022SubmitOrderRequest\022\037\n\013customer_id\030\001 \001" +
+      "(\tR\ncustomerId\0224\n\005order\030\002 \001(\0132\036.acme.app" +
+      "s.api.orders.v1.OrderR\005order\"\233\001\n\005Order\022\031" +
+      "\n\010order_id\030\001 \001(\tR\007orderId\0223\n\005items\030\002 \003(\013" +
+      "2\035.acme.apps.api.orders.v1.ItemR\005items\022B" +
+      "\n\020shipping_address\030\003 \001(\0132\027.acme.common.v" +
+      "1.AddressR\017shippingAddress\";\n\004Item\022\027\n\007it" +
+      "em_id\030\001 \001(\tR\006itemId\022\032\n\010quantity\030\002 \001(\005R\010q" +
+      "uantity\"\203\001\n\023SubmitOrderResponse\022\031\n\010order" +
+      "_id\030\001 \001(\tR\007orderId\022\026\n\006status\030\002 \001(\tR\006stat" +
+      "us\0229\n\ncreated_at\030\003 \001(\0132\032.google.protobuf" +
+      ".TimestampR\tcreatedAt\"\251\001\n\022MakePaymentReq" +
+      "uest\022\037\n\013customer_id\030\001 \001(\tR\ncustomerId\022\020\n" +
+      "\003rrn\030\002 \001(\tR\003rrn\022!\n\014amount_cents\030\003 \001(\003R\013a" +
+      "mountCents\022=\n\010metadata\030\004 \001(\0132!.acme.apps" +
+      ".api.orders.v1.MetadataR\010metadata\"%\n\010Met" +
+      "adata\022\031\n\010order_id\030\001 \001(\tR\007orderId\"\207\001\n\023Mak" +
+      "ePaymentResponse\022\031\n\010order_id\030\001 \001(\tR\007orde" +
+      "rId\022\026\n\006status\030\002 \001(\tR\006status\022=\n\014processed" +
+      "_at\030\003 \001(\0132\032.google.protobuf.TimestampR\013p" +
+      "rocessedAt\"p\n\021ListOrdersRequest\022\037\n\013custo" +
+      "mer_id\030\001 \001(\tR\ncustomerId\022\033\n\tpage_size\030\002 " +
+      "\001(\005R\010pageSize\022\035\n\npage_token\030\003 \001(\tR\tpageT" +
+      "oken\"{\n\022ListOrdersResponse\022=\n\006orders\030\001 \003" +
+      "(\0132%.acme.apps.api.orders.v1.OrderSummar" +
+      "yR\006orders\022&\n\017next_page_token\030\002 \001(\tR\rnext" +
+      "PageToken\"\313\001\n\014OrderSummary\022\031\n\010order_id\030\001" +
+      " \001(\tR\007orderId\022\037\n\013customer_id\030\002 \001(\tR\ncust" +
+      "omerId\022\026\n\006status\030\003 \001(\tR\006status\022,\n\022total_" +
+      "amount_cents\030\004 \001(\003R\020totalAmountCents\0229\n\n" +
+      "created_at\030\005 \001(\0132\032.google.protobuf.Times" +
+      "tampR\tcreatedAt\"+\n\023ListProductsRequest\022\024" +
+      "\n\005limit\030\001 \001(\005R\005limit\"N\n\024ListProductsResp" +
+      "onse\0226\n\005items\030\001 \003(\0132 .acme.apps.api.orde" +
+      "rs.v1.ProductR\005items\"\226\001\n\007Product\022\027\n\007item" +
+      "_id\030\001 \001(\tR\006itemId\022\022\n\004name\030\002 \001(\tR\004name\022 \n" +
+      "\013description\030\003 \001(\tR\013description\022\037\n\013price" +
+      "_cents\030\004 \001(\003R\npriceCents\022\033\n\timage_url\030\005 " +
+      "\001(\tR\010imageUrlB\267\001\n&com.acme.proto.acme.ap" +
+      "ps.api.orders.v1B\014MessageProtoP\001\242\002\004AAAO\252" +
+      "\002\027Acme.Apps.Api.Orders.V1\312\002\027Acme\\Apps\\Ap" +
+      "i\\Orders\\V1\342\002#Acme\\Apps\\Api\\Orders\\V1\\GP" +
+      "BMetadata\352\002\033Acme::Apps::Api::Orders::V1b" +
+      "\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           com.google.protobuf.TimestampProto.getDescriptor(),
+          com.acme.proto.acme.common.v1.ValuesProto.getDescriptor(),
         });
     internal_static_acme_apps_api_orders_v1_SubmitOrderRequest_descriptor =
       getDescriptor().getMessageType(0);
@@ -179,74 +172,69 @@ public final class MessageProto extends com.google.protobuf.GeneratedFile {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_apps_api_orders_v1_Item_descriptor,
         new java.lang.String[] { "ItemId", "Quantity", });
-    internal_static_acme_apps_api_orders_v1_ShippingAddress_descriptor =
-      getDescriptor().getMessageType(3);
-    internal_static_acme_apps_api_orders_v1_ShippingAddress_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_acme_apps_api_orders_v1_ShippingAddress_descriptor,
-        new java.lang.String[] { "Street", "City", "State", "PostalCode", "Country", });
     internal_static_acme_apps_api_orders_v1_SubmitOrderResponse_descriptor =
-      getDescriptor().getMessageType(4);
+      getDescriptor().getMessageType(3);
     internal_static_acme_apps_api_orders_v1_SubmitOrderResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_apps_api_orders_v1_SubmitOrderResponse_descriptor,
         new java.lang.String[] { "OrderId", "Status", "CreatedAt", });
     internal_static_acme_apps_api_orders_v1_MakePaymentRequest_descriptor =
-      getDescriptor().getMessageType(5);
+      getDescriptor().getMessageType(4);
     internal_static_acme_apps_api_orders_v1_MakePaymentRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_apps_api_orders_v1_MakePaymentRequest_descriptor,
         new java.lang.String[] { "CustomerId", "Rrn", "AmountCents", "Metadata", });
     internal_static_acme_apps_api_orders_v1_Metadata_descriptor =
-      getDescriptor().getMessageType(6);
+      getDescriptor().getMessageType(5);
     internal_static_acme_apps_api_orders_v1_Metadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_apps_api_orders_v1_Metadata_descriptor,
         new java.lang.String[] { "OrderId", });
     internal_static_acme_apps_api_orders_v1_MakePaymentResponse_descriptor =
-      getDescriptor().getMessageType(7);
+      getDescriptor().getMessageType(6);
     internal_static_acme_apps_api_orders_v1_MakePaymentResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_apps_api_orders_v1_MakePaymentResponse_descriptor,
         new java.lang.String[] { "OrderId", "Status", "ProcessedAt", });
     internal_static_acme_apps_api_orders_v1_ListOrdersRequest_descriptor =
-      getDescriptor().getMessageType(8);
+      getDescriptor().getMessageType(7);
     internal_static_acme_apps_api_orders_v1_ListOrdersRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_apps_api_orders_v1_ListOrdersRequest_descriptor,
         new java.lang.String[] { "CustomerId", "PageSize", "PageToken", });
     internal_static_acme_apps_api_orders_v1_ListOrdersResponse_descriptor =
-      getDescriptor().getMessageType(9);
+      getDescriptor().getMessageType(8);
     internal_static_acme_apps_api_orders_v1_ListOrdersResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_apps_api_orders_v1_ListOrdersResponse_descriptor,
         new java.lang.String[] { "Orders", "NextPageToken", });
     internal_static_acme_apps_api_orders_v1_OrderSummary_descriptor =
-      getDescriptor().getMessageType(10);
+      getDescriptor().getMessageType(9);
     internal_static_acme_apps_api_orders_v1_OrderSummary_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_apps_api_orders_v1_OrderSummary_descriptor,
         new java.lang.String[] { "OrderId", "CustomerId", "Status", "TotalAmountCents", "CreatedAt", });
     internal_static_acme_apps_api_orders_v1_ListProductsRequest_descriptor =
-      getDescriptor().getMessageType(11);
+      getDescriptor().getMessageType(10);
     internal_static_acme_apps_api_orders_v1_ListProductsRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_apps_api_orders_v1_ListProductsRequest_descriptor,
         new java.lang.String[] { "Limit", });
     internal_static_acme_apps_api_orders_v1_ListProductsResponse_descriptor =
-      getDescriptor().getMessageType(12);
+      getDescriptor().getMessageType(11);
     internal_static_acme_apps_api_orders_v1_ListProductsResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_apps_api_orders_v1_ListProductsResponse_descriptor,
         new java.lang.String[] { "Items", });
     internal_static_acme_apps_api_orders_v1_Product_descriptor =
-      getDescriptor().getMessageType(13);
+      getDescriptor().getMessageType(12);
     internal_static_acme_apps_api_orders_v1_Product_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_apps_api_orders_v1_Product_descriptor,
         new java.lang.String[] { "ItemId", "Name", "Description", "PriceCents", "ImageUrl", });
     descriptor.resolveAllFeaturesImmutable();
     com.google.protobuf.TimestampProto.getDescriptor();
+    com.acme.proto.acme.common.v1.ValuesProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

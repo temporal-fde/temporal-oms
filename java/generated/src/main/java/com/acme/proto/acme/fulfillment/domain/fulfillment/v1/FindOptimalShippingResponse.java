@@ -53,53 +53,53 @@ private static final long serialVersionUID = 0L;
   private int bitField0_;
   public static final int OPTIONS_FIELD_NUMBER = 1;
   @SuppressWarnings("serial")
-  private java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption> options_;
+  private java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy> options_;
   /**
-   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 1 [json_name = "options"];</code>
+   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy options = 1 [json_name = "options"];</code>
    */
   @java.lang.Override
-  public java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption> getOptionsList() {
+  public java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy> getOptionsList() {
     return options_;
   }
   /**
-   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 1 [json_name = "options"];</code>
+   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy options = 1 [json_name = "options"];</code>
    */
   @java.lang.Override
-  public java.util.List<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionOrBuilder> 
+  public java.util.List<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacyOrBuilder> 
       getOptionsOrBuilderList() {
     return options_;
   }
   /**
-   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 1 [json_name = "options"];</code>
+   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy options = 1 [json_name = "options"];</code>
    */
   @java.lang.Override
   public int getOptionsCount() {
     return options_.size();
   }
   /**
-   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 1 [json_name = "options"];</code>
+   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy options = 1 [json_name = "options"];</code>
    */
   @java.lang.Override
-  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption getOptions(int index) {
+  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy getOptions(int index) {
     return options_.get(index);
   }
   /**
-   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 1 [json_name = "options"];</code>
+   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy options = 1 [json_name = "options"];</code>
    */
   @java.lang.Override
-  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionOrBuilder getOptionsOrBuilder(
+  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacyOrBuilder getOptionsOrBuilder(
       int index) {
     return options_.get(index);
   }
 
   public static final int RECOMMENDED_FIELD_NUMBER = 2;
-  private com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption recommended_;
+  private com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy recommended_;
   /**
    * <pre>
    * AI-selected
    * </pre>
    *
-   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingOption recommended = 2 [json_name = "recommended"];</code>
+   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy recommended = 2 [json_name = "recommended"];</code>
    * @return Whether the recommended field is set.
    */
   @java.lang.Override
@@ -111,23 +111,23 @@ private static final long serialVersionUID = 0L;
    * AI-selected
    * </pre>
    *
-   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingOption recommended = 2 [json_name = "recommended"];</code>
+   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy recommended = 2 [json_name = "recommended"];</code>
    * @return The recommended.
    */
   @java.lang.Override
-  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption getRecommended() {
-    return recommended_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.getDefaultInstance() : recommended_;
+  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy getRecommended() {
+    return recommended_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy.getDefaultInstance() : recommended_;
   }
   /**
    * <pre>
    * AI-selected
    * </pre>
    *
-   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingOption recommended = 2 [json_name = "recommended"];</code>
+   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy recommended = 2 [json_name = "recommended"];</code>
    */
   @java.lang.Override
-  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionOrBuilder getRecommendedOrBuilder() {
-    return recommended_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.getDefaultInstance() : recommended_;
+  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacyOrBuilder getRecommendedOrBuilder() {
+    return recommended_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy.getDefaultInstance() : recommended_;
   }
 
   public static final int REASONING_FIELD_NUMBER = 3;
@@ -553,9 +553,9 @@ private static final long serialVersionUID = 0L;
               done = true;
               break;
             case 10: {
-              com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption m =
+              com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy m =
                   input.readMessage(
-                      com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.parser(),
+                      com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy.parser(),
                       extensionRegistry);
               if (optionsBuilder_ == null) {
                 ensureOptionsIsMutable();
@@ -594,22 +594,22 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption> options_ =
+    private java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy> options_ =
       java.util.Collections.emptyList();
     private void ensureOptionsIsMutable() {
       if (!((bitField0_ & 0x00000001) != 0)) {
-        options_ = new java.util.ArrayList<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption>(options_);
+        options_ = new java.util.ArrayList<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy>(options_);
         bitField0_ |= 0x00000001;
        }
     }
 
     private com.google.protobuf.RepeatedFieldBuilder<
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionOrBuilder> optionsBuilder_;
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacyOrBuilder> optionsBuilder_;
 
     /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 1 [json_name = "options"];</code>
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy options = 1 [json_name = "options"];</code>
      */
-    public java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption> getOptionsList() {
+    public java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy> getOptionsList() {
       if (optionsBuilder_ == null) {
         return java.util.Collections.unmodifiableList(options_);
       } else {
@@ -617,7 +617,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 1 [json_name = "options"];</code>
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy options = 1 [json_name = "options"];</code>
      */
     public int getOptionsCount() {
       if (optionsBuilder_ == null) {
@@ -627,9 +627,9 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 1 [json_name = "options"];</code>
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy options = 1 [json_name = "options"];</code>
      */
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption getOptions(int index) {
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy getOptions(int index) {
       if (optionsBuilder_ == null) {
         return options_.get(index);
       } else {
@@ -637,10 +637,10 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 1 [json_name = "options"];</code>
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy options = 1 [json_name = "options"];</code>
      */
     public Builder setOptions(
-        int index, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption value) {
+        int index, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy value) {
       if (optionsBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
@@ -654,10 +654,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 1 [json_name = "options"];</code>
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy options = 1 [json_name = "options"];</code>
      */
     public Builder setOptions(
-        int index, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.Builder builderForValue) {
+        int index, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy.Builder builderForValue) {
       if (optionsBuilder_ == null) {
         ensureOptionsIsMutable();
         options_.set(index, builderForValue.build());
@@ -668,9 +668,9 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 1 [json_name = "options"];</code>
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy options = 1 [json_name = "options"];</code>
      */
-    public Builder addOptions(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption value) {
+    public Builder addOptions(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy value) {
       if (optionsBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
@@ -684,10 +684,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 1 [json_name = "options"];</code>
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy options = 1 [json_name = "options"];</code>
      */
     public Builder addOptions(
-        int index, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption value) {
+        int index, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy value) {
       if (optionsBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
@@ -701,10 +701,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 1 [json_name = "options"];</code>
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy options = 1 [json_name = "options"];</code>
      */
     public Builder addOptions(
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.Builder builderForValue) {
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy.Builder builderForValue) {
       if (optionsBuilder_ == null) {
         ensureOptionsIsMutable();
         options_.add(builderForValue.build());
@@ -715,10 +715,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 1 [json_name = "options"];</code>
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy options = 1 [json_name = "options"];</code>
      */
     public Builder addOptions(
-        int index, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.Builder builderForValue) {
+        int index, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy.Builder builderForValue) {
       if (optionsBuilder_ == null) {
         ensureOptionsIsMutable();
         options_.add(index, builderForValue.build());
@@ -729,10 +729,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 1 [json_name = "options"];</code>
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy options = 1 [json_name = "options"];</code>
      */
     public Builder addAllOptions(
-        java.lang.Iterable<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption> values) {
+        java.lang.Iterable<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy> values) {
       if (optionsBuilder_ == null) {
         ensureOptionsIsMutable();
         com.google.protobuf.AbstractMessageLite.Builder.addAll(
@@ -744,7 +744,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 1 [json_name = "options"];</code>
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy options = 1 [json_name = "options"];</code>
      */
     public Builder clearOptions() {
       if (optionsBuilder_ == null) {
@@ -757,7 +757,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 1 [json_name = "options"];</code>
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy options = 1 [json_name = "options"];</code>
      */
     public Builder removeOptions(int index) {
       if (optionsBuilder_ == null) {
@@ -770,16 +770,16 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 1 [json_name = "options"];</code>
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy options = 1 [json_name = "options"];</code>
      */
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.Builder getOptionsBuilder(
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy.Builder getOptionsBuilder(
         int index) {
       return internalGetOptionsFieldBuilder().getBuilder(index);
     }
     /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 1 [json_name = "options"];</code>
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy options = 1 [json_name = "options"];</code>
      */
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionOrBuilder getOptionsOrBuilder(
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacyOrBuilder getOptionsOrBuilder(
         int index) {
       if (optionsBuilder_ == null) {
         return options_.get(index);  } else {
@@ -787,9 +787,9 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 1 [json_name = "options"];</code>
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy options = 1 [json_name = "options"];</code>
      */
-    public java.util.List<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionOrBuilder> 
+    public java.util.List<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacyOrBuilder> 
          getOptionsOrBuilderList() {
       if (optionsBuilder_ != null) {
         return optionsBuilder_.getMessageOrBuilderList();
@@ -798,33 +798,33 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 1 [json_name = "options"];</code>
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy options = 1 [json_name = "options"];</code>
      */
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.Builder addOptionsBuilder() {
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy.Builder addOptionsBuilder() {
       return internalGetOptionsFieldBuilder().addBuilder(
-          com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.getDefaultInstance());
+          com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy.getDefaultInstance());
     }
     /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 1 [json_name = "options"];</code>
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy options = 1 [json_name = "options"];</code>
      */
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.Builder addOptionsBuilder(
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy.Builder addOptionsBuilder(
         int index) {
       return internalGetOptionsFieldBuilder().addBuilder(
-          index, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.getDefaultInstance());
+          index, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy.getDefaultInstance());
     }
     /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOption options = 1 [json_name = "options"];</code>
+     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy options = 1 [json_name = "options"];</code>
      */
-    public java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.Builder> 
+    public java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy.Builder> 
          getOptionsBuilderList() {
       return internalGetOptionsFieldBuilder().getBuilderList();
     }
     private com.google.protobuf.RepeatedFieldBuilder<
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionOrBuilder> 
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacyOrBuilder> 
         internalGetOptionsFieldBuilder() {
       if (optionsBuilder_ == null) {
         optionsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
-            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionOrBuilder>(
+            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacyOrBuilder>(
                 options_,
                 ((bitField0_ & 0x00000001) != 0),
                 getParentForChildren(),
@@ -834,15 +834,15 @@ private static final long serialVersionUID = 0L;
       return optionsBuilder_;
     }
 
-    private com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption recommended_;
+    private com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy recommended_;
     private com.google.protobuf.SingleFieldBuilder<
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionOrBuilder> recommendedBuilder_;
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacyOrBuilder> recommendedBuilder_;
     /**
      * <pre>
      * AI-selected
      * </pre>
      *
-     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingOption recommended = 2 [json_name = "recommended"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy recommended = 2 [json_name = "recommended"];</code>
      * @return Whether the recommended field is set.
      */
     public boolean hasRecommended() {
@@ -853,12 +853,12 @@ private static final long serialVersionUID = 0L;
      * AI-selected
      * </pre>
      *
-     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingOption recommended = 2 [json_name = "recommended"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy recommended = 2 [json_name = "recommended"];</code>
      * @return The recommended.
      */
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption getRecommended() {
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy getRecommended() {
       if (recommendedBuilder_ == null) {
-        return recommended_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.getDefaultInstance() : recommended_;
+        return recommended_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy.getDefaultInstance() : recommended_;
       } else {
         return recommendedBuilder_.getMessage();
       }
@@ -868,9 +868,9 @@ private static final long serialVersionUID = 0L;
      * AI-selected
      * </pre>
      *
-     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingOption recommended = 2 [json_name = "recommended"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy recommended = 2 [json_name = "recommended"];</code>
      */
-    public Builder setRecommended(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption value) {
+    public Builder setRecommended(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy value) {
       if (recommendedBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
@@ -888,10 +888,10 @@ private static final long serialVersionUID = 0L;
      * AI-selected
      * </pre>
      *
-     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingOption recommended = 2 [json_name = "recommended"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy recommended = 2 [json_name = "recommended"];</code>
      */
     public Builder setRecommended(
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.Builder builderForValue) {
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy.Builder builderForValue) {
       if (recommendedBuilder_ == null) {
         recommended_ = builderForValue.build();
       } else {
@@ -906,13 +906,13 @@ private static final long serialVersionUID = 0L;
      * AI-selected
      * </pre>
      *
-     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingOption recommended = 2 [json_name = "recommended"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy recommended = 2 [json_name = "recommended"];</code>
      */
-    public Builder mergeRecommended(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption value) {
+    public Builder mergeRecommended(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy value) {
       if (recommendedBuilder_ == null) {
         if (((bitField0_ & 0x00000002) != 0) &&
           recommended_ != null &&
-          recommended_ != com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.getDefaultInstance()) {
+          recommended_ != com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy.getDefaultInstance()) {
           getRecommendedBuilder().mergeFrom(value);
         } else {
           recommended_ = value;
@@ -931,7 +931,7 @@ private static final long serialVersionUID = 0L;
      * AI-selected
      * </pre>
      *
-     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingOption recommended = 2 [json_name = "recommended"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy recommended = 2 [json_name = "recommended"];</code>
      */
     public Builder clearRecommended() {
       bitField0_ = (bitField0_ & ~0x00000002);
@@ -948,9 +948,9 @@ private static final long serialVersionUID = 0L;
      * AI-selected
      * </pre>
      *
-     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingOption recommended = 2 [json_name = "recommended"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy recommended = 2 [json_name = "recommended"];</code>
      */
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.Builder getRecommendedBuilder() {
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy.Builder getRecommendedBuilder() {
       bitField0_ |= 0x00000002;
       onChanged();
       return internalGetRecommendedFieldBuilder().getBuilder();
@@ -960,14 +960,14 @@ private static final long serialVersionUID = 0L;
      * AI-selected
      * </pre>
      *
-     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingOption recommended = 2 [json_name = "recommended"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy recommended = 2 [json_name = "recommended"];</code>
      */
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionOrBuilder getRecommendedOrBuilder() {
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacyOrBuilder getRecommendedOrBuilder() {
       if (recommendedBuilder_ != null) {
         return recommendedBuilder_.getMessageOrBuilder();
       } else {
         return recommended_ == null ?
-            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.getDefaultInstance() : recommended_;
+            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy.getDefaultInstance() : recommended_;
       }
     }
     /**
@@ -975,14 +975,14 @@ private static final long serialVersionUID = 0L;
      * AI-selected
      * </pre>
      *
-     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingOption recommended = 2 [json_name = "recommended"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy recommended = 2 [json_name = "recommended"];</code>
      */
     private com.google.protobuf.SingleFieldBuilder<
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionOrBuilder> 
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacyOrBuilder> 
         internalGetRecommendedFieldBuilder() {
       if (recommendedBuilder_ == null) {
         recommendedBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOption.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionOrBuilder>(
+            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacy.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingOptionLegacyOrBuilder>(
                 getRecommended(),
                 getParentForChildren(),
                 isClean());

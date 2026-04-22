@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-import os
 from collections import defaultdict
 from datetime import datetime, timezone
 
 import aiohttp
 from temporalio import activity
+
+from src.config import settings
 from temporalio.exceptions import ApplicationError
 
 from acme.fulfillment.domain.v1.shipping_agent_p2p import (
@@ -100,7 +101,7 @@ class LocationEventsActivities:
         }
 
         headers = {
-            "Authorization": f"Bearer {os.getenv('PREDICTHQ_API_KEY', '')}",
+            "Authorization": f"Bearer {settings.predicthq_api_key}",
             "Accept": "application/json",
         }
 
