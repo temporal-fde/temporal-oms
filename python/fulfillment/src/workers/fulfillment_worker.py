@@ -9,7 +9,7 @@ from src.agents.activities.inventory import LookupInventoryActivities
 from src.agents.activities.llm import LlmActivities
 from src.agents.workflows.shipping_agent import ShippingAgent
 
-_TASK_QUEUE = "fulfillment"
+_TASK_QUEUE = "agents"
 
 
 async def build_fulfillment_worker() -> Worker:
