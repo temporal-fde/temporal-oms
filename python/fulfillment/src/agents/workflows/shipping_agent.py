@@ -59,17 +59,6 @@ _TOOLS = ToolSpecs(
         retry_policy=_ACTIVITY_RETRY,
     ),
     activity_tool(
-        activity_name(EasyPostActivities.verify_address),
-        "Verify a raw shipping address via EasyPost. "
-        "Returns an EasyPost address ID and lat/lng coordinates required for get_location_events.",
-        EasyPostActivities.verify_address,
-        VerifyAddressRequest,
-        VerifyAddressResponse,
-        task_queue="fulfillment-easypost",
-        start_to_close_timeout=_ACTIVITY_TIMEOUT,
-        retry_policy=_ACTIVITY_RETRY,
-    ),
-    activity_tool(
         activity_name(EasyPostActivities.get_carrier_rates),
         "Create an EasyPost shipment and retrieve available carrier rates.",
         EasyPostActivities.get_carrier_rates,
