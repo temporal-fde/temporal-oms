@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import easypost
+import easypost.errors
 from temporalio import activity
+from temporalio.exceptions import ApplicationError
 
 from src.config import settings
 from acme.common.v1.values_p2p import Address, Coordinate, EasyPostAddress, Money
@@ -65,14 +67,18 @@ class EasyPostActivities:
 
         activity.logger.info(f"Verifying address: {ep}")
 
-        ep_addr = client.address.create_and_verify(
-            street1=ep.street1,
-            street2=ep.street2,
-            city=ep.city,
-            state=ep.state,
-            zip=ep.zip,
-            country=ep.country or "US",
-        )
+        try:
+            ep_addr = client.address.create_and_verify(
+                street1=ep.street1,
+                street2=ep.street2,
+                city=ep.city,
+                state=ep.state,
+                zip=ep.zip,
+                country=ep.country or "US",
+            )
+        except easypost.errors.EasyPostError as e:
+            raise ApplicationError(str(e), non_retryable=True) from e
+
         activity.logger.info(f"Verified address: {ep_addr}")
         coordinate = _extract_coordinate(ep_addr)
 
@@ -97,14 +103,24 @@ class EasyPostActivities:
         self,
         request: GetShippingRatesRequest,
     ) -> GetShippingRatesResponse:
+        if not request.from_easypost_id or not request.to_easypost_id:
+            raise ApplicationError(
+                "get_carrier_rates requires valid from_easypost_id and to_easypost_id",
+                non_retryable=True,
+            )
+
         client = _get_client()
 
-        # V1: default parcel (1 lb, 6×6×4 in) — no proto field for dimensions.
-        shipment = client.shipment.create(
-            from_address={"id": request.from_easypost_id},
-            to_address={"id": request.to_easypost_id},
-            parcel=_DEFAULT_PARCEL,
-        )
+        try:
+            # V1: default parcel (1 lb, 6×6×4 in) — no proto field for dimensions.
+            shipment = client.shipment.create(
+                from_address={"id": request.from_easypost_id},
+                to_address={"id": request.to_easypost_id},
+                parcel=_DEFAULT_PARCEL,
+            )
+        except easypost.errors.EasyPostError as e:
+            activity.logger.error(f"EasyPost error: {e}")
+            raise ApplicationError(str(e), non_retryable=True) from e
 
         options: list[ShippingOption] = []
         for rate in getattr(shipment, "rates", []):
