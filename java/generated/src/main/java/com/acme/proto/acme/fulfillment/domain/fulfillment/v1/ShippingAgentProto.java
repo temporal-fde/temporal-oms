@@ -87,15 +87,15 @@ public final class ShippingAgentProto extends com.google.protobuf.GeneratedFile 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_acme_fulfillment_domain_fulfillment_v1_ShippingOptionsCache_ResultsEntry_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryLocationRequest_descriptor;
+    internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryAddressRequest_descriptor;
   static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryLocationRequest_fieldAccessorTable;
+      internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryAddressRequest_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryLocationResponse_descriptor;
+    internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryAddressResponse_descriptor;
   static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryLocationResponse_fieldAccessorTable;
+      internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryAddressResponse_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_acme_fulfillment_domain_fulfillment_v1_GetShippingRatesRequest_descriptor;
   static final 
@@ -202,37 +202,37 @@ public final class ShippingAgentProto extends com.google.protobuf.GeneratedFile 
       "esults\032y\n\014ResultsEntry\022\020\n\003key\030\001 \001(\tR\003key" +
       "\022S\n\005value\030\002 \001(\0132=.acme.fulfillment.domai" +
       "n.fulfillment.v1.ShippingOptionsResultR\005" +
-      "value:\0028\001\"\246\001\n\036LookupInventoryLocationReq" +
-      "uest\022N\n\005items\030\001 \003(\01328.acme.fulfillment.d" +
-      "omain.fulfillment.v1.ShippingLineItemR\005i" +
-      "tems\022$\n\013location_id\030\002 \001(\tH\000R\nlocationId\210" +
-      "\001\001B\016\n\014_location_id\"T\n\037LookupInventoryLoc" +
-      "ationResponse\0221\n\007address\030\001 \001(\0132\027.acme.co" +
-      "mmon.v1.AddressR\007address\"\271\001\n\027GetShipping" +
-      "RatesRequest\022(\n\020from_easypost_id\030\001 \001(\tR\016" +
-      "fromEasypostId\022$\n\016to_easypost_id\030\002 \001(\tR\014" +
-      "toEasypostId\022N\n\005items\030\003 \003(\01328.acme.fulfi" +
-      "llment.domain.fulfillment.v1.ShippingLin" +
-      "eItemR\005items\"\215\001\n\030GetShippingRatesRespons" +
-      "e\022\037\n\013shipment_id\030\001 \001(\tR\nshipmentId\022P\n\007op" +
-      "tions\030\002 \003(\01326.acme.fulfillment.domain.fu" +
-      "lfillment.v1.ShippingOptionR\007options\"}\n\030" +
-      "BuildSystemPromptRequest\022a\n\007request\030\001 \001(" +
-      "\0132G.acme.fulfillment.domain.fulfillment." +
-      "v1.CalculateShippingOptionsRequestR\007requ" +
-      "est\"@\n\031BuildSystemPromptResponse\022#\n\rsyst" +
-      "em_prompt\030\001 \001(\tR\014systemPrompt*\233\001\n\025Recomm" +
-      "endationOutcome\022&\n\"RECOMMENDATION_OUTCOM" +
-      "E_UNSPECIFIED\020\000\022\013\n\007PROCEED\020\001\022\025\n\021CHEAPER_" +
-      "AVAILABLE\020\002\022\024\n\020FASTER_AVAILABLE\020\003\022\020\n\014MAR" +
-      "GIN_SPIKE\020\004\022\016\n\nSLA_BREACH\020\005B\210\002\n5com.acme" +
-      ".proto.acme.fulfillment.domain.fulfillme" +
-      "nt.v1B\022ShippingAgentProtoP\001\242\002\004AFDF\252\002&Acm" +
-      "e.Fulfillment.Domain.Fulfillment.V1\312\002&Ac" +
-      "me\\Fulfillment\\Domain\\Fulfillment\\V1\342\0022A" +
-      "cme\\Fulfillment\\Domain\\Fulfillment\\V1\\GP" +
-      "BMetadata\352\002*Acme::Fulfillment::Domain::F" +
-      "ulfillment::V1b\006proto3"
+      "value:\0028\001\"\242\001\n\035LookupInventoryAddressRequ" +
+      "est\022N\n\005items\030\001 \003(\01328.acme.fulfillment.do" +
+      "main.fulfillment.v1.ShippingLineItemR\005it" +
+      "ems\022\"\n\naddress_id\030\002 \001(\tH\000R\taddressId\210\001\001B" +
+      "\r\n\013_address_id\"S\n\036LookupInventoryAddress" +
+      "Response\0221\n\007address\030\001 \001(\0132\027.acme.common." +
+      "v1.AddressR\007address\"\271\001\n\027GetShippingRates" +
+      "Request\022(\n\020from_easypost_id\030\001 \001(\tR\016fromE" +
+      "asypostId\022$\n\016to_easypost_id\030\002 \001(\tR\014toEas" +
+      "ypostId\022N\n\005items\030\003 \003(\01328.acme.fulfillmen" +
+      "t.domain.fulfillment.v1.ShippingLineItem" +
+      "R\005items\"\215\001\n\030GetShippingRatesResponse\022\037\n\013" +
+      "shipment_id\030\001 \001(\tR\nshipmentId\022P\n\007options" +
+      "\030\002 \003(\01326.acme.fulfillment.domain.fulfill" +
+      "ment.v1.ShippingOptionR\007options\"}\n\030Build" +
+      "SystemPromptRequest\022a\n\007request\030\001 \001(\0132G.a" +
+      "cme.fulfillment.domain.fulfillment.v1.Ca" +
+      "lculateShippingOptionsRequestR\007request\"@" +
+      "\n\031BuildSystemPromptResponse\022#\n\rsystem_pr" +
+      "ompt\030\001 \001(\tR\014systemPrompt*\233\001\n\025Recommendat" +
+      "ionOutcome\022&\n\"RECOMMENDATION_OUTCOME_UNS" +
+      "PECIFIED\020\000\022\013\n\007PROCEED\020\001\022\025\n\021CHEAPER_AVAIL" +
+      "ABLE\020\002\022\024\n\020FASTER_AVAILABLE\020\003\022\020\n\014MARGIN_S" +
+      "PIKE\020\004\022\016\n\nSLA_BREACH\020\005B\210\002\n5com.acme.prot" +
+      "o.acme.fulfillment.domain.fulfillment.v1" +
+      "B\022ShippingAgentProtoP\001\242\002\004AFDF\252\002&Acme.Ful" +
+      "fillment.Domain.Fulfillment.V1\312\002&Acme\\Fu" +
+      "lfillment\\Domain\\Fulfillment\\V1\342\0022Acme\\F" +
+      "ulfillment\\Domain\\Fulfillment\\V1\\GPBMeta" +
+      "data\352\002*Acme::Fulfillment::Domain::Fulfil" +
+      "lment::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -313,17 +313,17 @@ public final class ShippingAgentProto extends com.google.protobuf.GeneratedFile 
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_ShippingOptionsCache_ResultsEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
-    internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryLocationRequest_descriptor =
+    internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryAddressRequest_descriptor =
       getDescriptor().getMessageType(11);
-    internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryLocationRequest_fieldAccessorTable = new
+    internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryAddressRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryLocationRequest_descriptor,
-        new java.lang.String[] { "Items", "LocationId", });
-    internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryLocationResponse_descriptor =
+        internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryAddressRequest_descriptor,
+        new java.lang.String[] { "Items", "AddressId", });
+    internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryAddressResponse_descriptor =
       getDescriptor().getMessageType(12);
-    internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryLocationResponse_fieldAccessorTable = new
+    internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryAddressResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryLocationResponse_descriptor,
+        internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryAddressResponse_descriptor,
         new java.lang.String[] { "Address", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_GetShippingRatesRequest_descriptor =
       getDescriptor().getMessageType(13);

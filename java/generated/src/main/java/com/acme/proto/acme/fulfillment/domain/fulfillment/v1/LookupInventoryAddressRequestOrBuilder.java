@@ -6,8 +6,8 @@
 package com.acme.proto.acme.fulfillment.domain.fulfillment.v1;
 
 @com.google.protobuf.Generated
-public interface LookupInventoryLocationRequestOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest)
+public interface LookupInventoryAddressRequestOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest)
     com.google.protobuf.MessageOrBuilder {
 
   /**
@@ -39,27 +39,27 @@ public interface LookupInventoryLocationRequestOrBuilder extends
    * if present, return matching warehouse directly
    * </pre>
    *
-   * <code>optional string location_id = 2 [json_name = "locationId"];</code>
-   * @return Whether the locationId field is set.
+   * <code>optional string address_id = 2 [json_name = "addressId"];</code>
+   * @return Whether the addressId field is set.
    */
-  boolean hasLocationId();
+  boolean hasAddressId();
   /**
    * <pre>
    * if present, return matching warehouse directly
    * </pre>
    *
-   * <code>optional string location_id = 2 [json_name = "locationId"];</code>
-   * @return The locationId.
+   * <code>optional string address_id = 2 [json_name = "addressId"];</code>
+   * @return The addressId.
    */
-  java.lang.String getLocationId();
+  java.lang.String getAddressId();
   /**
    * <pre>
    * if present, return matching warehouse directly
    * </pre>
    *
-   * <code>optional string location_id = 2 [json_name = "locationId"];</code>
-   * @return The bytes for locationId.
+   * <code>optional string address_id = 2 [json_name = "addressId"];</code>
+   * @return The bytes for addressId.
    */
   com.google.protobuf.ByteString
-      getLocationIdBytes();
+      getAddressIdBytes();
 }

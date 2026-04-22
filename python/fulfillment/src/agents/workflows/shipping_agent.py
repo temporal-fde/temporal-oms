@@ -27,8 +27,8 @@ with workflow.unsafe.imports_passed_through():
         GetLocationEventsResponse,
         GetShippingRatesRequest,
         GetShippingRatesResponse,
-        LookupInventoryLocationRequest,
-        LookupInventoryLocationResponse,
+        LookupInventoryAddressRequest,
+        LookupInventoryAddressResponse,
         RecommendationOutcome,
         ShippingOption,
         ShippingRecommendation,
@@ -48,12 +48,12 @@ _ACTIVITY_RETRY = RetryPolicy(maximum_attempts=3)
 
 _TOOLS = ToolSpecs(
     activity_tool(
-        activity_name(LookupInventoryActivities.lookup_inventory_location),
+        activity_name(LookupInventoryActivities.lookup_inventory_address),
         "Resolve sku_ids to a warehouse location and address. "
         "Call this first when from_address is not provided.",
-        LookupInventoryActivities.lookup_inventory_location,
-        LookupInventoryLocationRequest,
-        LookupInventoryLocationResponse,
+        LookupInventoryActivities.lookup_inventory_address,
+        LookupInventoryAddressRequest,
+        LookupInventoryAddressResponse,
         task_queue="fulfillment",
         start_to_close_timeout=_ACTIVITY_TIMEOUT,
         retry_policy=_ACTIVITY_RETRY,
@@ -103,7 +103,7 @@ def _parse_recommendation(text: str) -> ShippingRecommendation:
 
 
 
-_NAME_LOOKUP = activity_name(LookupInventoryActivities.lookup_inventory_location)
+_NAME_LOOKUP = activity_name(LookupInventoryActivities.lookup_inventory_address)
 _NAME_RATES  = activity_name(EasyPostActivities.get_carrier_rates)
 
 
@@ -146,9 +146,9 @@ class ShippingAgent:
         if needs_verify:
             lookup_result, verify_result = await asyncio.gather(
                 workflow.execute_activity(
-                    "lookup_inventory_location",
-                    args=[LookupInventoryLocationRequest(items=request.items)],
-                    result_type=LookupInventoryLocationResponse,
+                    "lookup_inventory_address",
+                    args=[LookupInventoryAddressRequest(items=request.items)],
+                    result_type=LookupInventoryAddressResponse,
                     task_queue="fulfillment",
                     start_to_close_timeout=_ACTIVITY_TIMEOUT,
                     retry_policy=_ACTIVITY_RETRY,
@@ -165,9 +165,9 @@ class ShippingAgent:
             dest_ep = verify_result.address.easypost
         else:
             lookup_result = await workflow.execute_activity(
-                "lookup_inventory_location",
-                args=[LookupInventoryLocationRequest(items=request.items)],
-                result_type=LookupInventoryLocationResponse,
+                "lookup_inventory_address",
+                args=[LookupInventoryAddressRequest(items=request.items)],
+                result_type=LookupInventoryAddressResponse,
                 task_queue="fulfillment",
                 start_to_close_timeout=_ACTIVITY_TIMEOUT,
                 retry_policy=_ACTIVITY_RETRY,

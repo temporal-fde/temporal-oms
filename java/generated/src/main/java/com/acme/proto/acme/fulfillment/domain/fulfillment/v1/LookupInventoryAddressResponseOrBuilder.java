@@ -6,8 +6,8 @@
 package com.acme.proto.acme.fulfillment.domain.fulfillment.v1;
 
 @com.google.protobuf.Generated
-public interface LookupInventoryLocationResponseOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationResponse)
+public interface LookupInventoryAddressResponseOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressResponse)
     com.google.protobuf.MessageOrBuilder {
 
   /**

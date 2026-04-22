@@ -37,8 +37,8 @@ from acme.fulfillment.domain.v1.shipping_agent_p2p import (
     GetLocationEventsResponse,
     GetShippingRatesRequest,
     GetShippingRatesResponse,
-    LookupInventoryLocationRequest,
-    LookupInventoryLocationResponse,
+    LookupInventoryAddressRequest,
+    LookupInventoryAddressResponse,
     RecommendationOutcome,
     ShippingAgentExecutionOptions,
     ShippingLineItem,
@@ -59,8 +59,6 @@ from src.agents.workflows.shipping_agent import ShippingAgent
 _WF_TASK_QUEUE = "fulfillment"
 _CUSTOMER_ID = "customer-test-1"
 _ORDER_ID = "order-test-1"
-_LOCATION_ID = "WH-EAST-01"
-
 _TO_ADDRESS = Address(
     street="123 Main St",
     city="New York",
@@ -139,8 +137,6 @@ def _tool_use_response(calls: list[tuple[str, str, dict]]) -> LlmResponse:
 
 def _base_request(
     *,
-    from_address: Address | None = None,
-    location_id: str = "",
     customer_paid_price: Money | None = None,
     transit_days_sla: int = 0,
 ) -> CalculateShippingOptionsRequest:
@@ -149,8 +145,6 @@ def _base_request(
         customer_id=_CUSTOMER_ID,
         to_address=_TO_ADDRESS,
         items=_ITEMS,
-        from_address=from_address,
-        location_id=location_id,
         customer_paid_price=customer_paid_price,
         transit_days_sla=transit_days_sla,
     )
@@ -176,8 +170,7 @@ async def _start_agent(client: Client, wf_id: str = _CUSTOMER_ID) -> object:
 
 # ─── Mock activities ──────────────────────────────────────────────────────────
 
-_LOOKUP_RESULT = LookupInventoryLocationResponse(
-    location_id=_LOCATION_ID,
+_LOOKUP_RESULT = LookupInventoryAddressResponse(
     address=_FROM_ADDRESS,
 )
 
@@ -208,10 +201,10 @@ _RATES_RESULT = GetShippingRatesResponse(
 )
 
 
-@activity.defn(name="lookup_inventory_location")
-async def mock_lookup_inventory_location(
-    req: LookupInventoryLocationRequest,
-) -> LookupInventoryLocationResponse:
+@activity.defn(name="lookup_inventory_address")
+async def mock_lookup_inventory_address(
+    req: LookupInventoryAddressRequest,
+) -> LookupInventoryAddressResponse:
     return _LOOKUP_RESULT
 
 
@@ -248,7 +241,7 @@ def _make_workers(
 ) -> list[Worker]:
     """Create one worker per task queue, all with the same mocked activities."""
     common_activities = [
-        mock_lookup_inventory_location,
+        mock_lookup_inventory_address,
         mock_verify_address,
         mock_get_carrier_rates,
         mock_get_location_events,
@@ -294,7 +287,7 @@ async def test_cache_hit_skips_llm() -> None:
         async with workers[0], workers[1], workers[2]:
             handle = await _start_agent(env.client)
 
-            req = _base_request(from_address=_FROM_ADDRESS, location_id=_LOCATION_ID)
+            req = _base_request()
             resp1: CalculateShippingOptionsResponse = await handle.execute_update(
                 ShippingAgent.calculate_shipping_options, req
             )
@@ -310,11 +303,11 @@ async def test_cache_hit_skips_llm() -> None:
 
 @pytest.mark.asyncio
 async def test_fulfillment_path_skips_lookup() -> None:
-    """When from_address and location_id are provided, lookup_inventory_location is never called."""
+    """When from_address and location_id are provided, lookup_inventory_address is never called."""
     lookup_called = False
 
-    @activity.defn(name="lookup_inventory_location")
-    async def tracking_lookup(req: LookupInventoryLocationRequest) -> LookupInventoryLocationResponse:
+    @activity.defn(name="lookup_inventory_address")
+    async def tracking_lookup(req: LookupInventoryAddressRequest) -> LookupInventoryAddressResponse:
         nonlocal lookup_called
         lookup_called = True
         return _LOOKUP_RESULT
@@ -333,7 +326,7 @@ async def test_fulfillment_path_skips_lookup() -> None:
             Worker(env.client, task_queue="fulfillment-predicthq", activities=common),
         ):
             handle = await _start_agent(env.client)
-            req = _base_request(from_address=_FROM_ADDRESS, location_id=_LOCATION_ID)
+            req = _base_request()
             resp = await handle.execute_update(ShippingAgent.calculate_shipping_options, req)
 
     assert resp.cache_hit is False
@@ -342,12 +335,12 @@ async def test_fulfillment_path_skips_lookup() -> None:
 
 @pytest.mark.asyncio
 async def test_cart_path_calls_lookup() -> None:
-    """When from_address is absent, LLM calls lookup_inventory_location first."""
+    """When from_address is absent, LLM calls lookup_inventory_address first."""
     lookup_called = False
     turn = 0
 
-    @activity.defn(name="lookup_inventory_location")
-    async def tracking_lookup(req: LookupInventoryLocationRequest) -> LookupInventoryLocationResponse:
+    @activity.defn(name="lookup_inventory_address")
+    async def tracking_lookup(req: LookupInventoryAddressRequest) -> LookupInventoryAddressResponse:
         nonlocal lookup_called
         lookup_called = True
         return _LOOKUP_RESULT
@@ -358,7 +351,7 @@ async def test_cart_path_calls_lookup() -> None:
         turn += 1
         if turn == 1:
             return _tool_use_response([
-                ("tu_1", "lookup_inventory_location", {"items": [{"sku_id": "ELEC-001", "quantity": 2}]})
+                ("tu_1", "lookup_inventory_address", {"items": [{"sku_id": "ELEC-001", "quantity": 2}]})
             ])
         return _end_turn_response(_PROCEED_JSON)
 
@@ -409,7 +402,7 @@ async def test_sequential_tool_dispatch() -> None:
         return _end_turn_response(_PROCEED_JSON)
 
     async with await WorkflowEnvironment.start_time_skipping() as env:
-        common = [mock_lookup_inventory_location, tracking_verify, tracking_rates,
+        common = [mock_lookup_inventory_address, tracking_verify, tracking_rates,
                   mock_get_location_events, sequential_llm]
         async with (
             Worker(env.client, task_queue="fulfillment", workflows=[ShippingAgent],
@@ -418,7 +411,7 @@ async def test_sequential_tool_dispatch() -> None:
             Worker(env.client, task_queue="fulfillment-predicthq", activities=common),
         ):
             handle = await _start_agent(env.client)
-            req = _base_request(from_address=_FROM_ADDRESS, location_id=_LOCATION_ID)
+            req = _base_request()
             await handle.execute_update(ShippingAgent.calculate_shipping_options, req)
 
     assert call_order == ["verify_address", "get_carrier_rates"]
@@ -467,7 +460,7 @@ async def test_concurrent_activity_dispatch() -> None:
         return _end_turn_response(_PROCEED_JSON)
 
     async with await WorkflowEnvironment.start_time_skipping() as env:
-        common = [mock_lookup_inventory_location, mock_verify_address, mock_get_carrier_rates,
+        common = [mock_lookup_inventory_address, mock_verify_address, mock_get_carrier_rates,
                   tracking_events, concurrent_llm]
         async with (
             Worker(env.client, task_queue="fulfillment", workflows=[ShippingAgent],
@@ -476,7 +469,7 @@ async def test_concurrent_activity_dispatch() -> None:
             Worker(env.client, task_queue="fulfillment-predicthq", activities=common),
         ):
             handle = await _start_agent(env.client)
-            req = _base_request(from_address=_FROM_ADDRESS, location_id=_LOCATION_ID)
+            req = _base_request()
             await handle.execute_update(ShippingAgent.calculate_shipping_options, req)
 
     # Both location event calls from the same LLM turn must have been dispatched
@@ -493,7 +486,7 @@ async def test_proceed_outcome() -> None:
         workers = _make_workers(env.client, proceed_llm)
         async with workers[0], workers[1], workers[2]:
             handle = await _start_agent(env.client)
-            req = _base_request(from_address=_FROM_ADDRESS, location_id=_LOCATION_ID)
+            req = _base_request()
             resp = await handle.execute_update(ShippingAgent.calculate_shipping_options, req)
 
     assert resp.recommendation.outcome == RecommendationOutcome.PROCEED
@@ -510,8 +503,6 @@ async def test_margin_spike_outcome() -> None:
         async with workers[0], workers[1], workers[2]:
             handle = await _start_agent(env.client)
             req = _base_request(
-                from_address=_FROM_ADDRESS,
-                location_id=_LOCATION_ID,
                 customer_paid_price=Money(currency="USD", units=1000),
             )
             resp = await handle.execute_update(ShippingAgent.calculate_shipping_options, req)
@@ -532,8 +523,6 @@ async def test_sla_breach_outcome() -> None:
         async with workers[0], workers[1], workers[2]:
             handle = await _start_agent(env.client)
             req = _base_request(
-                from_address=_FROM_ADDRESS,
-                location_id=_LOCATION_ID,
                 transit_days_sla=2,
             )
             resp = await handle.execute_update(ShippingAgent.calculate_shipping_options, req)
@@ -571,7 +560,7 @@ async def test_ttl_expiry_triggers_refetch() -> None:
                 retry_policy=_WF_RETRY,
             )
 
-            req = _base_request(from_address=_FROM_ADDRESS, location_id=_LOCATION_ID)
+            req = _base_request()
 
             # First call — cache miss, LLM called
             resp1 = await handle.execute_update(ShippingAgent.calculate_shipping_options, req)

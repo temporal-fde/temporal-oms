@@ -160,15 +160,15 @@ class ShippingOptionsCache(_message.Message):
     results: _containers.MessageMap[str, ShippingOptionsResult]
     def __init__(self, results: _Optional[_Mapping[str, ShippingOptionsResult]] = ...) -> None: ...
 
-class LookupInventoryLocationRequest(_message.Message):
-    __slots__ = ("items", "location_id")
+class LookupInventoryAddressRequest(_message.Message):
+    __slots__ = ("items", "address_id")
     ITEMS_FIELD_NUMBER: _ClassVar[int]
-    LOCATION_ID_FIELD_NUMBER: _ClassVar[int]
+    ADDRESS_ID_FIELD_NUMBER: _ClassVar[int]
     items: _containers.RepeatedCompositeFieldContainer[ShippingLineItem]
-    location_id: str
-    def __init__(self, items: _Optional[_Iterable[_Union[ShippingLineItem, _Mapping]]] = ..., location_id: _Optional[str] = ...) -> None: ...
+    address_id: str
+    def __init__(self, items: _Optional[_Iterable[_Union[ShippingLineItem, _Mapping]]] = ..., address_id: _Optional[str] = ...) -> None: ...
 
-class LookupInventoryLocationResponse(_message.Message):
+class LookupInventoryAddressResponse(_message.Message):
     __slots__ = ("address",)
     ADDRESS_FIELD_NUMBER: _ClassVar[int]
     address: _values_pb2_1.Address

@@ -26,7 +26,7 @@ async def build_fulfillment_worker() -> Worker:
         task_queue=_TASK_QUEUE,
         workflows=[ShippingAgent],
         activities=[
-            inventory_activities.lookup_inventory_location,
+            inventory_activities.lookup_inventory_address,
             llm_activities.build_system_prompt,
             llm_activities.call_llm,
         ],

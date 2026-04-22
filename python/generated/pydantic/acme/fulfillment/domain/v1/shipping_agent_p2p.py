@@ -153,18 +153,18 @@ class ShippingOptionsCache(BaseModel):
 
     results: "typing.Dict[str, ShippingOptionsResult]" = Field(default_factory=dict)
 
-class LookupInventoryLocationRequest(BaseModel):
+class LookupInventoryAddressRequest(BaseModel):
     """
-     LookupInventoryLocationRequest resolves sku_ids to a warehouse address.
+     LookupInventoryAddressRequest resolves sku_ids to a warehouse address.
  V1: static config lookup; future: Inventory Locations service.
     """
 
     items: typing.List[ShippingLineItem] = Field(default_factory=list)
-    location_id: typing.Optional[str] = Field(default="")# if present, return matching warehouse directly
+    address_id: typing.Optional[str] = Field(default="")# if present, return matching warehouse directly
 
-class LookupInventoryLocationResponse(BaseModel):
+class LookupInventoryAddressResponse(BaseModel):
     """
-     LookupInventoryLocationResponse returns the resolved warehouse address.
+     LookupInventoryAddressResponse returns the resolved warehouse address.
  address.easypost_address is pre-populated from inventory seed data — warehouse addresses
  are pre-verified so the LLM can use easypost_address.id directly without calling verify_address.
     """

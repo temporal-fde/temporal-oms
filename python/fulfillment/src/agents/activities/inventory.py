@@ -6,8 +6,8 @@ from temporalio import activity
 from src.config import settings
 
 from acme.fulfillment.domain.v1.shipping_agent_p2p import (
-    LookupInventoryLocationRequest,
-    LookupInventoryLocationResponse,
+    LookupInventoryAddressRequest,
+    LookupInventoryAddressResponse,
 )
 from acme.common.v1.values_p2p import Address, EasyPostAddress
 
@@ -41,15 +41,14 @@ class LookupInventoryActivities:
         self._warehouses = _load_warehouses()
 
     @activity.defn
-    async def lookup_inventory_location(
+    async def lookup_inventory_address(
         self,
-        request: LookupInventoryLocationRequest,
-    ) -> LookupInventoryLocationResponse:
-        if request.location_id:
+        request: LookupInventoryAddressRequest,
+    ) -> LookupInventoryAddressResponse:
+        if request.address_id:
             for w in self._warehouses:
-                if w["location_id"] == request.location_id:
-                    return LookupInventoryLocationResponse(
-                        location_id=w["location_id"],
+                if w["location_id"] == request.address_id:
+                    return LookupInventoryAddressResponse(
                         address=_warehouse_to_address(w),
                     )
 
@@ -58,16 +57,14 @@ class LookupInventoryActivities:
         for w in self._warehouses:
             prefixes = w.get("sku_prefixes", [])
             if any(sku.startswith(tuple(prefixes)) for sku in item_skus if prefixes):
-                return LookupInventoryLocationResponse(
-                    location_id=w["location_id"],
+                return LookupInventoryAddressResponse(
                     address=_warehouse_to_address(w),
                 )
 
         # Fallback: first warehouse (V1 simplification)
         if self._warehouses:
             w = self._warehouses[0]
-            return LookupInventoryLocationResponse(
-                location_id=w["location_id"],
+            return LookupInventoryAddressResponse(
                 address=_warehouse_to_address(w),
             )
 

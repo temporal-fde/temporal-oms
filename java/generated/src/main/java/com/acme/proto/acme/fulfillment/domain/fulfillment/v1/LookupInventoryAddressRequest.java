@@ -7,17 +7,17 @@ package com.acme.proto.acme.fulfillment.domain.fulfillment.v1;
 
 /**
  * <pre>
- * LookupInventoryLocationRequest resolves sku_ids to a warehouse address.
+ * LookupInventoryAddressRequest resolves sku_ids to a warehouse address.
  * V1: static config lookup; future: Inventory Locations service.
  * </pre>
  *
- * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest}
+ * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest}
  */
 @com.google.protobuf.Generated
-public final class LookupInventoryLocationRequest extends
+public final class LookupInventoryAddressRequest extends
     com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest)
-    LookupInventoryLocationRequestOrBuilder {
+    // @@protoc_insertion_point(message_implements:acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest)
+    LookupInventoryAddressRequestOrBuilder {
 private static final long serialVersionUID = 0L;
   static {
     com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
@@ -26,33 +26,33 @@ private static final long serialVersionUID = 0L;
       /* minor= */ 34,
       /* patch= */ 1,
       /* suffix= */ "",
-      "LookupInventoryLocationRequest");
+      "LookupInventoryAddressRequest");
   }
-  // Use LookupInventoryLocationRequest.newBuilder() to construct.
-  private LookupInventoryLocationRequest(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+  // Use LookupInventoryAddressRequest.newBuilder() to construct.
+  private LookupInventoryAddressRequest(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
   }
-  private LookupInventoryLocationRequest() {
+  private LookupInventoryAddressRequest() {
     items_ = java.util.Collections.emptyList();
-    locationId_ = "";
+    addressId_ = "";
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryLocationRequest_descriptor;
+    return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryAddressRequest_descriptor;
   }
 
   @java.lang.Override
   public com.google.protobuf.Descriptors.Descriptor getDescriptorForType() {
-    return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryLocationRequest_descriptor;
+    return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryAddressRequest_descriptor;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryLocationRequest_fieldAccessorTable
+    return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryAddressRequest_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
-            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest.class, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest.Builder.class);
+            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest.class, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest.Builder.class);
   }
 
   private int bitField0_;
@@ -97,19 +97,19 @@ private static final long serialVersionUID = 0L;
     return items_.get(index);
   }
 
-  public static final int LOCATION_ID_FIELD_NUMBER = 2;
+  public static final int ADDRESS_ID_FIELD_NUMBER = 2;
   @SuppressWarnings("serial")
-  private volatile java.lang.Object locationId_ = "";
+  private volatile java.lang.Object addressId_ = "";
   /**
    * <pre>
    * if present, return matching warehouse directly
    * </pre>
    *
-   * <code>optional string location_id = 2 [json_name = "locationId"];</code>
-   * @return Whether the locationId field is set.
+   * <code>optional string address_id = 2 [json_name = "addressId"];</code>
+   * @return Whether the addressId field is set.
    */
   @java.lang.Override
-  public boolean hasLocationId() {
+  public boolean hasAddressId() {
     return ((bitField0_ & 0x00000001) != 0);
   }
   /**
@@ -117,19 +117,19 @@ private static final long serialVersionUID = 0L;
    * if present, return matching warehouse directly
    * </pre>
    *
-   * <code>optional string location_id = 2 [json_name = "locationId"];</code>
-   * @return The locationId.
+   * <code>optional string address_id = 2 [json_name = "addressId"];</code>
+   * @return The addressId.
    */
   @java.lang.Override
-  public java.lang.String getLocationId() {
-    java.lang.Object ref = locationId_;
+  public java.lang.String getAddressId() {
+    java.lang.Object ref = addressId_;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
       com.google.protobuf.ByteString bs = 
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
-      locationId_ = s;
+      addressId_ = s;
       return s;
     }
   }
@@ -138,18 +138,18 @@ private static final long serialVersionUID = 0L;
    * if present, return matching warehouse directly
    * </pre>
    *
-   * <code>optional string location_id = 2 [json_name = "locationId"];</code>
-   * @return The bytes for locationId.
+   * <code>optional string address_id = 2 [json_name = "addressId"];</code>
+   * @return The bytes for addressId.
    */
   @java.lang.Override
   public com.google.protobuf.ByteString
-      getLocationIdBytes() {
-    java.lang.Object ref = locationId_;
+      getAddressIdBytes() {
+    java.lang.Object ref = addressId_;
     if (ref instanceof java.lang.String) {
       com.google.protobuf.ByteString b = 
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
-      locationId_ = b;
+      addressId_ = b;
       return b;
     } else {
       return (com.google.protobuf.ByteString) ref;
@@ -174,7 +174,7 @@ private static final long serialVersionUID = 0L;
       output.writeMessage(1, items_.get(i));
     }
     if (((bitField0_ & 0x00000001) != 0)) {
-      com.google.protobuf.GeneratedMessage.writeString(output, 2, locationId_);
+      com.google.protobuf.GeneratedMessage.writeString(output, 2, addressId_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -195,7 +195,7 @@ private static final long serialVersionUID = 0L;
           size += 1 * count;
         }
     if (((bitField0_ & 0x00000001) != 0)) {
-      size += com.google.protobuf.GeneratedMessage.computeStringSize(2, locationId_);
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(2, addressId_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -207,17 +207,17 @@ private static final long serialVersionUID = 0L;
     if (obj == this) {
      return true;
     }
-    if (!(obj instanceof com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest)) {
+    if (!(obj instanceof com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest)) {
       return super.equals(obj);
     }
-    com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest other = (com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest) obj;
+    com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest other = (com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest) obj;
 
     if (!getItemsList()
         .equals(other.getItemsList())) return false;
-    if (hasLocationId() != other.hasLocationId()) return false;
-    if (hasLocationId()) {
-      if (!getLocationId()
-          .equals(other.getLocationId())) return false;
+    if (hasAddressId() != other.hasAddressId()) return false;
+    if (hasAddressId()) {
+      if (!getAddressId()
+          .equals(other.getAddressId())) return false;
     }
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
@@ -234,53 +234,53 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + ITEMS_FIELD_NUMBER;
       hash = (53 * hash) + getItemsList().hashCode();
     }
-    if (hasLocationId()) {
-      hash = (37 * hash) + LOCATION_ID_FIELD_NUMBER;
-      hash = (53 * hash) + getLocationId().hashCode();
+    if (hasAddressId()) {
+      hash = (37 * hash) + ADDRESS_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getAddressId().hashCode();
     }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
   }
 
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest parseFrom(
       java.nio.ByteBuffer data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest parseFrom(
       java.nio.ByteBuffer data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest parseFrom(
       com.google.protobuf.ByteString data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest parseFrom(byte[] data)
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest parseFrom(byte[] data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest parseFrom(
       byte[] data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest parseFrom(java.io.InputStream input)
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest parseFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessage
         .parseWithIOException(PARSER, input);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest parseFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -288,26 +288,26 @@ private static final long serialVersionUID = 0L;
         .parseWithIOException(PARSER, input, extensionRegistry);
   }
 
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest parseDelimitedFrom(java.io.InputStream input)
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest parseDelimitedFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessage
         .parseDelimitedWithIOException(PARSER, input);
   }
 
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest parseDelimitedFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest parseDelimitedFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessage
         .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest parseFrom(
       com.google.protobuf.CodedInputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessage
         .parseWithIOException(PARSER, input);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest parseFrom(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -320,7 +320,7 @@ private static final long serialVersionUID = 0L;
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-  public static Builder newBuilder(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest prototype) {
+  public static Builder newBuilder(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
   @java.lang.Override
@@ -337,30 +337,30 @@ private static final long serialVersionUID = 0L;
   }
   /**
    * <pre>
-   * LookupInventoryLocationRequest resolves sku_ids to a warehouse address.
+   * LookupInventoryAddressRequest resolves sku_ids to a warehouse address.
    * V1: static config lookup; future: Inventory Locations service.
    * </pre>
    *
-   * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest}
+   * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest}
    */
   public static final class Builder extends
       com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest)
-      com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequestOrBuilder {
+      // @@protoc_insertion_point(builder_implements:acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest)
+      com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequestOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryLocationRequest_descriptor;
+      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryAddressRequest_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryLocationRequest_fieldAccessorTable
+      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryAddressRequest_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest.class, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest.Builder.class);
+              com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest.class, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest.Builder.class);
     }
 
-    // Construct using com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest.newBuilder()
+    // Construct using com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest.newBuilder()
     private Builder() {
 
     }
@@ -381,24 +381,24 @@ private static final long serialVersionUID = 0L;
         itemsBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000001);
-      locationId_ = "";
+      addressId_ = "";
       return this;
     }
 
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryLocationRequest_descriptor;
+      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_LookupInventoryAddressRequest_descriptor;
     }
 
     @java.lang.Override
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest getDefaultInstanceForType() {
-      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest.getDefaultInstance();
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest getDefaultInstanceForType() {
+      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest.getDefaultInstance();
     }
 
     @java.lang.Override
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest build() {
-      com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest result = buildPartial();
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest build() {
+      com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest result = buildPartial();
       if (!result.isInitialized()) {
         throw newUninitializedMessageException(result);
       }
@@ -406,15 +406,15 @@ private static final long serialVersionUID = 0L;
     }
 
     @java.lang.Override
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest buildPartial() {
-      com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest result = new com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest(this);
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest buildPartial() {
+      com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest result = new com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest(this);
       buildPartialRepeatedFields(result);
       if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
     }
 
-    private void buildPartialRepeatedFields(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest result) {
+    private void buildPartialRepeatedFields(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest result) {
       if (itemsBuilder_ == null) {
         if (((bitField0_ & 0x00000001) != 0)) {
           items_ = java.util.Collections.unmodifiableList(items_);
@@ -426,11 +426,11 @@ private static final long serialVersionUID = 0L;
       }
     }
 
-    private void buildPartial0(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest result) {
+    private void buildPartial0(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest result) {
       int from_bitField0_ = bitField0_;
       int to_bitField0_ = 0;
       if (((from_bitField0_ & 0x00000002) != 0)) {
-        result.locationId_ = locationId_;
+        result.addressId_ = addressId_;
         to_bitField0_ |= 0x00000001;
       }
       result.bitField0_ |= to_bitField0_;
@@ -438,16 +438,16 @@ private static final long serialVersionUID = 0L;
 
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
-      if (other instanceof com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest) {
-        return mergeFrom((com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest)other);
+      if (other instanceof com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest) {
+        return mergeFrom((com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest)other);
       } else {
         super.mergeFrom(other);
         return this;
       }
     }
 
-    public Builder mergeFrom(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest other) {
-      if (other == com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest.getDefaultInstance()) return this;
+    public Builder mergeFrom(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest other) {
+      if (other == com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest.getDefaultInstance()) return this;
       if (itemsBuilder_ == null) {
         if (!other.items_.isEmpty()) {
           if (items_.isEmpty()) {
@@ -474,8 +474,8 @@ private static final long serialVersionUID = 0L;
           }
         }
       }
-      if (other.hasLocationId()) {
-        locationId_ = other.locationId_;
+      if (other.hasAddressId()) {
+        addressId_ = other.addressId_;
         bitField0_ |= 0x00000002;
         onChanged();
       }
@@ -519,7 +519,7 @@ private static final long serialVersionUID = 0L;
               break;
             } // case 10
             case 18: {
-              locationId_ = input.readStringRequireUtf8();
+              addressId_ = input.readStringRequireUtf8();
               bitField0_ |= 0x00000002;
               break;
             } // case 18
@@ -780,16 +780,16 @@ private static final long serialVersionUID = 0L;
       return itemsBuilder_;
     }
 
-    private java.lang.Object locationId_ = "";
+    private java.lang.Object addressId_ = "";
     /**
      * <pre>
      * if present, return matching warehouse directly
      * </pre>
      *
-     * <code>optional string location_id = 2 [json_name = "locationId"];</code>
-     * @return Whether the locationId field is set.
+     * <code>optional string address_id = 2 [json_name = "addressId"];</code>
+     * @return Whether the addressId field is set.
      */
-    public boolean hasLocationId() {
+    public boolean hasAddressId() {
       return ((bitField0_ & 0x00000002) != 0);
     }
     /**
@@ -797,16 +797,16 @@ private static final long serialVersionUID = 0L;
      * if present, return matching warehouse directly
      * </pre>
      *
-     * <code>optional string location_id = 2 [json_name = "locationId"];</code>
-     * @return The locationId.
+     * <code>optional string address_id = 2 [json_name = "addressId"];</code>
+     * @return The addressId.
      */
-    public java.lang.String getLocationId() {
-      java.lang.Object ref = locationId_;
+    public java.lang.String getAddressId() {
+      java.lang.Object ref = addressId_;
       if (!(ref instanceof java.lang.String)) {
         com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        locationId_ = s;
+        addressId_ = s;
         return s;
       } else {
         return (java.lang.String) ref;
@@ -817,17 +817,17 @@ private static final long serialVersionUID = 0L;
      * if present, return matching warehouse directly
      * </pre>
      *
-     * <code>optional string location_id = 2 [json_name = "locationId"];</code>
-     * @return The bytes for locationId.
+     * <code>optional string address_id = 2 [json_name = "addressId"];</code>
+     * @return The bytes for addressId.
      */
     public com.google.protobuf.ByteString
-        getLocationIdBytes() {
-      java.lang.Object ref = locationId_;
+        getAddressIdBytes() {
+      java.lang.Object ref = addressId_;
       if (ref instanceof String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        locationId_ = b;
+        addressId_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
@@ -838,14 +838,14 @@ private static final long serialVersionUID = 0L;
      * if present, return matching warehouse directly
      * </pre>
      *
-     * <code>optional string location_id = 2 [json_name = "locationId"];</code>
-     * @param value The locationId to set.
+     * <code>optional string address_id = 2 [json_name = "addressId"];</code>
+     * @param value The addressId to set.
      * @return This builder for chaining.
      */
-    public Builder setLocationId(
+    public Builder setAddressId(
         java.lang.String value) {
       if (value == null) { throw new NullPointerException(); }
-      locationId_ = value;
+      addressId_ = value;
       bitField0_ |= 0x00000002;
       onChanged();
       return this;
@@ -855,11 +855,11 @@ private static final long serialVersionUID = 0L;
      * if present, return matching warehouse directly
      * </pre>
      *
-     * <code>optional string location_id = 2 [json_name = "locationId"];</code>
+     * <code>optional string address_id = 2 [json_name = "addressId"];</code>
      * @return This builder for chaining.
      */
-    public Builder clearLocationId() {
-      locationId_ = getDefaultInstance().getLocationId();
+    public Builder clearAddressId() {
+      addressId_ = getDefaultInstance().getAddressId();
       bitField0_ = (bitField0_ & ~0x00000002);
       onChanged();
       return this;
@@ -869,37 +869,37 @@ private static final long serialVersionUID = 0L;
      * if present, return matching warehouse directly
      * </pre>
      *
-     * <code>optional string location_id = 2 [json_name = "locationId"];</code>
-     * @param value The bytes for locationId to set.
+     * <code>optional string address_id = 2 [json_name = "addressId"];</code>
+     * @param value The bytes for addressId to set.
      * @return This builder for chaining.
      */
-    public Builder setLocationIdBytes(
+    public Builder setAddressIdBytes(
         com.google.protobuf.ByteString value) {
       if (value == null) { throw new NullPointerException(); }
       checkByteStringIsUtf8(value);
-      locationId_ = value;
+      addressId_ = value;
       bitField0_ |= 0x00000002;
       onChanged();
       return this;
     }
 
-    // @@protoc_insertion_point(builder_scope:acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest)
+    // @@protoc_insertion_point(builder_scope:acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest)
   }
 
-  // @@protoc_insertion_point(class_scope:acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest)
-  private static final com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest DEFAULT_INSTANCE;
+  // @@protoc_insertion_point(class_scope:acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest)
+  private static final com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest();
+    DEFAULT_INSTANCE = new com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest();
   }
 
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest getDefaultInstance() {
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest getDefaultInstance() {
     return DEFAULT_INSTANCE;
   }
 
-  private static final com.google.protobuf.Parser<LookupInventoryLocationRequest>
-      PARSER = new com.google.protobuf.AbstractParser<LookupInventoryLocationRequest>() {
+  private static final com.google.protobuf.Parser<LookupInventoryAddressRequest>
+      PARSER = new com.google.protobuf.AbstractParser<LookupInventoryAddressRequest>() {
     @java.lang.Override
-    public LookupInventoryLocationRequest parsePartialFrom(
+    public LookupInventoryAddressRequest parsePartialFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -918,17 +918,17 @@ private static final long serialVersionUID = 0L;
     }
   };
 
-  public static com.google.protobuf.Parser<LookupInventoryLocationRequest> parser() {
+  public static com.google.protobuf.Parser<LookupInventoryAddressRequest> parser() {
     return PARSER;
   }
 
   @java.lang.Override
-  public com.google.protobuf.Parser<LookupInventoryLocationRequest> getParserForType() {
+  public com.google.protobuf.Parser<LookupInventoryAddressRequest> getParserForType() {
     return PARSER;
   }
 
   @java.lang.Override
-  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryLocationRequest getDefaultInstanceForType() {
+  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest getDefaultInstanceForType() {
     return DEFAULT_INSTANCE;
   }
 
