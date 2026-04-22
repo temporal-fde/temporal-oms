@@ -101,30 +101,61 @@ class LlmActivities:
     async def build_system_prompt(self, req: BuildSystemPromptRequest) -> BuildSystemPromptResponse:
         r = req.request
         margin_rule = (
-            f"MARGIN RULE: If any available rate cost exceeds the customer paid price "
+            f"MARGIN RULE: If all available rate costs exceed the customer paid price "
             f"({r.customer_paid_price.units} {r.customer_paid_price.currency} "
             f"in minor currency units), outcome MUST be MARGIN_SPIKE; "
-            f"set margin_delta_cents to the overage."
+            f"set margin_delta_cents to the overage of the cheapest available rate."
             if (r.customer_paid_price and r.customer_paid_price.units > 0)
             else "MARGIN RULE: No customer paid price — skip margin spike logic."
         )
+
         sla_rule = (
             f"SLA RULE: If no rate delivers within {r.transit_days_sla} days, outcome MUST be SLA_BREACH."
             if (r.transit_days_sla and r.transit_days_sla > 0)
             else "SLA RULE: No transit SLA specified."
         )
+
+        priority_rule = (
+            "RULE PRIORITY: When multiple rules apply, resolve conflicts in this order:\n"
+            "1. MARGIN_SPIKE — if all rates exceed the paid price, return MARGIN_SPIKE regardless of SLA or risk.\n"
+            "2. SLA_BREACH — if no rate meets the SLA (and margin is not breached), return SLA_BREACH.\n"
+            "3. RISK RULE — only applies when a rate technically meets the SLA but risk suggests it will fail."
+        )
+
+        risk_rule = (
+            "RISK RULE: If get_location_events reveals severe disruptions (HIGH or CRITICAL risk) "
+            "at the origin or destination that would delay transit, the original SLA is considered void. "
+            "You MUST prioritize the cheapest available option (to protect margin) rather than buying "
+            "a futile expedited label. Set the outcome to PROCEED and explain the risk-driven downgrade in reasoning."
+        )
+
         prompt = "\n\n".join([
-            "You are a shipping advisor for an e-commerce fulfillment system.",
+            "You are a shipping advisor for an e-commerce fulfillment system. All provided addresses are pre-verified as valid and deliverable.",
             margin_rule,
             sla_rule,
+            priority_rule,
+            risk_rule,
             (
                 "PATH RULE: The origin and destination addresses are pre-resolved and provided in the task "
                 "with their easypost_ids and coordinates. Use them directly for get_carrier_rates and "
-                "get_location_events. Only call verify_address if an address shows easypost_id=(unverified)."
+                "get_location_events."
             ),
             (
                 "CONCURRENCY: Call multiple tools in a single response when there are no dependencies "
-                "between them (e.g. verify_address for origin AND get_location_events for destination)."
+                "between them (e.g. get_location_events for origin AND get_location_events for destination simultaneously)."
+            ),
+            (
+                "RECOMMENDED ACTIONS:\n"
+                "- If all carrier rates exceed the customer paid price, call find_alternate_warehouse "
+                "before returning MARGIN_SPIKE. Only return MARGIN_SPIKE if no alternate warehouse "
+                "exists or its rates also exceed the paid price.\n"
+                "- If no rate meets the transit SLA, call find_alternate_warehouse before returning "
+                "SLA_BREACH. A closer warehouse may offer faster options."
+            ),
+            (
+                "LIMITATIONS:\n"
+                "- If an address has no coordinates (latitude and longitude both absent or zero), "
+                "skip get_location_events for that address entirely — do not attempt it."
             ),
             (
                 "FINAL RESPONSE: When you have all data, respond with ONLY a JSON object:\n"
