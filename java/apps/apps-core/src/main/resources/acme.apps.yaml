@@ -8,8 +8,14 @@ spring.temporal:
     - task-queue: apps
       workflow-classes:
         - com.acme.apps.workflows.OrderImpl
+        - com.acme.apps.workflows.IntegrationsImpl
       activity-beans:
         - options-activities
+      nexus-service-beans:
+        - commerce-app-service
+        - pims-service
+        - payments-service
+        - inventory-service
 #     deployment-properties:
 #       use-versioning: true
 #       default-versioning-behavior: PINNED

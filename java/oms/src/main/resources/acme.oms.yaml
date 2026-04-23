@@ -10,10 +10,12 @@ oms:
     nexus:
       endpoints:
         apps: oms-apps-v1
+        integrations: oms-integrations-v1
   fulfillment:
     nexus:
       endpoints:
         apps: oms-apps-v1
+        integrations: oms-integrations-v1
 
 otel.sdk.disabled: true
 

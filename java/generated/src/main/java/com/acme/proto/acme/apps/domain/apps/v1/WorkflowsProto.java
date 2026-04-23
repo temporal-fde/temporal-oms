@@ -66,6 +66,11 @@ public final class WorkflowsProto extends com.google.protobuf.GeneratedFile {
   static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_acme_apps_domain_apps_v1_CapturePaymentRequest_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_acme_apps_domain_apps_v1_StartIntegrationsRequest_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_acme_apps_domain_apps_v1_StartIntegrationsRequest_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -131,12 +136,13 @@ public final class WorkflowsProto extends com.google.protobuf.GeneratedFile {
       ".OrderR\005order\"\201\001\n\025CapturePaymentRequest\022" +
       "8\n\ttimestamp\030\001 \001(\0132\032.google.protobuf.Tim" +
       "estampR\ttimestamp\022.\n\007payment\030\002 \001(\0132\024.acm" +
-      "e.oms.v1.PaymentR\007paymentB\276\001\n\'com.acme.p" +
-      "roto.acme.apps.domain.apps.v1B\016Workflows" +
-      "ProtoP\001\242\002\004AADA\252\002\030Acme.Apps.Domain.Apps.V" +
-      "1\312\002\030Acme\\Apps\\Domain\\Apps\\V1\342\002$Acme\\Apps" +
-      "\\Domain\\Apps\\V1\\GPBMetadata\352\002\034Acme::Apps" +
-      "::Domain::Apps::V1b\006proto3"
+      "e.oms.v1.PaymentR\007payment\"\032\n\030StartIntegr" +
+      "ationsRequestB\276\001\n\'com.acme.proto.acme.ap" +
+      "ps.domain.apps.v1B\016WorkflowsProtoP\001\242\002\004AA" +
+      "DA\252\002\030Acme.Apps.Domain.Apps.V1\312\002\030Acme\\App" +
+      "s\\Domain\\Apps\\V1\342\002$Acme\\Apps\\Domain\\Apps" +
+      "\\V1\\GPBMetadata\352\002\034Acme::Apps::Domain::Ap" +
+      "ps::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -195,6 +201,12 @@ public final class WorkflowsProto extends com.google.protobuf.GeneratedFile {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_apps_domain_apps_v1_CapturePaymentRequest_descriptor,
         new java.lang.String[] { "Timestamp", "Payment", });
+    internal_static_acme_apps_domain_apps_v1_StartIntegrationsRequest_descriptor =
+      getDescriptor().getMessageType(8);
+    internal_static_acme_apps_domain_apps_v1_StartIntegrationsRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_acme_apps_domain_apps_v1_StartIntegrationsRequest_descriptor,
+        new java.lang.String[] { });
     descriptor.resolveAllFeaturesImmutable();
     com.google.protobuf.TimestampProto.getDescriptor();
     com.acme.proto.acme.apps.domain.apps.v1.ValuesProto.getDescriptor();

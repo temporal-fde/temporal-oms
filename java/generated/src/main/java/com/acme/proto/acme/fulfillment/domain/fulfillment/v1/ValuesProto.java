@@ -41,6 +41,11 @@ public final class ValuesProto extends com.google.protobuf.GeneratedFile {
   static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_acme_fulfillment_domain_fulfillment_v1_LocationRiskSummary_EventsByCategoryEntry_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_acme_fulfillment_domain_fulfillment_v1_ShippingLineItem_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_acme_fulfillment_domain_fulfillment_v1_ShippingLineItem_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -72,21 +77,23 @@ public final class ValuesProto extends com.google.protobuf.GeneratedFile {
       "ment.domain.fulfillment.v1.LocationRiskS" +
       "ummary.EventsByCategoryEntryR\020eventsByCa" +
       "tegory\032C\n\025EventsByCategoryEntry\022\020\n\003key\030\001" +
-      " \001(\tR\003key\022\024\n\005value\030\002 \001(\005R\005value:\0028\001*\204\001\n\006" +
-      "Errors\022\025\n\021ERROR_UNSPECIFIED\020\000\022\026\n\022ERROR_U" +
-      "NAUTHORIZED\020\001\022\023\n\017ERROR_FORBIDDEN\020\002\022\025\n\021ER" +
-      "ROR_BAD_REQUEST\020\003\022\037\n\033ERROR_ADDRESS_VERIF" +
-      "Y_FAILED\020\004*\227\001\n\tRiskLevel\022\032\n\026RISK_LEVEL_U" +
-      "NSPECIFIED\020\000\022\023\n\017RISK_LEVEL_NONE\020\001\022\022\n\016RIS" +
-      "K_LEVEL_LOW\020\002\022\027\n\023RISK_LEVEL_MODERATE\020\003\022\023" +
-      "\n\017RISK_LEVEL_HIGH\020\004\022\027\n\023RISK_LEVEL_CRITIC" +
-      "AL\020\005B\201\002\n5com.acme.proto.acme.fulfillment" +
-      ".domain.fulfillment.v1B\013ValuesProtoP\001\242\002\004" +
-      "AFDF\252\002&Acme.Fulfillment.Domain.Fulfillme" +
-      "nt.V1\312\002&Acme\\Fulfillment\\Domain\\Fulfillm" +
-      "ent\\V1\342\0022Acme\\Fulfillment\\Domain\\Fulfill" +
-      "ment\\V1\\GPBMetadata\352\002*Acme::Fulfillment:" +
-      ":Domain::Fulfillment::V1b\006proto3"
+      " \001(\tR\003key\022\024\n\005value\030\002 \001(\005R\005value:\0028\001\"E\n\020S" +
+      "hippingLineItem\022\025\n\006sku_id\030\001 \001(\tR\005skuId\022\032" +
+      "\n\010quantity\030\002 \001(\005R\010quantity*\204\001\n\006Errors\022\025\n" +
+      "\021ERROR_UNSPECIFIED\020\000\022\026\n\022ERROR_UNAUTHORIZ" +
+      "ED\020\001\022\023\n\017ERROR_FORBIDDEN\020\002\022\025\n\021ERROR_BAD_R" +
+      "EQUEST\020\003\022\037\n\033ERROR_ADDRESS_VERIFY_FAILED\020" +
+      "\004*\227\001\n\tRiskLevel\022\032\n\026RISK_LEVEL_UNSPECIFIE" +
+      "D\020\000\022\023\n\017RISK_LEVEL_NONE\020\001\022\022\n\016RISK_LEVEL_L" +
+      "OW\020\002\022\027\n\023RISK_LEVEL_MODERATE\020\003\022\023\n\017RISK_LE" +
+      "VEL_HIGH\020\004\022\027\n\023RISK_LEVEL_CRITICAL\020\005B\201\002\n5" +
+      "com.acme.proto.acme.fulfillment.domain.f" +
+      "ulfillment.v1B\013ValuesProtoP\001\242\002\004AFDF\252\002&Ac" +
+      "me.Fulfillment.Domain.Fulfillment.V1\312\002&A" +
+      "cme\\Fulfillment\\Domain\\Fulfillment\\V1\342\0022" +
+      "Acme\\Fulfillment\\Domain\\Fulfillment\\V1\\G" +
+      "PBMetadata\352\002*Acme::Fulfillment::Domain::" +
+      "Fulfillment::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -111,6 +118,12 @@ public final class ValuesProto extends com.google.protobuf.GeneratedFile {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_LocationRiskSummary_EventsByCategoryEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
+    internal_static_acme_fulfillment_domain_fulfillment_v1_ShippingLineItem_descriptor =
+      getDescriptor().getMessageType(2);
+    internal_static_acme_fulfillment_domain_fulfillment_v1_ShippingLineItem_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_acme_fulfillment_domain_fulfillment_v1_ShippingLineItem_descriptor,
+        new java.lang.String[] { "SkuId", "Quantity", });
     descriptor.resolveAllFeaturesImmutable();
     com.google.protobuf.TimestampProto.getDescriptor();
   }

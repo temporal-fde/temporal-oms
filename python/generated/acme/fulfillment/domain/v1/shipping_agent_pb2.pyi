@@ -55,14 +55,6 @@ class GetLocationEventsResponse(_message.Message):
     timezone: str
     def __init__(self, summary: _Optional[_Union[_values_pb2.LocationRiskSummary, _Mapping]] = ..., events: _Optional[_Iterable[_Union[_values_pb2.LocationEvent, _Mapping]]] = ..., window_from: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., window_to: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., timezone: _Optional[str] = ...) -> None: ...
 
-class ShippingLineItem(_message.Message):
-    __slots__ = ("sku_id", "quantity")
-    SKU_ID_FIELD_NUMBER: _ClassVar[int]
-    QUANTITY_FIELD_NUMBER: _ClassVar[int]
-    sku_id: str
-    quantity: int
-    def __init__(self, sku_id: _Optional[str] = ..., quantity: _Optional[int] = ...) -> None: ...
-
 class ShippingOption(_message.Message):
     __slots__ = ("id", "carrier", "service_level", "cost", "estimated_days", "rate_id")
     ID_FIELD_NUMBER: _ClassVar[int]
@@ -121,11 +113,11 @@ class CalculateShippingOptionsRequest(_message.Message):
     order_id: str
     customer_id: str
     to_address: _values_pb2_1.Address
-    items: _containers.RepeatedCompositeFieldContainer[ShippingLineItem]
+    items: _containers.RepeatedCompositeFieldContainer[_values_pb2.ShippingLineItem]
     selected_shipping_option_id: str
     customer_paid_price: _values_pb2_1.Money
     transit_days_sla: int
-    def __init__(self, order_id: _Optional[str] = ..., customer_id: _Optional[str] = ..., to_address: _Optional[_Union[_values_pb2_1.Address, _Mapping]] = ..., items: _Optional[_Iterable[_Union[ShippingLineItem, _Mapping]]] = ..., selected_shipping_option_id: _Optional[str] = ..., customer_paid_price: _Optional[_Union[_values_pb2_1.Money, _Mapping]] = ..., transit_days_sla: _Optional[int] = ...) -> None: ...
+    def __init__(self, order_id: _Optional[str] = ..., customer_id: _Optional[str] = ..., to_address: _Optional[_Union[_values_pb2_1.Address, _Mapping]] = ..., items: _Optional[_Iterable[_Union[_values_pb2.ShippingLineItem, _Mapping]]] = ..., selected_shipping_option_id: _Optional[str] = ..., customer_paid_price: _Optional[_Union[_values_pb2_1.Money, _Mapping]] = ..., transit_days_sla: _Optional[int] = ...) -> None: ...
 
 class CalculateShippingOptionsResponse(_message.Message):
     __slots__ = ("recommendation", "options", "cache_hit")
@@ -160,36 +152,6 @@ class ShippingOptionsCache(_message.Message):
     results: _containers.MessageMap[str, ShippingOptionsResult]
     def __init__(self, results: _Optional[_Mapping[str, ShippingOptionsResult]] = ...) -> None: ...
 
-class LookupInventoryAddressRequest(_message.Message):
-    __slots__ = ("items", "address_id")
-    ITEMS_FIELD_NUMBER: _ClassVar[int]
-    ADDRESS_ID_FIELD_NUMBER: _ClassVar[int]
-    items: _containers.RepeatedCompositeFieldContainer[ShippingLineItem]
-    address_id: str
-    def __init__(self, items: _Optional[_Iterable[_Union[ShippingLineItem, _Mapping]]] = ..., address_id: _Optional[str] = ...) -> None: ...
-
-class LookupInventoryAddressResponse(_message.Message):
-    __slots__ = ("address",)
-    ADDRESS_FIELD_NUMBER: _ClassVar[int]
-    address: _values_pb2_1.Address
-    def __init__(self, address: _Optional[_Union[_values_pb2_1.Address, _Mapping]] = ...) -> None: ...
-
-class FindAlternateWarehouseRequest(_message.Message):
-    __slots__ = ("items", "current_address_id", "to_address_id")
-    ITEMS_FIELD_NUMBER: _ClassVar[int]
-    CURRENT_ADDRESS_ID_FIELD_NUMBER: _ClassVar[int]
-    TO_ADDRESS_ID_FIELD_NUMBER: _ClassVar[int]
-    items: _containers.RepeatedCompositeFieldContainer[ShippingLineItem]
-    current_address_id: str
-    to_address_id: str
-    def __init__(self, items: _Optional[_Iterable[_Union[ShippingLineItem, _Mapping]]] = ..., current_address_id: _Optional[str] = ..., to_address_id: _Optional[str] = ...) -> None: ...
-
-class FindAlternateWarehouseResponse(_message.Message):
-    __slots__ = ("address",)
-    ADDRESS_FIELD_NUMBER: _ClassVar[int]
-    address: _values_pb2_1.Address
-    def __init__(self, address: _Optional[_Union[_values_pb2_1.Address, _Mapping]] = ...) -> None: ...
-
 class GetShippingRatesRequest(_message.Message):
     __slots__ = ("from_easypost_id", "to_easypost_id", "items")
     FROM_EASYPOST_ID_FIELD_NUMBER: _ClassVar[int]
@@ -197,8 +159,8 @@ class GetShippingRatesRequest(_message.Message):
     ITEMS_FIELD_NUMBER: _ClassVar[int]
     from_easypost_id: str
     to_easypost_id: str
-    items: _containers.RepeatedCompositeFieldContainer[ShippingLineItem]
-    def __init__(self, from_easypost_id: _Optional[str] = ..., to_easypost_id: _Optional[str] = ..., items: _Optional[_Iterable[_Union[ShippingLineItem, _Mapping]]] = ...) -> None: ...
+    items: _containers.RepeatedCompositeFieldContainer[_values_pb2.ShippingLineItem]
+    def __init__(self, from_easypost_id: _Optional[str] = ..., to_easypost_id: _Optional[str] = ..., items: _Optional[_Iterable[_Union[_values_pb2.ShippingLineItem, _Mapping]]] = ...) -> None: ...
 
 class GetShippingRatesResponse(_message.Message):
     __slots__ = ("shipment_id", "options")
