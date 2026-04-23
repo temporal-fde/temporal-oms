@@ -158,7 +158,7 @@ public class IntegrationsImpl implements Integrations {
                 .orElse(warehouses.get(0));
 
         logger.info("lookupInventoryAddress resolved to locationId={}, easypostId={}",
-                match.locationId(), match.easypostId());
+                match.warehouseId(), match.easypostId());
         return LookupInventoryAddressResponse.newBuilder().setAddress(toAddress(match)).build();
     }
 

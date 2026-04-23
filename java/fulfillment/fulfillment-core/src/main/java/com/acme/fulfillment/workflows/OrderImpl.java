@@ -197,7 +197,7 @@ public class OrderImpl implements Order {
         var ratesResponse = deliveryService.getCarrierRates(
                 GetCarrierRatesRequest.newBuilder()
                         .setOrderId(orderId)
-                        .setEasypostAddressId(state.getValidatedAddress().getEasypostAddress().getId())
+                        .setEasypostAddressId(state.getValidatedAddress().getEasypost().getId())
                         .addAllItems(extractProcessedItems(request.getProcessedOrder()))
                         .build());
 
