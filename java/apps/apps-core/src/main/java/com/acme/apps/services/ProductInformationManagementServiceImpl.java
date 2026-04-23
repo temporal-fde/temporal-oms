@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 public class ProductInformationManagementServiceImpl {
 
     private static final String WORKFLOW_ID = "integrations";
-    private static final String TASK_QUEUE  = "apps";
+    private static final String TASK_QUEUE  = "integrations";
 
     private final Logger logger = LoggerFactory.getLogger(ProductInformationManagementServiceImpl.class);
 

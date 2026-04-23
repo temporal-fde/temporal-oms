@@ -5,3 +5,4 @@ spring.temporal.start-workers: true
 spring:
   application:
     name: apps-workers
+easypost.api-key: ${EASYPOST_API_KEY:}
