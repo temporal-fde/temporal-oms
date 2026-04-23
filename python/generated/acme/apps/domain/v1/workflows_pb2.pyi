@@ -94,3 +94,7 @@ class CapturePaymentRequest(_message.Message):
     timestamp: _timestamp_pb2.Timestamp
     payment: _values_pb2_1.Payment
     def __init__(self, timestamp: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., payment: _Optional[_Union[_values_pb2_1.Payment, _Mapping]] = ...) -> None: ...
+
+class StartIntegrationsRequest(_message.Message):
+    __slots__ = ()
+    def __init__(self) -> None: ...

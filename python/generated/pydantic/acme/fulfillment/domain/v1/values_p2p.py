@@ -64,3 +64,12 @@ class LocationRiskSummary(BaseModel):
 # Count of events per PredictHQ category string
 # (e.g. {"severe-weather": 2, "airport-delays": 1}).
     events_by_category: "typing.Dict[str, int]" = Field(default_factory=dict)
+
+class ShippingLineItem(BaseModel):
+    """
+     ShippingLineItem is a sku/quantity pair for shipping rate calculation.
+ Simpler than FulfillmentItem (which carries warehouse/brand fields irrelevant to rate calculation).
+    """
+
+    sku_id: str = Field(default="")
+    quantity: int = Field(default=0)

@@ -80,3 +80,11 @@ class LocationRiskSummary(_message.Message):
     unscheduled_event_count: int
     events_by_category: _containers.ScalarMap[str, int]
     def __init__(self, overall_risk_level: _Optional[_Union[RiskLevel, str]] = ..., peak_rank: _Optional[int] = ..., total_event_count: _Optional[int] = ..., unscheduled_event_count: _Optional[int] = ..., events_by_category: _Optional[_Mapping[str, int]] = ...) -> None: ...
+
+class ShippingLineItem(_message.Message):
+    __slots__ = ("sku_id", "quantity")
+    SKU_ID_FIELD_NUMBER: _ClassVar[int]
+    QUANTITY_FIELD_NUMBER: _ClassVar[int]
+    sku_id: str
+    quantity: int
+    def __init__(self, sku_id: _Optional[str] = ..., quantity: _Optional[int] = ...) -> None: ...

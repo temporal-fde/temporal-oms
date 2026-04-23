@@ -1,6 +1,7 @@
 package com.acme.fulfillment.activities;
 
 import com.acme.fulfillment.workflows.activities.AddressVerification;
+import com.acme.proto.acme.common.v1.Address;
 import com.acme.proto.acme.common.v1.EasyPostAddress;
 import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.VerifyAddressRequest;
 import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.VerifyAddressResponse;
@@ -13,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import io.temporal.failure.ApplicationFailure;
 import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.Errors;
-
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,22 +31,23 @@ public class AddressVerificationImpl implements AddressVerification {
     @Override
     public VerifyAddressResponse verifyAddress(VerifyAddressRequest request) {
         var address = request.getAddress();
+        var ep = address.getEasypost();
 
-        logger.info("verifyAddress called for address: {}", address.getStreet());
+        logger.info("verifyAddress called for address: {}", ep.getStreet1());
 
-        // If already verified by EasyPost, return as-is
-        if (address.hasEasypostAddress()) {
+        // If already verified by EasyPost (id is present), return as-is
+        if (address.hasEasypost() && !ep.getId().isEmpty()) {
             return VerifyAddressResponse.newBuilder()
                     .setAddress(address)
                     .build();
         }
 
         Map<String, Object> addressFields = new HashMap<>();
-        addressFields.put("street1", address.getStreet());
-        addressFields.put("city", address.getCity());
-        addressFields.put("state", address.getState());
-        addressFields.put("zip", address.getPostalCode());
-        addressFields.put("country", address.getCountry());
+        addressFields.put("street1", ep.getStreet1());
+        addressFields.put("city",    ep.getCity());
+        addressFields.put("state",   ep.getState());
+        addressFields.put("zip",     ep.getZip());
+        addressFields.put("country", ep.getCountry());
 
         try {
             com.easypost.model.Address verifiedAddressResponse = easyPostClient.address.createAndVerify(addressFields);
@@ -59,18 +60,16 @@ public class AddressVerificationImpl implements AddressVerification {
 
             var easyPostAddress = EasyPostAddress.newBuilder()
                     .setId(verifiedAddressResponse.getId())
+                    .setStreet1(verifiedAddressResponse.getStreet1() != null ? verifiedAddressResponse.getStreet1() : ep.getStreet1())
+                    .setCity(verifiedAddressResponse.getCity()    != null ? verifiedAddressResponse.getCity()    : ep.getCity())
+                    .setState(verifiedAddressResponse.getState()   != null ? verifiedAddressResponse.getState()   : ep.getState())
+                    .setZip(verifiedAddressResponse.getZip()     != null ? verifiedAddressResponse.getZip()     : ep.getZip())
+                    .setCountry(verifiedAddressResponse.getCountry() != null ? verifiedAddressResponse.getCountry() : ep.getCountry())
                     .setResidential(Boolean.TRUE.equals(residential))
-                    .setVerified(isVerified)
                     .build();
 
-            // return the verified address
-            var verifiedAddress = address.toBuilder()
-                    .setStreet(verifiedAddressResponse.getStreet1())
-                    .setCity(verifiedAddressResponse.getCity())
-                    .setState(verifiedAddressResponse.getState())
-                    .setPostalCode(verifiedAddressResponse.getZip())
-                    .setCountry(verifiedAddressResponse.getCountry())
-                    .setEasypostAddress(easyPostAddress)
+            var verifiedAddress = Address.newBuilder()
+                    .setEasypost(easyPostAddress)
                     .build();
 
             logger.info("verifyAddress succeeded: easypost_id={}, verified={}, residential={}",
@@ -84,7 +83,6 @@ public class AddressVerificationImpl implements AddressVerification {
                 String addressError = "undefined";
                 String failedField = "undefined";
 
-                // Get the detailed error from the errors object.
                 List<?> errors = ((APIException) e).getErrors();
                 if (errors != null && !errors.isEmpty()) {
                     FieldError fieldError = (FieldError) errors.getFirst();
@@ -93,7 +91,6 @@ public class AddressVerificationImpl implements AddressVerification {
                 }
 
             throw ApplicationFailure.newNonRetryableFailureWithCause(addressError + ". Error with field '" + failedField + "'", Errors.ERROR_ADDRESS_VERIFY_FAILED.name(), e);
-
         }
     }
 }

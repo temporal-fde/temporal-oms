@@ -62,4 +62,6 @@ message CapturePaymentRequest {
   acme.oms.v1.Payment payment = 2;
 }
 
+message StartIntegrationsRequest {}
+
 

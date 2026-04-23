@@ -55,3 +55,6 @@ class GetOptionsRequest(BaseModel):
 
 class CancelOrderResponse(BaseModel):
     pass
+
+class StartIntegrationsRequest(BaseModel):
+    pass

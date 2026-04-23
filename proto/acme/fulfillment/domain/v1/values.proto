@@ -59,3 +59,10 @@ message LocationRiskSummary {
   // (e.g. {"severe-weather": 2, "airport-delays": 1}).
   map<string, int32> events_by_category = 5;
 }
+
+ // ShippingLineItem is a sku/quantity pair for shipping rate calculation.
+ // Simpler than FulfillmentItem (which carries warehouse/brand fields irrelevant to rate calculation).
+ message ShippingLineItem {
+   string sku_id    = 1;
+   int32  quantity  = 2;
+ }
