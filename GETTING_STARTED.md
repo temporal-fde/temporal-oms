@@ -57,6 +57,35 @@ Continue below for pure local development without Kubernetes. This is great for:
    curl --version
    ```
 
+5. **uv** (Python package manager, for the Python fulfillment worker)
+   ```bash
+   # macOS
+   brew install uv
+
+   # Or: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+   # Install Python dependencies (run once from repo root)
+   cd python && uv sync
+   ```
+
+### Configure Environment
+
+Copy the environment template before starting any services:
+
+```bash
+cp .env.example .env.local
+```
+
+All Java services and Python workers load `.env.local` automatically — no extra steps needed once it exists. The defaults in `.env.example` are already correct for local Temporal (no API keys required for Temporal itself).
+
+API keys are only needed for integration features. Workers start and connect without them — activities that call external APIs will fail with a clear error message if the key is missing when that feature is exercised.
+
+| Variable | Where to get it | Needed for |
+|----------|----------------|------------|
+| `EASYPOST_API_KEY` | [easypost.com](https://www.easypost.com) → Dashboard → API Keys | Address verification, carrier rate quotes |
+| `ANTHROPIC_API_KEY` | [console.anthropic.com](https://console.anthropic.com) | AI shipping agent (shipping route selection) |
+| `PREDICTHQ_API_KEY` | [predicthq.com](https://www.predicthq.com) | Location risk events (weather/event disruption data) |
+
 ### Step 1: Start Local Temporal
 
 ```bash
@@ -132,28 +161,37 @@ mvn spring-boot:run
 **Terminal 2 — Apps Worker**:
 ```bash
 cd java/apps/apps-workers
-export TEMPORAL_NAMESPACE=apps
 mvn spring-boot:run
 ```
 
 **Terminal 3 — Processing Worker**:
 ```bash
 cd java/processing/processing-workers
-export TEMPORAL_NAMESPACE=processing
 mvn spring-boot:run
 ```
 
-**Terminal 4 — Fulfillment Worker**:
+**Terminal 4 — Fulfillment Worker** (Java):
 ```bash
 cd java/fulfillment/fulfillment-workers
-export TEMPORAL_NAMESPACE=processing
-export EASYPOST_API_KEY=<your_easypost_api_key>
 mvn spring-boot:run
 ```
+
+> Uses `EASYPOST_API_KEY` from `.env.local` for address verification. The worker starts without it, but address verification activities will fail with a clear error until the key is set.
+
+**Terminal 5 — Python Fulfillment Workers** (shipping agent + EasyPost + PredictHQ):
+```bash
+cd python/fulfillment
+uv run --project .. python -m src.worker
+```
+
+> Uses `ANTHROPIC_API_KEY`, `EASYPOST_API_KEY`, and `PREDICTHQ_API_KEY` from `.env.local`. Workers connect and poll without them — activities that call these APIs surface a clear error when invoked without the key.
+
 All services are now ready:
 - ✅ Apps API running on `http://localhost:8080`
 - ✅ Apps Worker connected to `apps` namespace
 - ✅ Processing Worker connected to `processing` namespace
+- ✅ Fulfillment Worker connected to `fulfillment` namespace
+- ✅ Python Workers (shipping agent, EasyPost, PredictHQ) connected to `fulfillment` namespace
 - ✅ Temporal UI at `http://localhost:8233`
 
 ---
