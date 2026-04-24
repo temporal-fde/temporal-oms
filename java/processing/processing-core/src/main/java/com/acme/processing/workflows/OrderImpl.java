@@ -1,11 +1,13 @@
 package com.acme.processing.workflows;
 
-import com.acme.processing.workflows.activities.CommerceApp;
-import com.acme.processing.workflows.activities.Enrichments;
+import com.acme.oms.services.CommerceAppService;
+import com.acme.oms.services.ProductInformationManagementService;
 import com.acme.processing.workflows.activities.Fulfillments;
+import com.acme.processing.workflows.activities.Options;
 import com.acme.processing.workflows.activities.Support;
 import com.acme.proto.acme.processing.domain.processing.v1.*;
 import io.temporal.activity.ActivityOptions;
+import io.temporal.activity.LocalActivityOptions;
 import io.temporal.failure.ActivityFailure;
 import io.temporal.common.VersioningBehavior;
 import io.temporal.failure.ApplicationFailure;
@@ -14,40 +16,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CancellationException;
 
-/**
- * Implementation of Order Workflow
- *
- * Pattern: Processing Service
- * - Coordinates order processing logic
- * - Uses Updates to manage order lifecycle
- * - Handles order submission, payment capture, and cancellation
- */
 public class OrderImpl implements Order {
-    private final CommerceApp commerceApp;
-    private final Enrichments enrichments;
+    private final Options optionsActs;
+    private final Fulfillments fulfillments;
     private GetProcessOrderStateResponse state;
     private Logger logger = LoggerFactory.getLogger(OrderImpl.class);
-    private Fulfillments fulfillments;
 
     @WorkflowInit
     public OrderImpl(ProcessOrderRequest args) {
         this.state = GetProcessOrderStateResponse.newBuilder().build();
         this.state = this.state.toBuilder().addArgs(args).build();
-        this.commerceApp = Workflow.newActivityStub(CommerceApp.class,
-                ActivityOptions.newBuilder()
-                        // the commerce app API is rate limited
-                        // so target this tq that is throttled by Temporal service
-                        .setTaskQueue("commerce-app")
-                        .setScheduleToCloseTimeout(Duration.ofSeconds(args.getOptions().getProcessingTimeoutSecs()))
-                        .setStartToCloseTimeout(Duration.ofSeconds(60)).build());
-
-        this.enrichments = Workflow.newActivityStub(Enrichments.class,
-                ActivityOptions.newBuilder()
-                        .setScheduleToCloseTimeout(Duration.ofSeconds(60)).build());
+        this.optionsActs = Workflow.newLocalActivityStub(Options.class,
+                LocalActivityOptions.newBuilder()
+                        .setScheduleToCloseTimeout(Duration.ofSeconds(2))
+                        .build());
         this.fulfillments = Workflow.newActivityStub(Fulfillments.class,
                 ActivityOptions.newBuilder()
                         .setScheduleToCloseTimeout(Duration.ofSeconds(60)).build());
@@ -58,50 +41,69 @@ public class OrderImpl implements Order {
     public GetProcessOrderStateResponse execute(ProcessOrderRequest request) {
         logger.info("Processing order {}", request);
 
-        // 1. validate order (immediate or async activity)
+        var opts = request.hasOptions()
+                ? request.getOptions()
+                : ProcessOrderRequestExecutionOptions.getDefaultInstance();
+        if (!opts.hasOmsProperties()) {
+            opts = this.optionsActs.getOptions(opts);
+        }
+
+        var integrationsEndpoint = opts.getOmsProperties().getProcessing().getNexus().getEndpointsOrThrow("integrations");
+        final long timeoutSecs = opts.getProcessingTimeoutSecs() > 0 ? opts.getProcessingTimeoutSecs() : 86400L;
+
+        var commerceAppService = Workflow.newNexusServiceStub(CommerceAppService.class,
+                NexusServiceOptions.newBuilder()
+                        .setEndpoint(integrationsEndpoint)
+                        .setOperationOptions(NexusOperationOptions.newBuilder()
+                                .setScheduleToCloseTimeout(Duration.ofSeconds(timeoutSecs))
+                                .setCancellationType(NexusOperationCancellationType.WAIT_REQUESTED)
+                                .build())
+                        .build());
+
+        var pimService = Workflow.newNexusServiceStub(ProductInformationManagementService.class,
+                NexusServiceOptions.newBuilder()
+                        .setEndpoint(integrationsEndpoint)
+                        .setOperationOptions(NexusOperationOptions.newBuilder()
+                                .setScheduleToCloseTimeout(Duration.ofSeconds(60))
+                                .setCancellationType(NexusOperationCancellationType.WAIT_REQUESTED)
+                                .build())
+                        .build());
+
+        // 1. validate order (immediate or manual correction via support)
         // 2. enrich order
         // 3. fulfill order
-        // if any of this fails, cancel order with `void` specified for payment
-        var scope = Workflow.newCancellationScope(inner-> {
+        // if any of this fails, cancel order
+        var scope = Workflow.newCancellationScope(inner -> {
 
-            // this might block for quite some time due to invalid order correction
-            var validation = this.commerceApp.validateOrder(ValidateOrderRequest.newBuilder()
+            var validation = commerceAppService.validateOrder(ValidateOrderRequest.newBuilder()
                     .setOrder(request.getOrder())
                     .setCustomerId(request.getCustomerId())
-                    .setValidationTimeoutSecs(request.getOptions().getProcessingTimeoutSecs()).build());
-            // validate the order
+                    .setValidationTimeoutSecs(timeoutSecs).build());
             this.state = this.state.toBuilder().setValidation(validation).build();
 
-            if(validation.getManualCorrectionNeeded() || validation.getValidationFailuresCount() > 0) {
+            if (validation.getManualCorrectionNeeded() || validation.getValidationFailuresCount() > 0) {
                 var support = Workflow.newActivityStub(Support.class, ActivityOptions.newBuilder()
-                                // we only set the schedule to close timeout here
-                                .setScheduleToCloseTimeout(Duration.ofSeconds(request.getOptions().getProcessingTimeoutSecs()))
-                                .setTaskQueue("support")
-                                .build());
+                        .setScheduleToCloseTimeout(Duration.ofSeconds(timeoutSecs))
+                        .setTaskQueue("support")
+                        .build());
                 this.state = this.state.toBuilder().setValidation(support.manuallyValidateOrder(ManuallyValidateOrderRequest.newBuilder()
                         .setOrder(request.getOrder())
                         .setCustomerId(request.getCustomerId())
                         .setWorkflowId(Workflow.getInfo().getWorkflowId())
                         .build())).build();
-                if(this.state.getValidation().getValidationFailuresCount() > 0) {
-                    // we tried to get manual correction of order but still failed so aborting processing here
+                if (this.state.getValidation().getValidationFailuresCount() > 0) {
                     return;
                 }
             }
 
-
-            // enrich the order
             this.state = this.state.toBuilder().setEnrichment(
-                    this.enrichments.enrichOrder(EnrichOrderRequest.newBuilder()
+                    pimService.enrichOrder(EnrichOrderRequest.newBuilder()
                             .setOrder(request.getOrder()).build())).build();
 
-
-            // fulfill the order
             try {
                 this.state = this.state.toBuilder().setFulfillment(this.fulfillments.fulfillOrder(FulfillOrderRequest.newBuilder()
                         .setOrder(request.getOrder()).addAllItems(this.state.getEnrichment().getItemsList()).build())).build();
-            }
-            catch (ApplicationFailure e) {
+            } catch (ApplicationFailure e) {
                 if (e.isNonRetryable()) {
                     // permanent failure
                     // move this to the support workflow
@@ -109,8 +111,8 @@ public class OrderImpl implements Order {
             }
         });
 
-        Workflow.newTimer(Duration.ofSeconds(request.getOptions().getProcessingTimeoutSecs())).thenApply(result -> {
-            if(!state.hasFulfillment()) {
+        Workflow.newTimer(Duration.ofSeconds(timeoutSecs)).thenApply(result -> {
+            if (!state.hasFulfillment()) {
                 scope.cancel();
             }
             return null;
@@ -129,5 +131,4 @@ public class OrderImpl implements Order {
     public GetProcessOrderStateResponse getState() {
         return this.state;
     }
-
 }

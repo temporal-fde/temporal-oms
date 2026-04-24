@@ -10,17 +10,17 @@ spring.temporal:
         - com.acme.apps.workflows.OrderImpl
       activity-beans:
         - options-activities
-      nexus-service-beans:
-        - commerce-app-service
-        - pims-service
-        - payments-service
-        - inventory-service
 #     deployment-properties:
     - task-queue: integrations
       workflow-classes:
         - com.acme.apps.workflows.IntegrationsImpl
       activity-beans:
         - integrations-setup-activities
+      nexus-service-beans:
+        - commerce-app-service
+        - pims-service
+        - payments-service
+        - inventory-service
       rate-limits:
         max-task-queue-activities-per-second: 5
 #

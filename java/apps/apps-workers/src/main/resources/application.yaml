@@ -1,4 +1,5 @@
-spring.config.import: classpath:acme.apps.yaml,optional:dotenv:.env.local
+spring.config.import: classpath:acme.apps.yaml
+spring.profiles.default: local
 server.port: 8081
 management.server.port: 9092
 spring.temporal.start-workers: true

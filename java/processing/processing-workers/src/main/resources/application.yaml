@@ -1,4 +1,5 @@
-spring.config.import: classpath:acme.processing.yaml,optional:dotenv:.env.local
+spring.config.import: classpath:acme.processing.yaml
+spring.profiles.default: local
 
 spring.application.name: processing-workers
 spring.main.web-application-type: reactive

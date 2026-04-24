@@ -1,6 +1,7 @@
 import datetime
 
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
+from acme.oms.v1 import message_pb2 as _message_pb2
 from acme.oms.v1 import values_pb2 as _values_pb2
 from acme.common.v1 import values_pb2 as _values_pb2_1
 from google.protobuf.internal import containers as _containers
@@ -28,10 +29,12 @@ class ProcessOrderRequest(_message.Message):
     def __init__(self, timestamp: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., options: _Optional[_Union[ProcessOrderRequestExecutionOptions, _Mapping]] = ..., order_id: _Optional[str] = ..., customer_id: _Optional[str] = ..., order: _Optional[_Union[_values_pb2.Order, _Mapping]] = ..., payment: _Optional[_Union[_values_pb2.Payment, _Mapping]] = ...) -> None: ...
 
 class ProcessOrderRequestExecutionOptions(_message.Message):
-    __slots__ = ("processing_timeout_secs",)
+    __slots__ = ("processing_timeout_secs", "oms_properties")
     PROCESSING_TIMEOUT_SECS_FIELD_NUMBER: _ClassVar[int]
+    OMS_PROPERTIES_FIELD_NUMBER: _ClassVar[int]
     processing_timeout_secs: int
-    def __init__(self, processing_timeout_secs: _Optional[int] = ...) -> None: ...
+    oms_properties: _message_pb2.OmsProperties
+    def __init__(self, processing_timeout_secs: _Optional[int] = ..., oms_properties: _Optional[_Union[_message_pb2.OmsProperties, _Mapping]] = ...) -> None: ...
 
 class GetProcessOrderStateResponse(_message.Message):
     __slots__ = ("args", "validation", "enrichment", "fulfillment", "errors")

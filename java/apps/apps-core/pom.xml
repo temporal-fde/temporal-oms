@@ -58,12 +58,6 @@
 
         <!-- Utilities -->
         <dependency>
-            <groupId>com.easypost</groupId>
-            <artifactId>easypost-api-client</artifactId>
-            <version>8.7.0</version>
-        </dependency>
-
-        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>

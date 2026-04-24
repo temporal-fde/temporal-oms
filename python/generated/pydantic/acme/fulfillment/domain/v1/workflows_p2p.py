@@ -10,8 +10,8 @@ from google.protobuf.message import Message  # type: ignore
 from pydantic import BaseModel
 from pydantic import ConfigDict
 from pydantic import Field
-from ....apps.domain.v1.workflows_p2p import CompleteOrderRequest
-from ....processing.domain.v1.workflows_p2p import GetProcessOrderStateResponse
+from workflows_p2p import CompleteOrderRequest
+from workflows_p2p import GetProcessOrderStateResponse
 import typing
 
 class Status(IntEnum):

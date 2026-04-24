@@ -10,6 +10,7 @@ spring.temporal:
         workflow-classes:
           - com.acme.processing.workflows.OrderImpl
         activity-beans:
+          - processing-options-activities
           - enrichment-activities
           - fulfillment-activities
         nexus-service-beans:
