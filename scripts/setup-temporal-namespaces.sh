@@ -82,6 +82,13 @@ temporal operator nexus endpoint create \
   --target-namespace apps \
   --target-task-queue apps
 
+# Integrations endpoint -> oms-integrations-v1 service (CommerceApp, PIM, Payments, Inventory handlers)
+echo "Registering endpoint 'oms-integrations-v1' targeting apps/integrations task queue"
+temporal operator nexus endpoint create \
+  --name "oms-integrations-v1" \
+  --target-namespace apps \
+  --target-task-queue integrations
+
 echo ""
 echo "✓ Setup complete!"
 echo ""

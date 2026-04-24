@@ -23,11 +23,12 @@ _sym_db = _symbol_database.Default()
 
 
 from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
+from acme.oms.v1 import message_pb2 as acme_dot_oms_dot_v1_dot_message__pb2
 from acme.oms.v1 import values_pb2 as acme_dot_oms_dot_v1_dot_values__pb2
 from acme.common.v1 import values_pb2 as acme_dot_common_dot_v1_dot_values__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n)acme/processing/domain/v1/workflows.proto\x12$acme.processing.domain.processing.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x18\x61\x63me/oms/v1/values.proto\x1a\x1b\x61\x63me/common/v1/values.proto\"\xdb\x02\n\x13ProcessOrderRequest\x12\x38\n\ttimestamp\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\ttimestamp\x12h\n\x07options\x18\x02 \x01(\x0b\x32I.acme.processing.domain.processing.v1.ProcessOrderRequestExecutionOptionsH\x00R\x07options\x88\x01\x01\x12\x19\n\x08order_id\x18\x03 \x01(\tR\x07orderId\x12\x1f\n\x0b\x63ustomer_id\x18\x04 \x01(\tR\ncustomerId\x12(\n\x05order\x18\x05 \x01(\x0b\x32\x12.acme.oms.v1.OrderR\x05order\x12.\n\x07payment\x18\x06 \x01(\x0b\x32\x14.acme.oms.v1.PaymentR\x07paymentB\n\n\x08_options\"~\n#ProcessOrderRequestExecutionOptions\x12;\n\x17processing_timeout_secs\x18\x01 \x01(\x03H\x00R\x15processingTimeoutSecs\x88\x01\x01\x42\x1a\n\x18_processing_timeout_secs\"\x9b\x03\n\x1cGetProcessOrderStateResponse\x12M\n\x04\x61rgs\x18\x01 \x03(\x0b\x32\x39.acme.processing.domain.processing.v1.ProcessOrderRequestR\x04\x61rgs\x12[\n\nvalidation\x18\x02 \x01(\x0b\x32;.acme.processing.domain.processing.v1.ValidateOrderResponseR\nvalidation\x12Y\n\nenrichment\x18\x03 \x01(\x0b\x32\x39.acme.processing.domain.processing.v1.EnrichOrderResponseR\nenrichment\x12\\\n\x0b\x66ulfillment\x18\x04 \x01(\x0b\x32:.acme.processing.domain.processing.v1.FulfillOrderResponseR\x0b\x66ulfillment\x12\x16\n\x06\x65rrors\x18\x05 \x03(\tR\x06\x65rrors\">\n\x12\x45nrichOrderRequest\x12(\n\x05order\x18\x01 \x01(\x0b\x32\x12.acme.oms.v1.OrderR\x05order\"\x89\x01\n\x13\x45nrichOrderResponse\x12(\n\x05order\x18\x01 \x01(\x0b\x32\x12.acme.oms.v1.OrderR\x05order\x12H\n\x05items\x18\x02 \x03(\x0b\x32\x32.acme.processing.domain.processing.v1.EnrichedItemR\x05items\"\x99\x01\n\x14ValidateOrderRequest\x12\x36\n\x17validation_timeout_secs\x18\x01 \x01(\x03R\x15validationTimeoutSecs\x12\x1f\n\x0b\x63ustomer_id\x18\x02 \x01(\tR\ncustomerId\x12(\n\x05order\x18\x03 \x01(\x0b\x32\x12.acme.oms.v1.OrderR\x05order\"\xd8\x01\n\x15ValidateOrderResponse\x12(\n\x05order\x18\x01 \x01(\x0b\x32\x12.acme.oms.v1.OrderR\x05order\x12\x38\n\x18manual_correction_needed\x18\x02 \x01(\x08R\x16manualCorrectionNeeded\x12*\n\x11support_ticket_id\x18\x03 \x01(\tR\x0fsupportTicketId\x12/\n\x13validation_failures\x18\x04 \x03(\tR\x12validationFailures\"y\n\x0c\x45nrichedItem\x12\x17\n\x07item_id\x18\x01 \x01(\tR\x06itemId\x12\x15\n\x06sku_id\x18\x02 \x01(\tR\x05skuId\x12\x1d\n\nbrand_code\x18\x03 \x01(\tR\tbrandCode\x12\x1a\n\x08quantity\x18\x04 \x01(\x05R\x08quantity\"M\n\x16\x43ompletePaymentRequest\x12\x10\n\x03rrn\x18\x01 \x01(\tR\x03rrn\x12!\n\x0c\x61mount_cents\x18\x02 \x01(\x03R\x0b\x61mountCents\"M\n\x17\x43ompletePaymentResponse\x12\x18\n\x07success\x18\x01 \x01(\x08R\x07success\x12\x18\n\x07message\x18\x02 \x01(\tR\x07message\"^\n\x16ValidatePaymentRequest\x12\x10\n\x03rrn\x18\x01 \x01(\tR\x03rrn\x12\x32\n\x15\x65xpected_amount_cents\x18\x02 \x01(\x03R\x13\x65xpectedAmountCents\"\x86\x01\n\x17ValidatePaymentResponse\x12\x14\n\x05valid\x18\x01 \x01(\x08R\x05valid\x12%\n\x0epayment_status\x18\x02 \x01(\tR\rpaymentStatus\x12.\n\x13\x61\x63tual_amount_cents\x18\x03 \x01(\x03R\x11\x61\x63tualAmountCents\"\xaa\x01\n\x13\x46ulfillOrderRequest\x12\x1f\n\x0b\x63ustomer_id\x18\x02 \x01(\tR\ncustomerId\x12(\n\x05order\x18\x01 \x01(\x0b\x32\x12.acme.oms.v1.OrderR\x05order\x12H\n\x05items\x18\x03 \x03(\x0b\x32\x32.acme.processing.domain.processing.v1.EnrichedItemR\x05items\"\x16\n\x14\x46ulfillOrderResponse\"\x8c\x01\n\x15InitializeSupportTeam\x12s\n\x13validation_requests\x18\x01 \x03(\x0b\x32\x42.acme.processing.domain.processing.v1.ManuallyValidateOrderRequestR\x12validationRequests\"\xab\x01\n\x1cManuallyValidateOrderRequest\x12\x1f\n\x0b\x63ustomer_id\x18\x01 \x01(\tR\ncustomerId\x12(\n\x05order\x18\x02 \x01(\x0b\x32\x12.acme.oms.v1.OrderR\x05order\x12\x1f\n\x0bworkflow_id\x18\x03 \x01(\tR\nworkflowId\x12\x1f\n\x0b\x61\x63tivity_id\x18\x04 \x01(\tR\nactivityId\"\x1f\n\x1dManuallyValidateOrderResponse\"\x81\x02\n\x1e\x43ompleteOrderValidationRequest\x12q\n\x12validation_request\x18\x01 \x01(\x0b\x32\x42.acme.processing.domain.processing.v1.ManuallyValidateOrderRequestR\x11validationRequest\x12l\n\x13validation_response\x18\x02 \x01(\x0b\x32;.acme.processing.domain.processing.v1.ValidateOrderResponseR\x12validationResponse\"\x92\x01\n\x1bGetSupportTeamStateResponse\x12s\n\x13validation_requests\x18\x01 \x03(\x0b\x32\x42.acme.processing.domain.processing.v1.ManuallyValidateOrderRequestR\x12validationRequestsB\xfa\x01\n3com.acme.proto.acme.processing.domain.processing.v1B\x0eWorkflowsProtoP\x01\xa2\x02\x04\x41PDP\xaa\x02$Acme.Processing.Domain.Processing.V1\xca\x02$Acme\\Processing\\Domain\\Processing\\V1\xe2\x02\x30\x41\x63me\\Processing\\Domain\\Processing\\V1\\GPBMetadata\xea\x02(Acme::Processing::Domain::Processing::V1b\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n)acme/processing/domain/v1/workflows.proto\x12$acme.processing.domain.processing.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x19\x61\x63me/oms/v1/message.proto\x1a\x18\x61\x63me/oms/v1/values.proto\x1a\x1b\x61\x63me/common/v1/values.proto\"\xdb\x02\n\x13ProcessOrderRequest\x12\x38\n\ttimestamp\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\ttimestamp\x12h\n\x07options\x18\x02 \x01(\x0b\x32I.acme.processing.domain.processing.v1.ProcessOrderRequestExecutionOptionsH\x00R\x07options\x88\x01\x01\x12\x19\n\x08order_id\x18\x03 \x01(\tR\x07orderId\x12\x1f\n\x0b\x63ustomer_id\x18\x04 \x01(\tR\ncustomerId\x12(\n\x05order\x18\x05 \x01(\x0b\x32\x12.acme.oms.v1.OrderR\x05order\x12.\n\x07payment\x18\x06 \x01(\x0b\x32\x14.acme.oms.v1.PaymentR\x07paymentB\n\n\x08_options\"\xd9\x01\n#ProcessOrderRequestExecutionOptions\x12;\n\x17processing_timeout_secs\x18\x01 \x01(\x03H\x00R\x15processingTimeoutSecs\x88\x01\x01\x12\x46\n\x0eoms_properties\x18\x02 \x01(\x0b\x32\x1a.acme.oms.v1.OmsPropertiesH\x01R\romsProperties\x88\x01\x01\x42\x1a\n\x18_processing_timeout_secsB\x11\n\x0f_oms_properties\"\x9b\x03\n\x1cGetProcessOrderStateResponse\x12M\n\x04\x61rgs\x18\x01 \x03(\x0b\x32\x39.acme.processing.domain.processing.v1.ProcessOrderRequestR\x04\x61rgs\x12[\n\nvalidation\x18\x02 \x01(\x0b\x32;.acme.processing.domain.processing.v1.ValidateOrderResponseR\nvalidation\x12Y\n\nenrichment\x18\x03 \x01(\x0b\x32\x39.acme.processing.domain.processing.v1.EnrichOrderResponseR\nenrichment\x12\\\n\x0b\x66ulfillment\x18\x04 \x01(\x0b\x32:.acme.processing.domain.processing.v1.FulfillOrderResponseR\x0b\x66ulfillment\x12\x16\n\x06\x65rrors\x18\x05 \x03(\tR\x06\x65rrors\">\n\x12\x45nrichOrderRequest\x12(\n\x05order\x18\x01 \x01(\x0b\x32\x12.acme.oms.v1.OrderR\x05order\"\x89\x01\n\x13\x45nrichOrderResponse\x12(\n\x05order\x18\x01 \x01(\x0b\x32\x12.acme.oms.v1.OrderR\x05order\x12H\n\x05items\x18\x02 \x03(\x0b\x32\x32.acme.processing.domain.processing.v1.EnrichedItemR\x05items\"\x99\x01\n\x14ValidateOrderRequest\x12\x36\n\x17validation_timeout_secs\x18\x01 \x01(\x03R\x15validationTimeoutSecs\x12\x1f\n\x0b\x63ustomer_id\x18\x02 \x01(\tR\ncustomerId\x12(\n\x05order\x18\x03 \x01(\x0b\x32\x12.acme.oms.v1.OrderR\x05order\"\xd8\x01\n\x15ValidateOrderResponse\x12(\n\x05order\x18\x01 \x01(\x0b\x32\x12.acme.oms.v1.OrderR\x05order\x12\x38\n\x18manual_correction_needed\x18\x02 \x01(\x08R\x16manualCorrectionNeeded\x12*\n\x11support_ticket_id\x18\x03 \x01(\tR\x0fsupportTicketId\x12/\n\x13validation_failures\x18\x04 \x03(\tR\x12validationFailures\"y\n\x0c\x45nrichedItem\x12\x17\n\x07item_id\x18\x01 \x01(\tR\x06itemId\x12\x15\n\x06sku_id\x18\x02 \x01(\tR\x05skuId\x12\x1d\n\nbrand_code\x18\x03 \x01(\tR\tbrandCode\x12\x1a\n\x08quantity\x18\x04 \x01(\x05R\x08quantity\"M\n\x16\x43ompletePaymentRequest\x12\x10\n\x03rrn\x18\x01 \x01(\tR\x03rrn\x12!\n\x0c\x61mount_cents\x18\x02 \x01(\x03R\x0b\x61mountCents\"M\n\x17\x43ompletePaymentResponse\x12\x18\n\x07success\x18\x01 \x01(\x08R\x07success\x12\x18\n\x07message\x18\x02 \x01(\tR\x07message\"^\n\x16ValidatePaymentRequest\x12\x10\n\x03rrn\x18\x01 \x01(\tR\x03rrn\x12\x32\n\x15\x65xpected_amount_cents\x18\x02 \x01(\x03R\x13\x65xpectedAmountCents\"\x86\x01\n\x17ValidatePaymentResponse\x12\x14\n\x05valid\x18\x01 \x01(\x08R\x05valid\x12%\n\x0epayment_status\x18\x02 \x01(\tR\rpaymentStatus\x12.\n\x13\x61\x63tual_amount_cents\x18\x03 \x01(\x03R\x11\x61\x63tualAmountCents\"\xaa\x01\n\x13\x46ulfillOrderRequest\x12\x1f\n\x0b\x63ustomer_id\x18\x02 \x01(\tR\ncustomerId\x12(\n\x05order\x18\x01 \x01(\x0b\x32\x12.acme.oms.v1.OrderR\x05order\x12H\n\x05items\x18\x03 \x03(\x0b\x32\x32.acme.processing.domain.processing.v1.EnrichedItemR\x05items\"\x16\n\x14\x46ulfillOrderResponse\"\x8c\x01\n\x15InitializeSupportTeam\x12s\n\x13validation_requests\x18\x01 \x03(\x0b\x32\x42.acme.processing.domain.processing.v1.ManuallyValidateOrderRequestR\x12validationRequests\"\xab\x01\n\x1cManuallyValidateOrderRequest\x12\x1f\n\x0b\x63ustomer_id\x18\x01 \x01(\tR\ncustomerId\x12(\n\x05order\x18\x02 \x01(\x0b\x32\x12.acme.oms.v1.OrderR\x05order\x12\x1f\n\x0bworkflow_id\x18\x03 \x01(\tR\nworkflowId\x12\x1f\n\x0b\x61\x63tivity_id\x18\x04 \x01(\tR\nactivityId\"\x1f\n\x1dManuallyValidateOrderResponse\"\x81\x02\n\x1e\x43ompleteOrderValidationRequest\x12q\n\x12validation_request\x18\x01 \x01(\x0b\x32\x42.acme.processing.domain.processing.v1.ManuallyValidateOrderRequestR\x11validationRequest\x12l\n\x13validation_response\x18\x02 \x01(\x0b\x32;.acme.processing.domain.processing.v1.ValidateOrderResponseR\x12validationResponse\"\x92\x01\n\x1bGetSupportTeamStateResponse\x12s\n\x13validation_requests\x18\x01 \x03(\x0b\x32\x42.acme.processing.domain.processing.v1.ManuallyValidateOrderRequestR\x12validationRequestsB\xfa\x01\n3com.acme.proto.acme.processing.domain.processing.v1B\x0eWorkflowsProtoP\x01\xa2\x02\x04\x41PDP\xaa\x02$Acme.Processing.Domain.Processing.V1\xca\x02$Acme\\Processing\\Domain\\Processing\\V1\xe2\x02\x30\x41\x63me\\Processing\\Domain\\Processing\\V1\\GPBMetadata\xea\x02(Acme::Processing::Domain::Processing::V1b\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -35,42 +36,42 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'acme.processing.domain.v1.w
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'\n3com.acme.proto.acme.processing.domain.processing.v1B\016WorkflowsProtoP\001\242\002\004APDP\252\002$Acme.Processing.Domain.Processing.V1\312\002$Acme\\Processing\\Domain\\Processing\\V1\342\0020Acme\\Processing\\Domain\\Processing\\V1\\GPBMetadata\352\002(Acme::Processing::Domain::Processing::V1'
-  _globals['_PROCESSORDERREQUEST']._serialized_start=172
-  _globals['_PROCESSORDERREQUEST']._serialized_end=519
-  _globals['_PROCESSORDERREQUESTEXECUTIONOPTIONS']._serialized_start=521
-  _globals['_PROCESSORDERREQUESTEXECUTIONOPTIONS']._serialized_end=647
-  _globals['_GETPROCESSORDERSTATERESPONSE']._serialized_start=650
-  _globals['_GETPROCESSORDERSTATERESPONSE']._serialized_end=1061
-  _globals['_ENRICHORDERREQUEST']._serialized_start=1063
-  _globals['_ENRICHORDERREQUEST']._serialized_end=1125
-  _globals['_ENRICHORDERRESPONSE']._serialized_start=1128
-  _globals['_ENRICHORDERRESPONSE']._serialized_end=1265
-  _globals['_VALIDATEORDERREQUEST']._serialized_start=1268
-  _globals['_VALIDATEORDERREQUEST']._serialized_end=1421
-  _globals['_VALIDATEORDERRESPONSE']._serialized_start=1424
-  _globals['_VALIDATEORDERRESPONSE']._serialized_end=1640
-  _globals['_ENRICHEDITEM']._serialized_start=1642
-  _globals['_ENRICHEDITEM']._serialized_end=1763
-  _globals['_COMPLETEPAYMENTREQUEST']._serialized_start=1765
-  _globals['_COMPLETEPAYMENTREQUEST']._serialized_end=1842
-  _globals['_COMPLETEPAYMENTRESPONSE']._serialized_start=1844
-  _globals['_COMPLETEPAYMENTRESPONSE']._serialized_end=1921
-  _globals['_VALIDATEPAYMENTREQUEST']._serialized_start=1923
-  _globals['_VALIDATEPAYMENTREQUEST']._serialized_end=2017
-  _globals['_VALIDATEPAYMENTRESPONSE']._serialized_start=2020
-  _globals['_VALIDATEPAYMENTRESPONSE']._serialized_end=2154
-  _globals['_FULFILLORDERREQUEST']._serialized_start=2157
-  _globals['_FULFILLORDERREQUEST']._serialized_end=2327
-  _globals['_FULFILLORDERRESPONSE']._serialized_start=2329
-  _globals['_FULFILLORDERRESPONSE']._serialized_end=2351
-  _globals['_INITIALIZESUPPORTTEAM']._serialized_start=2354
-  _globals['_INITIALIZESUPPORTTEAM']._serialized_end=2494
-  _globals['_MANUALLYVALIDATEORDERREQUEST']._serialized_start=2497
-  _globals['_MANUALLYVALIDATEORDERREQUEST']._serialized_end=2668
-  _globals['_MANUALLYVALIDATEORDERRESPONSE']._serialized_start=2670
-  _globals['_MANUALLYVALIDATEORDERRESPONSE']._serialized_end=2701
-  _globals['_COMPLETEORDERVALIDATIONREQUEST']._serialized_start=2704
-  _globals['_COMPLETEORDERVALIDATIONREQUEST']._serialized_end=2961
-  _globals['_GETSUPPORTTEAMSTATERESPONSE']._serialized_start=2964
-  _globals['_GETSUPPORTTEAMSTATERESPONSE']._serialized_end=3110
+  _globals['_PROCESSORDERREQUEST']._serialized_start=199
+  _globals['_PROCESSORDERREQUEST']._serialized_end=546
+  _globals['_PROCESSORDERREQUESTEXECUTIONOPTIONS']._serialized_start=549
+  _globals['_PROCESSORDERREQUESTEXECUTIONOPTIONS']._serialized_end=766
+  _globals['_GETPROCESSORDERSTATERESPONSE']._serialized_start=769
+  _globals['_GETPROCESSORDERSTATERESPONSE']._serialized_end=1180
+  _globals['_ENRICHORDERREQUEST']._serialized_start=1182
+  _globals['_ENRICHORDERREQUEST']._serialized_end=1244
+  _globals['_ENRICHORDERRESPONSE']._serialized_start=1247
+  _globals['_ENRICHORDERRESPONSE']._serialized_end=1384
+  _globals['_VALIDATEORDERREQUEST']._serialized_start=1387
+  _globals['_VALIDATEORDERREQUEST']._serialized_end=1540
+  _globals['_VALIDATEORDERRESPONSE']._serialized_start=1543
+  _globals['_VALIDATEORDERRESPONSE']._serialized_end=1759
+  _globals['_ENRICHEDITEM']._serialized_start=1761
+  _globals['_ENRICHEDITEM']._serialized_end=1882
+  _globals['_COMPLETEPAYMENTREQUEST']._serialized_start=1884
+  _globals['_COMPLETEPAYMENTREQUEST']._serialized_end=1961
+  _globals['_COMPLETEPAYMENTRESPONSE']._serialized_start=1963
+  _globals['_COMPLETEPAYMENTRESPONSE']._serialized_end=2040
+  _globals['_VALIDATEPAYMENTREQUEST']._serialized_start=2042
+  _globals['_VALIDATEPAYMENTREQUEST']._serialized_end=2136
+  _globals['_VALIDATEPAYMENTRESPONSE']._serialized_start=2139
+  _globals['_VALIDATEPAYMENTRESPONSE']._serialized_end=2273
+  _globals['_FULFILLORDERREQUEST']._serialized_start=2276
+  _globals['_FULFILLORDERREQUEST']._serialized_end=2446
+  _globals['_FULFILLORDERRESPONSE']._serialized_start=2448
+  _globals['_FULFILLORDERRESPONSE']._serialized_end=2470
+  _globals['_INITIALIZESUPPORTTEAM']._serialized_start=2473
+  _globals['_INITIALIZESUPPORTTEAM']._serialized_end=2613
+  _globals['_MANUALLYVALIDATEORDERREQUEST']._serialized_start=2616
+  _globals['_MANUALLYVALIDATEORDERREQUEST']._serialized_end=2787
+  _globals['_MANUALLYVALIDATEORDERRESPONSE']._serialized_start=2789
+  _globals['_MANUALLYVALIDATEORDERRESPONSE']._serialized_end=2820
+  _globals['_COMPLETEORDERVALIDATIONREQUEST']._serialized_start=2823
+  _globals['_COMPLETEORDERVALIDATIONREQUEST']._serialized_end=3080
+  _globals['_GETSUPPORTTEAMSTATERESPONSE']._serialized_start=3083
+  _globals['_GETSUPPORTTEAMSTATERESPONSE']._serialized_end=3229
 # @@protoc_insertion_point(module_scope)

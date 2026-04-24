@@ -2,6 +2,7 @@
 # gen by protobuf_to_pydantic[v0.3.3.1](https://github.com/so1n/protobuf_to_pydantic)
 # Protobuf Version: 6.33.6 
 # Pydantic Version: 2.13.0 
+from ....oms.v1.message_p2p import OmsProperties
 from ....oms.v1.values_p2p import Order
 from ....oms.v1.values_p2p import Payment
 from datetime import datetime
@@ -13,6 +14,7 @@ import typing
 
 class ProcessOrderRequestExecutionOptions(BaseModel):
     processing_timeout_secs: typing.Optional[int] = Field(default=0)
+    oms_properties: typing.Optional[OmsProperties] = Field(default_factory=OmsProperties)
 
 class ProcessOrderRequest(BaseModel):
     """

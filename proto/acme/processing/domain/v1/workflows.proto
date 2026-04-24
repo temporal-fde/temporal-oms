@@ -2,6 +2,7 @@
 syntax = "proto3";
 
 import "google/protobuf/timestamp.proto";
+import "acme/oms/v1/message.proto";
 import "acme/oms/v1/values.proto";
 import "acme/common/v1/values.proto";
 
@@ -20,6 +21,7 @@ message ProcessOrderRequest {
 
 message ProcessOrderRequestExecutionOptions {
   optional int64 processing_timeout_secs = 1;
+  optional acme.oms.v1.OmsProperties oms_properties = 2;
 }
 message GetProcessOrderStateResponse {
   repeated ProcessOrderRequest args = 1;

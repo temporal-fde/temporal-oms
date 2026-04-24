@@ -61,7 +61,7 @@ public class IntegrationsImpl implements Integrations {
     }
 
     @Override
-    @WorkflowVersioningBehavior(VersioningBehavior.PINNED)
+//    @WorkflowVersioningBehavior(VersioningBehavior.PINNED)
     public void execute(StartIntegrationsRequest request) {
         logger.info("apps.Integrations started (singleton) — preloading warehouse addresses");
         this.warehouses = setup.preloadWarehouseAddresses();

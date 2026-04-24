@@ -1,4 +1,5 @@
-spring.config.import: classpath:acme.enablements.yaml,optional:dotenv:.env.local
+spring.config.import: classpath:acme.enablements.yaml
+spring.profiles.default: local
 server.port: -1
 spring.application.name: enablements-workers
 spring.temporal.start-workers: true

@@ -9,8 +9,8 @@ from datetime import datetime
 from google.protobuf.message import Message  # type: ignore
 from pydantic import BaseModel
 from pydantic import Field
-from ....processing.domain.v1.workflows_p2p import GetProcessOrderStateResponse
-from ....processing.domain.v1.workflows_p2p import ProcessOrderRequest
+from workflows_p2p import GetProcessOrderStateResponse
+from workflows_p2p import ProcessOrderRequest
 import typing
 
 

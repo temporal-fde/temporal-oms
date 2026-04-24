@@ -24,12 +24,19 @@ public class AddressVerificationImpl implements AddressVerification {
 
     private static final Logger logger = LoggerFactory.getLogger(AddressVerificationImpl.class);
     private final EasyPostClient easyPostClient;
+
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
     public AddressVerificationImpl(EasyPostClient easyPostClient) {
         this.easyPostClient = easyPostClient;
     }
 
     @Override
     public VerifyAddressResponse verifyAddress(VerifyAddressRequest request) {
+        if (easyPostClient == null) {
+            throw ApplicationFailure.newNonRetryableFailure(
+                    "EasyPost not configured — set EASYPOST_API_KEY", Errors.ERROR_ADDRESS_VERIFY_FAILED.name());
+        }
+
         var address = request.getAddress();
         var ep = address.getEasypost();
 

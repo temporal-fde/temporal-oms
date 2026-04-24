@@ -5,8 +5,8 @@
 from google.protobuf.message import Message  # type: ignore
 from pydantic import BaseModel
 from pydantic import Field
-from ...common.v1.values_p2p import Address
-from ...common.v1.values_p2p import Money
+from values_p2p import Address
+from values_p2p import Money
 import typing
 
 
