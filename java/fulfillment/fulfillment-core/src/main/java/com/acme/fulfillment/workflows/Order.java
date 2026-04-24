@@ -59,7 +59,7 @@ public interface Order {
      * DELIVERED → complete workflow. CANCELED → notify customer, complete workflow.
      */
     @SignalMethod
-    void notifyDeliveryStatus(DeliveryStatusNotification notification);
+    void notifyDeliveryStatus(NotifyDeliveryStatusRequest request);
 
     /**
      * Query: Return the current fulfillment order state.

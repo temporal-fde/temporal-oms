@@ -9,12 +9,11 @@ spring.temporal:
       workflow-classes:
         - com.acme.fulfillment.workflows.OrderImpl
       activity-beans:
-        - carriersActivities
         - fulfillmentOptionsLoaderActivities
       nexus-service-beans:
         - fulfillment-service
-      deployment-properties:
-        use-versioning: true
-        default-versioning-behavior: PINNED
-        deployment-name: ${TEMPORAL_DEPLOYMENT_NAME:fulfillment}
-        build-id: ${TEMPORAL_WORKER_BUILD_ID:local}
+    - task-queue: fulfillment-carriers
+      activity-beans:
+        - carriersActivities
+      rate-limits:
+        max-task-queue-activities-per-second: 5

@@ -143,4 +143,19 @@ public interface GetFulfillmentOrderStateResponseOrBuilder extends
    */
   com.google.protobuf.ByteString
       getErrorsBytes(int index);
+
+  /**
+   * <code>optional .acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest notify_delivery_status = 10 [json_name = "notifyDeliveryStatus"];</code>
+   * @return Whether the notifyDeliveryStatus field is set.
+   */
+  boolean hasNotifyDeliveryStatus();
+  /**
+   * <code>optional .acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest notify_delivery_status = 10 [json_name = "notifyDeliveryStatus"];</code>
+   * @return The notifyDeliveryStatus.
+   */
+  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest getNotifyDeliveryStatus();
+  /**
+   * <code>optional .acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest notify_delivery_status = 10 [json_name = "notifyDeliveryStatus"];</code>
+   */
+  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequestOrBuilder getNotifyDeliveryStatusOrBuilder();
 }

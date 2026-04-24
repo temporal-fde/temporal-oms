@@ -24,4 +24,19 @@ public interface OrderFulfillRequestOrBuilder extends
    * <code>.acme.fulfillment.domain.fulfillment.v1.ProcessedOrder processed_order = 1 [json_name = "processedOrder"];</code>
    */
   com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ProcessedOrderOrBuilder getProcessedOrderOrBuilder();
+
+  /**
+   * <code>optional .acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest delivery_status_request = 2 [json_name = "deliveryStatusRequest"];</code>
+   * @return Whether the deliveryStatusRequest field is set.
+   */
+  boolean hasDeliveryStatusRequest();
+  /**
+   * <code>optional .acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest delivery_status_request = 2 [json_name = "deliveryStatusRequest"];</code>
+   * @return The deliveryStatusRequest.
+   */
+  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest getDeliveryStatusRequest();
+  /**
+   * <code>optional .acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest delivery_status_request = 2 [json_name = "deliveryStatusRequest"];</code>
+   */
+  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequestOrBuilder getDeliveryStatusRequestOrBuilder();
 }

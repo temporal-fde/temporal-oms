@@ -296,6 +296,32 @@ private static final long serialVersionUID = 0L;
     return errors_.getByteString(index);
   }
 
+  public static final int NOTIFY_DELIVERY_STATUS_FIELD_NUMBER = 10;
+  private com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest notifyDeliveryStatus_;
+  /**
+   * <code>optional .acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest notify_delivery_status = 10 [json_name = "notifyDeliveryStatus"];</code>
+   * @return Whether the notifyDeliveryStatus field is set.
+   */
+  @java.lang.Override
+  public boolean hasNotifyDeliveryStatus() {
+    return ((bitField0_ & 0x00000020) != 0);
+  }
+  /**
+   * <code>optional .acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest notify_delivery_status = 10 [json_name = "notifyDeliveryStatus"];</code>
+   * @return The notifyDeliveryStatus.
+   */
+  @java.lang.Override
+  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest getNotifyDeliveryStatus() {
+    return notifyDeliveryStatus_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest.getDefaultInstance() : notifyDeliveryStatus_;
+  }
+  /**
+   * <code>optional .acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest notify_delivery_status = 10 [json_name = "notifyDeliveryStatus"];</code>
+   */
+  @java.lang.Override
+  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequestOrBuilder getNotifyDeliveryStatusOrBuilder() {
+    return notifyDeliveryStatus_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest.getDefaultInstance() : notifyDeliveryStatus_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -336,6 +362,9 @@ private static final long serialVersionUID = 0L;
     }
     for (int i = 0; i < errors_.size(); i++) {
       com.google.protobuf.GeneratedMessage.writeString(output, 9, errors_.getRaw(i));
+    }
+    if (((bitField0_ & 0x00000020) != 0)) {
+      output.writeMessage(10, getNotifyDeliveryStatus());
     }
     getUnknownFields().writeTo(output);
   }
@@ -385,6 +414,10 @@ private static final long serialVersionUID = 0L;
       size += dataSize;
       size += 1 * getErrorsList().size();
     }
+    if (((bitField0_ & 0x00000020) != 0)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(10, getNotifyDeliveryStatus());
+    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -431,6 +464,11 @@ private static final long serialVersionUID = 0L;
     if (deliveryStatus_ != other.deliveryStatus_) return false;
     if (!getErrorsList()
         .equals(other.getErrorsList())) return false;
+    if (hasNotifyDeliveryStatus() != other.hasNotifyDeliveryStatus()) return false;
+    if (hasNotifyDeliveryStatus()) {
+      if (!getNotifyDeliveryStatus()
+          .equals(other.getNotifyDeliveryStatus())) return false;
+    }
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -471,6 +509,10 @@ private static final long serialVersionUID = 0L;
     if (getErrorsCount() > 0) {
       hash = (37 * hash) + ERRORS_FIELD_NUMBER;
       hash = (53 * hash) + getErrorsList().hashCode();
+    }
+    if (hasNotifyDeliveryStatus()) {
+      hash = (37 * hash) + NOTIFY_DELIVERY_STATUS_FIELD_NUMBER;
+      hash = (53 * hash) + getNotifyDeliveryStatus().hashCode();
     }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
@@ -607,6 +649,7 @@ private static final long serialVersionUID = 0L;
         internalGetValidatedAddressFieldBuilder();
         internalGetFulfillmentRequestFieldBuilder();
         internalGetShippingSelectionFieldBuilder();
+        internalGetNotifyDeliveryStatusFieldBuilder();
       }
     }
     @java.lang.Override
@@ -643,6 +686,11 @@ private static final long serialVersionUID = 0L;
       deliveryStatus_ = 0;
       errors_ =
           com.google.protobuf.LazyStringArrayList.emptyList();
+      notifyDeliveryStatus_ = null;
+      if (notifyDeliveryStatusBuilder_ != null) {
+        notifyDeliveryStatusBuilder_.dispose();
+        notifyDeliveryStatusBuilder_ = null;
+      }
       return this;
     }
 
@@ -720,6 +768,12 @@ private static final long serialVersionUID = 0L;
         errors_.makeImmutable();
         result.errors_ = errors_;
       }
+      if (((from_bitField0_ & 0x00000200) != 0)) {
+        result.notifyDeliveryStatus_ = notifyDeliveryStatusBuilder_ == null
+            ? notifyDeliveryStatus_
+            : notifyDeliveryStatusBuilder_.build();
+        to_bitField0_ |= 0x00000020;
+      }
       result.bitField0_ |= to_bitField0_;
     }
 
@@ -770,6 +824,9 @@ private static final long serialVersionUID = 0L;
           errors_.addAll(other.errors_);
         }
         onChanged();
+      }
+      if (other.hasNotifyDeliveryStatus()) {
+        mergeNotifyDeliveryStatus(other.getNotifyDeliveryStatus());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -852,6 +909,13 @@ private static final long serialVersionUID = 0L;
               errors_.add(input.readStringRequireUtf8());
               break;
             } // case 74
+            case 82: {
+              input.readMessage(
+                  internalGetNotifyDeliveryStatusFieldBuilder().getBuilder(),
+                  extensionRegistry);
+              bitField0_ |= 0x00000200;
+              break;
+            } // case 82
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -1759,6 +1823,127 @@ private static final long serialVersionUID = 0L;
       bitField0_ |= 0x00000100;
       onChanged();
       return this;
+    }
+
+    private com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest notifyDeliveryStatus_;
+    private com.google.protobuf.SingleFieldBuilder<
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequestOrBuilder> notifyDeliveryStatusBuilder_;
+    /**
+     * <code>optional .acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest notify_delivery_status = 10 [json_name = "notifyDeliveryStatus"];</code>
+     * @return Whether the notifyDeliveryStatus field is set.
+     */
+    public boolean hasNotifyDeliveryStatus() {
+      return ((bitField0_ & 0x00000200) != 0);
+    }
+    /**
+     * <code>optional .acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest notify_delivery_status = 10 [json_name = "notifyDeliveryStatus"];</code>
+     * @return The notifyDeliveryStatus.
+     */
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest getNotifyDeliveryStatus() {
+      if (notifyDeliveryStatusBuilder_ == null) {
+        return notifyDeliveryStatus_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest.getDefaultInstance() : notifyDeliveryStatus_;
+      } else {
+        return notifyDeliveryStatusBuilder_.getMessage();
+      }
+    }
+    /**
+     * <code>optional .acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest notify_delivery_status = 10 [json_name = "notifyDeliveryStatus"];</code>
+     */
+    public Builder setNotifyDeliveryStatus(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest value) {
+      if (notifyDeliveryStatusBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        notifyDeliveryStatus_ = value;
+      } else {
+        notifyDeliveryStatusBuilder_.setMessage(value);
+      }
+      bitField0_ |= 0x00000200;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional .acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest notify_delivery_status = 10 [json_name = "notifyDeliveryStatus"];</code>
+     */
+    public Builder setNotifyDeliveryStatus(
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest.Builder builderForValue) {
+      if (notifyDeliveryStatusBuilder_ == null) {
+        notifyDeliveryStatus_ = builderForValue.build();
+      } else {
+        notifyDeliveryStatusBuilder_.setMessage(builderForValue.build());
+      }
+      bitField0_ |= 0x00000200;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional .acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest notify_delivery_status = 10 [json_name = "notifyDeliveryStatus"];</code>
+     */
+    public Builder mergeNotifyDeliveryStatus(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest value) {
+      if (notifyDeliveryStatusBuilder_ == null) {
+        if (((bitField0_ & 0x00000200) != 0) &&
+          notifyDeliveryStatus_ != null &&
+          notifyDeliveryStatus_ != com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest.getDefaultInstance()) {
+          getNotifyDeliveryStatusBuilder().mergeFrom(value);
+        } else {
+          notifyDeliveryStatus_ = value;
+        }
+      } else {
+        notifyDeliveryStatusBuilder_.mergeFrom(value);
+      }
+      if (notifyDeliveryStatus_ != null) {
+        bitField0_ |= 0x00000200;
+        onChanged();
+      }
+      return this;
+    }
+    /**
+     * <code>optional .acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest notify_delivery_status = 10 [json_name = "notifyDeliveryStatus"];</code>
+     */
+    public Builder clearNotifyDeliveryStatus() {
+      bitField0_ = (bitField0_ & ~0x00000200);
+      notifyDeliveryStatus_ = null;
+      if (notifyDeliveryStatusBuilder_ != null) {
+        notifyDeliveryStatusBuilder_.dispose();
+        notifyDeliveryStatusBuilder_ = null;
+      }
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional .acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest notify_delivery_status = 10 [json_name = "notifyDeliveryStatus"];</code>
+     */
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest.Builder getNotifyDeliveryStatusBuilder() {
+      bitField0_ |= 0x00000200;
+      onChanged();
+      return internalGetNotifyDeliveryStatusFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>optional .acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest notify_delivery_status = 10 [json_name = "notifyDeliveryStatus"];</code>
+     */
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequestOrBuilder getNotifyDeliveryStatusOrBuilder() {
+      if (notifyDeliveryStatusBuilder_ != null) {
+        return notifyDeliveryStatusBuilder_.getMessageOrBuilder();
+      } else {
+        return notifyDeliveryStatus_ == null ?
+            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest.getDefaultInstance() : notifyDeliveryStatus_;
+      }
+    }
+    /**
+     * <code>optional .acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest notify_delivery_status = 10 [json_name = "notifyDeliveryStatus"];</code>
+     */
+    private com.google.protobuf.SingleFieldBuilder<
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequestOrBuilder> 
+        internalGetNotifyDeliveryStatusFieldBuilder() {
+      if (notifyDeliveryStatusBuilder_ == null) {
+        notifyDeliveryStatusBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequestOrBuilder>(
+                getNotifyDeliveryStatus(),
+                getParentForChildren(),
+                isClean());
+        notifyDeliveryStatus_ = null;
+      }
+      return notifyDeliveryStatusBuilder_;
     }
 
     // @@protoc_insertion_point(builder_scope:acme.fulfillment.domain.fulfillment.v1.GetFulfillmentOrderStateResponse)

@@ -10,8 +10,8 @@ from google.protobuf.message import Message  # type: ignore
 from pydantic import BaseModel
 from pydantic import ConfigDict
 from pydantic import Field
-from workflows_p2p import CompleteOrderRequest
-from workflows_p2p import GetProcessOrderStateResponse
+from ....apps.domain.v1.workflows_p2p import CompleteOrderRequest
+from ....processing.domain.v1.workflows_p2p import GetProcessOrderStateResponse
 import typing
 
 class Status(IntEnum):
@@ -230,6 +230,13 @@ class ProcessedOrder(BaseModel):
     customer_id: str = Field(default="")
     state: GetProcessOrderStateResponse = Field(default_factory=GetProcessOrderStateResponse)
 
+class NotifyDeliveryStatusRequest(BaseModel):
+    model_config = ConfigDict(validate_default=True)
+    order_id: str = Field(default="")
+    delivery_status: DeliveryStatus = Field(default=0)
+    carrier_tracking_id: typing.Optional[str] = Field(default="")
+    failure_reason: typing.Optional[str] = Field(default="")
+
 class OrderFulfillRequest(BaseModel):
     """
      OrderFulfillRequest is the input to the fulfillOrder Update handler.
@@ -237,6 +244,7 @@ class OrderFulfillRequest(BaseModel):
     """
 
     processed_order: ProcessedOrder = Field(default_factory=ProcessedOrder)
+    delivery_status_request: typing.Optional[NotifyDeliveryStatusRequest] = Field(default_factory=NotifyDeliveryStatusRequest)
 
 class ShippingSelection(BaseModel):
     """
@@ -267,13 +275,6 @@ class CancelFulfillmentOrderRequest(BaseModel):
     order_id: str = Field(default="")
     reason: str = Field(default="")
 
-class DeliveryStatusNotification(BaseModel):
-    model_config = ConfigDict(validate_default=True)
-    order_id: str = Field(default="")
-    delivery_status: DeliveryStatus = Field(default=0)
-    carrier_tracking_id: typing.Optional[str] = Field(default="")
-    failure_reason: typing.Optional[str] = Field(default="")
-
 class GetFulfillmentOrderStateResponse(BaseModel):
     model_config = ConfigDict(validate_default=True)
     args: StartOrderFulfillmentRequest = Field(default_factory=StartOrderFulfillmentRequest)
@@ -285,6 +286,7 @@ class GetFulfillmentOrderStateResponse(BaseModel):
     status: FulfillmentStatus = Field(default=0)
     delivery_status: DeliveryStatus = Field(default=0)
     errors: typing.List[str] = Field(default_factory=list)
+    notify_delivery_status: typing.Optional[NotifyDeliveryStatusRequest] = Field(default_factory=NotifyDeliveryStatusRequest)
 
 class FulfillmentItem(BaseModel):
     """

@@ -168,6 +168,9 @@ public class OrderImpl implements Order {
                             .setCustomerId(this.state.getArgs().getCustomerId())
                             .setState(this.state.getProcessedOrder())
                             .build())
+                            .setDeliveryStatusRequest(
+                                    NotifyDeliveryStatusRequest.newBuilder().
+                                            setDeliveryStatusValue(DeliveryStatus.DELIVERY_STATUS_DELIVERED_VALUE))
                     .build());
 
             Workflow.await(Workflow::isEveryHandlerFinished);

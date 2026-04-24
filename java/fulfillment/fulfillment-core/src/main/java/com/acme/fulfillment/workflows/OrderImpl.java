@@ -24,9 +24,10 @@ import java.util.Optional;
  * Lifecycle:
  *  1. [UpdateWithStart] validateOrder → Carriers.verifyAddress → store verified Address → return
  *  2. execute() unblocks → loadOptions (LocalActivity) → InventoryService.holdItems → await fulfillOrder/cancel/timeout
- *  3. [Update] fulfillOrder → InventoryService.reserveItems → Carriers.getCarrierRates → select rate (margin check)
- *               → concurrent: Carriers.printShippingLabel + InventoryService.deductInventory → await notifyDeliveryStatus
- *  4. [Signal] notifyDeliveryStatus → DELIVERED or CANCELED
+ *  3. [Update] fulfillOrder → stores request → InventoryService.reserveItems → Carriers.getCarrierRates → select rate (margin check)
+ *               → concurrent: Carriers.printShippingLabel + InventoryService.deductInventory → return response (no delivery await)
+ *  4. execute() awaits state.notifyDeliveryStatus → updates delivery_status + status → complete
+ *  5. [Signal] notifyDeliveryStatus → stores NotifyDeliveryStatusRequest in state
  *
  * Compensation: detached scope releases inventory hold via InventoryService on cancelOrder Signal or timeout.
  */
@@ -45,7 +46,6 @@ public class OrderImpl implements Order {
     private GetFulfillmentOrderStateResponse state;
     private boolean cancelFlag = false;
     private boolean fulfillOrderReceived = false;
-    private boolean deliveryStatusReceived = false;
 
     private final Logger logger = LoggerFactory.getLogger(OrderImpl.class);
 
@@ -56,11 +56,11 @@ public class OrderImpl implements Order {
                 .setStatus(FulfillmentStatus.FULFILLMENT_STATUS_STARTED)
                 .build();
 
-        var defaultActivityOptions = ActivityOptions.newBuilder()
-                .setStartToCloseTimeout(Duration.ofSeconds(30))
-                .build();
-
-        this.carriers = Workflow.newActivityStub(Carriers.class, defaultActivityOptions);
+        this.carriers = Workflow.newActivityStub(Carriers.class,
+                ActivityOptions.newBuilder()
+                        .setTaskQueue("fulfillment-carriers")
+                        .setStartToCloseTimeout(Duration.ofSeconds(30))
+                        .build());
         this.optionsLoader = Workflow.newLocalActivityStub(FulfillmentOptionsLoader.class,
                 LocalActivityOptions.newBuilder()
                         .setStartToCloseTimeout(Duration.ofSeconds(5))
@@ -131,8 +131,17 @@ public class OrderImpl implements Order {
             return;
         }
 
-        // fulfillOrder Update has been received; wait for the handler (+ notifyDeliveryStatus) to complete
-        Workflow.await(Workflow::isEveryHandlerFinished);
+        // Await delivery status — set by notifyDeliveryStatus signal or pre-populated via delivery_status_request
+        Workflow.await(() -> state.hasNotifyDeliveryStatus());
+
+        var notification = state.getNotifyDeliveryStatus();
+        this.state = this.state.toBuilder()
+                .setDeliveryStatus(notification.getDeliveryStatus())
+                .setStatus(notification.getDeliveryStatus() == DeliveryStatus.DELIVERY_STATUS_DELIVERED
+                        ? FulfillmentStatus.FULFILLMENT_STATUS_DELIVERED
+                        : FulfillmentStatus.FULFILLMENT_STATUS_CANCELED)
+                .build();
+
         logger.info("fulfillment.Order complete for order_id={}, status={}",
                 request.getOrderId(), state.getStatus());
     }
@@ -243,8 +252,12 @@ public class OrderImpl implements Order {
 
         logger.info("Label printed for order_id={}, tracking_number={}", orderId, labelResponse.getTrackingNumber());
 
-        // Await delivery status signal — DELIVERED or CANCELED
-        Workflow.await(() -> deliveryStatusReceived);
+        // Pre-populate notify_delivery_status from request so execute can proceed without signal
+        if (request.hasDeliveryStatusRequest()) {
+            this.state = this.state.toBuilder()
+                    .setNotifyDeliveryStatus(request.getDeliveryStatusRequest())
+                    .build();
+        }
 
         return OrderFulfillResponse.newBuilder()
                 .setTrackingNumber(labelResponse.getTrackingNumber())
@@ -263,15 +276,11 @@ public class OrderImpl implements Order {
     // ── notifyDeliveryStatus Signal ───────────────────────────────────────────
 
     @Override
-    public void notifyDeliveryStatus(DeliveryStatusNotification notification) {
+    public void notifyDeliveryStatus(NotifyDeliveryStatusRequest request) {
         logger.info("notifyDeliveryStatus for order_id={}: {}",
-                notification.getOrderId(), notification.getDeliveryStatus());
-        this.deliveryStatusReceived = true;
+                request.getOrderId(), request.getDeliveryStatus());
         this.state = this.state.toBuilder()
-                .setDeliveryStatus(notification.getDeliveryStatus())
-                .setStatus(notification.getDeliveryStatus() == DeliveryStatus.DELIVERY_STATUS_DELIVERED
-                        ? FulfillmentStatus.FULFILLMENT_STATUS_DELIVERED
-                        : FulfillmentStatus.FULFILLMENT_STATUS_CANCELED)
+                .setNotifyDeliveryStatus(request)
                 .build();
     }
 

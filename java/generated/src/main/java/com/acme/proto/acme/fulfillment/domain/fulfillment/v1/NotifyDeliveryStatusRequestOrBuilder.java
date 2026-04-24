@@ -6,8 +6,8 @@
 package com.acme.proto.acme.fulfillment.domain.fulfillment.v1;
 
 @com.google.protobuf.Generated
-public interface DeliveryStatusNotificationOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification)
+public interface NotifyDeliveryStatusRequestOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest)
     com.google.protobuf.MessageOrBuilder {
 
   /**

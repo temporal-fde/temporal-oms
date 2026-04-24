@@ -309,10 +309,12 @@ class FulfillmentOptions(_message.Message):
     def __init__(self, shipping_margin: _Optional[_Union[_values_pb2.Money, _Mapping]] = ..., integrations_endpoint: _Optional[str] = ...) -> None: ...
 
 class OrderFulfillRequest(_message.Message):
-    __slots__ = ("processed_order",)
+    __slots__ = ("processed_order", "delivery_status_request")
     PROCESSED_ORDER_FIELD_NUMBER: _ClassVar[int]
+    DELIVERY_STATUS_REQUEST_FIELD_NUMBER: _ClassVar[int]
     processed_order: ProcessedOrder
-    def __init__(self, processed_order: _Optional[_Union[ProcessedOrder, _Mapping]] = ...) -> None: ...
+    delivery_status_request: NotifyDeliveryStatusRequest
+    def __init__(self, processed_order: _Optional[_Union[ProcessedOrder, _Mapping]] = ..., delivery_status_request: _Optional[_Union[NotifyDeliveryStatusRequest, _Mapping]] = ...) -> None: ...
 
 class ProcessedOrder(_message.Message):
     __slots__ = ("order_id", "customer_id", "state")
@@ -360,7 +362,7 @@ class CancelFulfillmentOrderRequest(_message.Message):
     reason: str
     def __init__(self, order_id: _Optional[str] = ..., reason: _Optional[str] = ...) -> None: ...
 
-class DeliveryStatusNotification(_message.Message):
+class NotifyDeliveryStatusRequest(_message.Message):
     __slots__ = ("order_id", "delivery_status", "carrier_tracking_id", "failure_reason")
     ORDER_ID_FIELD_NUMBER: _ClassVar[int]
     DELIVERY_STATUS_FIELD_NUMBER: _ClassVar[int]
@@ -373,7 +375,7 @@ class DeliveryStatusNotification(_message.Message):
     def __init__(self, order_id: _Optional[str] = ..., delivery_status: _Optional[_Union[DeliveryStatus, str]] = ..., carrier_tracking_id: _Optional[str] = ..., failure_reason: _Optional[str] = ...) -> None: ...
 
 class GetFulfillmentOrderStateResponse(_message.Message):
-    __slots__ = ("args", "options", "validated_address", "fulfillment_request", "shipping_selection", "tracking_number", "status", "delivery_status", "errors")
+    __slots__ = ("args", "options", "validated_address", "fulfillment_request", "shipping_selection", "tracking_number", "status", "delivery_status", "errors", "notify_delivery_status")
     ARGS_FIELD_NUMBER: _ClassVar[int]
     OPTIONS_FIELD_NUMBER: _ClassVar[int]
     VALIDATED_ADDRESS_FIELD_NUMBER: _ClassVar[int]
@@ -383,6 +385,7 @@ class GetFulfillmentOrderStateResponse(_message.Message):
     STATUS_FIELD_NUMBER: _ClassVar[int]
     DELIVERY_STATUS_FIELD_NUMBER: _ClassVar[int]
     ERRORS_FIELD_NUMBER: _ClassVar[int]
+    NOTIFY_DELIVERY_STATUS_FIELD_NUMBER: _ClassVar[int]
     args: StartOrderFulfillmentRequest
     options: FulfillmentOptions
     validated_address: _values_pb2.Address
@@ -392,7 +395,8 @@ class GetFulfillmentOrderStateResponse(_message.Message):
     status: FulfillmentStatus
     delivery_status: DeliveryStatus
     errors: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, args: _Optional[_Union[StartOrderFulfillmentRequest, _Mapping]] = ..., options: _Optional[_Union[FulfillmentOptions, _Mapping]] = ..., validated_address: _Optional[_Union[_values_pb2.Address, _Mapping]] = ..., fulfillment_request: _Optional[_Union[OrderFulfillRequest, _Mapping]] = ..., shipping_selection: _Optional[_Union[ShippingSelection, _Mapping]] = ..., tracking_number: _Optional[str] = ..., status: _Optional[_Union[FulfillmentStatus, str]] = ..., delivery_status: _Optional[_Union[DeliveryStatus, str]] = ..., errors: _Optional[_Iterable[str]] = ...) -> None: ...
+    notify_delivery_status: NotifyDeliveryStatusRequest
+    def __init__(self, args: _Optional[_Union[StartOrderFulfillmentRequest, _Mapping]] = ..., options: _Optional[_Union[FulfillmentOptions, _Mapping]] = ..., validated_address: _Optional[_Union[_values_pb2.Address, _Mapping]] = ..., fulfillment_request: _Optional[_Union[OrderFulfillRequest, _Mapping]] = ..., shipping_selection: _Optional[_Union[ShippingSelection, _Mapping]] = ..., tracking_number: _Optional[str] = ..., status: _Optional[_Union[FulfillmentStatus, str]] = ..., delivery_status: _Optional[_Union[DeliveryStatus, str]] = ..., errors: _Optional[_Iterable[str]] = ..., notify_delivery_status: _Optional[_Union[NotifyDeliveryStatusRequest, _Mapping]] = ...) -> None: ...
 
 class FulfillmentItem(_message.Message):
     __slots__ = ("item_id", "sku_id", "brand_code", "quantity", "warehouse_id", "warehouse_location")

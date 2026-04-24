@@ -209,6 +209,7 @@ message FulfillmentOptions {
 // Name is distinct from the Python-era FulfillOrderRequest in this package.
 message OrderFulfillRequest {
   ProcessedOrder processed_order = 1;
+  optional NotifyDeliveryStatusRequest delivery_status_request = 2;
 }
 
 // ProcessedOrder carries the result of processing.Order for use in fulfillment
@@ -249,7 +250,7 @@ message CancelFulfillmentOrderRequest {
 
 // ── notifyDeliveryStatus Signal ───────────────────────────────────────────────
 
-message DeliveryStatusNotification {
+message NotifyDeliveryStatusRequest {
   string order_id = 1;
   DeliveryStatus delivery_status = 2;
   optional string carrier_tracking_id = 3;
@@ -274,6 +275,7 @@ message GetFulfillmentOrderStateResponse {
   FulfillmentStatus status = 7;
   DeliveryStatus delivery_status = 8;
   repeated string errors = 9;
+  optional NotifyDeliveryStatusRequest notify_delivery_status = 10;
 }
 
 enum FulfillmentStatus {

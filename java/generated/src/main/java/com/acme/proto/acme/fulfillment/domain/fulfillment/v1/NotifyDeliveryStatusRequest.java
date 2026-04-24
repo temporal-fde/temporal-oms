@@ -6,13 +6,13 @@
 package com.acme.proto.acme.fulfillment.domain.fulfillment.v1;
 
 /**
- * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification}
+ * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest}
  */
 @com.google.protobuf.Generated
-public final class DeliveryStatusNotification extends
+public final class NotifyDeliveryStatusRequest extends
     com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification)
-    DeliveryStatusNotificationOrBuilder {
+    // @@protoc_insertion_point(message_implements:acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest)
+    NotifyDeliveryStatusRequestOrBuilder {
 private static final long serialVersionUID = 0L;
   static {
     com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
@@ -21,13 +21,13 @@ private static final long serialVersionUID = 0L;
       /* minor= */ 34,
       /* patch= */ 1,
       /* suffix= */ "",
-      "DeliveryStatusNotification");
+      "NotifyDeliveryStatusRequest");
   }
-  // Use DeliveryStatusNotification.newBuilder() to construct.
-  private DeliveryStatusNotification(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+  // Use NotifyDeliveryStatusRequest.newBuilder() to construct.
+  private NotifyDeliveryStatusRequest(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
   }
-  private DeliveryStatusNotification() {
+  private NotifyDeliveryStatusRequest() {
     orderId_ = "";
     deliveryStatus_ = 0;
     carrierTrackingId_ = "";
@@ -36,20 +36,20 @@ private static final long serialVersionUID = 0L;
 
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.WorkflowsProto.internal_static_acme_fulfillment_domain_fulfillment_v1_DeliveryStatusNotification_descriptor;
+    return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.WorkflowsProto.internal_static_acme_fulfillment_domain_fulfillment_v1_NotifyDeliveryStatusRequest_descriptor;
   }
 
   @java.lang.Override
   public com.google.protobuf.Descriptors.Descriptor getDescriptorForType() {
-    return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.WorkflowsProto.internal_static_acme_fulfillment_domain_fulfillment_v1_DeliveryStatusNotification_descriptor;
+    return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.WorkflowsProto.internal_static_acme_fulfillment_domain_fulfillment_v1_NotifyDeliveryStatusRequest_descriptor;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.WorkflowsProto.internal_static_acme_fulfillment_domain_fulfillment_v1_DeliveryStatusNotification_fieldAccessorTable
+    return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.WorkflowsProto.internal_static_acme_fulfillment_domain_fulfillment_v1_NotifyDeliveryStatusRequest_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
-            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification.class, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification.Builder.class);
+            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest.class, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest.Builder.class);
   }
 
   private int bitField0_;
@@ -262,10 +262,10 @@ private static final long serialVersionUID = 0L;
     if (obj == this) {
      return true;
     }
-    if (!(obj instanceof com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification)) {
+    if (!(obj instanceof com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest)) {
       return super.equals(obj);
     }
-    com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification other = (com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification) obj;
+    com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest other = (com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest) obj;
 
     if (!getOrderId()
         .equals(other.getOrderId())) return false;
@@ -308,44 +308,44 @@ private static final long serialVersionUID = 0L;
     return hash;
   }
 
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest parseFrom(
       java.nio.ByteBuffer data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest parseFrom(
       java.nio.ByteBuffer data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest parseFrom(
       com.google.protobuf.ByteString data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification parseFrom(byte[] data)
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest parseFrom(byte[] data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest parseFrom(
       byte[] data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification parseFrom(java.io.InputStream input)
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest parseFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessage
         .parseWithIOException(PARSER, input);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest parseFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -353,26 +353,26 @@ private static final long serialVersionUID = 0L;
         .parseWithIOException(PARSER, input, extensionRegistry);
   }
 
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification parseDelimitedFrom(java.io.InputStream input)
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest parseDelimitedFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessage
         .parseDelimitedWithIOException(PARSER, input);
   }
 
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification parseDelimitedFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest parseDelimitedFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessage
         .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest parseFrom(
       com.google.protobuf.CodedInputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessage
         .parseWithIOException(PARSER, input);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest parseFrom(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -385,7 +385,7 @@ private static final long serialVersionUID = 0L;
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-  public static Builder newBuilder(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification prototype) {
+  public static Builder newBuilder(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
   @java.lang.Override
@@ -401,26 +401,26 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
-   * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification}
+   * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest}
    */
   public static final class Builder extends
       com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification)
-      com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotificationOrBuilder {
+      // @@protoc_insertion_point(builder_implements:acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest)
+      com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequestOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.WorkflowsProto.internal_static_acme_fulfillment_domain_fulfillment_v1_DeliveryStatusNotification_descriptor;
+      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.WorkflowsProto.internal_static_acme_fulfillment_domain_fulfillment_v1_NotifyDeliveryStatusRequest_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.WorkflowsProto.internal_static_acme_fulfillment_domain_fulfillment_v1_DeliveryStatusNotification_fieldAccessorTable
+      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.WorkflowsProto.internal_static_acme_fulfillment_domain_fulfillment_v1_NotifyDeliveryStatusRequest_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification.class, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification.Builder.class);
+              com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest.class, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest.Builder.class);
     }
 
-    // Construct using com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification.newBuilder()
+    // Construct using com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest.newBuilder()
     private Builder() {
 
     }
@@ -444,17 +444,17 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.WorkflowsProto.internal_static_acme_fulfillment_domain_fulfillment_v1_DeliveryStatusNotification_descriptor;
+      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.WorkflowsProto.internal_static_acme_fulfillment_domain_fulfillment_v1_NotifyDeliveryStatusRequest_descriptor;
     }
 
     @java.lang.Override
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification getDefaultInstanceForType() {
-      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification.getDefaultInstance();
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest getDefaultInstanceForType() {
+      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest.getDefaultInstance();
     }
 
     @java.lang.Override
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification build() {
-      com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification result = buildPartial();
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest build() {
+      com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest result = buildPartial();
       if (!result.isInitialized()) {
         throw newUninitializedMessageException(result);
       }
@@ -462,14 +462,14 @@ private static final long serialVersionUID = 0L;
     }
 
     @java.lang.Override
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification buildPartial() {
-      com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification result = new com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification(this);
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest buildPartial() {
+      com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest result = new com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest(this);
       if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
     }
 
-    private void buildPartial0(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification result) {
+    private void buildPartial0(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest result) {
       int from_bitField0_ = bitField0_;
       if (((from_bitField0_ & 0x00000001) != 0)) {
         result.orderId_ = orderId_;
@@ -491,16 +491,16 @@ private static final long serialVersionUID = 0L;
 
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
-      if (other instanceof com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification) {
-        return mergeFrom((com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification)other);
+      if (other instanceof com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest) {
+        return mergeFrom((com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest)other);
       } else {
         super.mergeFrom(other);
         return this;
       }
     }
 
-    public Builder mergeFrom(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification other) {
-      if (other == com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification.getDefaultInstance()) return this;
+    public Builder mergeFrom(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest other) {
+      if (other == com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest.getDefaultInstance()) return this;
       if (!other.getOrderId().isEmpty()) {
         orderId_ = other.orderId_;
         bitField0_ |= 0x00000001;
@@ -864,23 +864,23 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    // @@protoc_insertion_point(builder_scope:acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification)
+    // @@protoc_insertion_point(builder_scope:acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest)
   }
 
-  // @@protoc_insertion_point(class_scope:acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification)
-  private static final com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification DEFAULT_INSTANCE;
+  // @@protoc_insertion_point(class_scope:acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest)
+  private static final com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification();
+    DEFAULT_INSTANCE = new com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest();
   }
 
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification getDefaultInstance() {
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest getDefaultInstance() {
     return DEFAULT_INSTANCE;
   }
 
-  private static final com.google.protobuf.Parser<DeliveryStatusNotification>
-      PARSER = new com.google.protobuf.AbstractParser<DeliveryStatusNotification>() {
+  private static final com.google.protobuf.Parser<NotifyDeliveryStatusRequest>
+      PARSER = new com.google.protobuf.AbstractParser<NotifyDeliveryStatusRequest>() {
     @java.lang.Override
-    public DeliveryStatusNotification parsePartialFrom(
+    public NotifyDeliveryStatusRequest parsePartialFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -899,17 +899,17 @@ private static final long serialVersionUID = 0L;
     }
   };
 
-  public static com.google.protobuf.Parser<DeliveryStatusNotification> parser() {
+  public static com.google.protobuf.Parser<NotifyDeliveryStatusRequest> parser() {
     return PARSER;
   }
 
   @java.lang.Override
-  public com.google.protobuf.Parser<DeliveryStatusNotification> getParserForType() {
+  public com.google.protobuf.Parser<NotifyDeliveryStatusRequest> getParserForType() {
     return PARSER;
   }
 
   @java.lang.Override
-  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeliveryStatusNotification getDefaultInstanceForType() {
+  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest getDefaultInstanceForType() {
     return DEFAULT_INSTANCE;
   }
 
