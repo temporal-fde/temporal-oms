@@ -12,6 +12,7 @@ import io.temporal.client.UpdateOptions;
 import io.temporal.client.WithStartWorkflowOperation;
 import io.temporal.client.WorkflowClient;
 import io.temporal.client.WorkflowOptions;
+import io.temporal.client.WorkflowStub;
 import io.temporal.client.WorkflowUpdateStage;
 import io.temporal.nexus.Nexus;
 import org.slf4j.Logger;
@@ -57,6 +58,30 @@ public class FulfillmentImpl {
                             .setWaitForStage(WorkflowUpdateStage.COMPLETED)
                             .build(),
                     new WithStartWorkflowOperation<>(orderWorkflow::execute, request));
+        });
+    }
+
+    @OperationImpl
+    public OperationHandler<OrderFulfillRequest, OrderFulfillResponse> fulfillOrder() {
+        // Dispatch fulfillOrder Update to the running fulfillment.Order workflow.
+        // We wait only for ACCEPTED — fulfillOrder awaits delivery status (long-running)
+        // and apps.Order does not need the result; fulfillment.Order is the source of truth.
+        return OperationHandler.sync((ctx, details, request) -> {
+            var orderId = request.getProcessedOrder().getOrderId();
+            logger.info("fulfillOrder Nexus operation for order_id={}", orderId);
+
+            WorkflowClient client = Nexus.getOperationContext().getWorkflowClient();
+            Order orderWorkflow = client.newWorkflowStub(Order.class, orderId);
+
+            WorkflowStub.fromTyped(orderWorkflow).startUpdate(
+                    UpdateOptions.<OrderFulfillResponse>newBuilder()
+                            .setUpdateName("fulfillOrder")
+                            .setResultType(OrderFulfillResponse.class)
+                            .setWaitForStage(WorkflowUpdateStage.ACCEPTED)
+                            .build(),
+                    request);
+
+            return OrderFulfillResponse.getDefaultInstance();
         });
     }
 

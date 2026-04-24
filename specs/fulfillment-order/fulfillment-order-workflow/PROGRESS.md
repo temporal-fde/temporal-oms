@@ -1,7 +1,7 @@
 # fulfillment.Order Workflow — Progress Tracking
 
 **Feature:** `fulfillment.Order` — Durable Fulfillment Orchestration
-**Status:** 🚧 Implementing — Phases 1–4 complete
+**Status:** 🚧 Implementing — Phases 1–5 complete (unit tests + deployment pending)
 **Owner:** Temporal FDE Team
 **Created:** 2026-04-15
 **Updated:** 2026-04-15
@@ -16,7 +16,7 @@
 | Phase 2 | Workflow & Activity Interfaces | ✅ Complete | Phase 1 |
 | Phase 3 | `fulfillment.Order` Implementation (V1) | ✅ Complete | Phase 2 |
 | Phase 4 | Nexus Handler for `validateOrder` | ✅ Complete | Phase 2 |
-| Phase 5 | Worker Versioning — `apps.Order` + `processing.Order` | ⏳ Not started | Phase 3 + Phase 4 + deployment spec |
+| Phase 5 | Worker Versioning — `apps.Order` + `processing.Order` | ✅ Complete (deploy + validate pending) | — |
 | Phase 6 | Activity Implementations | ⏳ Not started | stubs in place; real integration deferred |
 | Phase 7 | V2 — `ShippingAgent` Nexus Integration | ⏳ Deferred | `ShippingAgent` spec |
 
@@ -108,13 +108,15 @@ Phase 5 cannot start until Phases 3 and 4 are both complete and the deployment s
 > Resolve `FulfillOrderResponse` in `apps.Order` state question first.
 
 #### `apps.Order` new build-id
-- [ ] Add `Fulfillment` Nexus service stub to `OrderImpl` (mirrors `Processing` stub; endpoint `order-fulfillment`)
-- [ ] In `execute()`, after `Workflow.await()` resolves: call `validateOrder` Nexus and `processOrder` Nexus as concurrent Promises
-- [ ] After `processOrder` completes: send `fulfillOrder` Update to `fulfillment.Order`
+- [x] Add `Fulfillment` Nexus service stub to `OrderImpl` (mirrors `Processing` stub; endpoint `order-fulfillment`)
+- [x] Add `fulfillOrder` Nexus operation to `Fulfillment` interface + `FulfillmentImpl` handler (ACCEPTED stage)
+- [x] In `execute()`, after `Workflow.await()` resolves: call `validateOrder` Nexus and `processOrder` Nexus as concurrent Promises
+- [x] After `processOrder` completes: await `validatePromise`, then call `fulfillOrder` Nexus
+- [x] Add `@WorkflowVersioningBehavior(PINNED)` to `execute()` and enable deployment-properties in `acme.apps.yaml`
 - [ ] Build and deploy `apps-workers` with new build-id; mark as default
 
 #### `processing.Order` new build-id
-- [ ] Add `Workflow.getVersion("remove-kafka-fulfillment", DEFAULT_VERSION, 1)` branch in `OrderImpl.execute()` immediately before `Fulfillments.fulfillOrder()` call; new version skips the activity
+- [x] Add `Workflow.getVersion("remove-kafka-fulfillment", DEFAULT_VERSION, 1)` branch in `OrderImpl.execute()` immediately before `Fulfillments.fulfillOrder()` call; new version skips the activity
 - [ ] Write replay test against a captured V1 history before deploying
 - [ ] Build and deploy `processing-workers` with new build-id; mark as default
 
@@ -175,3 +177,4 @@ Phase 5 cannot start until Phases 3 and 4 are both complete and the deployment s
 | 2026-04-15 | Temporal FDE Team | Initial spec + PROGRESS.md |
 | 2026-04-15 | Temporal FDE Team | Moved to Planning; detailed task breakdown added |
 | 2026-04-15 | Temporal FDE Team | Phases 1–4 implemented: proto schema, workflow + activity interfaces, OrderImpl, FulfillmentNexusHandler, stub activity beans |
+| 2026-04-24 | Mike Nichols | Phase 5 code complete: Fulfillment Nexus fulfillOrder operation (ACCEPTED stage), apps.Order PINNED + concurrent validateOrder/processOrder + fulfillOrder dispatch, processing.Order getVersion branch, acme.apps.yaml deployment-properties enabled |
