@@ -1,6 +1,5 @@
-package com.acme.fulfillment.activities;
+package com.acme.fulfillment.workflows.activities;
 
-import com.acme.fulfillment.workflows.activities.FulfillmentOptionsLoader;
 import com.acme.proto.acme.common.v1.Money;
 import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillmentOptions;
 import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LoadFulfillmentOptionsRequest;

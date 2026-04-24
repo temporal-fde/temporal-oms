@@ -89,8 +89,11 @@ API keys are only needed for integration features. Workers start and connect wit
 ### Step 1: Start Local Temporal
 
 ```bash
-temporal server start-dev
+temporal server start-dev \
+  --dynamic-config-value system.enableDeploymentWorkflows=true
 ```
+
+> The `system.enableDeploymentWorkflows` flag enables the Worker Deployment feature used by the setup script to pin each deployment to `build-id=local`. Without it, the `set-current-version` calls in `setup-temporal-namespaces.sh` will time out with "context deadline exceeded".
 
 Verify Temporal is running:
 ```bash
@@ -309,6 +312,18 @@ scripts/
 ---
 
 ## Troubleshooting
+
+### ❌ `setup-temporal-namespaces.sh` fails with "context deadline exceeded" on `set-current-version`
+
+The Worker Deployment feature requires a server-side dynamic config flag that is off by default in `temporal server start-dev`.
+
+**Fix**: Stop the dev server and restart it with:
+```bash
+temporal server start-dev \
+  --dynamic-config-value system.enableDeploymentWorkflows=true
+```
+
+Then rerun `./scripts/setup-temporal-namespaces.sh`. The script is idempotent — already-created namespaces and endpoints are skipped safely.
 
 ### ❌ `INVALID_ARGUMENT: versioning behavior cannot be specified without deployment options`
 

@@ -76,7 +76,7 @@ public class FulfillmentImpl {
             WorkflowStub.fromTyped(orderWorkflow).startUpdate(
                     UpdateOptions.<OrderFulfillResponse>newBuilder()
                             .setUpdateName("fulfillOrder")
-                            .setResultType(OrderFulfillResponse.class)
+                            .setResultClass(OrderFulfillResponse.class)
                             .setWaitForStage(WorkflowUpdateStage.ACCEPTED)
                             .build(),
                     request);
