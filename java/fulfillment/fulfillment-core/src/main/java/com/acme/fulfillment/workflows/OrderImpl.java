@@ -68,7 +68,7 @@ public class OrderImpl implements Order {
     }
 
     @Override
-    @WorkflowVersioningBehavior(VersioningBehavior.PINNED)
+//    @WorkflowVersioningBehavior(VersioningBehavior.PINNED)
     public void execute(StartOrderFulfillmentRequest request) {
         logger.info("fulfillment.Order started for order_id={}", request.getOrderId());
 
