@@ -24,4 +24,16 @@ public interface FulfillmentOptionsOrBuilder extends
    * <code>.acme.common.v1.Money shipping_margin = 1 [json_name = "shippingMargin"];</code>
    */
   com.acme.proto.acme.common.v1.MoneyOrBuilder getShippingMarginOrBuilder();
+
+  /**
+   * <code>string integrations_endpoint = 2 [json_name = "integrationsEndpoint"];</code>
+   * @return The integrationsEndpoint.
+   */
+  java.lang.String getIntegrationsEndpoint();
+  /**
+   * <code>string integrations_endpoint = 2 [json_name = "integrationsEndpoint"];</code>
+   * @return The bytes for integrationsEndpoint.
+   */
+  com.google.protobuf.ByteString
+      getIntegrationsEndpointBytes();
 }

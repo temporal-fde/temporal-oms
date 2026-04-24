@@ -214,9 +214,11 @@ class FulfillmentOptions(BaseModel):
      FulfillmentOptions carries policy loaded at workflow start via LocalActivity.
  shipping_margin is the maximum acceptable shipping cost; amounts above it
  are recorded in the margin_leak SearchAttribute.
+ integrations_endpoint is the Nexus endpoint name for the apps InventoryService.
     """
 
     shipping_margin: Money = Field(default_factory=Money)
+    integrations_endpoint: str = Field(default="")
 
 class ProcessedOrder(BaseModel):
     """

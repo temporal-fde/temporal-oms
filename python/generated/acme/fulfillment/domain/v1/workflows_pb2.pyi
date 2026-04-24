@@ -301,10 +301,12 @@ class LoadFulfillmentOptionsRequest(_message.Message):
     def __init__(self, order_id: _Optional[str] = ...) -> None: ...
 
 class FulfillmentOptions(_message.Message):
-    __slots__ = ("shipping_margin",)
+    __slots__ = ("shipping_margin", "integrations_endpoint")
     SHIPPING_MARGIN_FIELD_NUMBER: _ClassVar[int]
+    INTEGRATIONS_ENDPOINT_FIELD_NUMBER: _ClassVar[int]
     shipping_margin: _values_pb2.Money
-    def __init__(self, shipping_margin: _Optional[_Union[_values_pb2.Money, _Mapping]] = ...) -> None: ...
+    integrations_endpoint: str
+    def __init__(self, shipping_margin: _Optional[_Union[_values_pb2.Money, _Mapping]] = ..., integrations_endpoint: _Optional[str] = ...) -> None: ...
 
 class OrderFulfillRequest(_message.Message):
     __slots__ = ("processed_order",)

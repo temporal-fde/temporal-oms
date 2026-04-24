@@ -9,9 +9,6 @@ spring.temporal:
       workflow-classes:
         - com.acme.fulfillment.workflows.OrderImpl
       activity-beans:
-        - addressVerificationActivities
-        - allocationsActivities
-        - deliveryServiceActivities
         - carriersActivities
         - fulfillmentOptionsLoaderActivities
       nexus-service-beans:

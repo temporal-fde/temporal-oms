@@ -1,10 +1,18 @@
 package com.acme.apps.workflows;
 
 import com.acme.proto.acme.apps.domain.apps.v1.StartIntegrationsRequest;
+import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeductInventoryRequest;
+import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeductInventoryResponse;
 import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FindAlternateWarehouseRequest;
 import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FindAlternateWarehouseResponse;
+import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.HoldItemsRequest;
+import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.HoldItemsResponse;
 import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest;
 import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressResponse;
+import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ReleaseHoldRequest;
+import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ReleaseHoldResponse;
+import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ReserveItemsRequest;
+import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ReserveItemsResponse;
 import com.acme.proto.acme.processing.domain.processing.v1.EnrichOrderRequest;
 import com.acme.proto.acme.processing.domain.processing.v1.EnrichOrderResponse;
 import com.acme.proto.acme.processing.domain.processing.v1.ValidateOrderRequest;
@@ -66,4 +74,28 @@ public interface Integrations {
 
     @UpdateValidatorMethod(updateName = "findAlternateWarehouse")
     void validateFindAlternateWarehouse(FindAlternateWarehouseRequest request);
+
+    @UpdateMethod
+    HoldItemsResponse holdItems(HoldItemsRequest request);
+
+    @UpdateValidatorMethod(updateName = "holdItems")
+    void validateHoldItems(HoldItemsRequest request);
+
+    @UpdateMethod
+    ReserveItemsResponse reserveItems(ReserveItemsRequest request);
+
+    @UpdateValidatorMethod(updateName = "reserveItems")
+    void validateReserveItems(ReserveItemsRequest request);
+
+    @UpdateMethod
+    DeductInventoryResponse deductInventory(DeductInventoryRequest request);
+
+    @UpdateValidatorMethod(updateName = "deductInventory")
+    void validateDeductInventory(DeductInventoryRequest request);
+
+    @UpdateMethod
+    ReleaseHoldResponse releaseHold(ReleaseHoldRequest request);
+
+    @UpdateValidatorMethod(updateName = "releaseHold")
+    void validateReleaseHold(ReleaseHoldRequest request);
 }

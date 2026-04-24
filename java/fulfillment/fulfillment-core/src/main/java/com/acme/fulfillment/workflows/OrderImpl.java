@@ -1,6 +1,8 @@
 package com.acme.fulfillment.workflows;
 
-import com.acme.fulfillment.workflows.activities.*;
+import com.acme.fulfillment.workflows.activities.Carriers;
+import com.acme.fulfillment.workflows.activities.FulfillmentOptionsLoader;
+import com.acme.oms.services.InventoryService;
 import com.acme.proto.acme.common.v1.Money;
 import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.*;
 import io.temporal.activity.ActivityOptions;
@@ -20,13 +22,13 @@ import java.util.Optional;
  * fulfillment.Order Workflow Implementation (V1)
  *
  * Lifecycle:
- *  1. [UpdateWithStart] validateOrder → verifyAddress → store verified Address → return
- *  2. execute() unblocks → loadOptions (LocalActivity) → holdItems → await fulfillOrder/cancel/timeout
- *  3. [Update] fulfillOrder → reserveItems → getCarrierRates → select rate (margin check)
- *               → concurrent: printShippingLabel + deductInventory → await notifyDeliveryStatus
+ *  1. [UpdateWithStart] validateOrder → Carriers.verifyAddress → store verified Address → return
+ *  2. execute() unblocks → loadOptions (LocalActivity) → InventoryService.holdItems → await fulfillOrder/cancel/timeout
+ *  3. [Update] fulfillOrder → InventoryService.reserveItems → Carriers.getCarrierRates → select rate (margin check)
+ *               → concurrent: Carriers.printShippingLabel + InventoryService.deductInventory → await notifyDeliveryStatus
  *  4. [Signal] notifyDeliveryStatus → DELIVERED or CANCELED
  *
- * Compensation: detached scope releases inventory hold on cancelOrder Signal or timeout.
+ * Compensation: detached scope releases inventory hold via InventoryService on cancelOrder Signal or timeout.
  */
 public class OrderImpl implements Order {
 
@@ -34,11 +36,11 @@ public class OrderImpl implements Order {
     private static final SearchAttributeKey<Long> MARGIN_LEAK = SearchAttributeKey.forLong("margin_leak");
     private static final long DEFAULT_FULFILLMENT_TIMEOUT_SECS = 86_400L; // 24 hours
 
-    private final AddressVerification addressVerification;
-    private final Allocations allocations;
-    private final DeliveryService deliveryService;
     private final Carriers carriers;
     private final FulfillmentOptionsLoader optionsLoader;
+
+    // Initialized in execute() after FulfillmentOptions are loaded (endpoint name needed)
+    private InventoryService inventory;
 
     private GetFulfillmentOrderStateResponse state;
     private boolean cancelFlag = false;
@@ -54,14 +56,11 @@ public class OrderImpl implements Order {
                 .setStatus(FulfillmentStatus.FULFILLMENT_STATUS_STARTED)
                 .build();
 
-        var defaultOptions = ActivityOptions.newBuilder()
+        var defaultActivityOptions = ActivityOptions.newBuilder()
                 .setStartToCloseTimeout(Duration.ofSeconds(30))
                 .build();
 
-        this.addressVerification = Workflow.newActivityStub(AddressVerification.class, defaultOptions);
-        this.allocations = Workflow.newActivityStub(Allocations.class, defaultOptions);
-        this.deliveryService = Workflow.newActivityStub(DeliveryService.class, defaultOptions);
-        this.carriers = Workflow.newActivityStub(Carriers.class, defaultOptions);
+        this.carriers = Workflow.newActivityStub(Carriers.class, defaultActivityOptions);
         this.optionsLoader = Workflow.newLocalActivityStub(FulfillmentOptionsLoader.class,
                 LocalActivityOptions.newBuilder()
                         .setStartToCloseTimeout(Duration.ofSeconds(5))
@@ -73,23 +72,31 @@ public class OrderImpl implements Order {
     public void execute(StartOrderFulfillmentRequest request) {
         logger.info("fulfillment.Order started for order_id={}", request.getOrderId());
 
-        // Wait for validateOrder Update to store the verified address before proceeding.
-        // validateOrder is delivered as part of UpdateWithStart from apps.Order.
+        // Wait for validateOrder Update (delivered as part of UpdateWithStart from apps.Order)
         Workflow.await(() -> state.hasValidatedAddress() || cancelFlag);
         if (cancelFlag) {
             logger.info("Order {} cancelled before address validation", request.getOrderId());
             return;
         }
 
-        // Load fulfillment policy (shipping_margin) via LocalActivity — no task queue round-trip
+        // Load fulfillment policy (shipping_margin + integrations_endpoint) via LocalActivity
         var options = optionsLoader.loadOptions(
                 LoadFulfillmentOptionsRequest.newBuilder()
                         .setOrderId(request.getOrderId())
                         .build());
         this.state = this.state.toBuilder().setOptions(options).build();
 
+        // Configure InventoryService Nexus stub using the integrations endpoint from options
+        this.inventory = Workflow.newNexusServiceStub(InventoryService.class,
+                NexusServiceOptions.newBuilder()
+                        .setEndpoint(options.getIntegrationsEndpoint())
+                        .setOperationOptions(NexusOperationOptions.newBuilder()
+                                .setScheduleToCloseTimeout(Duration.ofSeconds(30))
+                                .build())
+                        .build());
+
         // Eagerly hold inventory while apps.Order processes the order
-        var holdResponse = allocations.holdItems(
+        var holdResponse = inventory.holdItems(
                 HoldItemsRequest.newBuilder()
                         .setOrderId(request.getOrderId())
                         .addAllItems(extractStartItems(request))
@@ -101,7 +108,7 @@ public class OrderImpl implements Order {
 
         // Detached scope: releaseHold runs even if the workflow scope is cancelled
         var releaseHoldScope = Workflow.newDetachedCancellationScope(() ->
-                allocations.releaseHold(ReleaseHoldRequest.newBuilder()
+                inventory.releaseHold(ReleaseHoldRequest.newBuilder()
                         .setOrderId(request.getOrderId())
                         .setHoldId(holdResponse.getHoldId())
                         .build()));
@@ -146,7 +153,7 @@ public class OrderImpl implements Order {
     public ValidateOrderResponse validateOrder(ValidateOrderRequest request) {
         logger.info("Verifying address for order_id={}", request.getOrderId());
 
-        var verifyResponse = addressVerification.verifyAddress(
+        var verifyResponse = carriers.verifyAddress(
                 VerifyAddressRequest.newBuilder()
                         .setAddress(request.getAddress())
                         .build());
@@ -186,15 +193,14 @@ public class OrderImpl implements Order {
                 .build();
 
         // Reserve inventory with warehouse allocations from processing
-        var reservation = allocations.reserveItems(
+        var reservation = inventory.reserveItems(
                 ReserveItemsRequest.newBuilder()
                         .setOrderId(orderId)
-                        .setHoldId("") // hold_id stored in execute() state; passed through ProcessedOrder context
                         .addAllItems(extractProcessedItems(request.getProcessedOrder()))
                         .build());
 
         // Get carrier rates — creates the EasyPost Shipment using the verified address ID
-        var ratesResponse = deliveryService.getCarrierRates(
+        var ratesResponse = carriers.getCarrierRates(
                 GetCarrierRatesRequest.newBuilder()
                         .setOrderId(orderId)
                         .setEasypostAddressId(state.getValidatedAddress().getEasypost().getId())
@@ -221,7 +227,7 @@ public class OrderImpl implements Order {
                         .setRateId(selection.getRateId())
                         .build());
 
-        var deductPromise = Async.function(allocations::deductInventory,
+        var deductPromise = Async.function(inventory::deductInventory,
                 DeductInventoryRequest.newBuilder()
                         .setOrderId(orderId)
                         .setReservationId(reservation.getReservationId())
@@ -278,14 +284,9 @@ public class OrderImpl implements Order {
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    /**
-     * Select a carrier rate from the available options. Prefers the customer's originally
-     * selected option (by option_id). Falls back to cheapest available within margin if
-     * the original is unavailable. Fallback is silent — no customer notification.
-     */
     private ShippingSelection selectRate(GetCarrierRatesResponse ratesResponse,
-                                          SelectedShippingOption selected,
-                                          Money shippingMargin) {
+                                         SelectedShippingOption selected,
+                                         Money shippingMargin) {
         List<CarrierRate> rates = ratesResponse.getRatesList();
         if (rates.isEmpty()) {
             throw ApplicationFailure.newNonRetryableFailure("No carrier rates available", "NO_RATES");
@@ -303,7 +304,6 @@ public class OrderImpl implements Order {
             chosen = originalRate.get();
         } else {
             long marginUnits = shippingMargin.getUnits();
-            // Prefer cheapest within margin; if all exceed margin take absolute cheapest
             chosen = rates.stream()
                     .filter(r -> r.getCost().getUnits() <= marginUnits)
                     .min((a, b) -> Long.compare(a.getCost().getUnits(), b.getCost().getUnits()))
@@ -330,9 +330,6 @@ public class OrderImpl implements Order {
                 .build();
     }
 
-    /**
-     * Extract FulfillmentItems from the workflow start request (pre-processing, no warehouse info).
-     */
     private List<FulfillmentItem> extractStartItems(StartOrderFulfillmentRequest request) {
         return request.getPlacedOrder().getProcessOrder().getOrder().getItemsList().stream()
                 .map(item -> FulfillmentItem.newBuilder()
@@ -342,9 +339,6 @@ public class OrderImpl implements Order {
                 .toList();
     }
 
-    /**
-     * Extract FulfillmentItems from the ProcessedOrder (post-enrichment, includes warehouse allocation).
-     */
     private List<FulfillmentItem> extractProcessedItems(ProcessedOrder processedOrder) {
         return processedOrder.getState().getEnrichment().getItemsList().stream()
                 .map(item -> FulfillmentItem.newBuilder()
