@@ -56,20 +56,22 @@ class GetLocationEventsResponse(_message.Message):
     def __init__(self, summary: _Optional[_Union[_values_pb2.LocationRiskSummary, _Mapping]] = ..., events: _Optional[_Iterable[_Union[_values_pb2.LocationEvent, _Mapping]]] = ..., window_from: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., window_to: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., timezone: _Optional[str] = ...) -> None: ...
 
 class ShippingOption(_message.Message):
-    __slots__ = ("id", "carrier", "service_level", "cost", "estimated_days", "rate_id")
+    __slots__ = ("id", "carrier", "service_level", "cost", "estimated_days", "rate_id", "shipment_id")
     ID_FIELD_NUMBER: _ClassVar[int]
     CARRIER_FIELD_NUMBER: _ClassVar[int]
     SERVICE_LEVEL_FIELD_NUMBER: _ClassVar[int]
     COST_FIELD_NUMBER: _ClassVar[int]
     ESTIMATED_DAYS_FIELD_NUMBER: _ClassVar[int]
     RATE_ID_FIELD_NUMBER: _ClassVar[int]
+    SHIPMENT_ID_FIELD_NUMBER: _ClassVar[int]
     id: str
     carrier: str
     service_level: str
     cost: _values_pb2_1.Money
     estimated_days: int
     rate_id: str
-    def __init__(self, id: _Optional[str] = ..., carrier: _Optional[str] = ..., service_level: _Optional[str] = ..., cost: _Optional[_Union[_values_pb2_1.Money, _Mapping]] = ..., estimated_days: _Optional[int] = ..., rate_id: _Optional[str] = ...) -> None: ...
+    shipment_id: str
+    def __init__(self, id: _Optional[str] = ..., carrier: _Optional[str] = ..., service_level: _Optional[str] = ..., cost: _Optional[_Union[_values_pb2_1.Money, _Mapping]] = ..., estimated_days: _Optional[int] = ..., rate_id: _Optional[str] = ..., shipment_id: _Optional[str] = ...) -> None: ...
 
 class ShippingRecommendation(_message.Message):
     __slots__ = ("outcome", "recommended_option_id", "reasoning", "margin_delta_cents", "origin_risk_level", "destination_risk_level")

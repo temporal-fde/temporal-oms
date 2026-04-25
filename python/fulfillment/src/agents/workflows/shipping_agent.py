@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 
 from temporalio import workflow
 from temporalio.common import RetryPolicy
@@ -23,18 +24,21 @@ with workflow.unsafe.imports_passed_through():
         BuildSystemPromptResponse,
         CalculateShippingOptionsRequest,
         CalculateShippingOptionsResponse,
-        FindAlternateWarehouseRequest,
-        FindAlternateWarehouseResponse,
         GetLocationEventsRequest,
         GetLocationEventsResponse,
         GetShippingRatesRequest,
         GetShippingRatesResponse,
-        LookupInventoryAddressRequest,
-        LookupInventoryAddressResponse,
         RecommendationOutcome,
         ShippingOption,
+        ShippingOptionsResult,
         ShippingRecommendation,
         StartShippingAgentRequest,
+    )
+    from acme.fulfillment.domain.v1.inventory_p2p import (
+        FindAlternateWarehouseRequest,
+        FindAlternateWarehouseResponse,
+        LookupInventoryAddressRequest,
+        LookupInventoryAddressResponse,
     )
     from acme.fulfillment.domain.v1.workflows_p2p import VerifyAddressRequest, VerifyAddressResponse
     from src.agents.activities.easypost import EasyPostActivities
@@ -121,6 +125,17 @@ _NAME_LOOKUP = activity_name(LookupInventoryActivities.lookup_inventory_address)
 _NAME_RATES  = activity_name(EasyPostActivities.get_carrier_rates)
 
 
+_DEFAULT_CACHE_TTL_SECS = 1800
+
+
+def _cache_key(from_ep_id: str, to_ep: object, items: list) -> str:
+    postal = getattr(to_ep, "zip", "") if to_ep else ""
+    country = getattr(to_ep, "country", "") if to_ep else ""
+    sorted_items = sorted((getattr(i, "sku_id", ""), getattr(i, "quantity", 0)) for i in items)
+    raw = f"{from_ep_id}:{postal}:{country}:{sorted_items}"
+    return hashlib.sha256(raw.encode()).hexdigest()[:16]
+
+
 @workflow.defn(name="ShippingAgent")
 class ShippingAgent:
     """Long-running per-customer shipping advisor workflow.
@@ -128,8 +143,14 @@ class ShippingAgent:
     WorkflowID: customer_id
     """
 
+    def __init__(self) -> None:
+        self._cache: dict[str, ShippingOptionsResult] = {}
+        self._cache_ttl_secs: int = _DEFAULT_CACHE_TTL_SECS
+
     @workflow.run
     async def run(self, request: StartShippingAgentRequest) -> None:
+        if request.execution_options and request.execution_options.cache_ttl_secs:
+            self._cache_ttl_secs = request.execution_options.cache_ttl_secs
         await workflow.wait_condition(lambda: False)
 
     @workflow.update
@@ -142,15 +163,6 @@ class ShippingAgent:
         self,
         request: CalculateShippingOptionsRequest,
     ) -> CalculateShippingOptionsResponse:
-        prompt_response: BuildSystemPromptResponse = await workflow.execute_local_activity(
-            LlmActivities.build_system_prompt,
-            BuildSystemPromptRequest(request=request),
-            result_type=BuildSystemPromptResponse,
-            start_to_close_timeout=timedelta(seconds=5),
-        )
-        system_prompt = prompt_response.system_prompt
-        tools = _TOOLS.definitions()
-
         # Pre-fetch origin and destination in parallel before the LLM loop.
         # Results are embedded directly in the task prompt so the LLM can call
         # get_carrier_rates + get_location_events concurrently on its first turn.
@@ -189,6 +201,29 @@ class ShippingAgent:
             dest_ep = to_ep
 
         origin_ep = lookup_result.address.easypost if lookup_result.address else None
+
+        # Cache check — key derived from resolved origin + destination + items.
+        from_ep_id = origin_ep.id if (origin_ep and origin_ep.id) else ""
+        key = _cache_key(from_ep_id, dest_ep, request.items)
+        cached = self._cache.get(key)
+        if cached is not None:
+            now = workflow.now()
+            age_secs = (now - cached.cached_at.replace(tzinfo=timezone.utc)).total_seconds()
+            if age_secs < self._cache_ttl_secs:
+                return CalculateShippingOptionsResponse(
+                    recommendation=cached.recommendation,
+                    options=list(cached.options),
+                    cache_hit=True,
+                )
+
+        prompt_response: BuildSystemPromptResponse = await workflow.execute_local_activity(
+            LlmActivities.build_system_prompt,
+            BuildSystemPromptRequest(request=request),
+            result_type=BuildSystemPromptResponse,
+            start_to_close_timeout=timedelta(seconds=5),
+        )
+        system_prompt = prompt_response.system_prompt
+        tools = _TOOLS.definitions()
 
         def _addr_line(ep) -> str:
             if not ep:
@@ -277,6 +312,12 @@ class ShippingAgent:
 
         if recommendation is None:
             raise ApplicationError("LLM did not produce a recommendation", non_retryable=False)
+
+        self._cache[key] = ShippingOptionsResult(
+            recommendation=recommendation,
+            options=all_options,
+            cached_at=workflow.now(),
+        )
 
         return CalculateShippingOptionsResponse(
             recommendation=recommendation,

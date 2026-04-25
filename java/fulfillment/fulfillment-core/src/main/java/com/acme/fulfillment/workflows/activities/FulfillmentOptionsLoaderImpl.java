@@ -19,11 +19,15 @@ public class FulfillmentOptionsLoaderImpl implements FulfillmentOptionsLoader {
     private static final long DEFAULT_SHIPPING_MARGIN_CENTS = 1000L; // $10.00
 
     private final String integrationsEndpoint;
+    private final String shippingAgentEndpoint;
 
     public FulfillmentOptionsLoaderImpl(
             @Value("${oms.fulfillment.nexus.endpoints.integrations:oms-integrations-v1}")
-            String integrationsEndpoint) {
+            String integrationsEndpoint,
+            @Value("${oms.fulfillment.nexus.endpoints.shipping-agent:oms-shipping-agent-v1}")
+            String shippingAgentEndpoint) {
         this.integrationsEndpoint = integrationsEndpoint;
+        this.shippingAgentEndpoint = shippingAgentEndpoint;
     }
 
     @Override
@@ -37,6 +41,7 @@ public class FulfillmentOptionsLoaderImpl implements FulfillmentOptionsLoader {
                         .setUnits(DEFAULT_SHIPPING_MARGIN_CENTS)
                         .build())
                 .setIntegrationsEndpoint(integrationsEndpoint)
+                .setShippingAgentEndpoint(shippingAgentEndpoint)
                 .build();
     }
 }

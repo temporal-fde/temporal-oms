@@ -8,6 +8,7 @@ from src.config import settings
 from src.agents.activities.inventory import LookupInventoryActivities
 from src.agents.activities.llm import LlmActivities
 from src.agents.workflows.shipping_agent import ShippingAgent
+from src.services.shipping_agent_impl import ShippingAgentImpl
 
 _TASK_QUEUE = "agents"
 
@@ -31,4 +32,5 @@ async def build_fulfillment_worker() -> Worker:
             llm_activities.build_system_prompt,
             llm_activities.call_llm,
         ],
+        nexus_service_handlers=[ShippingAgentImpl()],
     )

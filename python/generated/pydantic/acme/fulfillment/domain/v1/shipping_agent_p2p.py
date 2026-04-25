@@ -64,6 +64,7 @@ class ShippingOption(BaseModel):
     """
      ShippingOption is a single carrier rate returned by get_carrier_rates.
  id is set to rate_id so the LLM can cross-reference recommended_option_id back to the rate.
+ shipment_id is the EasyPost Shipment ID — needed by fulfillment.Order to call printShippingLabel.
     """
 
     id: str = Field(default="")
@@ -72,6 +73,7 @@ class ShippingOption(BaseModel):
     cost: Money = Field(default_factory=Money)
     estimated_days: int = Field(default=0)
     rate_id: str = Field(default="")
+    shipment_id: str = Field(default="")
 
 class ShippingRecommendation(BaseModel):
     """

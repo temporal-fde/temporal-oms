@@ -5,7 +5,7 @@ from temporalio import activity
 
 from src.config import settings
 
-from acme.fulfillment.domain.v1.shipping_agent_p2p import (
+from acme.fulfillment.domain.v1.inventory_p2p import (
     FindAlternateWarehouseRequest,
     FindAlternateWarehouseResponse,
     LookupInventoryAddressRequest,

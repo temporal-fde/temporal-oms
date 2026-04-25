@@ -8,24 +8,7 @@ import "acme/common/v1/values.proto";
 import "acme/apps/domain/v1/workflows.proto";
 import "acme/processing/domain/v1/workflows.proto";
 
-// Order Fulfillment AI Agent Workflow
-message FulfillOrderRequest {
-  string order_id = 1;
-  string customer_id = 2;
-  repeated Item items = 3;
-  string payment_rrn = 4;
-  acme.common.v1.Address shipping_address = 5;
-  google.protobuf.Timestamp created_at = 6;
-}
-
-message FulfillOrderResponse {
-  string order_id = 1;
-  Status status = 2;
-  ShippingDetails shipping = 3;
-  repeated AllocatedItem allocated_items = 4;
-  google.protobuf.Timestamp completed_at = 5;
-}
-
+// Order Fulfillment AI Agent Workflow (Python-era)
 message Item {
   string item_id = 1;
   string sku_id = 2;
@@ -198,18 +181,22 @@ message LoadFulfillmentOptionsRequest {
 // shipping_margin is the maximum acceptable shipping cost; amounts above it
 // are recorded in the margin_leak SearchAttribute.
 // integrations_endpoint is the Nexus endpoint name for the apps InventoryService.
+// shipping_agent_endpoint is the Nexus endpoint name for the ShippingAgent service.
 message FulfillmentOptions {
   acme.common.v1.Money shipping_margin = 1;
   string integrations_endpoint = 2;
+  string shipping_agent_endpoint = 3;
 }
 
 // ── fulfillOrder Update ───────────────────────────────────────────────────────
 
-// OrderFulfillRequest is the input to the fulfillOrder Update handler.
-// Name is distinct from the Python-era FulfillOrderRequest in this package.
-message OrderFulfillRequest {
+// FulfillOrderRequest is the input to the fulfillOrder Update handler.
+message FulfillOrderRequest {
   ProcessedOrder processed_order = 1;
   optional NotifyDeliveryStatusRequest delivery_status_request = 2;
+  // selected_shipping_option_id is the customer's original rate selection.
+  // If absent, fulfillment.Order falls back to state.args.selected_shipping.option_id.
+  optional string selected_shipping_option_id = 3;
 }
 
 // ProcessedOrder carries the result of processing.Order for use in fulfillment
@@ -220,9 +207,8 @@ message ProcessedOrder {
   acme.processing.domain.processing.v1.GetProcessOrderStateResponse state = 3;
 }
 
-// OrderFulfillResponse is returned to the fulfillOrder Update caller (apps.Order).
-// Name is distinct from the Python-era FulfillOrderResponse in this package.
-message OrderFulfillResponse {
+// FulfillOrderResponse is returned to the fulfillOrder Update caller (apps.Order).
+message FulfillOrderResponse {
   string tracking_number = 1;
   ShippingSelection shipping_selection = 2;
 }
@@ -269,7 +255,7 @@ message GetFulfillmentOrderStateResponse {
   StartOrderFulfillmentRequest args = 1;
   FulfillmentOptions options = 2;
   acme.common.v1.Address validated_address = 3;
-  OrderFulfillRequest fulfillment_request = 4;
+  FulfillOrderRequest fulfillment_request = 4;
   ShippingSelection shipping_selection = 5;
   string tracking_number = 6;
   FulfillmentStatus status = 7;

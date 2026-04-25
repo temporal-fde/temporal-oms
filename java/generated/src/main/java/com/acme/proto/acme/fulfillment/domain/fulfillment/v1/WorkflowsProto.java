@@ -27,16 +27,6 @@ public final class WorkflowsProto extends com.google.protobuf.GeneratedFile {
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_acme_fulfillment_domain_fulfillment_v1_FulfillOrderRequest_descriptor;
-  static final 
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_acme_fulfillment_domain_fulfillment_v1_FulfillOrderRequest_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_acme_fulfillment_domain_fulfillment_v1_FulfillOrderResponse_descriptor;
-  static final 
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_acme_fulfillment_domain_fulfillment_v1_FulfillOrderResponse_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_acme_fulfillment_domain_fulfillment_v1_Item_descriptor;
   static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -147,20 +137,20 @@ public final class WorkflowsProto extends com.google.protobuf.GeneratedFile {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_acme_fulfillment_domain_fulfillment_v1_FulfillmentOptions_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_acme_fulfillment_domain_fulfillment_v1_OrderFulfillRequest_descriptor;
+    internal_static_acme_fulfillment_domain_fulfillment_v1_FulfillOrderRequest_descriptor;
   static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_acme_fulfillment_domain_fulfillment_v1_OrderFulfillRequest_fieldAccessorTable;
+      internal_static_acme_fulfillment_domain_fulfillment_v1_FulfillOrderRequest_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_acme_fulfillment_domain_fulfillment_v1_ProcessedOrder_descriptor;
   static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_acme_fulfillment_domain_fulfillment_v1_ProcessedOrder_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_acme_fulfillment_domain_fulfillment_v1_OrderFulfillResponse_descriptor;
+    internal_static_acme_fulfillment_domain_fulfillment_v1_FulfillOrderResponse_descriptor;
   static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_acme_fulfillment_domain_fulfillment_v1_OrderFulfillResponse_fieldAccessorTable;
+      internal_static_acme_fulfillment_domain_fulfillment_v1_FulfillOrderResponse_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_acme_fulfillment_domain_fulfillment_v1_ShippingSelection_descriptor;
   static final 
@@ -265,24 +255,7 @@ public final class WorkflowsProto extends com.google.protobuf.GeneratedFile {
       "t.v1\032\037google/protobuf/timestamp.proto\032\033a" +
       "cme/common/v1/values.proto\032#acme/apps/do" +
       "main/v1/workflows.proto\032)acme/processing" +
-      "/domain/v1/workflows.proto\"\265\002\n\023FulfillOr" +
-      "derRequest\022\031\n\010order_id\030\001 \001(\tR\007orderId\022\037\n" +
-      "\013customer_id\030\002 \001(\tR\ncustomerId\022B\n\005items\030" +
-      "\003 \003(\0132,.acme.fulfillment.domain.fulfillm" +
-      "ent.v1.ItemR\005items\022\037\n\013payment_rrn\030\004 \001(\tR" +
-      "\npaymentRrn\022B\n\020shipping_address\030\005 \001(\0132\027." +
-      "acme.common.v1.AddressR\017shippingAddress\022" +
-      "9\n\ncreated_at\030\006 \001(\0132\032.google.protobuf.Ti" +
-      "mestampR\tcreatedAt\"\355\002\n\024FulfillOrderRespo" +
-      "nse\022\031\n\010order_id\030\001 \001(\tR\007orderId\022F\n\006status" +
-      "\030\002 \001(\0162..acme.fulfillment.domain.fulfill" +
-      "ment.v1.StatusR\006status\022S\n\010shipping\030\003 \001(\013" +
-      "27.acme.fulfillment.domain.fulfillment.v" +
-      "1.ShippingDetailsR\010shipping\022^\n\017allocated" +
-      "_items\030\004 \003(\01325.acme.fulfillment.domain.f" +
-      "ulfillment.v1.AllocatedItemR\016allocatedIt" +
-      "ems\022=\n\014completed_at\030\005 \001(\0132\032.google.proto" +
-      "buf.TimestampR\013completedAt\"q\n\004Item\022\027\n\007it" +
+      "/domain/v1/workflows.proto\"q\n\004Item\022\027\n\007it" +
       "em_id\030\001 \001(\tR\006itemId\022\025\n\006sku_id\030\002 \001(\tR\005sku" +
       "Id\022\035\n\nbrand_code\030\003 \001(\tR\tbrandCode\022\032\n\010qua" +
       "ntity\030\004 \001(\005R\010quantity\"\277\001\n\017ShippingDetail" +
@@ -370,127 +343,131 @@ public final class WorkflowsProto extends com.google.protobuf.GeneratedFile {
       "ressResponse\0221\n\007address\030\001 \001(\0132\027.acme.com" +
       "mon.v1.AddressR\007address\":\n\035LoadFulfillme" +
       "ntOptionsRequest\022\031\n\010order_id\030\001 \001(\tR\007orde" +
-      "rId\"\211\001\n\022FulfillmentOptions\022>\n\017shipping_m" +
+      "rId\"\301\001\n\022FulfillmentOptions\022>\n\017shipping_m" +
       "argin\030\001 \001(\0132\025.acme.common.v1.MoneyR\016ship" +
       "pingMargin\0223\n\025integrations_endpoint\030\002 \001(" +
-      "\tR\024integrationsEndpoint\"\225\002\n\023OrderFulfill" +
-      "Request\022_\n\017processed_order\030\001 \001(\01326.acme." +
-      "fulfillment.domain.fulfillment.v1.Proces" +
-      "sedOrderR\016processedOrder\022\200\001\n\027delivery_st" +
-      "atus_request\030\002 \001(\0132C.acme.fulfillment.do" +
-      "main.fulfillment.v1.NotifyDeliveryStatus" +
-      "RequestH\000R\025deliveryStatusRequest\210\001\001B\032\n\030_" +
-      "delivery_status_request\"\246\001\n\016ProcessedOrd" +
-      "er\022\031\n\010order_id\030\001 \001(\tR\007orderId\022\037\n\013custome" +
-      "r_id\030\002 \001(\tR\ncustomerId\022X\n\005state\030\003 \001(\0132B." +
-      "acme.processing.domain.processing.v1.Get" +
-      "ProcessOrderStateResponseR\005state\"\251\001\n\024Ord" +
-      "erFulfillResponse\022\'\n\017tracking_number\030\001 \001" +
-      "(\tR\016trackingNumber\022h\n\022shipping_selection" +
-      "\030\002 \001(\01329.acme.fulfillment.domain.fulfill" +
-      "ment.v1.ShippingSelectionR\021shippingSelec" +
-      "tion\"\272\002\n\021ShippingSelection\022\033\n\toption_id\030" +
-      "\001 \001(\tR\010optionId\022\027\n\007rate_id\030\002 \001(\tR\006rateId" +
-      "\022\030\n\007carrier\030\003 \001(\tR\007carrier\022#\n\rservice_le" +
-      "vel\030\004 \001(\tR\014serviceLevel\0228\n\014actual_price\030" +
-      "\005 \001(\0132\025.acme.common.v1.MoneyR\013actualPric" +
-      "e\022,\n\022margin_delta_cents\030\006 \001(\003R\020marginDel" +
-      "taCents\022\037\n\013is_fallback\030\007 \001(\010R\nisFallback" +
-      "\022\'\n\017fallback_reason\030\010 \001(\tR\016fallbackReaso" +
-      "n\"R\n\035CancelFulfillmentOrderRequest\022\031\n\010or" +
-      "der_id\030\001 \001(\tR\007orderId\022\026\n\006reason\030\002 \001(\tR\006r" +
-      "eason\"\245\002\n\033NotifyDeliveryStatusRequest\022\031\n" +
-      "\010order_id\030\001 \001(\tR\007orderId\022_\n\017delivery_sta" +
-      "tus\030\002 \001(\01626.acme.fulfillment.domain.fulf" +
-      "illment.v1.DeliveryStatusR\016deliveryStatu" +
-      "s\0223\n\023carrier_tracking_id\030\003 \001(\tH\000R\021carrie" +
-      "rTrackingId\210\001\001\022*\n\016failure_reason\030\004 \001(\tH\001" +
-      "R\rfailureReason\210\001\001B\026\n\024_carrier_tracking_" +
-      "idB\021\n\017_failure_reason\"\200\007\n GetFulfillment" +
-      "OrderStateResponse\022X\n\004args\030\001 \001(\0132D.acme." +
-      "fulfillment.domain.fulfillment.v1.StartO" +
-      "rderFulfillmentRequestR\004args\022T\n\007options\030" +
-      "\002 \001(\0132:.acme.fulfillment.domain.fulfillm" +
-      "ent.v1.FulfillmentOptionsR\007options\022D\n\021va" +
-      "lidated_address\030\003 \001(\0132\027.acme.common.v1.A" +
-      "ddressR\020validatedAddress\022l\n\023fulfillment_" +
-      "request\030\004 \001(\0132;.acme.fulfillment.domain." +
-      "fulfillment.v1.OrderFulfillRequestR\022fulf" +
-      "illmentRequest\022h\n\022shipping_selection\030\005 \001" +
+      "\tR\024integrationsEndpoint\0226\n\027shipping_agen" +
+      "t_endpoint\030\003 \001(\tR\025shippingAgentEndpoint\"" +
+      "\371\002\n\023FulfillOrderRequest\022_\n\017processed_ord" +
+      "er\030\001 \001(\01326.acme.fulfillment.domain.fulfi" +
+      "llment.v1.ProcessedOrderR\016processedOrder" +
+      "\022\200\001\n\027delivery_status_request\030\002 \001(\0132C.acm" +
+      "e.fulfillment.domain.fulfillment.v1.Noti" +
+      "fyDeliveryStatusRequestH\000R\025deliveryStatu" +
+      "sRequest\210\001\001\022B\n\033selected_shipping_option_" +
+      "id\030\003 \001(\tH\001R\030selectedShippingOptionId\210\001\001B" +
+      "\032\n\030_delivery_status_requestB\036\n\034_selected" +
+      "_shipping_option_id\"\246\001\n\016ProcessedOrder\022\031" +
+      "\n\010order_id\030\001 \001(\tR\007orderId\022\037\n\013customer_id" +
+      "\030\002 \001(\tR\ncustomerId\022X\n\005state\030\003 \001(\0132B.acme" +
+      ".processing.domain.processing.v1.GetProc" +
+      "essOrderStateResponseR\005state\"\251\001\n\024Fulfill" +
+      "OrderResponse\022\'\n\017tracking_number\030\001 \001(\tR\016" +
+      "trackingNumber\022h\n\022shipping_selection\030\002 \001" +
       "(\01329.acme.fulfillment.domain.fulfillment" +
       ".v1.ShippingSelectionR\021shippingSelection" +
-      "\022\'\n\017tracking_number\030\006 \001(\tR\016trackingNumbe" +
-      "r\022Q\n\006status\030\007 \001(\01629.acme.fulfillment.dom" +
-      "ain.fulfillment.v1.FulfillmentStatusR\006st" +
-      "atus\022_\n\017delivery_status\030\010 \001(\01626.acme.ful" +
-      "fillment.domain.fulfillment.v1.DeliveryS" +
-      "tatusR\016deliveryStatus\022\026\n\006errors\030\t \003(\tR\006e" +
-      "rrors\022~\n\026notify_delivery_status\030\n \001(\0132C." +
-      "acme.fulfillment.domain.fulfillment.v1.N" +
-      "otifyDeliveryStatusRequestH\000R\024notifyDeli" +
-      "veryStatus\210\001\001B\031\n\027_notify_delivery_status" +
-      "\"\200\002\n\017FulfillmentItem\022\027\n\007item_id\030\001 \001(\tR\006i" +
-      "temId\022\025\n\006sku_id\030\002 \001(\tR\005skuId\022\035\n\nbrand_co" +
-      "de\030\003 \001(\tR\tbrandCode\022\032\n\010quantity\030\004 \001(\005R\010q" +
-      "uantity\022&\n\014warehouse_id\030\005 \001(\tH\000R\013warehou" +
-      "seId\210\001\001\0222\n\022warehouse_location\030\006 \001(\tH\001R\021w" +
-      "arehouseLocation\210\001\001B\017\n\r_warehouse_idB\025\n\023" +
-      "_warehouse_location\"|\n\020HoldItemsRequest\022" +
-      "\031\n\010order_id\030\001 \001(\tR\007orderId\022M\n\005items\030\002 \003(" +
-      "\01327.acme.fulfillment.domain.fulfillment." +
-      "v1.FulfillmentItemR\005items\",\n\021HoldItemsRe" +
-      "sponse\022\027\n\007hold_id\030\001 \001(\tR\006holdId\"\230\001\n\023Rese" +
-      "rveItemsRequest\022\031\n\010order_id\030\001 \001(\tR\007order" +
-      "Id\022\027\n\007hold_id\030\002 \001(\tR\006holdId\022M\n\005items\030\003 \003" +
-      "(\01327.acme.fulfillment.domain.fulfillment" +
-      ".v1.FulfillmentItemR\005items\"=\n\024ReserveIte" +
-      "msResponse\022%\n\016reservation_id\030\001 \001(\tR\rrese" +
-      "rvationId\"Z\n\026DeductInventoryRequest\022\031\n\010o" +
-      "rder_id\030\001 \001(\tR\007orderId\022%\n\016reservation_id" +
-      "\030\002 \001(\tR\rreservationId\"3\n\027DeductInventory" +
-      "Response\022\030\n\007success\030\001 \001(\010R\007success\"H\n\022Re" +
-      "leaseHoldRequest\022\031\n\010order_id\030\001 \001(\tR\007orde" +
-      "rId\022\027\n\007hold_id\030\002 \001(\tR\006holdId\"/\n\023ReleaseH" +
-      "oldResponse\022\030\n\007success\030\001 \001(\010R\007success\"\262\001" +
-      "\n\026GetCarrierRatesRequest\022\031\n\010order_id\030\001 \001" +
-      "(\tR\007orderId\022.\n\023easypost_address_id\030\002 \001(\t" +
-      "R\021easypostAddressId\022M\n\005items\030\003 \003(\01327.acm" +
-      "e.fulfillment.domain.fulfillment.v1.Fulf" +
-      "illmentItemR\005items\"\205\001\n\027GetCarrierRatesRe" +
-      "sponse\022\037\n\013shipment_id\030\001 \001(\tR\nshipmentId\022" +
-      "I\n\005rates\030\002 \003(\01323.acme.fulfillment.domain" +
-      ".fulfillment.v1.CarrierRateR\005rates\"\267\001\n\013C" +
-      "arrierRate\022\027\n\007rate_id\030\001 \001(\tR\006rateId\022\030\n\007c" +
-      "arrier\030\002 \001(\tR\007carrier\022#\n\rservice_level\030\003" +
-      " \001(\tR\014serviceLevel\022)\n\004cost\030\004 \001(\0132\025.acme." +
-      "common.v1.MoneyR\004cost\022%\n\016estimated_days\030" +
-      "\005 \001(\005R\restimatedDays\"p\n\031PrintShippingLab" +
-      "elRequest\022\031\n\010order_id\030\001 \001(\tR\007orderId\022\037\n\013" +
-      "shipment_id\030\002 \001(\tR\nshipmentId\022\027\n\007rate_id" +
-      "\030\003 \001(\tR\006rateId\"b\n\032PrintShippingLabelResp" +
-      "onse\022\'\n\017tracking_number\030\001 \001(\tR\016trackingN" +
-      "umber\022\033\n\tlabel_url\030\002 \001(\tR\010labelUrl*\222\001\n\006S" +
-      "tatus\022\026\n\022STATUS_UNSPECIFIED\020\000\022\022\n\016STATUS_" +
-      "PENDING\020\001\022\025\n\021STATUS_ALLOCATING\020\002\022\034\n\030STAT" +
-      "US_SHIPPING_SELECTED\020\003\022\024\n\020STATUS_COMPLET" +
-      "ED\020\004\022\021\n\rSTATUS_FAILED\020\005*n\n\016DeliveryStatu" +
-      "s\022\037\n\033DELIVERY_STATUS_UNSPECIFIED\020\000\022\035\n\031DE" +
-      "LIVERY_STATUS_DELIVERED\020\001\022\034\n\030DELIVERY_ST" +
-      "ATUS_CANCELED\020\002*\240\002\n\021FulfillmentStatus\022\"\n" +
-      "\036FULFILLMENT_STATUS_UNSPECIFIED\020\000\022\036\n\032FUL" +
-      "FILLMENT_STATUS_STARTED\020\001\022 \n\034FULFILLMENT" +
-      "_STATUS_VALIDATED\020\002\022!\n\035FULFILLMENT_STATU" +
-      "S_FULFILLING\020\003\022 \n\034FULFILLMENT_STATUS_COM" +
-      "PLETED\020\004\022 \n\034FULFILLMENT_STATUS_DELIVERED" +
-      "\020\005\022\037\n\033FULFILLMENT_STATUS_CANCELED\020\006\022\035\n\031F" +
-      "ULFILLMENT_STATUS_FAILED\020\007B\204\002\n5com.acme." +
-      "proto.acme.fulfillment.domain.fulfillmen" +
-      "t.v1B\016WorkflowsProtoP\001\242\002\004AFDF\252\002&Acme.Ful" +
-      "fillment.Domain.Fulfillment.V1\312\002&Acme\\Fu" +
-      "lfillment\\Domain\\Fulfillment\\V1\342\0022Acme\\F" +
-      "ulfillment\\Domain\\Fulfillment\\V1\\GPBMeta" +
-      "data\352\002*Acme::Fulfillment::Domain::Fulfil" +
-      "lment::V1b\006proto3"
+      "\"\272\002\n\021ShippingSelection\022\033\n\toption_id\030\001 \001(" +
+      "\tR\010optionId\022\027\n\007rate_id\030\002 \001(\tR\006rateId\022\030\n\007" +
+      "carrier\030\003 \001(\tR\007carrier\022#\n\rservice_level\030" +
+      "\004 \001(\tR\014serviceLevel\0228\n\014actual_price\030\005 \001(" +
+      "\0132\025.acme.common.v1.MoneyR\013actualPrice\022,\n" +
+      "\022margin_delta_cents\030\006 \001(\003R\020marginDeltaCe" +
+      "nts\022\037\n\013is_fallback\030\007 \001(\010R\nisFallback\022\'\n\017" +
+      "fallback_reason\030\010 \001(\tR\016fallbackReason\"R\n" +
+      "\035CancelFulfillmentOrderRequest\022\031\n\010order_" +
+      "id\030\001 \001(\tR\007orderId\022\026\n\006reason\030\002 \001(\tR\006reaso" +
+      "n\"\245\002\n\033NotifyDeliveryStatusRequest\022\031\n\010ord" +
+      "er_id\030\001 \001(\tR\007orderId\022_\n\017delivery_status\030" +
+      "\002 \001(\01626.acme.fulfillment.domain.fulfillm" +
+      "ent.v1.DeliveryStatusR\016deliveryStatus\0223\n" +
+      "\023carrier_tracking_id\030\003 \001(\tH\000R\021carrierTra" +
+      "ckingId\210\001\001\022*\n\016failure_reason\030\004 \001(\tH\001R\rfa" +
+      "ilureReason\210\001\001B\026\n\024_carrier_tracking_idB\021" +
+      "\n\017_failure_reason\"\200\007\n GetFulfillmentOrde" +
+      "rStateResponse\022X\n\004args\030\001 \001(\0132D.acme.fulf" +
+      "illment.domain.fulfillment.v1.StartOrder" +
+      "FulfillmentRequestR\004args\022T\n\007options\030\002 \001(" +
+      "\0132:.acme.fulfillment.domain.fulfillment." +
+      "v1.FulfillmentOptionsR\007options\022D\n\021valida" +
+      "ted_address\030\003 \001(\0132\027.acme.common.v1.Addre" +
+      "ssR\020validatedAddress\022l\n\023fulfillment_requ" +
+      "est\030\004 \001(\0132;.acme.fulfillment.domain.fulf" +
+      "illment.v1.FulfillOrderRequestR\022fulfillm" +
+      "entRequest\022h\n\022shipping_selection\030\005 \001(\01329" +
+      ".acme.fulfillment.domain.fulfillment.v1." +
+      "ShippingSelectionR\021shippingSelection\022\'\n\017" +
+      "tracking_number\030\006 \001(\tR\016trackingNumber\022Q\n" +
+      "\006status\030\007 \001(\01629.acme.fulfillment.domain." +
+      "fulfillment.v1.FulfillmentStatusR\006status" +
+      "\022_\n\017delivery_status\030\010 \001(\01626.acme.fulfill" +
+      "ment.domain.fulfillment.v1.DeliveryStatu" +
+      "sR\016deliveryStatus\022\026\n\006errors\030\t \003(\tR\006error" +
+      "s\022~\n\026notify_delivery_status\030\n \001(\0132C.acme" +
+      ".fulfillment.domain.fulfillment.v1.Notif" +
+      "yDeliveryStatusRequestH\000R\024notifyDelivery" +
+      "Status\210\001\001B\031\n\027_notify_delivery_status\"\200\002\n" +
+      "\017FulfillmentItem\022\027\n\007item_id\030\001 \001(\tR\006itemI" +
+      "d\022\025\n\006sku_id\030\002 \001(\tR\005skuId\022\035\n\nbrand_code\030\003" +
+      " \001(\tR\tbrandCode\022\032\n\010quantity\030\004 \001(\005R\010quant" +
+      "ity\022&\n\014warehouse_id\030\005 \001(\tH\000R\013warehouseId" +
+      "\210\001\001\0222\n\022warehouse_location\030\006 \001(\tH\001R\021wareh" +
+      "ouseLocation\210\001\001B\017\n\r_warehouse_idB\025\n\023_war" +
+      "ehouse_location\"|\n\020HoldItemsRequest\022\031\n\010o" +
+      "rder_id\030\001 \001(\tR\007orderId\022M\n\005items\030\002 \003(\01327." +
+      "acme.fulfillment.domain.fulfillment.v1.F" +
+      "ulfillmentItemR\005items\",\n\021HoldItemsRespon" +
+      "se\022\027\n\007hold_id\030\001 \001(\tR\006holdId\"\230\001\n\023ReserveI" +
+      "temsRequest\022\031\n\010order_id\030\001 \001(\tR\007orderId\022\027" +
+      "\n\007hold_id\030\002 \001(\tR\006holdId\022M\n\005items\030\003 \003(\01327" +
+      ".acme.fulfillment.domain.fulfillment.v1." +
+      "FulfillmentItemR\005items\"=\n\024ReserveItemsRe" +
+      "sponse\022%\n\016reservation_id\030\001 \001(\tR\rreservat" +
+      "ionId\"Z\n\026DeductInventoryRequest\022\031\n\010order" +
+      "_id\030\001 \001(\tR\007orderId\022%\n\016reservation_id\030\002 \001" +
+      "(\tR\rreservationId\"3\n\027DeductInventoryResp" +
+      "onse\022\030\n\007success\030\001 \001(\010R\007success\"H\n\022Releas" +
+      "eHoldRequest\022\031\n\010order_id\030\001 \001(\tR\007orderId\022" +
+      "\027\n\007hold_id\030\002 \001(\tR\006holdId\"/\n\023ReleaseHoldR" +
+      "esponse\022\030\n\007success\030\001 \001(\010R\007success\"\262\001\n\026Ge" +
+      "tCarrierRatesRequest\022\031\n\010order_id\030\001 \001(\tR\007" +
+      "orderId\022.\n\023easypost_address_id\030\002 \001(\tR\021ea" +
+      "sypostAddressId\022M\n\005items\030\003 \003(\01327.acme.fu" +
+      "lfillment.domain.fulfillment.v1.Fulfillm" +
+      "entItemR\005items\"\205\001\n\027GetCarrierRatesRespon" +
+      "se\022\037\n\013shipment_id\030\001 \001(\tR\nshipmentId\022I\n\005r" +
+      "ates\030\002 \003(\01323.acme.fulfillment.domain.ful" +
+      "fillment.v1.CarrierRateR\005rates\"\267\001\n\013Carri" +
+      "erRate\022\027\n\007rate_id\030\001 \001(\tR\006rateId\022\030\n\007carri" +
+      "er\030\002 \001(\tR\007carrier\022#\n\rservice_level\030\003 \001(\t" +
+      "R\014serviceLevel\022)\n\004cost\030\004 \001(\0132\025.acme.comm" +
+      "on.v1.MoneyR\004cost\022%\n\016estimated_days\030\005 \001(" +
+      "\005R\restimatedDays\"p\n\031PrintShippingLabelRe" +
+      "quest\022\031\n\010order_id\030\001 \001(\tR\007orderId\022\037\n\013ship" +
+      "ment_id\030\002 \001(\tR\nshipmentId\022\027\n\007rate_id\030\003 \001" +
+      "(\tR\006rateId\"b\n\032PrintShippingLabelResponse" +
+      "\022\'\n\017tracking_number\030\001 \001(\tR\016trackingNumbe" +
+      "r\022\033\n\tlabel_url\030\002 \001(\tR\010labelUrl*\222\001\n\006Statu" +
+      "s\022\026\n\022STATUS_UNSPECIFIED\020\000\022\022\n\016STATUS_PEND" +
+      "ING\020\001\022\025\n\021STATUS_ALLOCATING\020\002\022\034\n\030STATUS_S" +
+      "HIPPING_SELECTED\020\003\022\024\n\020STATUS_COMPLETED\020\004" +
+      "\022\021\n\rSTATUS_FAILED\020\005*n\n\016DeliveryStatus\022\037\n" +
+      "\033DELIVERY_STATUS_UNSPECIFIED\020\000\022\035\n\031DELIVE" +
+      "RY_STATUS_DELIVERED\020\001\022\034\n\030DELIVERY_STATUS" +
+      "_CANCELED\020\002*\240\002\n\021FulfillmentStatus\022\"\n\036FUL" +
+      "FILLMENT_STATUS_UNSPECIFIED\020\000\022\036\n\032FULFILL" +
+      "MENT_STATUS_STARTED\020\001\022 \n\034FULFILLMENT_STA" +
+      "TUS_VALIDATED\020\002\022!\n\035FULFILLMENT_STATUS_FU" +
+      "LFILLING\020\003\022 \n\034FULFILLMENT_STATUS_COMPLET" +
+      "ED\020\004\022 \n\034FULFILLMENT_STATUS_DELIVERED\020\005\022\037" +
+      "\n\033FULFILLMENT_STATUS_CANCELED\020\006\022\035\n\031FULFI" +
+      "LLMENT_STATUS_FAILED\020\007B\204\002\n5com.acme.prot" +
+      "o.acme.fulfillment.domain.fulfillment.v1" +
+      "B\016WorkflowsProtoP\001\242\002\004AFDF\252\002&Acme.Fulfill" +
+      "ment.Domain.Fulfillment.V1\312\002&Acme\\Fulfil" +
+      "lment\\Domain\\Fulfillment\\V1\342\0022Acme\\Fulfi" +
+      "llment\\Domain\\Fulfillment\\V1\\GPBMetadata" +
+      "\352\002*Acme::Fulfillment::Domain::Fulfillmen" +
+      "t::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -500,272 +477,260 @@ public final class WorkflowsProto extends com.google.protobuf.GeneratedFile {
           com.acme.proto.acme.apps.domain.apps.v1.WorkflowsProto.getDescriptor(),
           com.acme.proto.acme.processing.domain.processing.v1.WorkflowsProto.getDescriptor(),
         });
-    internal_static_acme_fulfillment_domain_fulfillment_v1_FulfillOrderRequest_descriptor =
-      getDescriptor().getMessageType(0);
-    internal_static_acme_fulfillment_domain_fulfillment_v1_FulfillOrderRequest_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_acme_fulfillment_domain_fulfillment_v1_FulfillOrderRequest_descriptor,
-        new java.lang.String[] { "OrderId", "CustomerId", "Items", "PaymentRrn", "ShippingAddress", "CreatedAt", });
-    internal_static_acme_fulfillment_domain_fulfillment_v1_FulfillOrderResponse_descriptor =
-      getDescriptor().getMessageType(1);
-    internal_static_acme_fulfillment_domain_fulfillment_v1_FulfillOrderResponse_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_acme_fulfillment_domain_fulfillment_v1_FulfillOrderResponse_descriptor,
-        new java.lang.String[] { "OrderId", "Status", "Shipping", "AllocatedItems", "CompletedAt", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_Item_descriptor =
-      getDescriptor().getMessageType(2);
+      getDescriptor().getMessageType(0);
     internal_static_acme_fulfillment_domain_fulfillment_v1_Item_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_Item_descriptor,
         new java.lang.String[] { "ItemId", "SkuId", "BrandCode", "Quantity", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_ShippingDetails_descriptor =
-      getDescriptor().getMessageType(3);
+      getDescriptor().getMessageType(1);
     internal_static_acme_fulfillment_domain_fulfillment_v1_ShippingDetails_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_ShippingDetails_descriptor,
         new java.lang.String[] { "Carrier", "ServiceLevel", "CostCents", "EstimatedDays", "TrackingNumber", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_AllocatedItem_descriptor =
-      getDescriptor().getMessageType(4);
+      getDescriptor().getMessageType(2);
     internal_static_acme_fulfillment_domain_fulfillment_v1_AllocatedItem_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_AllocatedItem_descriptor,
         new java.lang.String[] { "ItemId", "SkuId", "Quantity", "WarehouseId", "WarehouseLocation", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_FindOptimalShippingRequest_descriptor =
-      getDescriptor().getMessageType(5);
+      getDescriptor().getMessageType(3);
     internal_static_acme_fulfillment_domain_fulfillment_v1_FindOptimalShippingRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_FindOptimalShippingRequest_descriptor,
         new java.lang.String[] { "Destination", "Items", "MaxCostCents", "MaxDays", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_FindOptimalShippingResponse_descriptor =
-      getDescriptor().getMessageType(6);
+      getDescriptor().getMessageType(4);
     internal_static_acme_fulfillment_domain_fulfillment_v1_FindOptimalShippingResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_FindOptimalShippingResponse_descriptor,
         new java.lang.String[] { "Options", "Recommended", "Reasoning", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_ShippingOptionLegacy_descriptor =
-      getDescriptor().getMessageType(7);
+      getDescriptor().getMessageType(5);
     internal_static_acme_fulfillment_domain_fulfillment_v1_ShippingOptionLegacy_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_ShippingOptionLegacy_descriptor,
         new java.lang.String[] { "Carrier", "ServiceLevel", "CostCents", "EstimatedDays", "Score", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_AllocateInventoryRequest_descriptor =
-      getDescriptor().getMessageType(8);
+      getDescriptor().getMessageType(6);
     internal_static_acme_fulfillment_domain_fulfillment_v1_AllocateInventoryRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_AllocateInventoryRequest_descriptor,
         new java.lang.String[] { "Items", "Destination", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_AllocateInventoryResponse_descriptor =
-      getDescriptor().getMessageType(9);
+      getDescriptor().getMessageType(7);
     internal_static_acme_fulfillment_domain_fulfillment_v1_AllocateInventoryResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_AllocateInventoryResponse_descriptor,
         new java.lang.String[] { "Allocations", "FullyAllocated", "Warnings", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_FindClosestWarehouseRequest_descriptor =
-      getDescriptor().getMessageType(10);
+      getDescriptor().getMessageType(8);
     internal_static_acme_fulfillment_domain_fulfillment_v1_FindClosestWarehouseRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_FindClosestWarehouseRequest_descriptor,
         new java.lang.String[] { "SkuId", "Quantity", "Destination", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_FindClosestWarehouseResponse_descriptor =
-      getDescriptor().getMessageType(11);
+      getDescriptor().getMessageType(9);
     internal_static_acme_fulfillment_domain_fulfillment_v1_FindClosestWarehouseResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_FindClosestWarehouseResponse_descriptor,
         new java.lang.String[] { "WarehouseId", "WarehouseLocation", "AvailableQuantity", "DistanceKm", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_FulfilledOrderEvent_descriptor =
-      getDescriptor().getMessageType(12);
+      getDescriptor().getMessageType(10);
     internal_static_acme_fulfillment_domain_fulfillment_v1_FulfilledOrderEvent_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_FulfilledOrderEvent_descriptor,
         new java.lang.String[] { "CustomerId", "OrderId", "PaymentDetails", "Items", "Shipping", "FulfilledAt", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_PaymentDetails_descriptor =
-      getDescriptor().getMessageType(13);
+      getDescriptor().getMessageType(11);
     internal_static_acme_fulfillment_domain_fulfillment_v1_PaymentDetails_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_PaymentDetails_descriptor,
         new java.lang.String[] { "Rrn", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_ItemOutput_descriptor =
-      getDescriptor().getMessageType(14);
+      getDescriptor().getMessageType(12);
     internal_static_acme_fulfillment_domain_fulfillment_v1_ItemOutput_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_ItemOutput_descriptor,
         new java.lang.String[] { "ItemId", "SkuId", "BrandCode", "Quantity", "WarehouseId", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_StartOrderFulfillmentRequest_descriptor =
-      getDescriptor().getMessageType(15);
+      getDescriptor().getMessageType(13);
     internal_static_acme_fulfillment_domain_fulfillment_v1_StartOrderFulfillmentRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_StartOrderFulfillmentRequest_descriptor,
         new java.lang.String[] { "OrderId", "CustomerId", "Options", "SelectedShipping", "PlacedOrder", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_StartOrderFulfillmentOptions_descriptor =
-      getDescriptor().getMessageType(16);
+      getDescriptor().getMessageType(14);
     internal_static_acme_fulfillment_domain_fulfillment_v1_StartOrderFulfillmentOptions_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_StartOrderFulfillmentOptions_descriptor,
         new java.lang.String[] { "FulfillmentTimeoutSecs", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_SelectedShippingOption_descriptor =
-      getDescriptor().getMessageType(17);
+      getDescriptor().getMessageType(15);
     internal_static_acme_fulfillment_domain_fulfillment_v1_SelectedShippingOption_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_SelectedShippingOption_descriptor,
         new java.lang.String[] { "OptionId", "Price", "ExpectedShipDate", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_ValidateOrderRequest_descriptor =
-      getDescriptor().getMessageType(18);
+      getDescriptor().getMessageType(16);
     internal_static_acme_fulfillment_domain_fulfillment_v1_ValidateOrderRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_ValidateOrderRequest_descriptor,
         new java.lang.String[] { "OrderId", "Address", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_ValidateOrderResponse_descriptor =
-      getDescriptor().getMessageType(19);
+      getDescriptor().getMessageType(17);
     internal_static_acme_fulfillment_domain_fulfillment_v1_ValidateOrderResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_ValidateOrderResponse_descriptor,
         new java.lang.String[] { "Address", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_VerifyAddressRequest_descriptor =
-      getDescriptor().getMessageType(20);
+      getDescriptor().getMessageType(18);
     internal_static_acme_fulfillment_domain_fulfillment_v1_VerifyAddressRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_VerifyAddressRequest_descriptor,
         new java.lang.String[] { "Address", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_VerifyAddressResponse_descriptor =
-      getDescriptor().getMessageType(21);
+      getDescriptor().getMessageType(19);
     internal_static_acme_fulfillment_domain_fulfillment_v1_VerifyAddressResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_VerifyAddressResponse_descriptor,
         new java.lang.String[] { "Address", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_LoadFulfillmentOptionsRequest_descriptor =
-      getDescriptor().getMessageType(22);
+      getDescriptor().getMessageType(20);
     internal_static_acme_fulfillment_domain_fulfillment_v1_LoadFulfillmentOptionsRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_LoadFulfillmentOptionsRequest_descriptor,
         new java.lang.String[] { "OrderId", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_FulfillmentOptions_descriptor =
-      getDescriptor().getMessageType(23);
+      getDescriptor().getMessageType(21);
     internal_static_acme_fulfillment_domain_fulfillment_v1_FulfillmentOptions_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_FulfillmentOptions_descriptor,
-        new java.lang.String[] { "ShippingMargin", "IntegrationsEndpoint", });
-    internal_static_acme_fulfillment_domain_fulfillment_v1_OrderFulfillRequest_descriptor =
-      getDescriptor().getMessageType(24);
-    internal_static_acme_fulfillment_domain_fulfillment_v1_OrderFulfillRequest_fieldAccessorTable = new
+        new java.lang.String[] { "ShippingMargin", "IntegrationsEndpoint", "ShippingAgentEndpoint", });
+    internal_static_acme_fulfillment_domain_fulfillment_v1_FulfillOrderRequest_descriptor =
+      getDescriptor().getMessageType(22);
+    internal_static_acme_fulfillment_domain_fulfillment_v1_FulfillOrderRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_acme_fulfillment_domain_fulfillment_v1_OrderFulfillRequest_descriptor,
-        new java.lang.String[] { "ProcessedOrder", "DeliveryStatusRequest", });
+        internal_static_acme_fulfillment_domain_fulfillment_v1_FulfillOrderRequest_descriptor,
+        new java.lang.String[] { "ProcessedOrder", "DeliveryStatusRequest", "SelectedShippingOptionId", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_ProcessedOrder_descriptor =
-      getDescriptor().getMessageType(25);
+      getDescriptor().getMessageType(23);
     internal_static_acme_fulfillment_domain_fulfillment_v1_ProcessedOrder_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_ProcessedOrder_descriptor,
         new java.lang.String[] { "OrderId", "CustomerId", "State", });
-    internal_static_acme_fulfillment_domain_fulfillment_v1_OrderFulfillResponse_descriptor =
-      getDescriptor().getMessageType(26);
-    internal_static_acme_fulfillment_domain_fulfillment_v1_OrderFulfillResponse_fieldAccessorTable = new
+    internal_static_acme_fulfillment_domain_fulfillment_v1_FulfillOrderResponse_descriptor =
+      getDescriptor().getMessageType(24);
+    internal_static_acme_fulfillment_domain_fulfillment_v1_FulfillOrderResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_acme_fulfillment_domain_fulfillment_v1_OrderFulfillResponse_descriptor,
+        internal_static_acme_fulfillment_domain_fulfillment_v1_FulfillOrderResponse_descriptor,
         new java.lang.String[] { "TrackingNumber", "ShippingSelection", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_ShippingSelection_descriptor =
-      getDescriptor().getMessageType(27);
+      getDescriptor().getMessageType(25);
     internal_static_acme_fulfillment_domain_fulfillment_v1_ShippingSelection_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_ShippingSelection_descriptor,
         new java.lang.String[] { "OptionId", "RateId", "Carrier", "ServiceLevel", "ActualPrice", "MarginDeltaCents", "IsFallback", "FallbackReason", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_CancelFulfillmentOrderRequest_descriptor =
-      getDescriptor().getMessageType(28);
+      getDescriptor().getMessageType(26);
     internal_static_acme_fulfillment_domain_fulfillment_v1_CancelFulfillmentOrderRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_CancelFulfillmentOrderRequest_descriptor,
         new java.lang.String[] { "OrderId", "Reason", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_NotifyDeliveryStatusRequest_descriptor =
-      getDescriptor().getMessageType(29);
+      getDescriptor().getMessageType(27);
     internal_static_acme_fulfillment_domain_fulfillment_v1_NotifyDeliveryStatusRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_NotifyDeliveryStatusRequest_descriptor,
         new java.lang.String[] { "OrderId", "DeliveryStatus", "CarrierTrackingId", "FailureReason", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_GetFulfillmentOrderStateResponse_descriptor =
-      getDescriptor().getMessageType(30);
+      getDescriptor().getMessageType(28);
     internal_static_acme_fulfillment_domain_fulfillment_v1_GetFulfillmentOrderStateResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_GetFulfillmentOrderStateResponse_descriptor,
         new java.lang.String[] { "Args", "Options", "ValidatedAddress", "FulfillmentRequest", "ShippingSelection", "TrackingNumber", "Status", "DeliveryStatus", "Errors", "NotifyDeliveryStatus", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_FulfillmentItem_descriptor =
-      getDescriptor().getMessageType(31);
+      getDescriptor().getMessageType(29);
     internal_static_acme_fulfillment_domain_fulfillment_v1_FulfillmentItem_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_FulfillmentItem_descriptor,
         new java.lang.String[] { "ItemId", "SkuId", "BrandCode", "Quantity", "WarehouseId", "WarehouseLocation", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_HoldItemsRequest_descriptor =
-      getDescriptor().getMessageType(32);
+      getDescriptor().getMessageType(30);
     internal_static_acme_fulfillment_domain_fulfillment_v1_HoldItemsRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_HoldItemsRequest_descriptor,
         new java.lang.String[] { "OrderId", "Items", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_HoldItemsResponse_descriptor =
-      getDescriptor().getMessageType(33);
+      getDescriptor().getMessageType(31);
     internal_static_acme_fulfillment_domain_fulfillment_v1_HoldItemsResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_HoldItemsResponse_descriptor,
         new java.lang.String[] { "HoldId", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_ReserveItemsRequest_descriptor =
-      getDescriptor().getMessageType(34);
+      getDescriptor().getMessageType(32);
     internal_static_acme_fulfillment_domain_fulfillment_v1_ReserveItemsRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_ReserveItemsRequest_descriptor,
         new java.lang.String[] { "OrderId", "HoldId", "Items", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_ReserveItemsResponse_descriptor =
-      getDescriptor().getMessageType(35);
+      getDescriptor().getMessageType(33);
     internal_static_acme_fulfillment_domain_fulfillment_v1_ReserveItemsResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_ReserveItemsResponse_descriptor,
         new java.lang.String[] { "ReservationId", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_DeductInventoryRequest_descriptor =
-      getDescriptor().getMessageType(36);
+      getDescriptor().getMessageType(34);
     internal_static_acme_fulfillment_domain_fulfillment_v1_DeductInventoryRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_DeductInventoryRequest_descriptor,
         new java.lang.String[] { "OrderId", "ReservationId", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_DeductInventoryResponse_descriptor =
-      getDescriptor().getMessageType(37);
+      getDescriptor().getMessageType(35);
     internal_static_acme_fulfillment_domain_fulfillment_v1_DeductInventoryResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_DeductInventoryResponse_descriptor,
         new java.lang.String[] { "Success", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_ReleaseHoldRequest_descriptor =
-      getDescriptor().getMessageType(38);
+      getDescriptor().getMessageType(36);
     internal_static_acme_fulfillment_domain_fulfillment_v1_ReleaseHoldRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_ReleaseHoldRequest_descriptor,
         new java.lang.String[] { "OrderId", "HoldId", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_ReleaseHoldResponse_descriptor =
-      getDescriptor().getMessageType(39);
+      getDescriptor().getMessageType(37);
     internal_static_acme_fulfillment_domain_fulfillment_v1_ReleaseHoldResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_ReleaseHoldResponse_descriptor,
         new java.lang.String[] { "Success", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_GetCarrierRatesRequest_descriptor =
-      getDescriptor().getMessageType(40);
+      getDescriptor().getMessageType(38);
     internal_static_acme_fulfillment_domain_fulfillment_v1_GetCarrierRatesRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_GetCarrierRatesRequest_descriptor,
         new java.lang.String[] { "OrderId", "EasypostAddressId", "Items", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_GetCarrierRatesResponse_descriptor =
-      getDescriptor().getMessageType(41);
+      getDescriptor().getMessageType(39);
     internal_static_acme_fulfillment_domain_fulfillment_v1_GetCarrierRatesResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_GetCarrierRatesResponse_descriptor,
         new java.lang.String[] { "ShipmentId", "Rates", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_CarrierRate_descriptor =
-      getDescriptor().getMessageType(42);
+      getDescriptor().getMessageType(40);
     internal_static_acme_fulfillment_domain_fulfillment_v1_CarrierRate_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_CarrierRate_descriptor,
         new java.lang.String[] { "RateId", "Carrier", "ServiceLevel", "Cost", "EstimatedDays", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_PrintShippingLabelRequest_descriptor =
-      getDescriptor().getMessageType(43);
+      getDescriptor().getMessageType(41);
     internal_static_acme_fulfillment_domain_fulfillment_v1_PrintShippingLabelRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_PrintShippingLabelRequest_descriptor,
         new java.lang.String[] { "OrderId", "ShipmentId", "RateId", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_PrintShippingLabelResponse_descriptor =
-      getDescriptor().getMessageType(44);
+      getDescriptor().getMessageType(42);
     internal_static_acme_fulfillment_domain_fulfillment_v1_PrintShippingLabelResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_PrintShippingLabelResponse_descriptor,

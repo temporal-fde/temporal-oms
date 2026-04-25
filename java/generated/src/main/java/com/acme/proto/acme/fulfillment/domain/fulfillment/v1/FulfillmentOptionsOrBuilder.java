@@ -36,4 +36,16 @@ public interface FulfillmentOptionsOrBuilder extends
    */
   com.google.protobuf.ByteString
       getIntegrationsEndpointBytes();
+
+  /**
+   * <code>string shipping_agent_endpoint = 3 [json_name = "shippingAgentEndpoint"];</code>
+   * @return The shippingAgentEndpoint.
+   */
+  java.lang.String getShippingAgentEndpoint();
+  /**
+   * <code>string shipping_agent_endpoint = 3 [json_name = "shippingAgentEndpoint"];</code>
+   * @return The bytes for shippingAgentEndpoint.
+   */
+  com.google.protobuf.ByteString
+      getShippingAgentEndpointBytes();
 }

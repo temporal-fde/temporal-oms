@@ -41,6 +41,7 @@ message GetLocationEventsResponse {
 
 // ShippingOption is a single carrier rate returned by get_carrier_rates.
 // id is set to rate_id so the LLM can cross-reference recommended_option_id back to the rate.
+// shipment_id is the EasyPost Shipment ID — needed by fulfillment.Order to call printShippingLabel.
 message ShippingOption {
   string              id             = 1;
   string              carrier        = 2;
@@ -48,6 +49,7 @@ message ShippingOption {
   acme.common.v1.Money cost          = 4;
   int32               estimated_days = 5;
   string              rate_id        = 6;
+  string              shipment_id    = 7;
 }
 
 // RecommendationOutcome is the LLM's decision about the shipping situation.

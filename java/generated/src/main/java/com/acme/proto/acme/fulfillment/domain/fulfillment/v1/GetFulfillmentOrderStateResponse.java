@@ -133,9 +133,9 @@ private static final long serialVersionUID = 0L;
   }
 
   public static final int FULFILLMENT_REQUEST_FIELD_NUMBER = 4;
-  private com.acme.proto.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest fulfillmentRequest_;
+  private com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest fulfillmentRequest_;
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest fulfillment_request = 4 [json_name = "fulfillmentRequest"];</code>
+   * <code>.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest fulfillment_request = 4 [json_name = "fulfillmentRequest"];</code>
    * @return Whether the fulfillmentRequest field is set.
    */
   @java.lang.Override
@@ -143,19 +143,19 @@ private static final long serialVersionUID = 0L;
     return ((bitField0_ & 0x00000008) != 0);
   }
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest fulfillment_request = 4 [json_name = "fulfillmentRequest"];</code>
+   * <code>.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest fulfillment_request = 4 [json_name = "fulfillmentRequest"];</code>
    * @return The fulfillmentRequest.
    */
   @java.lang.Override
-  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest getFulfillmentRequest() {
-    return fulfillmentRequest_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest.getDefaultInstance() : fulfillmentRequest_;
+  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest getFulfillmentRequest() {
+    return fulfillmentRequest_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest.getDefaultInstance() : fulfillmentRequest_;
   }
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest fulfillment_request = 4 [json_name = "fulfillmentRequest"];</code>
+   * <code>.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest fulfillment_request = 4 [json_name = "fulfillmentRequest"];</code>
    */
   @java.lang.Override
-  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequestOrBuilder getFulfillmentRequestOrBuilder() {
-    return fulfillmentRequest_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest.getDefaultInstance() : fulfillmentRequest_;
+  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequestOrBuilder getFulfillmentRequestOrBuilder() {
+    return fulfillmentRequest_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest.getDefaultInstance() : fulfillmentRequest_;
   }
 
   public static final int SHIPPING_SELECTION_FIELD_NUMBER = 5;
@@ -1296,31 +1296,31 @@ private static final long serialVersionUID = 0L;
       return validatedAddressBuilder_;
     }
 
-    private com.acme.proto.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest fulfillmentRequest_;
+    private com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest fulfillmentRequest_;
     private com.google.protobuf.SingleFieldBuilder<
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequestOrBuilder> fulfillmentRequestBuilder_;
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequestOrBuilder> fulfillmentRequestBuilder_;
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest fulfillment_request = 4 [json_name = "fulfillmentRequest"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest fulfillment_request = 4 [json_name = "fulfillmentRequest"];</code>
      * @return Whether the fulfillmentRequest field is set.
      */
     public boolean hasFulfillmentRequest() {
       return ((bitField0_ & 0x00000008) != 0);
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest fulfillment_request = 4 [json_name = "fulfillmentRequest"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest fulfillment_request = 4 [json_name = "fulfillmentRequest"];</code>
      * @return The fulfillmentRequest.
      */
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest getFulfillmentRequest() {
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest getFulfillmentRequest() {
       if (fulfillmentRequestBuilder_ == null) {
-        return fulfillmentRequest_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest.getDefaultInstance() : fulfillmentRequest_;
+        return fulfillmentRequest_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest.getDefaultInstance() : fulfillmentRequest_;
       } else {
         return fulfillmentRequestBuilder_.getMessage();
       }
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest fulfillment_request = 4 [json_name = "fulfillmentRequest"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest fulfillment_request = 4 [json_name = "fulfillmentRequest"];</code>
      */
-    public Builder setFulfillmentRequest(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest value) {
+    public Builder setFulfillmentRequest(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest value) {
       if (fulfillmentRequestBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
@@ -1334,10 +1334,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest fulfillment_request = 4 [json_name = "fulfillmentRequest"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest fulfillment_request = 4 [json_name = "fulfillmentRequest"];</code>
      */
     public Builder setFulfillmentRequest(
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest.Builder builderForValue) {
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest.Builder builderForValue) {
       if (fulfillmentRequestBuilder_ == null) {
         fulfillmentRequest_ = builderForValue.build();
       } else {
@@ -1348,13 +1348,13 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest fulfillment_request = 4 [json_name = "fulfillmentRequest"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest fulfillment_request = 4 [json_name = "fulfillmentRequest"];</code>
      */
-    public Builder mergeFulfillmentRequest(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest value) {
+    public Builder mergeFulfillmentRequest(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest value) {
       if (fulfillmentRequestBuilder_ == null) {
         if (((bitField0_ & 0x00000008) != 0) &&
           fulfillmentRequest_ != null &&
-          fulfillmentRequest_ != com.acme.proto.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest.getDefaultInstance()) {
+          fulfillmentRequest_ != com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest.getDefaultInstance()) {
           getFulfillmentRequestBuilder().mergeFrom(value);
         } else {
           fulfillmentRequest_ = value;
@@ -1369,7 +1369,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest fulfillment_request = 4 [json_name = "fulfillmentRequest"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest fulfillment_request = 4 [json_name = "fulfillmentRequest"];</code>
      */
     public Builder clearFulfillmentRequest() {
       bitField0_ = (bitField0_ & ~0x00000008);
@@ -1382,33 +1382,33 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest fulfillment_request = 4 [json_name = "fulfillmentRequest"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest fulfillment_request = 4 [json_name = "fulfillmentRequest"];</code>
      */
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest.Builder getFulfillmentRequestBuilder() {
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest.Builder getFulfillmentRequestBuilder() {
       bitField0_ |= 0x00000008;
       onChanged();
       return internalGetFulfillmentRequestFieldBuilder().getBuilder();
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest fulfillment_request = 4 [json_name = "fulfillmentRequest"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest fulfillment_request = 4 [json_name = "fulfillmentRequest"];</code>
      */
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequestOrBuilder getFulfillmentRequestOrBuilder() {
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequestOrBuilder getFulfillmentRequestOrBuilder() {
       if (fulfillmentRequestBuilder_ != null) {
         return fulfillmentRequestBuilder_.getMessageOrBuilder();
       } else {
         return fulfillmentRequest_ == null ?
-            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest.getDefaultInstance() : fulfillmentRequest_;
+            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest.getDefaultInstance() : fulfillmentRequest_;
       }
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest fulfillment_request = 4 [json_name = "fulfillmentRequest"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest fulfillment_request = 4 [json_name = "fulfillmentRequest"];</code>
      */
     private com.google.protobuf.SingleFieldBuilder<
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequestOrBuilder> 
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequestOrBuilder> 
         internalGetFulfillmentRequestFieldBuilder() {
       if (fulfillmentRequestBuilder_ == null) {
         fulfillmentRequestBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequestOrBuilder>(
+            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequestOrBuilder>(
                 getFulfillmentRequest(),
                 getParentForChildren(),
                 isClean());

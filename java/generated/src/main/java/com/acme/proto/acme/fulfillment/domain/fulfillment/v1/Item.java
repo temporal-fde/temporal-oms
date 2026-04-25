@@ -6,6 +6,10 @@
 package com.acme.proto.acme.fulfillment.domain.fulfillment.v1;
 
 /**
+ * <pre>
+ * Order Fulfillment AI Agent Workflow (Python-era)
+ * </pre>
+ *
  * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.Item}
  */
 @com.google.protobuf.Generated
@@ -367,6 +371,10 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
+   * <pre>
+   * Order Fulfillment AI Agent Workflow (Python-era)
+   * </pre>
+   *
    * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.Item}
    */
   public static final class Builder extends

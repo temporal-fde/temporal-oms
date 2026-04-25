@@ -42,10 +42,10 @@ public interface Order {
      * Drives carrier rate selection, label printing, and inventory deduction.
      */
     @UpdateMethod
-    OrderFulfillResponse fulfillOrder(OrderFulfillRequest request);
+    FulfillOrderResponse fulfillOrder(FulfillOrderRequest request);
 
     @UpdateValidatorMethod(updateName = "fulfillOrder")
-    void validateFulfillOrder(OrderFulfillRequest request);
+    void validateFulfillOrder(FulfillOrderRequest request);
 
     /**
      * Signal: Cancel the fulfillment order.

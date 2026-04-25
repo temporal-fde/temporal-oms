@@ -162,7 +162,7 @@ public class OrderImpl implements Order {
 
             // Dispatch fulfillOrder to fulfillment.Order — fire-and-forward via Nexus
             // fulfillment.Order is the source of truth for fulfillment state after this point
-            this.fulfillment.fulfillOrder(OrderFulfillRequest.newBuilder()
+            this.fulfillment.fulfillOrder(FulfillOrderRequest.newBuilder()
                     .setProcessedOrder(ProcessedOrder.newBuilder()
                             .setOrderId(this.state.getArgs().getOrderId())
                             .setCustomerId(this.state.getArgs().getCustomerId())

@@ -35,14 +35,10 @@ from acme.fulfillment.domain.v1.shipping_agent_p2p import (
     BuildSystemPromptResponse,
     CalculateShippingOptionsRequest,
     CalculateShippingOptionsResponse,
-    FindAlternateWarehouseRequest,
-    FindAlternateWarehouseResponse,
     GetLocationEventsRequest,
     GetLocationEventsResponse,
     GetShippingRatesRequest,
     GetShippingRatesResponse,
-    LookupInventoryAddressRequest,
-    LookupInventoryAddressResponse,
     RecommendationOutcome,
     ShippingAgentExecutionOptions,
     ShippingLineItem,
@@ -50,6 +46,12 @@ from acme.fulfillment.domain.v1.shipping_agent_p2p import (
     ShippingOptionsResult,
     ShippingRecommendation,
     StartShippingAgentRequest,
+)
+from acme.fulfillment.domain.v1.inventory_p2p import (
+    FindAlternateWarehouseRequest,
+    FindAlternateWarehouseResponse,
+    LookupInventoryAddressRequest,
+    LookupInventoryAddressResponse,
 )
 from acme.fulfillment.domain.v1.values_p2p import LocationRiskSummary, RiskLevel
 from acme.fulfillment.domain.v1.workflows_p2p import (

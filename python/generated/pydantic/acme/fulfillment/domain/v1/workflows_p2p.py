@@ -40,22 +40,14 @@ class FulfillmentStatus(IntEnum):
     FULFILLMENT_STATUS_FAILED = 7
 
 class Item(BaseModel):
+    """
+     Order Fulfillment AI Agent Workflow (Python-era)
+    """
+
     item_id: str = Field(default="")
     sku_id: str = Field(default="")
     brand_code: str = Field(default="")
     quantity: int = Field(default=0)
-
-class FulfillOrderRequest(BaseModel):
-    """
-     Order Fulfillment AI Agent Workflow
-    """
-
-    order_id: str = Field(default="")
-    customer_id: str = Field(default="")
-    items: typing.List[Item] = Field(default_factory=list)
-    payment_rrn: str = Field(default="")
-    shipping_address: Address = Field(default_factory=Address)
-    created_at: datetime = Field(default_factory=datetime.now)
 
 class ShippingDetails(BaseModel):
     carrier: str = Field(default="")
@@ -70,14 +62,6 @@ class AllocatedItem(BaseModel):
     quantity: int = Field(default=0)
     warehouse_id: str = Field(default="")
     warehouse_location: str = Field(default="")
-
-class FulfillOrderResponse(BaseModel):
-    model_config = ConfigDict(validate_default=True)
-    order_id: str = Field(default="")
-    status: Status = Field(default=0)
-    shipping: ShippingDetails = Field(default_factory=ShippingDetails)
-    allocated_items: typing.List[AllocatedItem] = Field(default_factory=list)
-    completed_at: datetime = Field(default_factory=datetime.now)
 
 class FindOptimalShippingRequest(BaseModel):
     """
@@ -215,10 +199,12 @@ class FulfillmentOptions(BaseModel):
  shipping_margin is the maximum acceptable shipping cost; amounts above it
  are recorded in the margin_leak SearchAttribute.
  integrations_endpoint is the Nexus endpoint name for the apps InventoryService.
+ shipping_agent_endpoint is the Nexus endpoint name for the ShippingAgent service.
     """
 
     shipping_margin: Money = Field(default_factory=Money)
     integrations_endpoint: str = Field(default="")
+    shipping_agent_endpoint: str = Field(default="")
 
 class ProcessedOrder(BaseModel):
     """
@@ -237,14 +223,16 @@ class NotifyDeliveryStatusRequest(BaseModel):
     carrier_tracking_id: typing.Optional[str] = Field(default="")
     failure_reason: typing.Optional[str] = Field(default="")
 
-class OrderFulfillRequest(BaseModel):
+class FulfillOrderRequest(BaseModel):
     """
-     OrderFulfillRequest is the input to the fulfillOrder Update handler.
- Name is distinct from the Python-era FulfillOrderRequest in this package.
+     FulfillOrderRequest is the input to the fulfillOrder Update handler.
     """
 
     processed_order: ProcessedOrder = Field(default_factory=ProcessedOrder)
     delivery_status_request: typing.Optional[NotifyDeliveryStatusRequest] = Field(default_factory=NotifyDeliveryStatusRequest)
+# selected_shipping_option_id is the customer's original rate selection.
+# If absent, fulfillment.Order falls back to state.args.selected_shipping.option_id.
+    selected_shipping_option_id: typing.Optional[str] = Field(default="")
 
 class ShippingSelection(BaseModel):
     """
@@ -262,10 +250,9 @@ class ShippingSelection(BaseModel):
     is_fallback: bool = Field(default=False)
     fallback_reason: str = Field(default="")
 
-class OrderFulfillResponse(BaseModel):
+class FulfillOrderResponse(BaseModel):
     """
-     OrderFulfillResponse is returned to the fulfillOrder Update caller (apps.Order).
- Name is distinct from the Python-era FulfillOrderResponse in this package.
+     FulfillOrderResponse is returned to the fulfillOrder Update caller (apps.Order).
     """
 
     tracking_number: str = Field(default="")
@@ -280,7 +267,7 @@ class GetFulfillmentOrderStateResponse(BaseModel):
     args: StartOrderFulfillmentRequest = Field(default_factory=StartOrderFulfillmentRequest)
     options: FulfillmentOptions = Field(default_factory=FulfillmentOptions)
     validated_address: Address = Field(default_factory=Address)
-    fulfillment_request: OrderFulfillRequest = Field(default_factory=OrderFulfillRequest)
+    fulfillment_request: FulfillOrderRequest = Field(default_factory=FulfillOrderRequest)
     shipping_selection: ShippingSelection = Field(default_factory=ShippingSelection)
     tracking_number: str = Field(default="")
     status: FulfillmentStatus = Field(default=0)

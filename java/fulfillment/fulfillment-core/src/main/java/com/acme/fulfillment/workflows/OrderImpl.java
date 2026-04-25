@@ -3,12 +3,12 @@ package com.acme.fulfillment.workflows;
 import com.acme.fulfillment.workflows.activities.Carriers;
 import com.acme.fulfillment.workflows.activities.FulfillmentOptionsLoader;
 import com.acme.oms.services.InventoryService;
+import com.acme.oms.services.ShippingAgent;
 import com.acme.proto.acme.common.v1.Money;
 import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.*;
 import io.temporal.activity.ActivityOptions;
 import io.temporal.activity.LocalActivityOptions;
 import io.temporal.common.SearchAttributeKey;
-import io.temporal.common.VersioningBehavior;
 import io.temporal.failure.ApplicationFailure;
 import io.temporal.workflow.*;
 import org.slf4j.Logger;
@@ -16,16 +16,15 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.Optional;
 
 /**
- * fulfillment.Order Workflow Implementation (V1)
+ * fulfillment.Order Workflow Implementation (V2)
  *
  * Lifecycle:
  *  1. [UpdateWithStart] validateOrder → Carriers.verifyAddress → store verified Address → return
  *  2. execute() unblocks → loadOptions (LocalActivity) → InventoryService.holdItems → await fulfillOrder/cancel/timeout
- *  3. [Update] fulfillOrder → stores request → InventoryService.reserveItems → Carriers.getCarrierRates → select rate (margin check)
- *               → concurrent: Carriers.printShippingLabel + InventoryService.deductInventory → return response (no delivery await)
+ *  3. [Update] fulfillOrder → stores request → InventoryService.reserveItems → ShippingAgent.calculateShippingOptions (Nexus)
+ *               → apply recommendation → concurrent: Carriers.printShippingLabel + InventoryService.deductInventory → return response
  *  4. execute() awaits state.notifyDeliveryStatus → updates delivery_status + status → complete
  *  5. [Signal] notifyDeliveryStatus → stores NotifyDeliveryStatusRequest in state
  *
@@ -40,8 +39,9 @@ public class OrderImpl implements Order {
     private final Carriers carriers;
     private final FulfillmentOptionsLoader optionsLoader;
 
-    // Initialized in execute() after FulfillmentOptions are loaded (endpoint name needed)
+    // Initialized in execute() after FulfillmentOptions are loaded (endpoint names needed)
     private InventoryService inventory;
+    private ShippingAgent shippingAgent;
 
     private GetFulfillmentOrderStateResponse state;
     private boolean cancelFlag = false;
@@ -79,7 +79,7 @@ public class OrderImpl implements Order {
             return;
         }
 
-        // Load fulfillment policy (shipping_margin + integrations_endpoint) via LocalActivity
+        // Load fulfillment policy (shipping_margin + endpoint names) via LocalActivity
         var options = optionsLoader.loadOptions(
                 LoadFulfillmentOptionsRequest.newBuilder()
                         .setOrderId(request.getOrderId())
@@ -92,6 +92,15 @@ public class OrderImpl implements Order {
                         .setEndpoint(options.getIntegrationsEndpoint())
                         .setOperationOptions(NexusOperationOptions.newBuilder()
                                 .setScheduleToCloseTimeout(Duration.ofSeconds(30))
+                                .build())
+                        .build());
+
+        // Configure ShippingAgent Nexus stub — routes to Python fulfillment namespace, "agents" task queue
+        this.shippingAgent = Workflow.newNexusServiceStub(ShippingAgent.class,
+                NexusServiceOptions.newBuilder()
+                        .setEndpoint(options.getShippingAgentEndpoint())
+                        .setOperationOptions(NexusOperationOptions.newBuilder()
+                                .setScheduleToCloseTimeout(Duration.ofSeconds(120))
                                 .build())
                         .build());
 
@@ -179,7 +188,7 @@ public class OrderImpl implements Order {
     // ── fulfillOrder Update ───────────────────────────────────────────────────
 
     @Override
-    public void validateFulfillOrder(OrderFulfillRequest request) {
+    public void validateFulfillOrder(FulfillOrderRequest request) {
         if (!state.hasValidatedAddress()) {
             throw ApplicationFailure.newNonRetryableFailure(
                     "validateOrder must complete before fulfillOrder can be accepted",
@@ -191,7 +200,7 @@ public class OrderImpl implements Order {
     }
 
     @Override
-    public OrderFulfillResponse fulfillOrder(OrderFulfillRequest request) {
+    public FulfillOrderResponse fulfillOrder(FulfillOrderRequest request) {
         var orderId = request.getProcessedOrder().getOrderId();
         logger.info("Processing fulfillOrder for order_id={}", orderId);
 
@@ -208,19 +217,24 @@ public class OrderImpl implements Order {
                         .addAllItems(extractProcessedItems(request.getProcessedOrder()))
                         .build());
 
-        // Get carrier rates — creates the EasyPost Shipment using the verified address ID
-        var ratesResponse = carriers.getCarrierRates(
-                GetCarrierRatesRequest.newBuilder()
+        // Resolve selected option ID: prefer explicit override in request, else use order-start selection
+        String selectedOptionId = request.hasSelectedShippingOptionId()
+                ? request.getSelectedShippingOptionId()
+                : state.getArgs().getSelectedShipping().getOptionId();
+
+        // Get AI-driven shipping recommendation via ShippingAgent Nexus operation (UpdateWithStart)
+        var shippingResponse = shippingAgent.calculateShippingOptions(
+                CalculateShippingOptionsRequest.newBuilder()
                         .setOrderId(orderId)
-                        .setEasypostAddressId(state.getValidatedAddress().getEasypost().getId())
-                        .addAllItems(extractProcessedItems(request.getProcessedOrder()))
+                        .setCustomerId(request.getProcessedOrder().getCustomerId())
+                        .setToAddress(state.getValidatedAddress())
+                        .addAllItems(convertToShippingLineItems(request.getProcessedOrder()))
+                        .setSelectedShippingOptionId(selectedOptionId)
+                        .setCustomerPaidPrice(state.getArgs().getSelectedShipping().getPrice())
                         .build());
 
-        // Select rate; detect and record margin leakage
-        var selection = selectRate(
-                ratesResponse,
-                state.getArgs().getSelectedShipping(),
-                state.getOptions().getShippingMargin());
+        // Apply recommendation: select rate and compute margin delta
+        var selection = applyRecommendation(shippingResponse, state.getOptions().getShippingMargin());
 
         if (selection.getMarginDeltaCents() > 0) {
             Workflow.upsertTypedSearchAttributes(MARGIN_LEAK.valueSet(selection.getMarginDeltaCents()));
@@ -228,12 +242,15 @@ public class OrderImpl implements Order {
 
         this.state = this.state.toBuilder().setShippingSelection(selection).build();
 
+        // Retrieve the selected ShippingOption to get the EasyPost shipment_id for label printing
+        var selectedOption = findOption(shippingResponse, selection.getOptionId());
+
         // Print label and deduct inventory concurrently — independent terminal operations
         var labelPromise = Async.function(carriers::printShippingLabel,
                 PrintShippingLabelRequest.newBuilder()
                         .setOrderId(orderId)
-                        .setShipmentId(ratesResponse.getShipmentId())
-                        .setRateId(selection.getRateId())
+                        .setShipmentId(selectedOption.getShipmentId())
+                        .setRateId(selectedOption.getRateId())
                         .build());
 
         var deductPromise = Async.function(inventory::deductInventory,
@@ -259,7 +276,7 @@ public class OrderImpl implements Order {
                     .build();
         }
 
-        return OrderFulfillResponse.newBuilder()
+        return FulfillOrderResponse.newBuilder()
                 .setTrackingNumber(labelResponse.getTrackingNumber())
                 .setShippingSelection(selection)
                 .build();
@@ -293,50 +310,35 @@ public class OrderImpl implements Order {
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    private ShippingSelection selectRate(GetCarrierRatesResponse ratesResponse,
-                                         SelectedShippingOption selected,
-                                         Money shippingMargin) {
-        List<CarrierRate> rates = ratesResponse.getRatesList();
-        if (rates.isEmpty()) {
-            throw ApplicationFailure.newNonRetryableFailure("No carrier rates available", "NO_RATES");
-        }
+    private ShippingOption findOption(CalculateShippingOptionsResponse response, String optionId) {
+        return response.getOptionsList().stream()
+                .filter(o -> o.getId().equals(optionId))
+                .findFirst()
+                .orElseThrow(() -> ApplicationFailure.newNonRetryableFailure(
+                        "Recommended option not found in ShippingAgent response: " + optionId, "NO_OPTION"));
+    }
 
-        Optional<CarrierRate> originalRate = rates.stream()
-                .filter(r -> r.getRateId().equals(selected.getOptionId()))
-                .findFirst();
-
-        CarrierRate chosen;
-        boolean isFallback = false;
-        String fallbackReason = "";
-
-        if (originalRate.isPresent()) {
-            chosen = originalRate.get();
-        } else {
-            long marginUnits = shippingMargin.getUnits();
-            chosen = rates.stream()
-                    .filter(r -> r.getCost().getUnits() <= marginUnits)
-                    .min((a, b) -> Long.compare(a.getCost().getUnits(), b.getCost().getUnits()))
-                    .orElseGet(() -> rates.stream()
-                            .min((a, b) -> Long.compare(a.getCost().getUnits(), b.getCost().getUnits()))
-                            .orElseThrow());
-            isFallback = true;
-            fallbackReason = "original_option_unavailable";
-        }
-
-        long actualCents = chosen.getCost().getUnits();
-        long marginCents = shippingMargin.getUnits();
-        long delta = Math.max(0L, actualCents - marginCents);
-
+    private ShippingSelection applyRecommendation(CalculateShippingOptionsResponse response, Money shippingMargin) {
+        var rec = response.getRecommendation();
+        var option = findOption(response, rec.getRecommendedOptionId());
+        long delta = Math.max(0L, option.getCost().getUnits() - shippingMargin.getUnits());
         return ShippingSelection.newBuilder()
-                .setOptionId(selected.getOptionId())
-                .setRateId(chosen.getRateId())
-                .setCarrier(chosen.getCarrier())
-                .setServiceLevel(chosen.getServiceLevel())
-                .setActualPrice(chosen.getCost())
+                .setOptionId(rec.getRecommendedOptionId())
+                .setRateId(option.getRateId())
+                .setCarrier(option.getCarrier())
+                .setServiceLevel(option.getServiceLevel())
+                .setActualPrice(option.getCost())
                 .setMarginDeltaCents(delta)
-                .setIsFallback(isFallback)
-                .setFallbackReason(fallbackReason)
                 .build();
+    }
+
+    private List<ShippingLineItem> convertToShippingLineItems(ProcessedOrder processedOrder) {
+        return processedOrder.getState().getEnrichment().getItemsList().stream()
+                .map(item -> ShippingLineItem.newBuilder()
+                        .setSkuId(item.getSkuId())
+                        .setQuantity(item.getQuantity())
+                        .build())
+                .toList();
     }
 
     private List<FulfillmentItem> extractStartItems(StartOrderFulfillmentRequest request) {

@@ -62,7 +62,7 @@ public class FulfillmentImpl {
     }
 
     @OperationImpl
-    public OperationHandler<OrderFulfillRequest, OrderFulfillResponse> fulfillOrder() {
+    public OperationHandler<FulfillOrderRequest, FulfillOrderResponse> fulfillOrder() {
         // Dispatch fulfillOrder Update to the running fulfillment.Order workflow.
         // We wait only for ACCEPTED — fulfillOrder awaits delivery status (long-running)
         // and apps.Order does not need the result; fulfillment.Order is the source of truth.
@@ -74,14 +74,14 @@ public class FulfillmentImpl {
             Order orderWorkflow = client.newWorkflowStub(Order.class, orderId);
 
             WorkflowStub.fromTyped(orderWorkflow).startUpdate(
-                    UpdateOptions.<OrderFulfillResponse>newBuilder()
+                    UpdateOptions.<FulfillOrderResponse>newBuilder()
                             .setUpdateName("fulfillOrder")
-                            .setResultClass(OrderFulfillResponse.class)
+                            .setResultClass(FulfillOrderResponse.class)
                             .setWaitForStage(WorkflowUpdateStage.ACCEPTED)
                             .build(),
                     request);
 
-            return OrderFulfillResponse.getDefaultInstance();
+            return FulfillOrderResponse.getDefaultInstance();
         });
     }
 

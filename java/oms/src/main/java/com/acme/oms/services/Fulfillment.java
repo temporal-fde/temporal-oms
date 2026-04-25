@@ -1,7 +1,7 @@
 package com.acme.oms.services;
 
-import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest;
-import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.OrderFulfillResponse;
+import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest;
+import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderResponse;
 import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.StartOrderFulfillmentRequest;
 import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ValidateOrderResponse;
 import io.nexusrpc.Operation;
@@ -24,5 +24,5 @@ public interface Fulfillment {
     ValidateOrderResponse validateOrder(StartOrderFulfillmentRequest request);
 
     @Operation
-    OrderFulfillResponse fulfillOrder(OrderFulfillRequest request);
+    FulfillOrderResponse fulfillOrder(FulfillOrderRequest request);
 }
