@@ -1,7 +1,9 @@
 package com.acme.apps.workflows;
 
 import com.acme.apps.workflows.activities.IntegrationsSetup;
+import com.acme.proto.acme.apps.domain.apps.v1.GetIntegrationsStateResponse;
 import com.acme.proto.acme.apps.domain.apps.v1.StartIntegrationsRequest;
+import com.acme.proto.acme.apps.domain.apps.v1.WarehouseEntry;
 import com.acme.proto.acme.common.v1.Address;
 import com.acme.proto.acme.common.v1.EasyPostAddress;
 import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeductInventoryRequest;
@@ -75,6 +77,21 @@ public class IntegrationsImpl implements Integrations {
         this.warehouses = setup.preloadWarehouseAddresses();
         logger.info("apps.Integrations ready with {} warehouses", warehouses.size());
         Workflow.await(() -> false);
+    }
+
+    @Override
+    public GetIntegrationsStateResponse getState() {
+        if (warehouses == null) return GetIntegrationsStateResponse.getDefaultInstance();
+        List<WarehouseEntry> entries = warehouses.stream()
+                .map(wh -> WarehouseEntry.newBuilder()
+                        .setWarehouseId(wh.warehouseId())
+                        .addAllSkuPrefixes(wh.skuPrefixes())
+                        .setAddress(toAddress(wh))
+                        .build())
+                .toList();
+        return GetIntegrationsStateResponse.newBuilder()
+                .addAllWarehouses(entries)
+                .build();
     }
 
     // ── CommerceApp ───────────────────────────────────────────────────────────

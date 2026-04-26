@@ -31,11 +31,7 @@ import java.util.Map;
 
 /**
  * All EasyPost shipping operations: address verification, carrier rate queries, and label printing.
- *
- * When EASYPOST_API_KEY is set, all three methods make real EasyPost API calls.
- * Use an EZT-prefixed test key to exercise the full path without purchasing real labels.
- * When the key is absent, each method falls back to a local stub so the workflow can
- * run end-to-end in environments without EasyPost credentials.
+ * Requires EASYPOST_API_KEY — use an EZT-prefixed test key to avoid purchasing real labels.
  */
 @Component("carriersActivities")
 public class CarriersImpl implements Carriers {
@@ -49,7 +45,7 @@ public class CarriersImpl implements Carriers {
     private static final float PARCEL_WIDTH    = 8.0f;
     private static final float PARCEL_HEIGHT   = 6.0f;
 
-    @Autowired(required = false)
+    @Autowired
     private EasyPostClient easyPostClient;
 
     @Value("${easypost.warehouse.from-address-id:}")
@@ -60,16 +56,9 @@ public class CarriersImpl implements Carriers {
     @Override
     public VerifyAddressResponse verifyAddress(VerifyAddressRequest request) {
         if (easyPostClient == null) {
-            var ep = request.getAddress().getEasypost();
-            logger.info("verifyAddress stub (no EasyPost key): {}", ep.getStreet1());
-            var stubAddress = EasyPostAddress.newBuilder()
-                    .setId("adr_stub_" + ep.getStreet1().replaceAll("\\s+", "_").toLowerCase())
-                    .setStreet1(ep.getStreet1()).setCity(ep.getCity())
-                    .setState(ep.getState()).setZip(ep.getZip()).setCountry(ep.getCountry())
-                    .build();
-            return VerifyAddressResponse.newBuilder()
-                    .setAddress(Address.newBuilder().setEasypost(stubAddress).build())
-                    .build();
+            throw ApplicationFailure.newNonRetryableFailure(
+                    "EasyPost API key is not configured — set EASYPOST_API_KEY",
+                    "EASYPOST_NOT_CONFIGURED");
         }
 
         var address = request.getAddress();
@@ -131,17 +120,9 @@ public class CarriersImpl implements Carriers {
     @Override
     public GetCarrierRatesResponse getCarrierRates(GetCarrierRatesRequest request) {
         if (easyPostClient == null) {
-            logger.info("getCarrierRates stub (no EasyPost key): order_id={}", request.getOrderId());
-            var stubRate = CarrierRate.newBuilder()
-                    .setRateId("rate_stub_" + request.getOrderId())
-                    .setCarrier("UPS").setServiceLevel("Ground")
-                    .setCost(Money.newBuilder().setCurrency("USD").setUnits(999L).build())
-                    .setEstimatedDays(5)
-                    .build();
-            return GetCarrierRatesResponse.newBuilder()
-                    .setShipmentId("shipment_stub_" + request.getOrderId())
-                    .addRates(stubRate)
-                    .build();
+            throw ApplicationFailure.newNonRetryableFailure(
+                    "EasyPost API key is not configured — set EASYPOST_API_KEY",
+                    "EASYPOST_NOT_CONFIGURED");
         }
 
         float weightOz = estimateWeightOz(request.getItemsList());
@@ -184,13 +165,9 @@ public class CarriersImpl implements Carriers {
     @Override
     public PrintShippingLabelResponse printShippingLabel(PrintShippingLabelRequest request) {
         if (easyPostClient == null) {
-            logger.info("printShippingLabel stub (no EasyPost key): order_id={}", request.getOrderId());
-            String orderId = request.getOrderId().replaceAll("[^A-Za-z0-9]", "");
-            String tracking = "1Z999AA1" + orderId.substring(0, Math.min(8, orderId.length())).toUpperCase();
-            return PrintShippingLabelResponse.newBuilder()
-                    .setTrackingNumber(tracking)
-                    .setLabelUrl("https://easypost.com/labels/stub_" + request.getShipmentId() + ".pdf")
-                    .build();
+            throw ApplicationFailure.newNonRetryableFailure(
+                    "EasyPost API key is not configured — set EASYPOST_API_KEY",
+                    "EASYPOST_NOT_CONFIGURED");
         }
 
         try {

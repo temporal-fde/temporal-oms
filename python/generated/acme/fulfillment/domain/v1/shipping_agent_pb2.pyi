@@ -28,7 +28,7 @@ MARGIN_SPIKE: RecommendationOutcome
 SLA_BREACH: RecommendationOutcome
 
 class GetLocationEventsRequest(_message.Message):
-    __slots__ = ("coordinate", "within_km", "active_from", "active_to", "timezone")
+    __slots__ = ()
     COORDINATE_FIELD_NUMBER: _ClassVar[int]
     WITHIN_KM_FIELD_NUMBER: _ClassVar[int]
     ACTIVE_FROM_FIELD_NUMBER: _ClassVar[int]
@@ -42,7 +42,7 @@ class GetLocationEventsRequest(_message.Message):
     def __init__(self, coordinate: _Optional[_Union[_values_pb2_1.Coordinate, _Mapping]] = ..., within_km: _Optional[float] = ..., active_from: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., active_to: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., timezone: _Optional[str] = ...) -> None: ...
 
 class GetLocationEventsResponse(_message.Message):
-    __slots__ = ("summary", "events", "window_from", "window_to", "timezone")
+    __slots__ = ()
     SUMMARY_FIELD_NUMBER: _ClassVar[int]
     EVENTS_FIELD_NUMBER: _ClassVar[int]
     WINDOW_FROM_FIELD_NUMBER: _ClassVar[int]
@@ -56,7 +56,7 @@ class GetLocationEventsResponse(_message.Message):
     def __init__(self, summary: _Optional[_Union[_values_pb2.LocationRiskSummary, _Mapping]] = ..., events: _Optional[_Iterable[_Union[_values_pb2.LocationEvent, _Mapping]]] = ..., window_from: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., window_to: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., timezone: _Optional[str] = ...) -> None: ...
 
 class ShippingOption(_message.Message):
-    __slots__ = ("id", "carrier", "service_level", "cost", "estimated_days", "rate_id", "shipment_id")
+    __slots__ = ()
     ID_FIELD_NUMBER: _ClassVar[int]
     CARRIER_FIELD_NUMBER: _ClassVar[int]
     SERVICE_LEVEL_FIELD_NUMBER: _ClassVar[int]
@@ -74,7 +74,7 @@ class ShippingOption(_message.Message):
     def __init__(self, id: _Optional[str] = ..., carrier: _Optional[str] = ..., service_level: _Optional[str] = ..., cost: _Optional[_Union[_values_pb2_1.Money, _Mapping]] = ..., estimated_days: _Optional[int] = ..., rate_id: _Optional[str] = ..., shipment_id: _Optional[str] = ...) -> None: ...
 
 class ShippingRecommendation(_message.Message):
-    __slots__ = ("outcome", "recommended_option_id", "reasoning", "margin_delta_cents", "origin_risk_level", "destination_risk_level")
+    __slots__ = ()
     OUTCOME_FIELD_NUMBER: _ClassVar[int]
     RECOMMENDED_OPTION_ID_FIELD_NUMBER: _ClassVar[int]
     REASONING_FIELD_NUMBER: _ClassVar[int]
@@ -90,7 +90,7 @@ class ShippingRecommendation(_message.Message):
     def __init__(self, outcome: _Optional[_Union[RecommendationOutcome, str]] = ..., recommended_option_id: _Optional[str] = ..., reasoning: _Optional[str] = ..., margin_delta_cents: _Optional[int] = ..., origin_risk_level: _Optional[_Union[_values_pb2.RiskLevel, str]] = ..., destination_risk_level: _Optional[_Union[_values_pb2.RiskLevel, str]] = ...) -> None: ...
 
 class StartShippingAgentRequest(_message.Message):
-    __slots__ = ("execution_options", "customer_id")
+    __slots__ = ()
     EXECUTION_OPTIONS_FIELD_NUMBER: _ClassVar[int]
     CUSTOMER_ID_FIELD_NUMBER: _ClassVar[int]
     execution_options: ShippingAgentExecutionOptions
@@ -98,13 +98,13 @@ class StartShippingAgentRequest(_message.Message):
     def __init__(self, execution_options: _Optional[_Union[ShippingAgentExecutionOptions, _Mapping]] = ..., customer_id: _Optional[str] = ...) -> None: ...
 
 class ShippingAgentExecutionOptions(_message.Message):
-    __slots__ = ("cache_ttl_secs",)
+    __slots__ = ()
     CACHE_TTL_SECS_FIELD_NUMBER: _ClassVar[int]
     cache_ttl_secs: int
     def __init__(self, cache_ttl_secs: _Optional[int] = ...) -> None: ...
 
 class CalculateShippingOptionsRequest(_message.Message):
-    __slots__ = ("order_id", "customer_id", "to_address", "items", "selected_shipping_option_id", "customer_paid_price", "transit_days_sla")
+    __slots__ = ()
     ORDER_ID_FIELD_NUMBER: _ClassVar[int]
     CUSTOMER_ID_FIELD_NUMBER: _ClassVar[int]
     TO_ADDRESS_FIELD_NUMBER: _ClassVar[int]
@@ -122,7 +122,7 @@ class CalculateShippingOptionsRequest(_message.Message):
     def __init__(self, order_id: _Optional[str] = ..., customer_id: _Optional[str] = ..., to_address: _Optional[_Union[_values_pb2_1.Address, _Mapping]] = ..., items: _Optional[_Iterable[_Union[_values_pb2.ShippingLineItem, _Mapping]]] = ..., selected_shipping_option_id: _Optional[str] = ..., customer_paid_price: _Optional[_Union[_values_pb2_1.Money, _Mapping]] = ..., transit_days_sla: _Optional[int] = ...) -> None: ...
 
 class CalculateShippingOptionsResponse(_message.Message):
-    __slots__ = ("recommendation", "options", "cache_hit")
+    __slots__ = ()
     RECOMMENDATION_FIELD_NUMBER: _ClassVar[int]
     OPTIONS_FIELD_NUMBER: _ClassVar[int]
     CACHE_HIT_FIELD_NUMBER: _ClassVar[int]
@@ -132,7 +132,7 @@ class CalculateShippingOptionsResponse(_message.Message):
     def __init__(self, recommendation: _Optional[_Union[ShippingRecommendation, _Mapping]] = ..., options: _Optional[_Iterable[_Union[ShippingOption, _Mapping]]] = ..., cache_hit: _Optional[bool] = ...) -> None: ...
 
 class ShippingOptionsResult(_message.Message):
-    __slots__ = ("recommendation", "options", "cached_at")
+    __slots__ = ()
     RECOMMENDATION_FIELD_NUMBER: _ClassVar[int]
     OPTIONS_FIELD_NUMBER: _ClassVar[int]
     CACHED_AT_FIELD_NUMBER: _ClassVar[int]
@@ -142,9 +142,9 @@ class ShippingOptionsResult(_message.Message):
     def __init__(self, recommendation: _Optional[_Union[ShippingRecommendation, _Mapping]] = ..., options: _Optional[_Iterable[_Union[ShippingOption, _Mapping]]] = ..., cached_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class ShippingOptionsCache(_message.Message):
-    __slots__ = ("results",)
+    __slots__ = ()
     class ResultsEntry(_message.Message):
-        __slots__ = ("key", "value")
+        __slots__ = ()
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
@@ -155,7 +155,7 @@ class ShippingOptionsCache(_message.Message):
     def __init__(self, results: _Optional[_Mapping[str, ShippingOptionsResult]] = ...) -> None: ...
 
 class GetShippingRatesRequest(_message.Message):
-    __slots__ = ("from_easypost_id", "to_easypost_id", "items")
+    __slots__ = ()
     FROM_EASYPOST_ID_FIELD_NUMBER: _ClassVar[int]
     TO_EASYPOST_ID_FIELD_NUMBER: _ClassVar[int]
     ITEMS_FIELD_NUMBER: _ClassVar[int]
@@ -165,7 +165,7 @@ class GetShippingRatesRequest(_message.Message):
     def __init__(self, from_easypost_id: _Optional[str] = ..., to_easypost_id: _Optional[str] = ..., items: _Optional[_Iterable[_Union[_values_pb2.ShippingLineItem, _Mapping]]] = ...) -> None: ...
 
 class GetShippingRatesResponse(_message.Message):
-    __slots__ = ("shipment_id", "options")
+    __slots__ = ()
     SHIPMENT_ID_FIELD_NUMBER: _ClassVar[int]
     OPTIONS_FIELD_NUMBER: _ClassVar[int]
     shipment_id: str
@@ -173,13 +173,13 @@ class GetShippingRatesResponse(_message.Message):
     def __init__(self, shipment_id: _Optional[str] = ..., options: _Optional[_Iterable[_Union[ShippingOption, _Mapping]]] = ...) -> None: ...
 
 class BuildSystemPromptRequest(_message.Message):
-    __slots__ = ("request",)
+    __slots__ = ()
     REQUEST_FIELD_NUMBER: _ClassVar[int]
     request: CalculateShippingOptionsRequest
     def __init__(self, request: _Optional[_Union[CalculateShippingOptionsRequest, _Mapping]] = ...) -> None: ...
 
 class BuildSystemPromptResponse(_message.Message):
-    __slots__ = ("system_prompt",)
+    __slots__ = ()
     SYSTEM_PROMPT_FIELD_NUMBER: _ClassVar[int]
     system_prompt: str
     def __init__(self, system_prompt: _Optional[str] = ...) -> None: ...

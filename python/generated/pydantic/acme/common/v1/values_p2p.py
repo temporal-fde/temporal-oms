@@ -36,6 +36,7 @@ class EasyPostAddress(BaseModel):
     country: str = Field(default="")
     residential: typing.Optional[bool] = Field(default=False)# affects carrier rate selection
     coordinate: typing.Optional[Coordinate] = Field(default_factory=Coordinate)# lat/lng from EasyPost verification; required by get_location_events
+    timezone: str = Field(default="")# IANA tz identifier from verifications.delivery.details.time_zone (e.g. "America/New_York")
 
 class Address(BaseModel):
     easypost: typing.Optional[EasyPostAddress] = Field(default_factory=EasyPostAddress)# populated after EasyPost verification

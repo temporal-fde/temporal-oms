@@ -8,7 +8,7 @@ package com.acme.proto.acme.fulfillment.domain.fulfillment.v1;
 /**
  * <pre>
  * StartOrderFulfillmentRequest is the input to fulfillment.Order execute().
- * Carries the full placed order from the apps domain and the customer's
+ * Carries fulfillment's own view of the placed order and the customer's
  * selected shipping option at order time.
  * </pre>
  *
@@ -188,9 +188,9 @@ private static final long serialVersionUID = 0L;
   }
 
   public static final int PLACED_ORDER_FIELD_NUMBER = 5;
-  private com.acme.proto.acme.apps.domain.apps.v1.CompleteOrderRequest placedOrder_;
+  private com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrder placedOrder_;
   /**
-   * <code>.acme.apps.domain.apps.v1.CompleteOrderRequest placed_order = 5 [json_name = "placedOrder"];</code>
+   * <code>.acme.fulfillment.domain.fulfillment.v1.PlacedOrder placed_order = 5 [json_name = "placedOrder"];</code>
    * @return Whether the placedOrder field is set.
    */
   @java.lang.Override
@@ -198,19 +198,19 @@ private static final long serialVersionUID = 0L;
     return ((bitField0_ & 0x00000004) != 0);
   }
   /**
-   * <code>.acme.apps.domain.apps.v1.CompleteOrderRequest placed_order = 5 [json_name = "placedOrder"];</code>
+   * <code>.acme.fulfillment.domain.fulfillment.v1.PlacedOrder placed_order = 5 [json_name = "placedOrder"];</code>
    * @return The placedOrder.
    */
   @java.lang.Override
-  public com.acme.proto.acme.apps.domain.apps.v1.CompleteOrderRequest getPlacedOrder() {
-    return placedOrder_ == null ? com.acme.proto.acme.apps.domain.apps.v1.CompleteOrderRequest.getDefaultInstance() : placedOrder_;
+  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrder getPlacedOrder() {
+    return placedOrder_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrder.getDefaultInstance() : placedOrder_;
   }
   /**
-   * <code>.acme.apps.domain.apps.v1.CompleteOrderRequest placed_order = 5 [json_name = "placedOrder"];</code>
+   * <code>.acme.fulfillment.domain.fulfillment.v1.PlacedOrder placed_order = 5 [json_name = "placedOrder"];</code>
    */
   @java.lang.Override
-  public com.acme.proto.acme.apps.domain.apps.v1.CompleteOrderRequestOrBuilder getPlacedOrderOrBuilder() {
-    return placedOrder_ == null ? com.acme.proto.acme.apps.domain.apps.v1.CompleteOrderRequest.getDefaultInstance() : placedOrder_;
+  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrderOrBuilder getPlacedOrderOrBuilder() {
+    return placedOrder_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrder.getDefaultInstance() : placedOrder_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -430,7 +430,7 @@ private static final long serialVersionUID = 0L;
   /**
    * <pre>
    * StartOrderFulfillmentRequest is the input to fulfillment.Order execute().
-   * Carries the full placed order from the apps domain and the customer's
+   * Carries fulfillment's own view of the placed order and the customer's
    * selected shipping option at order time.
    * </pre>
    *
@@ -1044,31 +1044,31 @@ private static final long serialVersionUID = 0L;
       return selectedShippingBuilder_;
     }
 
-    private com.acme.proto.acme.apps.domain.apps.v1.CompleteOrderRequest placedOrder_;
+    private com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrder placedOrder_;
     private com.google.protobuf.SingleFieldBuilder<
-        com.acme.proto.acme.apps.domain.apps.v1.CompleteOrderRequest, com.acme.proto.acme.apps.domain.apps.v1.CompleteOrderRequest.Builder, com.acme.proto.acme.apps.domain.apps.v1.CompleteOrderRequestOrBuilder> placedOrderBuilder_;
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrder.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrderOrBuilder> placedOrderBuilder_;
     /**
-     * <code>.acme.apps.domain.apps.v1.CompleteOrderRequest placed_order = 5 [json_name = "placedOrder"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.PlacedOrder placed_order = 5 [json_name = "placedOrder"];</code>
      * @return Whether the placedOrder field is set.
      */
     public boolean hasPlacedOrder() {
       return ((bitField0_ & 0x00000010) != 0);
     }
     /**
-     * <code>.acme.apps.domain.apps.v1.CompleteOrderRequest placed_order = 5 [json_name = "placedOrder"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.PlacedOrder placed_order = 5 [json_name = "placedOrder"];</code>
      * @return The placedOrder.
      */
-    public com.acme.proto.acme.apps.domain.apps.v1.CompleteOrderRequest getPlacedOrder() {
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrder getPlacedOrder() {
       if (placedOrderBuilder_ == null) {
-        return placedOrder_ == null ? com.acme.proto.acme.apps.domain.apps.v1.CompleteOrderRequest.getDefaultInstance() : placedOrder_;
+        return placedOrder_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrder.getDefaultInstance() : placedOrder_;
       } else {
         return placedOrderBuilder_.getMessage();
       }
     }
     /**
-     * <code>.acme.apps.domain.apps.v1.CompleteOrderRequest placed_order = 5 [json_name = "placedOrder"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.PlacedOrder placed_order = 5 [json_name = "placedOrder"];</code>
      */
-    public Builder setPlacedOrder(com.acme.proto.acme.apps.domain.apps.v1.CompleteOrderRequest value) {
+    public Builder setPlacedOrder(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrder value) {
       if (placedOrderBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
@@ -1082,10 +1082,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.acme.apps.domain.apps.v1.CompleteOrderRequest placed_order = 5 [json_name = "placedOrder"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.PlacedOrder placed_order = 5 [json_name = "placedOrder"];</code>
      */
     public Builder setPlacedOrder(
-        com.acme.proto.acme.apps.domain.apps.v1.CompleteOrderRequest.Builder builderForValue) {
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrder.Builder builderForValue) {
       if (placedOrderBuilder_ == null) {
         placedOrder_ = builderForValue.build();
       } else {
@@ -1096,13 +1096,13 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.acme.apps.domain.apps.v1.CompleteOrderRequest placed_order = 5 [json_name = "placedOrder"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.PlacedOrder placed_order = 5 [json_name = "placedOrder"];</code>
      */
-    public Builder mergePlacedOrder(com.acme.proto.acme.apps.domain.apps.v1.CompleteOrderRequest value) {
+    public Builder mergePlacedOrder(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrder value) {
       if (placedOrderBuilder_ == null) {
         if (((bitField0_ & 0x00000010) != 0) &&
           placedOrder_ != null &&
-          placedOrder_ != com.acme.proto.acme.apps.domain.apps.v1.CompleteOrderRequest.getDefaultInstance()) {
+          placedOrder_ != com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrder.getDefaultInstance()) {
           getPlacedOrderBuilder().mergeFrom(value);
         } else {
           placedOrder_ = value;
@@ -1117,7 +1117,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.acme.apps.domain.apps.v1.CompleteOrderRequest placed_order = 5 [json_name = "placedOrder"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.PlacedOrder placed_order = 5 [json_name = "placedOrder"];</code>
      */
     public Builder clearPlacedOrder() {
       bitField0_ = (bitField0_ & ~0x00000010);
@@ -1130,33 +1130,33 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.acme.apps.domain.apps.v1.CompleteOrderRequest placed_order = 5 [json_name = "placedOrder"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.PlacedOrder placed_order = 5 [json_name = "placedOrder"];</code>
      */
-    public com.acme.proto.acme.apps.domain.apps.v1.CompleteOrderRequest.Builder getPlacedOrderBuilder() {
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrder.Builder getPlacedOrderBuilder() {
       bitField0_ |= 0x00000010;
       onChanged();
       return internalGetPlacedOrderFieldBuilder().getBuilder();
     }
     /**
-     * <code>.acme.apps.domain.apps.v1.CompleteOrderRequest placed_order = 5 [json_name = "placedOrder"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.PlacedOrder placed_order = 5 [json_name = "placedOrder"];</code>
      */
-    public com.acme.proto.acme.apps.domain.apps.v1.CompleteOrderRequestOrBuilder getPlacedOrderOrBuilder() {
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrderOrBuilder getPlacedOrderOrBuilder() {
       if (placedOrderBuilder_ != null) {
         return placedOrderBuilder_.getMessageOrBuilder();
       } else {
         return placedOrder_ == null ?
-            com.acme.proto.acme.apps.domain.apps.v1.CompleteOrderRequest.getDefaultInstance() : placedOrder_;
+            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrder.getDefaultInstance() : placedOrder_;
       }
     }
     /**
-     * <code>.acme.apps.domain.apps.v1.CompleteOrderRequest placed_order = 5 [json_name = "placedOrder"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.PlacedOrder placed_order = 5 [json_name = "placedOrder"];</code>
      */
     private com.google.protobuf.SingleFieldBuilder<
-        com.acme.proto.acme.apps.domain.apps.v1.CompleteOrderRequest, com.acme.proto.acme.apps.domain.apps.v1.CompleteOrderRequest.Builder, com.acme.proto.acme.apps.domain.apps.v1.CompleteOrderRequestOrBuilder> 
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrder.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrderOrBuilder> 
         internalGetPlacedOrderFieldBuilder() {
       if (placedOrderBuilder_ == null) {
         placedOrderBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-            com.acme.proto.acme.apps.domain.apps.v1.CompleteOrderRequest, com.acme.proto.acme.apps.domain.apps.v1.CompleteOrderRequest.Builder, com.acme.proto.acme.apps.domain.apps.v1.CompleteOrderRequestOrBuilder>(
+            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrder.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrderOrBuilder>(
                 getPlacedOrder(),
                 getParentForChildren(),
                 isClean());

@@ -236,13 +236,17 @@ Identified during planning; all resolved.
        - Each activity uses `ActivityOptions` with appropriate `start_to_close_timeout`
        - Append all `tool_result` blocks to messages in the same order as `tool_use` blocks
        - If `lookup_inventory_location` was called in this turn: extract `location_id` from its result; compute cache key and check cache (cart path cache check — can only happen after location resolves)
-    3. If `response.stop_reason == LlmStopReason.LLM_STOP_REASON_END_TURN`: find block where `block.type == "text"`; parse JSON from `block.text.text` as `ShippingRecommendation`; break loop
+    3. If `response.stop_reason == LlmStopReason.LLM_STOP_REASON_TOOL_USE` and block name is `finalize_recommendation`: extract `ShippingRecommendation` directly from `block.tool_use.input` dict; break loop — **do not dispatch this block as an activity**
+    4. If `response.stop_reason == LlmStopReason.LLM_STOP_REASON_END_TURN` with no preceding `finalize_recommendation`: raise retryable `ApplicationError("LLM ended without calling finalize_recommendation")`
   - After loop: store `ShippingOptionsResult` in `_cache[key]`, store `workflow.now()` in `_cache_meta[key]`
   - Return `CalculateShippingOptionsResponse(recommendation=..., options=..., cache_hit=False)`
 
-- [x] `ShippingRecommendation` JSON parsing from final LLM text response
-  - Extract JSON block from text (strip markdown code fences if present)
-  - Validate `outcome` against `RecommendationOutcome` enum; raise `ApplicationError` on invalid value (non-retryable; prevents infinite retry on malformed LLM output)
+- [ ] **Revise**: Replace text-based `ShippingRecommendation` JSON parsing with `finalize_recommendation` tool extraction
+  - Add `finalize_recommendation` to the tool list passed to `call_llm` (alongside the four real activity tools); schema: `outcome` enum, `recommended_option_id`, `reasoning`, `margin_delta_cents`, `origin_risk_level` enum, `destination_risk_level` enum — all required
+  - In the agentic loop, detect `finalize_recommendation` in `tool_use` blocks before dispatching to `_TOOLS`; extract `ShippingRecommendation` directly from `block.tool_use.input` (already a `dict`; no `json.loads()` needed)
+  - Update `build_system_prompt` FINAL RESPONSE instruction: replace "output only raw JSON" with "call the `finalize_recommendation` tool"
+  - Remove `_parse_recommendation` function
+  - **Rationale**: observed production failures where `claude-haiku-4-5` prefixes its JSON answer with analysis prose or markdown, breaking `json.loads()` non-retryably; tool inputs are always SDK-serialized JSON — prose contamination is structurally impossible
 
 #### 3b — Unit tests
 
@@ -279,3 +283,4 @@ All tests use Temporal Python test framework (`temporalio.testing.WorkflowEnviro
 | 2026-04-17 | Temporal FDE Team | All 9 planning open questions resolved; task breakdown updated (Q6: removed `VerifyShippingAddressRequest/Response` proto tasks; Q9: removed `continue_as_new` task; Q7: added cross-dependency to fulfillment-order Phase 6) |
 | 2026-04-17 | Mike Nichols | Phases 1–3 implemented: proto schema + buf generate, 3 activity classes, 3 worker modules, worker entry point, ShippingAgent workflow with agentic loop, 9 passing unit tests. Notes: (1) temporalio pinned to >=1.26.0 for `@update.validator` API; (2) ShippingOptionLegacy rename in workflows.proto to resolve name conflict; (3) broken unqualified imports fixed in 3 generated _p2p files (codegen bug); (4) system prompt embedded in first user message since call_llm signature is locked to (messages, tools). |
 | 2026-04-20 | Mike Nichols | Spec updated: refactor `_build_system_prompt` from inline workflow function to `build_system_prompt` LocalActivity so prompt changes can be shipped without bumping the workflow build-id. Task added to Phase 3 task list. Design Decisions table updated with rationale. |
+| 2026-04-25 | Mike Nichols | Spec updated: replace raw JSON text parsing with `finalize_recommendation` forced tool use. Root cause: `claude-haiku-4-5` (and smaller models generally) adds prose/markdown before the JSON despite "output only raw JSON" instructions, causing non-retryable `json.loads()` failures in production. Fix: add a `finalize_recommendation` tool the model must call to submit its answer; tool inputs are SDK-serialized JSON so prose contamination is structurally impossible. Agentic Loop, Design Decisions, and Risks sections updated in spec.md; Phase 3 task revised in PROGRESS.md. |

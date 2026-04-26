@@ -1,1 +1,1 @@
-spring.config.import: optional:dotenv:.env.local,optional:dotenv:../../../.env.local
+# Local profile — env vars loaded automatically via DotEnvPostProcessor in oms module

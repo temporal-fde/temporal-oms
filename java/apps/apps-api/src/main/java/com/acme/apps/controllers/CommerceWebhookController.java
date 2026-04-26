@@ -82,11 +82,11 @@ public class CommerceWebhookController {
                         .setShippingAddress(
                             com.acme.proto.acme.common.v1.Address.newBuilder()
                                 .setEasypost(com.acme.proto.acme.common.v1.EasyPostAddress.newBuilder()
-                                    .setStreet1(request.getOrder().getShippingAddress().getEasypost().getStreet1())
-                                    .setCity(request.getOrder().getShippingAddress().getEasypost().getCity())
-                                    .setState(request.getOrder().getShippingAddress().getEasypost().getState())
-                                    .setZip(request.getOrder().getShippingAddress().getEasypost().getZip())
-                                    .setCountry(request.getOrder().getShippingAddress().getEasypost().getCountry()))
+                                    .setStreet1(request.getOrder().getShippingAddress().getStreet())
+                                    .setCity(request.getOrder().getShippingAddress().getCity())
+                                    .setState(request.getOrder().getShippingAddress().getState())
+                                    .setZip(request.getOrder().getShippingAddress().getPostalCode())
+                                    .setCountry(request.getOrder().getShippingAddress().getCountry()))
                                 .build())
                         .build())
                 .build();

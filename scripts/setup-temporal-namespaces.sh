@@ -12,9 +12,18 @@ echo "Temporal Address: $TEMPORAL_ADDRESS"
 echo ""
 
 # Wait for Temporal server to be ready
-echo "Waiting for Temporal server at $TEMPORAL_ADDRESS..."
-until temporal operator namespace list --address "$TEMPORAL_ADDRESS" &>/dev/null; do
-  echo "  server not ready, retrying in 2s..."
+# Stage 1: frontend gRPC accepting connections
+echo "Waiting for Temporal frontend at $TEMPORAL_ADDRESS..."
+until temporal operator namespace list --address "$TEMPORAL_ADDRESS" --command-timeout 2s &>/dev/null; do
+  echo "  frontend not ready, retrying in 2s..."
+  sleep 2
+done
+echo "  frontend ready"
+
+# Stage 2: history + matching services ready (required for workflow ops and set-current-version)
+echo "Waiting for Temporal internal services..."
+until temporal workflow list --address "$TEMPORAL_ADDRESS" --namespace default --command-timeout 2s &>/dev/null; do
+  echo "  internal services not ready, retrying in 2s..."
   sleep 2
 done
 echo "  server is ready"
@@ -41,7 +50,7 @@ temporal worker deployment set-current-version \
   --build-id local \
   --allow-no-pollers \
   --namespace apps \
-  --yes 2>/dev/null || echo "  (skipped — start server with --dynamic-config-value system.enableDeploymentWorkflows=true)"
+  --yes 2>/dev/null || echo "  (skipped)"
 
 echo ""
 echo "Setting 'processing' Worker Deployment to build-id='local'"
@@ -52,7 +61,7 @@ temporal worker deployment set-current-version \
   --build-id local \
   --allow-no-pollers \
   --namespace processing \
-  --yes 2>/dev/null || echo "  (skipped — start server with --dynamic-config-value system.enableDeploymentWorkflows=true)"
+  --yes 2>/dev/null || echo "  (skipped)"
 
 echo ""
 echo "Setting 'fulfillment' Worker Deployment to as build-id='local'"
@@ -63,7 +72,7 @@ temporal worker deployment set-current-version \
   --build-id local \
   --allow-no-pollers \
   --namespace fulfillment \
-  --yes 2>/dev/null || echo "  (skipped — start server with --dynamic-config-value system.enableDeploymentWorkflows=true)"
+  --yes 2>/dev/null || echo "  (skipped)"
 
 echo ""
 echo "Registering Nexus endpoints..."
@@ -96,6 +105,13 @@ temporal operator nexus endpoint create \
   --name "oms-fulfillment-v1" \
   --target-namespace fulfillment \
   --target-task-queue fulfillment 2>/dev/null || echo "  (endpoint may already exist)"
+
+echo "Registering endpoint 'oms-fulfillment-agents-v1' targeting fulfillment/agents task queue"
+temporal operator nexus endpoint create \
+  --address "$TEMPORAL_ADDRESS" \
+  --name "oms-fulfillment-agents-v1" \
+  --target-namespace fulfillment \
+  --target-task-queue agents 2>/dev/null || echo "  (endpoint may already exist)"
 
 echo ""
 echo "Registering custom search attributes..."

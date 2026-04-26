@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import re
-
 import anthropic
 from temporalio import activity
 
@@ -55,10 +53,6 @@ def _to_tool_param(tool: LlmToolDefinition) -> anthropic.types.ToolParam:
     }
 
 
-def _extract_text(text: str) -> str:
-    match = re.search(r"```(?:json)?\s*\n(.*?)\n\s*```", text, re.DOTALL)
-    return match.group(1).strip() if match else text
-
 
 def _to_llm_response(resp: anthropic.types.Message) -> LlmResponse:
     stop_reason = (
@@ -71,7 +65,7 @@ def _to_llm_response(resp: anthropic.types.Message) -> LlmResponse:
         if block_obj.type == "text":
             blocks.append(LlmContentBlock(
                 type="text",
-                text=LlmTextBlock(text=_extract_text(block_obj.text)),
+                text=LlmTextBlock(text=block_obj.text),
             ))
         elif block_obj.type == "tool_use":
             blocks.append(LlmContentBlock(
@@ -131,6 +125,13 @@ class LlmActivities:
 
         prompt = "\n\n".join([
             "You are a shipping advisor for an e-commerce fulfillment system. All provided addresses are pre-verified as valid and deliverable.",
+            (
+                "MANDATORY BEHAVIOR: You MUST always respond with either (a) tool calls to gather data, "
+                "or (b) the final JSON recommendation. Never ask for clarification, request additional "
+                "information, or explain that data is missing or incomplete. If any address field appears "
+                "empty or stub-like, proceed with the tool calls using whatever data is provided — "
+                "the system guarantees the addresses are actionable."
+            ),
             margin_rule,
             sla_rule,
             priority_rule,
@@ -158,12 +159,9 @@ class LlmActivities:
                 "skip get_location_events for that address entirely — do not attempt it."
             ),
             (
-                "FINAL RESPONSE: When you have all data, respond with ONLY a JSON object:\n"
-                '{"outcome":"<PROCEED|CHEAPER_AVAILABLE|FASTER_AVAILABLE|MARGIN_SPIKE|SLA_BREACH>",'
-                '"recommended_option_id":"<id>","reasoning":"<text>",'
-                '"margin_delta_cents":<int>,'
-                '"origin_risk_level":"<RISK_LEVEL_NONE|RISK_LEVEL_LOW|RISK_LEVEL_MODERATE|RISK_LEVEL_HIGH|RISK_LEVEL_CRITICAL>",'
-                '"destination_risk_level":"<RISK_LEVEL_NONE|RISK_LEVEL_LOW|RISK_LEVEL_MODERATE|RISK_LEVEL_HIGH|RISK_LEVEL_CRITICAL>"}'
+                "FINAL RESPONSE: When you have called all relevant tools and are ready to submit "
+                "your recommendation, call the `finalize_recommendation` tool. "
+                "Do not output text — call the tool."
             ),
         ])
         return BuildSystemPromptResponse(system_prompt=prompt)

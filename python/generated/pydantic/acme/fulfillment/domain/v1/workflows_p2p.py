@@ -10,8 +10,6 @@ from google.protobuf.message import Message  # type: ignore
 from pydantic import BaseModel
 from pydantic import ConfigDict
 from pydantic import Field
-from ....apps.domain.v1.workflows_p2p import CompleteOrderRequest
-from ....processing.domain.v1.workflows_p2p import GetProcessOrderStateResponse
 import typing
 
 class Status(IntEnum):
@@ -152,10 +150,35 @@ class SelectedShippingOption(BaseModel):
     price: Money = Field(default_factory=Money)
     expected_ship_date: datetime = Field(default_factory=datetime.now)
 
+class FulfillmentItem(BaseModel):
+    """
+     FulfillmentItem is the line-item type for fulfillment activities.
+ Name is distinct from the Python-era Item in this package.
+ warehouse_id and warehouse_location are populated after processing completes.
+    """
+
+    item_id: str = Field(default="")
+    sku_id: str = Field(default="")
+    brand_code: str = Field(default="")
+    quantity: int = Field(default=0)
+    warehouse_id: typing.Optional[str] = Field(default="")
+    warehouse_location: typing.Optional[str] = Field(default="")
+
+class PlacedOrder(BaseModel):
+    """
+     PlacedOrder is fulfillment's own view of the order at workflow start.
+ Populated by apps.Order from the submitted order before calling validateOrder.
+    """
+
+    order_id: str = Field(default="")
+    customer_id: str = Field(default="")
+    items: typing.List[FulfillmentItem] = Field(default_factory=list)
+    shipping_address: Address = Field(default_factory=Address)
+
 class StartOrderFulfillmentRequest(BaseModel):
     """
      StartOrderFulfillmentRequest is the input to fulfillment.Order execute().
- Carries the full placed order from the apps domain and the customer's
+ Carries fulfillment's own view of the placed order and the customer's
  selected shipping option at order time.
     """
 
@@ -163,7 +186,7 @@ class StartOrderFulfillmentRequest(BaseModel):
     customer_id: str = Field(default="")
     options: typing.Optional[StartOrderFulfillmentOptions] = Field(default_factory=StartOrderFulfillmentOptions)
     selected_shipping: SelectedShippingOption = Field(default_factory=SelectedShippingOption)
-    placed_order: CompleteOrderRequest = Field(default_factory=CompleteOrderRequest)
+    placed_order: PlacedOrder = Field(default_factory=PlacedOrder)
 
 class ValidateOrderRequest(BaseModel):
     """
@@ -208,13 +231,13 @@ class FulfillmentOptions(BaseModel):
 
 class ProcessedOrder(BaseModel):
     """
-     ProcessedOrder carries the result of processing.Order for use in fulfillment
- activities (carrier rates, label printing, inventory deduction).
+     ProcessedOrder carries fulfillment's own view of the processing result.
+ Populated by apps.Order by mapping enriched items from processing.Order state.
     """
 
     order_id: str = Field(default="")
     customer_id: str = Field(default="")
-    state: GetProcessOrderStateResponse = Field(default_factory=GetProcessOrderStateResponse)
+    items: typing.List[FulfillmentItem] = Field(default_factory=list)
 
 class NotifyDeliveryStatusRequest(BaseModel):
     model_config = ConfigDict(validate_default=True)
@@ -274,20 +297,6 @@ class GetFulfillmentOrderStateResponse(BaseModel):
     delivery_status: DeliveryStatus = Field(default=0)
     errors: typing.List[str] = Field(default_factory=list)
     notify_delivery_status: typing.Optional[NotifyDeliveryStatusRequest] = Field(default_factory=NotifyDeliveryStatusRequest)
-
-class FulfillmentItem(BaseModel):
-    """
-     FulfillmentItem is the line-item type for fulfillment activities.
- Name is distinct from the Python-era Item in this package.
- warehouse_id and warehouse_location are populated after processing completes.
-    """
-
-    item_id: str = Field(default="")
-    sku_id: str = Field(default="")
-    brand_code: str = Field(default="")
-    quantity: int = Field(default=0)
-    warehouse_id: typing.Optional[str] = Field(default="")
-    warehouse_location: typing.Optional[str] = Field(default="")
 
 class HoldItemsRequest(BaseModel):
     order_id: str = Field(default="")

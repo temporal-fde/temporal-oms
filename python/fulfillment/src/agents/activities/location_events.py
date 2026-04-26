@@ -87,6 +87,17 @@ class LocationEventsActivities:
         Returns a risk summary and event list for the ShippingAgent LLM
         to reason about — no shipping logic here.
         """
+        if request.within_km <= 0:
+            raise ApplicationError(
+                f"within_km must be > 0, got {request.within_km}",
+                non_retryable=True,
+            )
+        if not request.timezone:
+            raise ApplicationError(
+                "timezone is required (IANA tz identifier, e.g. 'America/New_York')",
+                non_retryable=True,
+            )
+
         params = {
             "within": (
                 f"{request.within_km}km"

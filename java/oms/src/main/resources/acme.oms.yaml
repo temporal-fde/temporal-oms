@@ -16,7 +16,7 @@ oms:
       endpoints:
         apps: oms-apps-v1
         integrations: oms-integrations-v1
-        shipping-agent: oms-shipping-agent-v1
+        shipping-agent: oms-fulfillment-agents-v1
 
 otel.sdk.disabled: true
 

@@ -5,8 +5,6 @@ package acme.fulfillment.domain.fulfillment.v1;
 
 import "google/protobuf/timestamp.proto";
 import "acme/common/v1/values.proto";
-import "acme/apps/domain/v1/workflows.proto";
-import "acme/processing/domain/v1/workflows.proto";
 
 // Order Fulfillment AI Agent Workflow (Python-era)
 message Item {
@@ -122,14 +120,14 @@ enum Status {
 // ── Workflow start ────────────────────────────────────────────────────────────
 
 // StartOrderFulfillmentRequest is the input to fulfillment.Order execute().
-// Carries the full placed order from the apps domain and the customer's
+// Carries fulfillment's own view of the placed order and the customer's
 // selected shipping option at order time.
 message StartOrderFulfillmentRequest {
   string order_id = 1;
   string customer_id = 2;
   optional StartOrderFulfillmentOptions options = 3;
   SelectedShippingOption selected_shipping = 4;
-  acme.apps.domain.apps.v1.CompleteOrderRequest placed_order = 5;
+  PlacedOrder placed_order = 5;
 }
 
 message StartOrderFulfillmentOptions {
@@ -199,12 +197,12 @@ message FulfillOrderRequest {
   optional string selected_shipping_option_id = 3;
 }
 
-// ProcessedOrder carries the result of processing.Order for use in fulfillment
-// activities (carrier rates, label printing, inventory deduction).
+// ProcessedOrder carries fulfillment's own view of the processing result.
+// Populated by apps.Order by mapping enriched items from processing.Order state.
 message ProcessedOrder {
   string order_id = 1;
   string customer_id = 2;
-  acme.processing.domain.processing.v1.GetProcessOrderStateResponse state = 3;
+  repeated FulfillmentItem items = 3;
 }
 
 // FulfillOrderResponse is returned to the fulfillOrder Update caller (apps.Order).
@@ -287,6 +285,15 @@ message FulfillmentItem {
   int32 quantity = 4;
   optional string warehouse_id = 5;
   optional string warehouse_location = 6;
+}
+
+// PlacedOrder is fulfillment's own view of the order at workflow start.
+// Populated by apps.Order from the submitted order before calling validateOrder.
+message PlacedOrder {
+  string order_id = 1;
+  string customer_id = 2;
+  repeated FulfillmentItem items = 3;
+  acme.common.v1.Address shipping_address = 4;
 }
 
 message HoldItemsRequest {

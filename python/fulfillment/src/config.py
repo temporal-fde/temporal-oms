@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     anthropic_api_key: str = ""
     easypost_api_key: str = ""
     predicthq_api_key: str = ""
-    warehouse_config_path: str = str(_ROOT / "python" / "fulfillment" / "config" / "warehouses.toml")
+    integrations_endpoint: str = "oms-integrations-v1"
 
 
 settings = Settings()

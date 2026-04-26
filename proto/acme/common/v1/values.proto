@@ -22,6 +22,7 @@ message EasyPostAddress {
   string country = 7;
   optional bool residential = 8; // affects carrier rate selection
   optional Coordinate coordinate = 9; // lat/lng from EasyPost verification; required by get_location_events
+  string timezone = 10;              // IANA tz identifier from verifications.delivery.details.time_zone (e.g. "America/New_York")
 }
 
 message Address {

@@ -6,11 +6,13 @@ All tests run with retry_policy.maximum_attempts=1 and treat all exceptions as f
 from __future__ import annotations
 
 import asyncio
-import json
+from contextlib import asynccontextmanager
 from datetime import timedelta
-from unittest.mock import AsyncMock, MagicMock
+from typing import AsyncIterator
 
 import pytest
+import temporalio.api.nexus.v1 as nexus_v1
+import temporalio.api.operatorservice.v1 as operator_v1
 from temporalio.client import Client
 from temporalio.common import RetryPolicy
 from temporalio.exceptions import ApplicationError
@@ -58,7 +60,9 @@ from acme.fulfillment.domain.v1.workflows_p2p import (
     VerifyAddressRequest,
     VerifyAddressResponse,
 )
+from nexusrpc.handler import StartOperationContext, service_handler, sync_operation
 from src.agents.workflows.shipping_agent import ShippingAgent
+from src.services.inventory_service import InventoryService
 
 # ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -91,41 +95,39 @@ _FROM_ADDRESS = Address(
 
 _ITEMS = [ShippingLineItem(sku_id="ELEC-001", quantity=2)]
 
-_PROCEED_JSON = json.dumps({
+_PROCEED_INPUT = {
     "outcome": "PROCEED",
     "recommended_option_id": "rate_001",
     "reasoning": "The selected rate is within budget and meets SLA.",
     "margin_delta_cents": -500,
     "origin_risk_level": "RISK_LEVEL_NONE",
     "destination_risk_level": "RISK_LEVEL_LOW",
-})
+}
 
-_MARGIN_SPIKE_JSON = json.dumps({
+_MARGIN_SPIKE_INPUT = {
     "outcome": "MARGIN_SPIKE",
     "recommended_option_id": "rate_002",
     "reasoning": "Original rate exceeds customer paid price.",
     "margin_delta_cents": 1500,
     "origin_risk_level": "RISK_LEVEL_NONE",
     "destination_risk_level": "RISK_LEVEL_NONE",
-})
+}
 
-_SLA_BREACH_JSON = json.dumps({
+_SLA_BREACH_INPUT = {
     "outcome": "SLA_BREACH",
     "recommended_option_id": "",
     "reasoning": "No available rate meets the 2-day SLA.",
     "margin_delta_cents": 0,
     "origin_risk_level": "RISK_LEVEL_NONE",
     "destination_risk_level": "RISK_LEVEL_NONE",
-})
+}
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
 
 
-def _end_turn_response(text: str) -> LlmResponse:
-    return LlmResponse(
-        content=[LlmContentBlock(type="text", text=LlmTextBlock(text=text))],
-        stop_reason=LlmStopReason.LLM_STOP_REASON_END_TURN,
-    )
+def _finalize_response(input_dict: dict, tool_id: str = "tu_final") -> LlmResponse:
+    """Build a TOOL_USE response that calls finalize_recommendation."""
+    return _tool_use_response([(tool_id, "finalize_recommendation", input_dict)])
 
 
 def _tool_use_response(calls: list[tuple[str, str, dict]]) -> LlmResponse:
@@ -164,6 +166,21 @@ _START_REQUEST = StartShippingAgentRequest(
 )
 
 _WF_RETRY = RetryPolicy(maximum_attempts=1)
+
+_INTEGRATIONS_ENDPOINT = "oms-integrations-v1"
+
+
+@asynccontextmanager
+async def _test_env() -> AsyncIterator[WorkflowEnvironment]:
+    """Start a time-skipping test environment with the integrations Nexus endpoint registered."""
+    async with await WorkflowEnvironment.start_time_skipping() as env:
+        spec = nexus_v1.EndpointSpec(name=_INTEGRATIONS_ENDPOINT)
+        spec.target.worker.namespace = env.client.namespace
+        spec.target.worker.task_queue = "fulfillment"
+        await env.client.operator_service.create_nexus_endpoint(
+            operator_v1.CreateNexusEndpointRequest(spec=spec)
+        )
+        yield env
 
 
 async def _start_agent(client: Client, wf_id: str = _CUSTOMER_ID) -> object:
@@ -208,11 +225,19 @@ _RATES_RESULT = GetShippingRatesResponse(
 )
 
 
-@activity.defn(name="lookup_inventory_address")
-async def mock_lookup_inventory_address(
-    req: LookupInventoryAddressRequest,
-) -> LookupInventoryAddressResponse:
-    return _LOOKUP_RESULT
+@service_handler(service=InventoryService)
+class MockInventoryService:
+    @sync_operation
+    async def lookupInventoryAddress(
+        self, ctx: StartOperationContext, req: LookupInventoryAddressRequest
+    ) -> LookupInventoryAddressResponse:
+        return _LOOKUP_RESULT
+
+    @sync_operation
+    async def findAlternateWarehouse(
+        self, ctx: StartOperationContext, req: FindAlternateWarehouseRequest
+    ) -> FindAlternateWarehouseResponse:
+        return FindAlternateWarehouseResponse()
 
 
 @activity.defn(name="verify_address")
@@ -247,21 +272,13 @@ async def mock_build_system_prompt(req: BuildSystemPromptRequest) -> BuildSystem
     return BuildSystemPromptResponse(system_prompt="You are a shipping advisor.")
 
 
-@activity.defn(name="find_alternate_warehouse")
-async def mock_find_alternate_warehouse(
-    req: FindAlternateWarehouseRequest,
-) -> FindAlternateWarehouseResponse:
-    return FindAlternateWarehouseResponse()
-
-
 def _make_workers(
     client: Client,
     call_llm_impl,
+    inventory_handler=None,
 ) -> list[Worker]:
     """Create one worker per task queue, all with the same mocked activities."""
     common_activities = [
-        mock_lookup_inventory_address,
-        mock_find_alternate_warehouse,
         mock_build_system_prompt,
         mock_verify_address,
         mock_get_carrier_rates,
@@ -274,6 +291,7 @@ def _make_workers(
             task_queue="fulfillment",
             workflows=[ShippingAgent],
             activities=common_activities,
+            nexus_service_handlers=[inventory_handler or MockInventoryService()],
             workflow_failure_exception_types=[Exception],
         ),
         Worker(
@@ -301,9 +319,9 @@ async def test_cache_hit_skips_llm() -> None:
     async def counting_call_llm(messages: list, tools: list) -> LlmResponse:
         nonlocal llm_call_count
         llm_call_count += 1
-        return _end_turn_response(_PROCEED_JSON)
+        return _finalize_response(_PROCEED_INPUT)
 
-    async with await WorkflowEnvironment.start_time_skipping() as env:
+    async with _test_env() as env:
         workers = _make_workers(env.client, counting_call_llm)
         async with workers[0], workers[1], workers[2]:
             handle = await _start_agent(env.client)
@@ -327,22 +345,33 @@ async def test_lookup_always_called() -> None:
     """lookup_inventory_address is always called to resolve the origin warehouse."""
     lookup_called = False
 
-    @activity.defn(name="lookup_inventory_address")
-    async def tracking_lookup(req: LookupInventoryAddressRequest) -> LookupInventoryAddressResponse:
-        nonlocal lookup_called
-        lookup_called = True
-        return _LOOKUP_RESULT
+    @service_handler(service=InventoryService)
+    class TrackingInventory:
+        @sync_operation
+        async def lookupInventoryAddress(
+            self, ctx: StartOperationContext, req: LookupInventoryAddressRequest
+        ) -> LookupInventoryAddressResponse:
+            nonlocal lookup_called
+            lookup_called = True
+            return _LOOKUP_RESULT
+
+        @sync_operation
+        async def findAlternateWarehouse(
+            self, ctx: StartOperationContext, req: FindAlternateWarehouseRequest
+        ) -> FindAlternateWarehouseResponse:
+            return FindAlternateWarehouseResponse()
 
     @activity.defn(name="call_llm")
     async def simple_llm(messages: list, tools: list) -> LlmResponse:
-        return _end_turn_response(_PROCEED_JSON)
+        return _finalize_response(_PROCEED_INPUT)
 
-    async with await WorkflowEnvironment.start_time_skipping() as env:
-        common = [tracking_lookup, mock_find_alternate_warehouse, mock_build_system_prompt,
-                  mock_verify_address, mock_get_carrier_rates, mock_get_location_events, simple_llm]
+    async with _test_env() as env:
+        common = [mock_build_system_prompt, mock_verify_address, mock_get_carrier_rates,
+                  mock_get_location_events, simple_llm]
         async with (
             Worker(env.client, task_queue="fulfillment", workflows=[ShippingAgent],
-                   activities=common, workflow_failure_exception_types=[Exception]),
+                   activities=common, nexus_service_handlers=[TrackingInventory()],
+                   workflow_failure_exception_types=[Exception]),
             Worker(env.client, task_queue="fulfillment-easypost", activities=common),
             Worker(env.client, task_queue="fulfillment-predicthq", activities=common),
         ):
@@ -359,11 +388,21 @@ async def test_cart_path_calls_lookup() -> None:
     lookup_called = False
     turn = 0
 
-    @activity.defn(name="lookup_inventory_address")
-    async def tracking_lookup(req: LookupInventoryAddressRequest) -> LookupInventoryAddressResponse:
-        nonlocal lookup_called
-        lookup_called = True
-        return _LOOKUP_RESULT
+    @service_handler(service=InventoryService)
+    class TrackingInventory:
+        @sync_operation
+        async def lookupInventoryAddress(
+            self, ctx: StartOperationContext, req: LookupInventoryAddressRequest
+        ) -> LookupInventoryAddressResponse:
+            nonlocal lookup_called
+            lookup_called = True
+            return _LOOKUP_RESULT
+
+        @sync_operation
+        async def findAlternateWarehouse(
+            self, ctx: StartOperationContext, req: FindAlternateWarehouseRequest
+        ) -> FindAlternateWarehouseResponse:
+            return FindAlternateWarehouseResponse()
 
     @activity.defn(name="call_llm")
     async def cart_llm(messages: list, tools: list) -> LlmResponse:
@@ -373,14 +412,15 @@ async def test_cart_path_calls_lookup() -> None:
             return _tool_use_response([
                 ("tu_1", "lookup_inventory_address", {"items": [{"sku_id": "ELEC-001", "quantity": 2}]})
             ])
-        return _end_turn_response(_PROCEED_JSON)
+        return _finalize_response(_PROCEED_INPUT)
 
-    async with await WorkflowEnvironment.start_time_skipping() as env:
-        common = [tracking_lookup, mock_find_alternate_warehouse, mock_build_system_prompt,
-                  mock_verify_address, mock_get_carrier_rates, mock_get_location_events, cart_llm]
+    async with _test_env() as env:
+        common = [mock_build_system_prompt, mock_verify_address, mock_get_carrier_rates,
+                  mock_get_location_events, cart_llm]
         async with (
             Worker(env.client, task_queue="fulfillment", workflows=[ShippingAgent],
-                   activities=common, workflow_failure_exception_types=[Exception]),
+                   activities=common, nexus_service_handlers=[TrackingInventory()],
+                   workflow_failure_exception_types=[Exception]),
             Worker(env.client, task_queue="fulfillment-easypost", activities=common),
             Worker(env.client, task_queue="fulfillment-predicthq", activities=common),
         ):
@@ -399,10 +439,20 @@ async def test_sequential_tool_dispatch() -> None:
     call_order: list[str] = []
     turn = 0
 
-    @activity.defn(name="find_alternate_warehouse")
-    async def tracking_alternate(req: FindAlternateWarehouseRequest) -> FindAlternateWarehouseResponse:
-        call_order.append("find_alternate_warehouse")
-        return FindAlternateWarehouseResponse()
+    @service_handler(service=InventoryService)
+    class TrackingInventory:
+        @sync_operation
+        async def lookupInventoryAddress(
+            self, ctx: StartOperationContext, req: LookupInventoryAddressRequest
+        ) -> LookupInventoryAddressResponse:
+            return _LOOKUP_RESULT
+
+        @sync_operation
+        async def findAlternateWarehouse(
+            self, ctx: StartOperationContext, req: FindAlternateWarehouseRequest
+        ) -> FindAlternateWarehouseResponse:
+            call_order.append("find_alternate_warehouse")
+            return FindAlternateWarehouseResponse()
 
     @activity.defn(name="get_carrier_rates")
     async def tracking_rates(req: GetShippingRatesRequest) -> GetShippingRatesResponse:
@@ -423,14 +473,15 @@ async def test_sequential_tool_dispatch() -> None:
                 ("tu_2", "get_carrier_rates",
                  {"from_easypost_id": "adr_wh_cent_01", "to_easypost_id": "adr_dest", "items": []}),
             ])
-        return _end_turn_response(_PROCEED_JSON)
+        return _finalize_response(_PROCEED_INPUT)
 
-    async with await WorkflowEnvironment.start_time_skipping() as env:
-        common = [mock_lookup_inventory_address, tracking_alternate, mock_build_system_prompt,
-                  mock_verify_address, tracking_rates, mock_get_location_events, sequential_llm]
+    async with _test_env() as env:
+        common = [mock_build_system_prompt, mock_verify_address, tracking_rates,
+                  mock_get_location_events, sequential_llm]
         async with (
             Worker(env.client, task_queue="fulfillment", workflows=[ShippingAgent],
-                   activities=common, workflow_failure_exception_types=[Exception]),
+                   activities=common, nexus_service_handlers=[TrackingInventory()],
+                   workflow_failure_exception_types=[Exception]),
             Worker(env.client, task_queue="fulfillment-easypost", activities=common),
             Worker(env.client, task_queue="fulfillment-predicthq", activities=common),
         ):
@@ -481,14 +532,15 @@ async def test_concurrent_activity_dispatch() -> None:
                     "timezone": "America/New_York",
                 }),
             ])
-        return _end_turn_response(_PROCEED_JSON)
+        return _finalize_response(_PROCEED_INPUT)
 
-    async with await WorkflowEnvironment.start_time_skipping() as env:
-        common = [mock_lookup_inventory_address, mock_find_alternate_warehouse, mock_build_system_prompt,
-                  mock_verify_address, mock_get_carrier_rates, tracking_events, concurrent_llm]
+    async with _test_env() as env:
+        common = [mock_build_system_prompt, mock_verify_address, mock_get_carrier_rates,
+                  tracking_events, concurrent_llm]
         async with (
             Worker(env.client, task_queue="fulfillment", workflows=[ShippingAgent],
-                   activities=common, workflow_failure_exception_types=[Exception]),
+                   activities=common, nexus_service_handlers=[MockInventoryService()],
+                   workflow_failure_exception_types=[Exception]),
             Worker(env.client, task_queue="fulfillment-easypost", activities=common),
             Worker(env.client, task_queue="fulfillment-predicthq", activities=common),
         ):
@@ -504,9 +556,9 @@ async def test_concurrent_activity_dispatch() -> None:
 async def test_proceed_outcome() -> None:
     @activity.defn(name="call_llm")
     async def proceed_llm(messages: list, tools: list) -> LlmResponse:
-        return _end_turn_response(_PROCEED_JSON)
+        return _finalize_response(_PROCEED_INPUT)
 
-    async with await WorkflowEnvironment.start_time_skipping() as env:
+    async with _test_env() as env:
         workers = _make_workers(env.client, proceed_llm)
         async with workers[0], workers[1], workers[2]:
             handle = await _start_agent(env.client)
@@ -520,9 +572,9 @@ async def test_proceed_outcome() -> None:
 async def test_margin_spike_outcome() -> None:
     @activity.defn(name="call_llm")
     async def margin_llm(messages: list, tools: list) -> LlmResponse:
-        return _end_turn_response(_MARGIN_SPIKE_JSON)
+        return _finalize_response(_MARGIN_SPIKE_INPUT)
 
-    async with await WorkflowEnvironment.start_time_skipping() as env:
+    async with _test_env() as env:
         workers = _make_workers(env.client, margin_llm)
         async with workers[0], workers[1], workers[2]:
             handle = await _start_agent(env.client)
@@ -540,9 +592,9 @@ async def test_sla_breach_outcome() -> None:
     """SLA_BREACH is returned to caller — not raised as an exception."""
     @activity.defn(name="call_llm")
     async def sla_llm(messages: list, tools: list) -> LlmResponse:
-        return _end_turn_response(_SLA_BREACH_JSON)
+        return _finalize_response(_SLA_BREACH_INPUT)
 
-    async with await WorkflowEnvironment.start_time_skipping() as env:
+    async with _test_env() as env:
         workers = _make_workers(env.client, sla_llm)
         async with workers[0], workers[1], workers[2]:
             handle = await _start_agent(env.client)
@@ -565,7 +617,7 @@ async def test_ttl_expiry_triggers_refetch() -> None:
     async def counting_llm(messages: list, tools: list) -> LlmResponse:
         nonlocal llm_call_count
         llm_call_count += 1
-        return _end_turn_response(_PROCEED_JSON)
+        return _finalize_response(_PROCEED_INPUT)
 
     # Use very short TTL (1 second) and time-skipping env to expire it
     short_ttl_start = StartShippingAgentRequest(
@@ -573,7 +625,7 @@ async def test_ttl_expiry_triggers_refetch() -> None:
         execution_options=ShippingAgentExecutionOptions(cache_ttl_secs=1),
     )
 
-    async with await WorkflowEnvironment.start_time_skipping() as env:
+    async with _test_env() as env:
         workers = _make_workers(env.client, counting_llm)
         async with workers[0], workers[1], workers[2]:
             handle = await env.client.start_workflow(

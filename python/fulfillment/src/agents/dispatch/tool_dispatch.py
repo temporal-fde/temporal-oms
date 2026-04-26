@@ -94,13 +94,20 @@ def nexus_tool(
     name: str,
     description: str,
     endpoint: str,
+    service_type: Any,
     operation: Any,
     req_type: type[BaseModel],
     result_type: type[BaseModel],
     **execute_kwargs: Any,
 ) -> ToolSpec:
     async def _dispatch(req: BaseModel) -> BaseModel:
-        raise NotImplementedError("nexus_tool not yet implemented")
+        client = workflow.create_nexus_client(service=service_type, endpoint=endpoint)
+        return await client.execute_operation(
+            operation,
+            req,
+            output_type=result_type,
+            **execute_kwargs,
+        )
 
     return ToolSpec(name=name, description=description, req_type=req_type, dispatch=_dispatch)
 

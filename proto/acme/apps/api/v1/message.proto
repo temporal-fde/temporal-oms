@@ -4,7 +4,6 @@ syntax = "proto3";
 package acme.apps.api.orders.v1;
 
 import "google/protobuf/timestamp.proto";
-import "acme/common/v1/values.proto";
 
 // PUT /api/v1/commerce-app/orders/{order_id}
 message SubmitOrderRequest {
@@ -15,7 +14,15 @@ message SubmitOrderRequest {
 message Order {
   string order_id = 1;
   repeated Item items = 2;
-  acme.common.v1.Address shipping_address = 3;
+  ShippingAddress shipping_address = 3;
+}
+
+message ShippingAddress {
+  string street = 1;
+  string city = 2;
+  string state = 3;
+  string postal_code = 4;
+  string country = 5;
 }
 
 message Item {

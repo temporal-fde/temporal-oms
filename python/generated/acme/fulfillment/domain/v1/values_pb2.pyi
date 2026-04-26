@@ -39,7 +39,7 @@ RISK_LEVEL_HIGH: RiskLevel
 RISK_LEVEL_CRITICAL: RiskLevel
 
 class LocationEvent(_message.Message):
-    __slots__ = ("id", "title", "description", "category", "rank", "local_rank", "unscheduled", "start", "end")
+    __slots__ = ()
     ID_FIELD_NUMBER: _ClassVar[int]
     TITLE_FIELD_NUMBER: _ClassVar[int]
     DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
@@ -61,9 +61,9 @@ class LocationEvent(_message.Message):
     def __init__(self, id: _Optional[str] = ..., title: _Optional[str] = ..., description: _Optional[str] = ..., category: _Optional[str] = ..., rank: _Optional[int] = ..., local_rank: _Optional[int] = ..., unscheduled: _Optional[bool] = ..., start: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., end: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class LocationRiskSummary(_message.Message):
-    __slots__ = ("overall_risk_level", "peak_rank", "total_event_count", "unscheduled_event_count", "events_by_category")
+    __slots__ = ()
     class EventsByCategoryEntry(_message.Message):
-        __slots__ = ("key", "value")
+        __slots__ = ()
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
@@ -82,7 +82,7 @@ class LocationRiskSummary(_message.Message):
     def __init__(self, overall_risk_level: _Optional[_Union[RiskLevel, str]] = ..., peak_rank: _Optional[int] = ..., total_event_count: _Optional[int] = ..., unscheduled_event_count: _Optional[int] = ..., events_by_category: _Optional[_Mapping[str, int]] = ...) -> None: ...
 
 class ShippingLineItem(_message.Message):
-    __slots__ = ("sku_id", "quantity")
+    __slots__ = ()
     SKU_ID_FIELD_NUMBER: _ClassVar[int]
     QUANTITY_FIELD_NUMBER: _ClassVar[int]
     sku_id: str

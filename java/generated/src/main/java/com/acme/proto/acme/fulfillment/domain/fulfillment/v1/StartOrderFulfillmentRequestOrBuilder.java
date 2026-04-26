@@ -65,17 +65,17 @@ public interface StartOrderFulfillmentRequestOrBuilder extends
   com.acme.proto.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOptionOrBuilder getSelectedShippingOrBuilder();
 
   /**
-   * <code>.acme.apps.domain.apps.v1.CompleteOrderRequest placed_order = 5 [json_name = "placedOrder"];</code>
+   * <code>.acme.fulfillment.domain.fulfillment.v1.PlacedOrder placed_order = 5 [json_name = "placedOrder"];</code>
    * @return Whether the placedOrder field is set.
    */
   boolean hasPlacedOrder();
   /**
-   * <code>.acme.apps.domain.apps.v1.CompleteOrderRequest placed_order = 5 [json_name = "placedOrder"];</code>
+   * <code>.acme.fulfillment.domain.fulfillment.v1.PlacedOrder placed_order = 5 [json_name = "placedOrder"];</code>
    * @return The placedOrder.
    */
-  com.acme.proto.acme.apps.domain.apps.v1.CompleteOrderRequest getPlacedOrder();
+  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrder getPlacedOrder();
   /**
-   * <code>.acme.apps.domain.apps.v1.CompleteOrderRequest placed_order = 5 [json_name = "placedOrder"];</code>
+   * <code>.acme.fulfillment.domain.fulfillment.v1.PlacedOrder placed_order = 5 [json_name = "placedOrder"];</code>
    */
-  com.acme.proto.acme.apps.domain.apps.v1.CompleteOrderRequestOrBuilder getPlacedOrderOrBuilder();
+  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrderOrBuilder getPlacedOrderOrBuilder();
 }

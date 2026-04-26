@@ -86,14 +86,6 @@ public class FulfillmentImpl {
     }
 
     private com.acme.proto.acme.common.v1.Address toCommonAddress(StartOrderFulfillmentRequest request) {
-        var shipping = request.getPlacedOrder().getProcessOrder().getOrder().getShippingAddress();
-        return com.acme.proto.acme.common.v1.Address.newBuilder()
-                .setEasypost(com.acme.proto.acme.common.v1.EasyPostAddress.newBuilder()
-                        .setStreet1(shipping.getEasypost().getStreet1())
-                        .setCity(shipping.getEasypost().getCity())
-                        .setState(shipping.getEasypost().getState())
-                        .setZip(shipping.getEasypost().getZip())
-                        .setCountry(shipping.getEasypost().getCountry()))
-                .build();
+        return request.getPlacedOrder().getShippingAddress();
     }
 }

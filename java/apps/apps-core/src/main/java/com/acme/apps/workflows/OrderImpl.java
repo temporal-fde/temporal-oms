@@ -6,6 +6,7 @@ import com.acme.oms.services.Processing;
 import com.acme.proto.acme.apps.domain.apps.v1.*;
 import com.acme.proto.acme.apps.domain.apps.v1.Errors;
 import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.*;
+import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest;
 import com.acme.proto.acme.processing.domain.processing.v1.*;
 import io.temporal.activity.LocalActivityOptions;
 import io.temporal.common.VersioningBehavior;
@@ -119,14 +120,20 @@ public class OrderImpl implements Order {
             return;
         }
 
-        // Build the StartOrderFulfillmentRequest — placed_order needs process_order populated
-        var placedOrder = this.state.getArgs().toBuilder()
-                .setProcessOrder(this.state.getProcessOrder())
-                .build();
         var fulfillmentStartRequest = StartOrderFulfillmentRequest.newBuilder()
                 .setOrderId(this.state.getArgs().getOrderId())
                 .setCustomerId(this.state.getArgs().getCustomerId())
-                .setPlacedOrder(placedOrder)
+                .setPlacedOrder(PlacedOrder.newBuilder()
+                        .setOrderId(this.state.getArgs().getOrderId())
+                        .setCustomerId(this.state.getArgs().getCustomerId())
+                        .addAllItems(this.state.getProcessOrder().getOrder().getItemsList().stream()
+                                .map(item -> FulfillmentItem.newBuilder()
+                                        .setItemId(item.getItemId())
+                                        .setQuantity(item.getQuantity())
+                                        .build())
+                                .toList())
+                        .setShippingAddress(this.state.getProcessOrder().getOrder().getShippingAddress())
+                        .build())
                 .build();
 
         // Launch validateOrder Nexus (starts fulfillment.Order + verifies address) concurrently with processOrder
@@ -166,11 +173,18 @@ public class OrderImpl implements Order {
                     .setProcessedOrder(ProcessedOrder.newBuilder()
                             .setOrderId(this.state.getArgs().getOrderId())
                             .setCustomerId(this.state.getArgs().getCustomerId())
-                            .setState(this.state.getProcessedOrder())
+                            .addAllItems(this.state.getProcessedOrder().getEnrichment().getItemsList().stream()
+                                    .map(item -> FulfillmentItem.newBuilder()
+                                            .setItemId(item.getItemId())
+                                            .setSkuId(item.getSkuId())
+                                            .setBrandCode(item.getBrandCode())
+                                            .setQuantity(item.getQuantity())
+                                            .build())
+                                    .toList())
                             .build())
-                            .setDeliveryStatusRequest(
-                                    NotifyDeliveryStatusRequest.newBuilder().
-                                            setDeliveryStatusValue(DeliveryStatus.DELIVERY_STATUS_DELIVERED_VALUE))
+                    .setDeliveryStatusRequest(
+                            NotifyDeliveryStatusRequest.newBuilder()
+                                    .setDeliveryStatusValue(DeliveryStatus.DELIVERY_STATUS_DELIVERED_VALUE))
                     .build());
 
             Workflow.await(Workflow::isEveryHandlerFinished);

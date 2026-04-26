@@ -1,5 +1,6 @@
 package com.acme.apps.workflows;
 
+import com.acme.proto.acme.apps.domain.apps.v1.GetIntegrationsStateResponse;
 import com.acme.proto.acme.apps.domain.apps.v1.StartIntegrationsRequest;
 import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeductInventoryRequest;
 import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeductInventoryResponse;
@@ -36,6 +37,9 @@ public interface Integrations {
 
     @WorkflowMethod
     void execute(StartIntegrationsRequest request);
+
+    @QueryMethod
+    GetIntegrationsStateResponse getState();
 
     // ── CommerceApp ───────────────────────────────────────────────────────────
 

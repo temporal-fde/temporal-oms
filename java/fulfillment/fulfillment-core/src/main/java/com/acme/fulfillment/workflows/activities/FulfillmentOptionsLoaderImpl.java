@@ -24,7 +24,7 @@ public class FulfillmentOptionsLoaderImpl implements FulfillmentOptionsLoader {
     public FulfillmentOptionsLoaderImpl(
             @Value("${oms.fulfillment.nexus.endpoints.integrations:oms-integrations-v1}")
             String integrationsEndpoint,
-            @Value("${oms.fulfillment.nexus.endpoints.shipping-agent:oms-shipping-agent-v1}")
+            @Value("${oms.fulfillment.nexus.endpoints.shipping-agent:oms-fulfillment-agents-v1}")
             String shippingAgentEndpoint) {
         this.integrationsEndpoint = integrationsEndpoint;
         this.shippingAgentEndpoint = shippingAgentEndpoint;

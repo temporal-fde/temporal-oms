@@ -1,15 +1,17 @@
 from __future__ import annotations
 
+import logging
 from concurrent.futures import ThreadPoolExecutor
 
 from temporalio.client import Client
-from temporalio.contrib.pydantic import pydantic_data_converter
+from src.converter import proto_pydantic_data_converter
 from temporalio.worker import Worker
 
 from src.config import settings
 from src.agents.activities.easypost import EasyPostActivities
 
 _TASK_QUEUE = "fulfillment-easypost"
+_log = logging.getLogger(__name__)
 
 
 async def build_easypost_worker() -> Worker:
@@ -17,8 +19,9 @@ async def build_easypost_worker() -> Worker:
         settings.temporal_fulfillment_address,
         namespace=settings.temporal_fulfillment_namespace,
         api_key=settings.temporal_fulfillment_api_key or None,
-        data_converter=pydantic_data_converter,
+        data_converter=proto_pydantic_data_converter,
     )
+    _log.info("[%s] connected — activities: verify_address, get_carrier_rates (max 5 rps)", _TASK_QUEUE)
     easypost_activities = EasyPostActivities()
     return Worker(
         client,

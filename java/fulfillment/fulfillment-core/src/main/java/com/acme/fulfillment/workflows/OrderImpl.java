@@ -333,7 +333,7 @@ public class OrderImpl implements Order {
     }
 
     private List<ShippingLineItem> convertToShippingLineItems(ProcessedOrder processedOrder) {
-        return processedOrder.getState().getEnrichment().getItemsList().stream()
+        return processedOrder.getItemsList().stream()
                 .map(item -> ShippingLineItem.newBuilder()
                         .setSkuId(item.getSkuId())
                         .setQuantity(item.getQuantity())
@@ -342,22 +342,10 @@ public class OrderImpl implements Order {
     }
 
     private List<FulfillmentItem> extractStartItems(StartOrderFulfillmentRequest request) {
-        return request.getPlacedOrder().getProcessOrder().getOrder().getItemsList().stream()
-                .map(item -> FulfillmentItem.newBuilder()
-                        .setItemId(item.getItemId())
-                        .setQuantity(item.getQuantity())
-                        .build())
-                .toList();
+        return request.getPlacedOrder().getItemsList();
     }
 
     private List<FulfillmentItem> extractProcessedItems(ProcessedOrder processedOrder) {
-        return processedOrder.getState().getEnrichment().getItemsList().stream()
-                .map(item -> FulfillmentItem.newBuilder()
-                        .setItemId(item.getItemId())
-                        .setSkuId(item.getSkuId())
-                        .setBrandCode(item.getBrandCode())
-                        .setQuantity(item.getQuantity())
-                        .build())
-                .toList();
+        return processedOrder.getItemsList();
     }
 }

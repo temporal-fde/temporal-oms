@@ -4,7 +4,7 @@
 **Status:** Draft
 **Owner:** Temporal FDE Team
 **Created:** 2026-04-15
-**Updated:** 2026-04-15
+**Updated:** 2026-04-25
 
 ---
 
@@ -149,12 +149,18 @@ The workflow runs a standard hand-rolled agentic loop:
    the system prompt string. Includes: margin threshold rule, SLA rule, path instruction
    (warehouse resolution vs. pre-verified `from_address`), concurrency instruction, and final
    JSON output format.
-3. Build tool definitions for the four registered activities
+3. Build tool definitions: the four registered activity tools plus a fifth internal-only
+   `finalize_recommendation` tool (see Design Decisions — Structured output via `finalize_recommendation`)
 4. Iterate:
    a. Call Claude (via `call_llm` activity — Anthropic API)
-   b. If response contains `tool_use` blocks: dispatch all as concurrent Temporal activities,
-      append all `tool_result` blocks to messages, continue loop
-   c. If response is text: parse `ShippingRecommendation`, exit loop
+   b. If response contains `tool_use` blocks and one block is `finalize_recommendation`:
+      extract `ShippingRecommendation` directly from the tool input dict (always valid
+      SDK-serialized JSON — no text parsing), exit loop
+   c. If response contains `tool_use` blocks with no `finalize_recommendation`: dispatch
+      all real activity tools as concurrent Temporal activities, append all `tool_result`
+      blocks to messages, continue loop
+   d. If `END_TURN` fires without a preceding `finalize_recommendation` call: raise a
+      retryable `ApplicationError` — the LLM did not follow instructions
 5. Cache result keyed by content hash with TTL
 6. Return `CalculateShippingOptionsResponse`
 
@@ -203,6 +209,7 @@ Cache key: `fn(sorted(from_easypost_ids), sorted([(skuId, qty)]), destinationPos
 | Separate `fulfillment-easypost` (5 rps) and `fulfillment-predicthq` (50 rps) task queues | EasyPost and PredictHQ limits differ by 10×; sharing one queue forces both to the 5 rps floor, wasting 45 rps of PredictHQ capacity | Single shared queue — simpler setup but throttles PredictHQ to EasyPost's limit |
 | Worker Versioning (new build-id) for V2 cutover | `fulfillment.Order` is PINNED and has no history to bridge; old workflows complete on V1 workers, new ones pick up V2 cleanly | `Workflow.getVersion()` — unnecessary for a new workflow with no pre-existing history |
 | System prompt built in `build_system_prompt` LocalActivity (not inline workflow code) | LocalActivity result is memoized in event history; on replay, Temporal returns the memoized value and ignores the current implementation. Prompt text can be updated and redeployed without a build-id bump — in-flight workflows replay against the original prompt from history. Inline function: any text change produces different `call_llm` args than history → non-determinism error on replay. | Inline `_build_system_prompt` function — simple but couples prompt iteration to build-id lifecycle |
+| Structured output via `finalize_recommendation` tool, not raw JSON text parsing | Observed in production: models (especially smaller ones like `claude-haiku-4-5`) frequently add preamble, analysis prose, or markdown code fences before or instead of the requested JSON, causing `json.loads()` to fail non-retryably. Tool call inputs are always SDK-serialized, structurally valid JSON — prose contamination is impossible. This is Anthropic's recommended approach for guaranteed structured output: define a tool the model must call to submit its answer, give it a strict JSON Schema with enum constraints, and extract the recommendation directly from `block.tool_use.input`. The `finalize_recommendation` tool is never dispatched to an activity; the loop detects it by name and exits. | System prompt instruction "output only raw JSON — no preamble, no markdown": the model can and does ignore this under certain prompting conditions; failures accumulate silently until a retry happens to comply |
 
 ### Component Design
 
@@ -447,7 +454,7 @@ added in Phase 1 alongside the `shipping_agent.proto` changes.
 
 | Risk | Impact | Likelihood | Mitigation |
 |---|---|---|---|
-| LLM response structure is unpredictable — `ShippingRecommendation` parsing fails | High | Medium | Use structured output / JSON mode in Claude API call; validate schema before caching |
+| LLM response structure is unpredictable — `ShippingRecommendation` parsing fails | High | Low | Mitigated by the `finalize_recommendation` tool (forced tool use for structured output): the final answer is always submitted as a tool call input, never as free-form text. Tool inputs are SDK-serialized JSON; prose and markdown contamination are structurally impossible. See Design Decisions. |
 | Inventory Locations spec not ready — `lookup_inventory_location` has nothing to query | High | High | V1 workaround: static config with hardcoded warehouse(s); unblock Workshop with seed data |
 | EasyPost write-op rate limit undocumented — actual limit for `createAndVerify` / Shipment creation may differ from the 5 rps index limit | Medium | Medium | 5 rps is the safe conservative bound; monitor 429 responses in workshop and raise if sustained throttling is observed |
 | PredictHQ API latency spikes degrade UpdateWithStart round-trip | Medium | Low | Set activity `start_to_close_timeout`; LLM can reason with partial data if one tool times out |

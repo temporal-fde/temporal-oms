@@ -12,12 +12,12 @@ plugins:
   - remote: buf.build/protocolbuffers/java
     out: java/generated/src/main/java
 
-  # Python generation
-  - remote: buf.build/protocolbuffers/python
+  # Python generation — pinned to match installed protobuf runtime (6.33.x / C++ 33.x)
+  - remote: buf.build/protocolbuffers/python:v33.0
     out: python/generated
 
   # Python type stubs
-  - remote: buf.build/protocolbuffers/pyi
+  - remote: buf.build/protocolbuffers/pyi:v33.0
     out: python/generated
 
   # Generate Pydantic models from .proto via protobuf-to-pydantic plugin

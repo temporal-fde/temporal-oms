@@ -5,6 +5,7 @@ package acme.apps.domain.apps.v1;
 
 import "google/protobuf/timestamp.proto";
 import "acme/apps/domain/v1/values.proto";
+import "acme/common/v1/values.proto";
 import "acme/oms/v1/message.proto";
 import "acme/oms/v1/values.proto";
 import "acme/processing/domain/v1/workflows.proto";
@@ -64,4 +65,13 @@ message CapturePaymentRequest {
 
 message StartIntegrationsRequest {}
 
+message WarehouseEntry {
+  string warehouse_id = 1;
+  repeated string sku_prefixes = 2;
+  acme.common.v1.Address address = 3;
+}
+
+message GetIntegrationsStateResponse {
+  repeated WarehouseEntry warehouses = 1;
+}
 
