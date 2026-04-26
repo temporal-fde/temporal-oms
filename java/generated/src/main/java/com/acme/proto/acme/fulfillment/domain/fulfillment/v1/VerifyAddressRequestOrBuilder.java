@@ -24,4 +24,16 @@ public interface VerifyAddressRequestOrBuilder extends
    * <code>.acme.common.v1.Address address = 1 [json_name = "address"];</code>
    */
   com.acme.proto.acme.common.v1.AddressOrBuilder getAddressOrBuilder();
+
+  /**
+   * <code>string customer_id = 2 [json_name = "customerId"];</code>
+   * @return The customerId.
+   */
+  java.lang.String getCustomerId();
+  /**
+   * <code>string customer_id = 2 [json_name = "customerId"];</code>
+   * @return The bytes for customerId.
+   */
+  com.google.protobuf.ByteString
+      getCustomerIdBytes();
 }

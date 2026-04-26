@@ -28,6 +28,7 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private VerifyAddressRequest() {
+    customerId_ = "";
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
@@ -75,6 +76,45 @@ private static final long serialVersionUID = 0L;
     return address_ == null ? com.acme.proto.acme.common.v1.Address.getDefaultInstance() : address_;
   }
 
+  public static final int CUSTOMER_ID_FIELD_NUMBER = 2;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object customerId_ = "";
+  /**
+   * <code>string customer_id = 2 [json_name = "customerId"];</code>
+   * @return The customerId.
+   */
+  @java.lang.Override
+  public java.lang.String getCustomerId() {
+    java.lang.Object ref = customerId_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      customerId_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string customer_id = 2 [json_name = "customerId"];</code>
+   * @return The bytes for customerId.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getCustomerIdBytes() {
+    java.lang.Object ref = customerId_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      customerId_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -92,6 +132,9 @@ private static final long serialVersionUID = 0L;
     if (((bitField0_ & 0x00000001) != 0)) {
       output.writeMessage(1, getAddress());
     }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(customerId_)) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 2, customerId_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -104,6 +147,9 @@ private static final long serialVersionUID = 0L;
     if (((bitField0_ & 0x00000001) != 0)) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(1, getAddress());
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(customerId_)) {
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(2, customerId_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -125,6 +171,8 @@ private static final long serialVersionUID = 0L;
       if (!getAddress()
           .equals(other.getAddress())) return false;
     }
+    if (!getCustomerId()
+        .equals(other.getCustomerId())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -140,6 +188,8 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + ADDRESS_FIELD_NUMBER;
       hash = (53 * hash) + getAddress().hashCode();
     }
+    hash = (37 * hash) + CUSTOMER_ID_FIELD_NUMBER;
+    hash = (53 * hash) + getCustomerId().hashCode();
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -282,6 +332,7 @@ private static final long serialVersionUID = 0L;
         addressBuilder_.dispose();
         addressBuilder_ = null;
       }
+      customerId_ = "";
       return this;
     }
 
@@ -322,6 +373,9 @@ private static final long serialVersionUID = 0L;
             : addressBuilder_.build();
         to_bitField0_ |= 0x00000001;
       }
+      if (((from_bitField0_ & 0x00000002) != 0)) {
+        result.customerId_ = customerId_;
+      }
       result.bitField0_ |= to_bitField0_;
     }
 
@@ -339,6 +393,11 @@ private static final long serialVersionUID = 0L;
       if (other == com.acme.proto.acme.fulfillment.domain.fulfillment.v1.VerifyAddressRequest.getDefaultInstance()) return this;
       if (other.hasAddress()) {
         mergeAddress(other.getAddress());
+      }
+      if (!other.getCustomerId().isEmpty()) {
+        customerId_ = other.customerId_;
+        bitField0_ |= 0x00000002;
+        onChanged();
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -373,6 +432,11 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000001;
               break;
             } // case 10
+            case 18: {
+              customerId_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000002;
+              break;
+            } // case 18
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -509,6 +573,78 @@ private static final long serialVersionUID = 0L;
         address_ = null;
       }
       return addressBuilder_;
+    }
+
+    private java.lang.Object customerId_ = "";
+    /**
+     * <code>string customer_id = 2 [json_name = "customerId"];</code>
+     * @return The customerId.
+     */
+    public java.lang.String getCustomerId() {
+      java.lang.Object ref = customerId_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        customerId_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string customer_id = 2 [json_name = "customerId"];</code>
+     * @return The bytes for customerId.
+     */
+    public com.google.protobuf.ByteString
+        getCustomerIdBytes() {
+      java.lang.Object ref = customerId_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        customerId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string customer_id = 2 [json_name = "customerId"];</code>
+     * @param value The customerId to set.
+     * @return This builder for chaining.
+     */
+    public Builder setCustomerId(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      customerId_ = value;
+      bitField0_ |= 0x00000002;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string customer_id = 2 [json_name = "customerId"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearCustomerId() {
+      customerId_ = getDefaultInstance().getCustomerId();
+      bitField0_ = (bitField0_ & ~0x00000002);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string customer_id = 2 [json_name = "customerId"];</code>
+     * @param value The bytes for customerId to set.
+     * @return This builder for chaining.
+     */
+    public Builder setCustomerIdBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      customerId_ = value;
+      bitField0_ |= 0x00000002;
+      onChanged();
+      return this;
     }
 
     // @@protoc_insertion_point(builder_scope:acme.fulfillment.domain.fulfillment.v1.VerifyAddressRequest)

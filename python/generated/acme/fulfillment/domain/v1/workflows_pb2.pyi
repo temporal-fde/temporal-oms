@@ -253,8 +253,10 @@ class ValidateOrderResponse(_message.Message):
 class VerifyAddressRequest(_message.Message):
     __slots__ = ()
     ADDRESS_FIELD_NUMBER: _ClassVar[int]
+    CUSTOMER_ID_FIELD_NUMBER: _ClassVar[int]
     address: _values_pb2.Address
-    def __init__(self, address: _Optional[_Union[_values_pb2.Address, _Mapping]] = ...) -> None: ...
+    customer_id: str
+    def __init__(self, address: _Optional[_Union[_values_pb2.Address, _Mapping]] = ..., customer_id: _Optional[str] = ...) -> None: ...
 
 class VerifyAddressResponse(_message.Message):
     __slots__ = ()

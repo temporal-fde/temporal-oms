@@ -174,6 +174,7 @@ public class OrderImpl implements Order {
         var verifyResponse = carriers.verifyAddress(
                 VerifyAddressRequest.newBuilder()
                         .setAddress(request.getAddress())
+                        .setCustomerId(state.getArgs().getCustomerId())
                         .build());
 
         this.state = this.state.toBuilder()

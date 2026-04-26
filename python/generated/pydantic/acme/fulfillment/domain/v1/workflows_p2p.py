@@ -209,6 +209,7 @@ class ValidateOrderResponse(BaseModel):
 
 class VerifyAddressRequest(BaseModel):
     address: Address = Field(default_factory=Address)
+    customer_id: str = Field(default="")
 
 class VerifyAddressResponse(BaseModel):
     address: Address = Field(default_factory=Address)# easypost_address populated after verification

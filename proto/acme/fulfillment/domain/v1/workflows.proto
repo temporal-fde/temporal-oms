@@ -163,6 +163,7 @@ message ValidateOrderResponse {
 
 message VerifyAddressRequest {
   acme.common.v1.Address address = 1;
+  string customer_id = 2;
 }
 
 message VerifyAddressResponse {

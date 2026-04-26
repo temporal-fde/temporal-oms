@@ -55,11 +55,6 @@ public class CarriersImpl implements Carriers {
 
     @Override
     public VerifyAddressResponse verifyAddress(VerifyAddressRequest request) {
-        if (easyPostClient == null) {
-            throw ApplicationFailure.newNonRetryableFailure(
-                    "EasyPost API key is not configured — set EASYPOST_API_KEY",
-                    "EASYPOST_NOT_CONFIGURED");
-        }
 
         var address = request.getAddress();
         var ep = address.getEasypost();
@@ -71,6 +66,7 @@ public class CarriersImpl implements Carriers {
         }
 
         Map<String, Object> fields = new HashMap<>();
+        fields.put("name",    request.getCustomerId());
         fields.put("street1", ep.getStreet1());
         fields.put("city",    ep.getCity());
         fields.put("state",   ep.getState());
@@ -164,23 +160,22 @@ public class CarriersImpl implements Carriers {
 
     @Override
     public PrintShippingLabelResponse printShippingLabel(PrintShippingLabelRequest request) {
-        if (easyPostClient == null) {
-            throw ApplicationFailure.newNonRetryableFailure(
-                    "EasyPost API key is not configured — set EASYPOST_API_KEY",
-                    "EASYPOST_NOT_CONFIGURED");
-        }
 
         try {
             Shipment shipment = easyPostClient.shipment.retrieve(request.getShipmentId());
 
-            Rate rate = shipment.getRates().stream()
-                    .filter(r -> r.getId().equals(request.getRateId()))
-                    .findFirst()
-                    .orElseThrow(() -> ApplicationFailure.newNonRetryableFailure(
-                            "Rate " + request.getRateId() + " not found on shipment " + request.getShipmentId(),
-                            "RATE_NOT_FOUND"));
+            logger.info("Shipment ID: {}", shipment.getId());
+            logger.info("Shipment status: {}", shipment.getStatus());
 
-            Shipment purchased = easyPostClient.shipment.buy(shipment.getId(), rate);
+            for (Rate r : shipment.getRates()) {
+                logger.info("Available rate: {}", r.getId());
+            }
+
+            logger.info("Using rate: {}", request.getRateId());
+            Map<String, Object> buyParams = new HashMap<>();
+            buyParams.put("rate",  request.getRateId());
+
+            Shipment purchased = easyPostClient.shipment.buy(request.getShipmentId(), buyParams);
 
             String trackingNumber = purchased.getTrackingCode() != null ? purchased.getTrackingCode() : "";
             String labelUrl = purchased.getPostageLabel() != null
@@ -194,9 +189,21 @@ public class CarriersImpl implements Carriers {
                     .setLabelUrl(labelUrl)
                     .build();
 
-        } catch (ApplicationFailure e) {
-            throw e;
         } catch (EasyPostException e) {
+            logger.error("EasyPost EasyPostException: {}", e.getMessage());
+
+            if (e.getCause() instanceof com.easypost.exception.API.InvalidRequestError ire) {
+
+                if (ire.getErrors() != null) {
+                    for (Object err : ire.getErrors()) {
+                        logger.error("EasyPost field error: {}", err);
+                    }
+                }
+//
+//                if (ire.getParam() != null) {
+//                    logger.error("Invalid param: {}", ire.getParam());
+//                }
+            }
             throw ApplicationFailure.newFailureWithCause(
                     "Failed to purchase label for shipment " + request.getShipmentId(),
                     "LABEL_PRINT_FAILED", e);
