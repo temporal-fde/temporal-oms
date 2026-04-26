@@ -271,6 +271,7 @@ public class IntegrationsImpl implements Integrations {
         return Address.newBuilder()
                 .setEasypost(EasyPostAddress.newBuilder()
                         .setId(wh.easypostId())
+                        .setCompany(wh.company())
                         .setStreet1(wh.street1())
                         .setCity(wh.city())
                         .setState(wh.state())

@@ -29,6 +29,7 @@ class EasyPostAddress(_message.Message):
     RESIDENTIAL_FIELD_NUMBER: _ClassVar[int]
     COORDINATE_FIELD_NUMBER: _ClassVar[int]
     TIMEZONE_FIELD_NUMBER: _ClassVar[int]
+    COMPANY_FIELD_NUMBER: _ClassVar[int]
     id: str
     street1: str
     street2: str
@@ -39,7 +40,8 @@ class EasyPostAddress(_message.Message):
     residential: bool
     coordinate: Coordinate
     timezone: str
-    def __init__(self, id: _Optional[str] = ..., street1: _Optional[str] = ..., street2: _Optional[str] = ..., city: _Optional[str] = ..., state: _Optional[str] = ..., zip: _Optional[str] = ..., country: _Optional[str] = ..., residential: _Optional[bool] = ..., coordinate: _Optional[_Union[Coordinate, _Mapping]] = ..., timezone: _Optional[str] = ...) -> None: ...
+    company: str
+    def __init__(self, id: _Optional[str] = ..., street1: _Optional[str] = ..., street2: _Optional[str] = ..., city: _Optional[str] = ..., state: _Optional[str] = ..., zip: _Optional[str] = ..., country: _Optional[str] = ..., residential: _Optional[bool] = ..., coordinate: _Optional[_Union[Coordinate, _Mapping]] = ..., timezone: _Optional[str] = ..., company: _Optional[str] = ...) -> None: ...
 
 class Address(_message.Message):
     __slots__ = ()

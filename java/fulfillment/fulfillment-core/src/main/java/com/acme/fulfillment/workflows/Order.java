@@ -28,7 +28,7 @@ public interface Order {
      * Update: Verify the shipping address via EasyPost.
      * Called by apps.Order via the validateOrder Nexus operation (UpdateWithStart).
      * Stores the verified Address (with easypost_address) in workflow state for
-     * downstream use in getCarrierRates.
+     * downstream use in ShippingAgent.calculateShippingOptions.
      */
     @UpdateMethod
     ValidateOrderResponse validateOrder(ValidateOrderRequest request);

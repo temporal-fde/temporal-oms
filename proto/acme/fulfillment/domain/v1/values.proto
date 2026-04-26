@@ -10,6 +10,7 @@ enum Errors {
   ERROR_FORBIDDEN = 2;
   ERROR_BAD_REQUEST = 3;
   ERROR_ADDRESS_VERIFY_FAILED = 4;
+  ERROR_INVALID_RATE = 5;
 }
 
 // RiskLevel normalizes PredictHQ rank (0–100) into tiers the agent can reason about.

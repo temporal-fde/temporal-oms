@@ -16,6 +16,7 @@ class Errors(IntEnum):
     ERROR_FORBIDDEN = 2
     ERROR_BAD_REQUEST = 3
     ERROR_ADDRESS_VERIFY_FAILED = 4
+    ERROR_INVALID_RATE = 5
 
 
 class RiskLevel(IntEnum):

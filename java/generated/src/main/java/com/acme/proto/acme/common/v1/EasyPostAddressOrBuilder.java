@@ -167,4 +167,24 @@ public interface EasyPostAddressOrBuilder extends
    */
   com.google.protobuf.ByteString
       getTimezoneBytes();
+
+  /**
+   * <pre>
+   * company name on the address (required by carriers for from_address)
+   * </pre>
+   *
+   * <code>string company = 11 [json_name = "company"];</code>
+   * @return The company.
+   */
+  java.lang.String getCompany();
+  /**
+   * <pre>
+   * company name on the address (required by carriers for from_address)
+   * </pre>
+   *
+   * <code>string company = 11 [json_name = "company"];</code>
+   * @return The bytes for company.
+   */
+  com.google.protobuf.ByteString
+      getCompanyBytes();
 }

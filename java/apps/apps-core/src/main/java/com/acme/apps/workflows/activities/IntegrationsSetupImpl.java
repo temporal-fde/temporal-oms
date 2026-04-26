@@ -31,19 +31,19 @@ public class IntegrationsSetupImpl implements IntegrationsSetup {
     }
 
     private record WarehouseConfig(
-            String warehouseId, String street1, String city,
+            String warehouseId, String company, String street1, String city,
             String state, String zip, String country, List<String> skuPrefixes) {
     }
 
     // Collection A first, Collection B after — ordering drives lookupInventoryAddress precedence.
     private static final List<WarehouseConfig> WAREHOUSES = List.of(
             // ── Collection A (primary) ─────────────────────────────────────────────
-            new WarehouseConfig("WH-EAST-01", "540 Broad St",              "Newark",        "NJ", "07102", "US", List.of("ELEC-", "GADG-", "TECH-")),
-            new WarehouseConfig("WH-WEST-01", "388 Townsend St",           "San Francisco", "CA", "94107", "US", List.of("APRL-", "HOME-", "SPRT-")),
+            new WarehouseConfig("WH-EAST-01", "acme", "540 Broad St",              "Newark",        "NJ", "07102", "US", List.of("ELEC-", "GADG-", "TECH-")),
+            new WarehouseConfig("WH-WEST-01", "acme", "388 Townsend St",           "San Francisco", "CA", "94107", "US", List.of("APRL-", "HOME-", "SPRT-")),
             // ── Collection B (alternates, share SKU prefixes with A) ───────────────
-            new WarehouseConfig("WH-EAST-02", "417 Montgomery St",         "San Francisco", "CA", "94104", "US", List.of("ELEC-", "GADG-")),
-            new WarehouseConfig("WH-WEST-02", "1600 Amphitheatre Pkwy",    "Mountain View", "CA", "94043", "US", List.of("APRL-", "SPRT-")),
-            new WarehouseConfig("WH-CENT-01", "1901 W Madison St",         "Chicago",       "IL", "60612", "US", List.of("TECH-", "HOME-"))
+            new WarehouseConfig("WH-EAST-02", "acme", "417 Montgomery St",         "San Francisco", "CA", "94104", "US", List.of("ELEC-", "GADG-")),
+            new WarehouseConfig("WH-WEST-02", "acme", "1600 Amphitheatre Pkwy",    "Mountain View", "CA", "94043", "US", List.of("APRL-", "SPRT-")),
+            new WarehouseConfig("WH-CENT-01", "acme", "1901 W Madison St",         "Chicago",       "IL", "60612", "US", List.of("TECH-", "HOME-"))
     );
 
 
@@ -57,6 +57,7 @@ public class IntegrationsSetupImpl implements IntegrationsSetup {
     private PreloadedWarehouse verifyWarehouse(WarehouseConfig config) {
 
         Map<String, Object> fields = new HashMap<>();
+        fields.put("company", config.company());
         fields.put("street1", config.street1());
         fields.put("city",    config.city());
         fields.put("state",   config.state());
@@ -74,6 +75,7 @@ public class IntegrationsSetupImpl implements IntegrationsSetup {
                 config.warehouseId(),
                 config.skuPrefixes(),
                 verified.getId(),
+                config.company(),
                 verified.getStreet1() != null ? verified.getStreet1() : config.street1(),
                 verified.getCity()    != null ? verified.getCity()    : config.city(),
                 verified.getState()   != null ? verified.getState()   : config.state(),

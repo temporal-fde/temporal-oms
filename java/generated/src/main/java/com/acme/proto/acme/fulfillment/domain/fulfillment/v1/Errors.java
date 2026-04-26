@@ -31,6 +31,10 @@ public enum Errors
    * <code>ERROR_ADDRESS_VERIFY_FAILED = 4;</code>
    */
   ERROR_ADDRESS_VERIFY_FAILED(4),
+  /**
+   * <code>ERROR_INVALID_RATE = 5;</code>
+   */
+  ERROR_INVALID_RATE(5),
   UNRECOGNIZED(-1),
   ;
 
@@ -63,6 +67,10 @@ public enum Errors
    * <code>ERROR_ADDRESS_VERIFY_FAILED = 4;</code>
    */
   public static final int ERROR_ADDRESS_VERIFY_FAILED_VALUE = 4;
+  /**
+   * <code>ERROR_INVALID_RATE = 5;</code>
+   */
+  public static final int ERROR_INVALID_RATE_VALUE = 5;
 
 
   public final int getNumber() {
@@ -94,6 +102,7 @@ public enum Errors
       case 2: return ERROR_FORBIDDEN;
       case 3: return ERROR_BAD_REQUEST;
       case 4: return ERROR_ADDRESS_VERIFY_FAILED;
+      case 5: return ERROR_INVALID_RATE;
       default: return null;
     }
   }

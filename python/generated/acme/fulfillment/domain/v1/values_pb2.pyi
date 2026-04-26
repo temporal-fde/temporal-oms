@@ -17,6 +17,7 @@ class Errors(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     ERROR_FORBIDDEN: _ClassVar[Errors]
     ERROR_BAD_REQUEST: _ClassVar[Errors]
     ERROR_ADDRESS_VERIFY_FAILED: _ClassVar[Errors]
+    ERROR_INVALID_RATE: _ClassVar[Errors]
 
 class RiskLevel(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
@@ -31,6 +32,7 @@ ERROR_UNAUTHORIZED: Errors
 ERROR_FORBIDDEN: Errors
 ERROR_BAD_REQUEST: Errors
 ERROR_ADDRESS_VERIFY_FAILED: Errors
+ERROR_INVALID_RATE: Errors
 RISK_LEVEL_UNSPECIFIED: RiskLevel
 RISK_LEVEL_NONE: RiskLevel
 RISK_LEVEL_LOW: RiskLevel
