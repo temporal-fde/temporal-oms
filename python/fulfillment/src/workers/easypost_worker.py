@@ -31,5 +31,5 @@ async def build_easypost_worker() -> Worker:
             easypost_activities.get_carrier_rates,
         ],
         activity_executor=ThreadPoolExecutor(max_workers=10),
-        max_activities_per_second=5.0,
+        max_activities_per_second=3.0,
     )

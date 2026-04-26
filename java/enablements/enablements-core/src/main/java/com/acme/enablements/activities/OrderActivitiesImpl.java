@@ -56,9 +56,10 @@ public class OrderActivitiesImpl implements OrderActivities {
                 String orderId = cmd.getOrderIdSeed() + "-" + enablementId + "-" + timestamp;
 
                 try {
+                    String customerId = "enablements-customer-" + UUID.randomUUID().toString();
                     // Call /api/v1/orders/{orderId} endpoint
-                    callOrderEndpoint(orderId);
-                    callPaymentEndpoint(orderId);
+                    callOrderEndpoint(orderId, customerId);
+                    callPaymentEndpoint(orderId, customerId);
                     if(cmd.getOrderIdSeed().contains("invalid")) {
                         scheduleValidation(orderId);
                     }
@@ -95,17 +96,18 @@ public class OrderActivitiesImpl implements OrderActivities {
                 .build();
     }
 
-    private void callOrderEndpoint(String orderId) {
+    private void callOrderEndpoint(String orderId, String customerId) {
+        // see com/acme/apps/workflows/activities/IntegrationsSetupImpl.java:40
         var shippingAddress = ShippingAddress.newBuilder()
-                .setStreet(orderId + "-street-" + UUID.randomUUID())
-                .setCity(orderId + "-city-" + UUID.randomUUID().toString().substring(0, 8))
+                .setStreet("388 Townsend St")
+                .setCity("San Francisco")
                 .setState("CA")
                 .setPostalCode("94107")
                 .setCountry("US")
                 .build();
 
         var item = com.acme.proto.acme.apps.api.orders.v1.Item.newBuilder()
-                .setItemId(orderId + "-item-" + UUID.randomUUID().toString().substring(0, 8))
+                .setItemId("HOME-" + UUID.randomUUID().toString().substring(0, 8))
                 .setQuantity((int) (Math.random() * 10) + 1)
                 .build();
 
@@ -116,7 +118,7 @@ public class OrderActivitiesImpl implements OrderActivities {
                 .build();
 
         var req = SubmitOrderRequest.newBuilder()
-                .setCustomerId("enablements")
+                .setCustomerId(customerId)
                 .setOrder(order)
                 .build();
 
@@ -138,9 +140,9 @@ public class OrderActivitiesImpl implements OrderActivities {
         }
     }
 
-    private void callPaymentEndpoint(String orderId) {
+    private void callPaymentEndpoint(String orderId, String customerId) {
         var req = MakePaymentRequest.newBuilder()
-                .setCustomerId("enablements")
+                .setCustomerId(customerId)
                 .setRrn(UUID.randomUUID().toString())
                 .setAmountCents((long) (Math.random() * 10000) + 100)
                 .setMetadata(Metadata.newBuilder().setOrderId(orderId).build())

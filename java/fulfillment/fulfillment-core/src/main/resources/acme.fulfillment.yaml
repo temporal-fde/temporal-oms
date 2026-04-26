@@ -16,4 +16,4 @@ spring.temporal:
       activity-beans:
         - carriersActivities
       rate-limits:
-        max-task-queue-activities-per-second: 5
+        max-task-queue-activities-per-second: 2

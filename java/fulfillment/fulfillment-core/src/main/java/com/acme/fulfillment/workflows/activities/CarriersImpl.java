@@ -7,6 +7,10 @@ import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PrintShippingLabelR
 import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PrintShippingLabelResponse;
 import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.VerifyAddressRequest;
 import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.VerifyAddressResponse;
+import com.easypost.exception.API.GatewayTimeoutError;
+import com.easypost.exception.API.RateLimitError;
+import com.easypost.exception.API.ServiceUnavailableError;
+import com.easypost.exception.API.TimeoutError;
 import com.easypost.exception.APIException;
 import com.easypost.exception.EasyPostException;
 import com.easypost.model.FieldError;
@@ -80,14 +84,20 @@ public class CarriersImpl implements Carriers {
                     .setAddress(Address.newBuilder().setEasypost(easyPostAddress).build())
                     .build();
 
+        } catch (RateLimitError | ServiceUnavailableError | GatewayTimeoutError | TimeoutError e) {
+            logger.warn("verifyAddress transient EasyPost error ({}), will retry: {}", e.getClass().getSimpleName(), e.getMessage());
+            throw ApplicationFailure.newFailureWithCause(
+                    "EasyPost transient error: " + e.getMessage(),
+                    "EASYPOST_TRANSIENT_ERROR", e);
         } catch (EasyPostException e) {
             String addressError = "undefined";
             String failedField  = "undefined";
-            List<?> errors = ((APIException) e).getErrors();
-            if (errors != null && !errors.isEmpty()) {
-                FieldError fieldError = (FieldError) errors.getFirst();
-                failedField  = fieldError.getField();
-                addressError = fieldError.getMessage();
+            if (e instanceof APIException ae) {
+                List<?> errors = ae.getErrors();
+                if (errors != null && !errors.isEmpty() && errors.getFirst() instanceof FieldError fieldError) {
+                    failedField  = fieldError.getField();
+                    addressError = fieldError.getMessage();
+                }
             }
             throw ApplicationFailure.newNonRetryableFailureWithCause(
                     addressError + ". Error with field '" + failedField + "'",

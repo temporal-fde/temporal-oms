@@ -31,4 +31,4 @@ spring.temporal:
         deployment-name: ${TEMPORAL_DEPLOYMENT_NAME:apps}
         build-id: ${TEMPORAL_WORKER_BUILD_ID:local}
       rate-limits:
-        max-task-queue-activities-per-second: 5
+        max-task-queue-activities-per-second: 1
