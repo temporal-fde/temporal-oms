@@ -26,10 +26,30 @@ message EasyPostAddress {
   string company = 11;               // company name on the address (required by carriers for from_address)
 }
 
-message Address {
-  optional EasyPostAddress easypost = 7; // populated after EasyPost verification
+message EasyPostRate {
+  string rate_id = 1;
+  optional int64 delivery_days = 2;
+  optional google.protobuf.Timestamp delivery_date = 3;
+  bool delivery_date_guaranteed = 4;
+}
+message EasyPostShipment {
+  string shipment_id = 1;
+  EasyPostRate selected_rate = 2;
 }
 
+message Address {
+  optional EasyPostAddress easypost = 1; // populated after EasyPost verification
+}
+
+
+message Shipment {
+  optional EasyPostShipment easypost = 1;
+  // there are various rates on an easypost rate that could have been purchased
+  // but we only care about the actual one the customer paid
+  // it is an error to have this field populated but no easypost details provided
+  optional Money paid_price = 2;
+  optional google.protobuf.Timestamp delivery_date = 3;
+}
 message TimeRange {
   google.protobuf.Timestamp start = 1;
   google.protobuf.Timestamp end = 2;

@@ -15,7 +15,7 @@ public interface AddressOrBuilder extends
    * populated after EasyPost verification
    * </pre>
    *
-   * <code>optional .acme.common.v1.EasyPostAddress easypost = 7 [json_name = "easypost"];</code>
+   * <code>optional .acme.common.v1.EasyPostAddress easypost = 1 [json_name = "easypost"];</code>
    * @return Whether the easypost field is set.
    */
   boolean hasEasypost();
@@ -24,7 +24,7 @@ public interface AddressOrBuilder extends
    * populated after EasyPost verification
    * </pre>
    *
-   * <code>optional .acme.common.v1.EasyPostAddress easypost = 7 [json_name = "easypost"];</code>
+   * <code>optional .acme.common.v1.EasyPostAddress easypost = 1 [json_name = "easypost"];</code>
    * @return The easypost.
    */
   com.acme.proto.acme.common.v1.EasyPostAddress getEasypost();
@@ -33,7 +33,7 @@ public interface AddressOrBuilder extends
    * populated after EasyPost verification
    * </pre>
    *
-   * <code>optional .acme.common.v1.EasyPostAddress easypost = 7 [json_name = "easypost"];</code>
+   * <code>optional .acme.common.v1.EasyPostAddress easypost = 1 [json_name = "easypost"];</code>
    */
   com.acme.proto.acme.common.v1.EasyPostAddressOrBuilder getEasypostOrBuilder();
 }

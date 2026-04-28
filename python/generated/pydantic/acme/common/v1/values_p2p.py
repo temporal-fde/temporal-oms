@@ -39,8 +39,26 @@ class EasyPostAddress(BaseModel):
     timezone: str = Field(default="")# IANA tz identifier from verifications.delivery.details.time_zone (e.g. "America/New_York")
     company: str = Field(default="")# company name on the address (required by carriers for from_address)
 
+class EasyPostRate(BaseModel):
+    rate_id: str = Field(default="")
+    delivery_days: typing.Optional[int] = Field(default=0)
+    delivery_date: typing.Optional[datetime] = Field(default_factory=datetime.now)
+    delivery_date_guaranteed: bool = Field(default=False)
+
+class EasyPostShipment(BaseModel):
+    shipment_id: str = Field(default="")
+    selected_rate: EasyPostRate = Field(default_factory=EasyPostRate)
+
 class Address(BaseModel):
     easypost: typing.Optional[EasyPostAddress] = Field(default_factory=EasyPostAddress)# populated after EasyPost verification
+
+class Shipment(BaseModel):
+    easypost: typing.Optional[EasyPostShipment] = Field(default_factory=EasyPostShipment)
+# there are various rates on an easypost rate that could have been purchased
+# but we only care about the actual one the customer paid
+# it is an error to have this field populated but no easypost details provided
+    paid_price: typing.Optional[Money] = Field(default_factory=Money)
+    delivery_date: typing.Optional[datetime] = Field(default_factory=datetime.now)
 
 class TimeRange(BaseModel):
     start: datetime = Field(default_factory=datetime.now)

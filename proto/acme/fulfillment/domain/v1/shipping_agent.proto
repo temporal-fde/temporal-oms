@@ -99,7 +99,7 @@ message CalculateShippingOptionsRequest {
   repeated ShippingLineItem items        = 4;
   optional string           selected_shipping_option_id = 5;
   optional acme.common.v1.Money   customer_paid_price   = 6;
-  optional int32                  transit_days_sla      = 7;
+  optional int32                  delivery_days_sla     = 7;
 }
 
 // CalculateShippingOptionsResponse is the Update response from the ShippingAgent.

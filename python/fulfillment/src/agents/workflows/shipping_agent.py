@@ -96,8 +96,8 @@ _TOOLS = ToolSpecs(
     nexus_tool(
         "find_alternate_warehouse",
         "Find a warehouse that can fulfill the given items from a different address than "
-        "the one already tried. Call before returning MARGIN_SPIKE or SLA_BREACH — a closer "
-        "warehouse may offer cheaper or faster rates. Returns empty address if none available.",
+        "the one already tried. You MUST call this before returning MARGIN_SPIKE or SLA_BREACH — "
+        "a closer warehouse may offer cheaper or faster rates. Returns empty address if none available.",
         endpoint=_INTEGRATIONS_ENDPOINT,
         service_type=InventoryService,
         operation=InventoryService.findAlternateWarehouse,
@@ -118,7 +118,13 @@ _FINALIZE_TOOL_SCHEMA = {
         },
         "recommended_option_id": {
             "type": "string",
-            "description": "Rate ID from get_carrier_rates. Empty string for MARGIN_SPIKE or SLA_BREACH when no valid rate exists.",
+            "description": (
+                "Rate ID from get_carrier_rates. "
+                "For PROCEED, CHEAPER_AVAILABLE, FASTER_AVAILABLE: the chosen rate ID. "
+                "For MARGIN_SPIKE: the cheapest available rate ID (even if it exceeds paid price). "
+                "For SLA_BREACH: the fastest available rate ID (even if it misses the SLA). "
+                "Never an empty string."
+            ),
         },
         "reasoning": {"type": "string"},
         "margin_delta_cents": {
@@ -166,7 +172,8 @@ def _build_recommendation(data: dict) -> ShippingRecommendation:
 
 
 _NAME_RATES = activity_name(EasyPostActivities.get_carrier_rates)
-
+_NAME_ALTERNATE_WAREHOUSE = "find_alternate_warehouse"
+_NEGATIVE_OUTCOMES = frozenset({"MARGIN_SPIKE", "SLA_BREACH"})
 
 _DEFAULT_CACHE_TTL_SECS = 1800
 
@@ -312,6 +319,7 @@ class ShippingAgent:
 
         recommendation: ShippingRecommendation | None = None
         all_options: list[ShippingOption] = []
+        alternate_warehouse_called = False
 
         while True:
             # ReAct: Reason — LLM evaluates state and decides next action (tool calls or final answer)
@@ -341,6 +349,23 @@ class ShippingAgent:
                     (b for b in tool_blocks if b.tool_use.name == _FINALIZE_TOOL_NAME), None
                 )
                 if finalize_block is not None:
+                    outcome = finalize_block.tool_use.input.get("outcome", "")
+                    if outcome in _NEGATIVE_OUTCOMES and not alternate_warehouse_called:
+                        messages.append(LlmMessage(
+                            role=LlmRole.LLM_ROLE_USER,
+                            content=[LlmContentBlock(
+                                type="tool_result",
+                                tool_result=LlmToolResultBlock(
+                                    tool_use_id=finalize_block.tool_use.id,
+                                    content=(
+                                        '{"error": "REJECTED: You must call find_alternate_warehouse '
+                                        f'before returning {outcome}. Call it now, then re-submit '
+                                        'your recommendation."}'
+                                    ),
+                                ),
+                            )],
+                        ))
+                        continue
                     recommendation = _build_recommendation(finalize_block.tool_use.input)
                     break
 
@@ -348,6 +373,10 @@ class ShippingAgent:
                 tool_results: list[str] = list(await asyncio.gather(
                     *[_TOOLS.dispatch(b) for b in tool_blocks]
                 ))
+
+                for block in tool_blocks:
+                    if block.tool_use.name == _NAME_ALTERNATE_WAREHOUSE:
+                        alternate_warehouse_called = True
 
                 for block, result_json in zip(tool_blocks, tool_results):
                     if block.tool_use.name == _NAME_RATES:

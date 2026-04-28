@@ -104,9 +104,12 @@ class LlmActivities:
         )
 
         sla_rule = (
-            f"SLA RULE: If no rate delivers within {r.transit_days_sla} days, outcome MUST be SLA_BREACH."
-            if (r.transit_days_sla and r.transit_days_sla > 0)
-            else "SLA RULE: No transit SLA specified."
+            f"SLA RULE: If no rate that costs at or below the customer paid price "
+            f"delivers within {r.delivery_days_sla} days, outcome MUST be SLA_BREACH. "
+            f"Set recommended_option_id to the rate ID of the fastest available option "
+            f"(minimise delivery delay even if the SLA cannot be met)."
+            if r.delivery_days_sla is not None
+            else "SLA RULE: No delivery days SLA specified."
         )
 
         priority_rule = (
@@ -146,12 +149,17 @@ class LlmActivities:
                 "between them (e.g. get_location_events for origin AND get_location_events for destination simultaneously)."
             ),
             (
-                "RECOMMENDED ACTIONS:\n"
-                "- If all carrier rates exceed the customer paid price, call find_alternate_warehouse "
-                "before returning MARGIN_SPIKE. Only return MARGIN_SPIKE if no alternate warehouse "
-                "exists or its rates also exceed the paid price.\n"
-                "- If no rate meets the transit SLA, call find_alternate_warehouse before returning "
-                "SLA_BREACH. A closer warehouse may offer faster options."
+                "MANDATORY ACTIONS:\n"
+                "- If all carrier rates exceed the customer paid price, you MUST call "
+                "find_alternate_warehouse before calling finalize_recommendation with MARGIN_SPIKE. "
+                "Only return MARGIN_SPIKE if no alternate warehouse exists or its rates also exceed "
+                "the paid price.\n"
+                "- If no rate meets the transit SLA, you MUST call find_alternate_warehouse before "
+                "calling finalize_recommendation with SLA_BREACH. A closer warehouse may offer "
+                "faster options.\n"
+                "Attempting to finalize with MARGIN_SPIKE or SLA_BREACH without first calling "
+                "find_alternate_warehouse will result in a rejection and you will be required to "
+                "call it anyway."
             ),
             (
                 "LIMITATIONS:\n"

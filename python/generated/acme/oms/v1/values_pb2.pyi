@@ -12,10 +12,12 @@ class Order(_message.Message):
     ORDER_ID_FIELD_NUMBER: _ClassVar[int]
     ITEMS_FIELD_NUMBER: _ClassVar[int]
     SHIPPING_ADDRESS_FIELD_NUMBER: _ClassVar[int]
+    SELECTED_SHIPMENT_FIELD_NUMBER: _ClassVar[int]
     order_id: str
     items: _containers.RepeatedCompositeFieldContainer[Item]
     shipping_address: _values_pb2.Address
-    def __init__(self, order_id: _Optional[str] = ..., items: _Optional[_Iterable[_Union[Item, _Mapping]]] = ..., shipping_address: _Optional[_Union[_values_pb2.Address, _Mapping]] = ...) -> None: ...
+    selected_shipment: _values_pb2.Shipment
+    def __init__(self, order_id: _Optional[str] = ..., items: _Optional[_Iterable[_Union[Item, _Mapping]]] = ..., shipping_address: _Optional[_Union[_values_pb2.Address, _Mapping]] = ..., selected_shipment: _Optional[_Union[_values_pb2.Shipment, _Mapping]] = ...) -> None: ...
 
 class Payment(_message.Message):
     __slots__ = ()

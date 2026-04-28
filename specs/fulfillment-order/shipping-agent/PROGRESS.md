@@ -1,7 +1,7 @@
 # ShippingAgent — Progress Tracking
 
 **Feature:** `ShippingAgent` — AI-Powered Shipping Rate Selection
-**Status:** ✅ Phases 1–3 Complete
+**Status:** ✅ Phases 1–3, 6 Complete
 **Owner:** Temporal FDE Team
 **Created:** 2026-04-15
 **Updated:** 2026-04-17
@@ -17,6 +17,7 @@
 | Phase 3 | ShippingAgent Workflow + Agentic Loop | ✅ Complete | Phase 2 |
 | Phase 4 | Nexus Handler + `fulfillment.Order` V2 Wiring | ⏳ Not started | Phase 3 + `fulfillment.Order` Phase 3–4 complete |
 | Phase 5 | Workshop Scenarios + Demo Scripts | ⏳ Not started | Phase 4 |
+| Phase 6 | Alternate Warehouse Path Hardening | ✅ Complete | — |
 
 ---
 
@@ -272,6 +273,49 @@ All tests use Temporal Python test framework (`temporalio.testing.WorkflowEnviro
 
 ---
 
+### Phase 6 — Alternate Warehouse Path Hardening
+> Blocked on: nothing (Phase 3 is complete). Can be implemented independently of Phases 4–5.
+> Goal: make `find_alternate_warehouse` a workflow-layer guarantee, not a prompt-level suggestion.
+
+#### 6a — Prompt hardening (`llm.py`)
+
+- [x] Change `"RECOMMENDED ACTIONS:"` to `"MANDATORY ACTIONS:"` in `build_system_prompt`
+- [x] Rewrite the `find_alternate_warehouse` requirement to explicit mandatory language:
+  - "You MUST call `find_alternate_warehouse` before calling `finalize_recommendation` with
+    outcome `MARGIN_SPIKE` or `SLA_BREACH`. The system will reject a finalize that arrives
+    without this call having been made first."
+- [x] Update `find_alternate_warehouse` tool description in `_TOOLS` to match:
+  - "You MUST call this before returning MARGIN_SPIKE or SLA_BREACH — a closer warehouse may
+    offer cheaper or faster rates. Returns empty address if none available."
+
+#### 6b — Post-loop enforcement (`shipping_agent.py`)
+
+- [x] Add `alternate_warehouse_called: bool = False` at the start of `_run_react_loop`
+- [x] In the tool dispatch block, set `alternate_warehouse_called = True` when any dispatched
+      block has `block.tool_use.name == "find_alternate_warehouse"`
+- [x] In the finalize detection block: when `outcome in ("MARGIN_SPIKE", "SLA_BREACH")` and
+      `not alternate_warehouse_called`:
+  - Do not break
+  - Append a `tool_result` `LlmMessage` for the finalize block's `tool_use.id` with content:
+    `{"error": "REJECTED: You must call find_alternate_warehouse before returning MARGIN_SPIKE or SLA_BREACH. Call it now, then re-submit your recommendation."}`
+  - Continue the loop
+- [x] When `alternate_warehouse_called` is `True`: fall through to `_build_recommendation` and break as normal
+
+#### 6c — Unit tests (`tests/test_shipping_agent.py`)
+
+- [x] `MARGIN_SPIKE` without prior `find_alternate_warehouse` → rejection injected → mock LLM
+      responds with `find_alternate_warehouse` call → second finalize accepted
+      (`test_margin_spike_enforces_alternate_warehouse`)
+- [x] `SLA_BREACH` without prior `find_alternate_warehouse` → same rejection pattern
+      (`test_sla_breach_enforces_alternate_warehouse`)
+- [x] `MARGIN_SPIKE` with `find_alternate_warehouse` already called → finalize accepted
+      immediately (`test_margin_spike_outcome` updated)
+- [x] `SLA_BREACH` with `find_alternate_warehouse` already called → finalize accepted
+      immediately (`test_sla_breach_outcome` updated)
+- [x] `customer_paid_price.units=1` used in margin spike tests as the deterministic trigger
+
+---
+
 ## Revision History
 
 | Date | Author | Change |
@@ -284,3 +328,4 @@ All tests use Temporal Python test framework (`temporalio.testing.WorkflowEnviro
 | 2026-04-17 | Mike Nichols | Phases 1–3 implemented: proto schema + buf generate, 3 activity classes, 3 worker modules, worker entry point, ShippingAgent workflow with agentic loop, 9 passing unit tests. Notes: (1) temporalio pinned to >=1.26.0 for `@update.validator` API; (2) ShippingOptionLegacy rename in workflows.proto to resolve name conflict; (3) broken unqualified imports fixed in 3 generated _p2p files (codegen bug); (4) system prompt embedded in first user message since call_llm signature is locked to (messages, tools). |
 | 2026-04-20 | Mike Nichols | Spec updated: refactor `_build_system_prompt` from inline workflow function to `build_system_prompt` LocalActivity so prompt changes can be shipped without bumping the workflow build-id. Task added to Phase 3 task list. Design Decisions table updated with rationale. |
 | 2026-04-25 | Mike Nichols | Spec updated: replace raw JSON text parsing with `finalize_recommendation` forced tool use. Root cause: `claude-haiku-4-5` (and smaller models generally) adds prose/markdown before the JSON despite "output only raw JSON" instructions, causing non-retryable `json.loads()` failures in production. Fix: add a `finalize_recommendation` tool the model must call to submit its answer; tool inputs are SDK-serialized JSON so prose contamination is structurally impossible. Agentic Loop, Design Decisions, and Risks sections updated in spec.md; Phase 3 task revised in PROGRESS.md. |
+| 2026-04-27 | Mike Nichols | Phase 6 implemented (11/11 tests passing): Alternate Warehouse Path Hardening. Hardens `find_alternate_warehouse` from a prompt-level suggestion ("RECOMMENDED ACTIONS") into a workflow-layer guarantee via post-loop rejection. The loop tracks `alternate_warehouse_called`; a premature MARGIN_SPIKE/SLA_BREACH finalize is rejected with an explicit error tool_result and the LLM is forced to call the tool. Test trigger: `customer_paid_price.units=1` deterministically induces MARGIN_SPIKE without EasyPost stubbing. Overview, Recommendation Outcomes, Agentic Loop, Activities, Design Decisions, Acceptance Criteria, and Risks sections updated in spec.md. |

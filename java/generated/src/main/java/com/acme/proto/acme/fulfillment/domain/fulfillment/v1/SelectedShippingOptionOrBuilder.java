@@ -51,4 +51,15 @@ public interface SelectedShippingOptionOrBuilder extends
    * <code>.google.protobuf.Timestamp expected_ship_date = 3 [json_name = "expectedShipDate"];</code>
    */
   com.google.protobuf.TimestampOrBuilder getExpectedShipDateOrBuilder();
+
+  /**
+   * <code>optional int32 delivery_days = 4 [json_name = "deliveryDays"];</code>
+   * @return Whether the deliveryDays field is set.
+   */
+  boolean hasDeliveryDays();
+  /**
+   * <code>optional int32 delivery_days = 4 [json_name = "deliveryDays"];</code>
+   * @return The deliveryDays.
+   */
+  int getDeliveryDays();
 }

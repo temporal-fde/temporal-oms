@@ -124,6 +124,13 @@ temporal operator search-attribute create \
   --name margin_leak \
   --type Int 2>/dev/null || echo "  (margin_leak attribute may already exist)"
 
+# sla_breach_days: records SLA overage (days) on fulfillment.Order workflows
+temporal operator search-attribute create \
+  --address "$TEMPORAL_ADDRESS" \
+  --namespace fulfillment \
+  --name sla_breach_days \
+  --type Int 2>/dev/null || echo "  (sla_breach_days attribute may already exist)"
+
 echo ""
 echo "✓ Setup complete!"
 echo ""

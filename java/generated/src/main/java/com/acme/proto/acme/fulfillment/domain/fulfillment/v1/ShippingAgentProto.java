@@ -154,7 +154,7 @@ public final class ShippingAgentProto extends com.google.protobuf.GeneratedFile 
       "mer_id\030\002 \001(\tR\ncustomerIdB\024\n\022_execution_o" +
       "ptions\"]\n\035ShippingAgentExecutionOptions\022" +
       ")\n\016cache_ttl_secs\030\001 \001(\003H\000R\014cacheTtlSecs\210" +
-      "\001\001B\021\n\017_cache_ttl_secs\"\361\003\n\037CalculateShipp" +
+      "\001\001B\021\n\017_cache_ttl_secs\"\364\003\n\037CalculateShipp" +
       "ingOptionsRequest\022\031\n\010order_id\030\001 \001(\tR\007ord" +
       "erId\022\037\n\013customer_id\030\002 \001(\tR\ncustomerId\0226\n" +
       "\nto_address\030\003 \001(\0132\027.acme.common.v1.Addre" +
@@ -163,54 +163,54 @@ public final class ShippingAgentProto extends com.google.protobuf.GeneratedFile 
       "neItemR\005items\022B\n\033selected_shipping_optio" +
       "n_id\030\005 \001(\tH\000R\030selectedShippingOptionId\210\001" +
       "\001\022J\n\023customer_paid_price\030\006 \001(\0132\025.acme.co" +
-      "mmon.v1.MoneyH\001R\021customerPaidPrice\210\001\001\022-\n" +
-      "\020transit_days_sla\030\007 \001(\005H\002R\016transitDaysSl" +
-      "a\210\001\001B\036\n\034_selected_shipping_option_idB\026\n\024" +
-      "_customer_paid_priceB\023\n\021_transit_days_sl" +
-      "a\"\371\001\n CalculateShippingOptionsResponse\022f" +
-      "\n\016recommendation\030\001 \001(\0132>.acme.fulfillmen" +
-      "t.domain.fulfillment.v1.ShippingRecommen" +
-      "dationR\016recommendation\022P\n\007options\030\002 \003(\0132" +
-      "6.acme.fulfillment.domain.fulfillment.v1" +
-      ".ShippingOptionR\007options\022\033\n\tcache_hit\030\003 " +
-      "\001(\010R\010cacheHit\"\212\002\n\025ShippingOptionsResult\022" +
-      "f\n\016recommendation\030\001 \001(\0132>.acme.fulfillme" +
-      "nt.domain.fulfillment.v1.ShippingRecomme" +
-      "ndationR\016recommendation\022P\n\007options\030\002 \003(\013" +
-      "26.acme.fulfillment.domain.fulfillment.v" +
-      "1.ShippingOptionR\007options\0227\n\tcached_at\030\003" +
-      " \001(\0132\032.google.protobuf.TimestampR\010cached" +
-      "At\"\366\001\n\024ShippingOptionsCache\022c\n\007results\030\001" +
-      " \003(\0132I.acme.fulfillment.domain.fulfillme" +
-      "nt.v1.ShippingOptionsCache.ResultsEntryR" +
-      "\007results\032y\n\014ResultsEntry\022\020\n\003key\030\001 \001(\tR\003k" +
-      "ey\022S\n\005value\030\002 \001(\0132=.acme.fulfillment.dom" +
-      "ain.fulfillment.v1.ShippingOptionsResult" +
-      "R\005value:\0028\001\"\271\001\n\027GetShippingRatesRequest\022" +
-      "(\n\020from_easypost_id\030\001 \001(\tR\016fromEasypostI" +
-      "d\022$\n\016to_easypost_id\030\002 \001(\tR\014toEasypostId\022" +
-      "N\n\005items\030\003 \003(\01328.acme.fulfillment.domain" +
-      ".fulfillment.v1.ShippingLineItemR\005items\"" +
-      "\215\001\n\030GetShippingRatesResponse\022\037\n\013shipment" +
-      "_id\030\001 \001(\tR\nshipmentId\022P\n\007options\030\002 \003(\01326" +
-      ".acme.fulfillment.domain.fulfillment.v1." +
-      "ShippingOptionR\007options\"}\n\030BuildSystemPr" +
-      "omptRequest\022a\n\007request\030\001 \001(\0132G.acme.fulf" +
-      "illment.domain.fulfillment.v1.CalculateS" +
-      "hippingOptionsRequestR\007request\"@\n\031BuildS" +
-      "ystemPromptResponse\022#\n\rsystem_prompt\030\001 \001" +
-      "(\tR\014systemPrompt*\233\001\n\025RecommendationOutco" +
-      "me\022&\n\"RECOMMENDATION_OUTCOME_UNSPECIFIED" +
-      "\020\000\022\013\n\007PROCEED\020\001\022\025\n\021CHEAPER_AVAILABLE\020\002\022\024" +
-      "\n\020FASTER_AVAILABLE\020\003\022\020\n\014MARGIN_SPIKE\020\004\022\016" +
-      "\n\nSLA_BREACH\020\005B\210\002\n5com.acme.proto.acme.f" +
-      "ulfillment.domain.fulfillment.v1B\022Shippi" +
-      "ngAgentProtoP\001\242\002\004AFDF\252\002&Acme.Fulfillment" +
-      ".Domain.Fulfillment.V1\312\002&Acme\\Fulfillmen" +
-      "t\\Domain\\Fulfillment\\V1\342\0022Acme\\Fulfillme" +
-      "nt\\Domain\\Fulfillment\\V1\\GPBMetadata\352\002*A" +
-      "cme::Fulfillment::Domain::Fulfillment::V" +
-      "1b\006proto3"
+      "mmon.v1.MoneyH\001R\021customerPaidPrice\210\001\001\022/\n" +
+      "\021delivery_days_sla\030\007 \001(\005H\002R\017deliveryDays" +
+      "Sla\210\001\001B\036\n\034_selected_shipping_option_idB\026" +
+      "\n\024_customer_paid_priceB\024\n\022_delivery_days" +
+      "_sla\"\371\001\n CalculateShippingOptionsRespons" +
+      "e\022f\n\016recommendation\030\001 \001(\0132>.acme.fulfill" +
+      "ment.domain.fulfillment.v1.ShippingRecom" +
+      "mendationR\016recommendation\022P\n\007options\030\002 \003" +
+      "(\01326.acme.fulfillment.domain.fulfillment" +
+      ".v1.ShippingOptionR\007options\022\033\n\tcache_hit" +
+      "\030\003 \001(\010R\010cacheHit\"\212\002\n\025ShippingOptionsResu" +
+      "lt\022f\n\016recommendation\030\001 \001(\0132>.acme.fulfil" +
+      "lment.domain.fulfillment.v1.ShippingReco" +
+      "mmendationR\016recommendation\022P\n\007options\030\002 " +
+      "\003(\01326.acme.fulfillment.domain.fulfillmen" +
+      "t.v1.ShippingOptionR\007options\0227\n\tcached_a" +
+      "t\030\003 \001(\0132\032.google.protobuf.TimestampR\010cac" +
+      "hedAt\"\366\001\n\024ShippingOptionsCache\022c\n\007result" +
+      "s\030\001 \003(\0132I.acme.fulfillment.domain.fulfil" +
+      "lment.v1.ShippingOptionsCache.ResultsEnt" +
+      "ryR\007results\032y\n\014ResultsEntry\022\020\n\003key\030\001 \001(\t" +
+      "R\003key\022S\n\005value\030\002 \001(\0132=.acme.fulfillment." +
+      "domain.fulfillment.v1.ShippingOptionsRes" +
+      "ultR\005value:\0028\001\"\271\001\n\027GetShippingRatesReque" +
+      "st\022(\n\020from_easypost_id\030\001 \001(\tR\016fromEasypo" +
+      "stId\022$\n\016to_easypost_id\030\002 \001(\tR\014toEasypost" +
+      "Id\022N\n\005items\030\003 \003(\01328.acme.fulfillment.dom" +
+      "ain.fulfillment.v1.ShippingLineItemR\005ite" +
+      "ms\"\215\001\n\030GetShippingRatesResponse\022\037\n\013shipm" +
+      "ent_id\030\001 \001(\tR\nshipmentId\022P\n\007options\030\002 \003(" +
+      "\01326.acme.fulfillment.domain.fulfillment." +
+      "v1.ShippingOptionR\007options\"}\n\030BuildSyste" +
+      "mPromptRequest\022a\n\007request\030\001 \001(\0132G.acme.f" +
+      "ulfillment.domain.fulfillment.v1.Calcula" +
+      "teShippingOptionsRequestR\007request\"@\n\031Bui" +
+      "ldSystemPromptResponse\022#\n\rsystem_prompt\030" +
+      "\001 \001(\tR\014systemPrompt*\233\001\n\025RecommendationOu" +
+      "tcome\022&\n\"RECOMMENDATION_OUTCOME_UNSPECIF" +
+      "IED\020\000\022\013\n\007PROCEED\020\001\022\025\n\021CHEAPER_AVAILABLE\020" +
+      "\002\022\024\n\020FASTER_AVAILABLE\020\003\022\020\n\014MARGIN_SPIKE\020" +
+      "\004\022\016\n\nSLA_BREACH\020\005B\210\002\n5com.acme.proto.acm" +
+      "e.fulfillment.domain.fulfillment.v1B\022Shi" +
+      "ppingAgentProtoP\001\242\002\004AFDF\252\002&Acme.Fulfillm" +
+      "ent.Domain.Fulfillment.V1\312\002&Acme\\Fulfill" +
+      "ment\\Domain\\Fulfillment\\V1\342\0022Acme\\Fulfil" +
+      "lment\\Domain\\Fulfillment\\V1\\GPBMetadata\352" +
+      "\002*Acme::Fulfillment::Domain::Fulfillment" +
+      "::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -260,7 +260,7 @@ public final class ShippingAgentProto extends com.google.protobuf.GeneratedFile 
     internal_static_acme_fulfillment_domain_fulfillment_v1_CalculateShippingOptionsRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_CalculateShippingOptionsRequest_descriptor,
-        new java.lang.String[] { "OrderId", "CustomerId", "ToAddress", "Items", "SelectedShippingOptionId", "CustomerPaidPrice", "TransitDaysSla", });
+        new java.lang.String[] { "OrderId", "CustomerId", "ToAddress", "Items", "SelectedShippingOptionId", "CustomerPaidPrice", "DeliveryDaysSla", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_CalculateShippingOptionsResponse_descriptor =
       getDescriptor().getMessageType(7);
     internal_static_acme_fulfillment_domain_fulfillment_v1_CalculateShippingOptionsResponse_fieldAccessorTable = new

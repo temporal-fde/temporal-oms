@@ -119,7 +119,7 @@ class CalculateShippingOptionsRequest(BaseModel):
     items: typing.List[ShippingLineItem] = Field(default_factory=list)
     selected_shipping_option_id: typing.Optional[str] = Field(default="")
     customer_paid_price: typing.Optional[Money] = Field(default_factory=Money)
-    transit_days_sla: typing.Optional[int] = Field(default=0)
+    delivery_days_sla: typing.Optional[int] = Field(default=0)
 
 class CalculateShippingOptionsResponse(BaseModel):
     """

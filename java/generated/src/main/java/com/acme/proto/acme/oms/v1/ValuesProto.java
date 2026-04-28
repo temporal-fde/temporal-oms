@@ -51,17 +51,20 @@ public final class ValuesProto extends com.google.protobuf.GeneratedFile {
   static {
     java.lang.String[] descriptorData = {
       "\n\030acme/oms/v1/values.proto\022\013acme.oms.v1\032" +
-      "\033acme/common/v1/values.proto\"\217\001\n\005Order\022\031" +
+      "\033acme/common/v1/values.proto\"\361\001\n\005Order\022\031" +
       "\n\010order_id\030\001 \001(\tR\007orderId\022\'\n\005items\030\002 \003(\013" +
       "2\021.acme.oms.v1.ItemR\005items\022B\n\020shipping_a" +
       "ddress\030\003 \001(\0132\027.acme.common.v1.AddressR\017s" +
-      "hippingAddress\"J\n\007Payment\022\020\n\003rrn\030\001 \001(\tR\003" +
-      "rrn\022-\n\006amount\030\002 \001(\0132\025.acme.common.v1.Mon" +
-      "eyR\006amount\";\n\004Item\022\027\n\007item_id\030\001 \001(\tR\006ite" +
-      "mId\022\032\n\010quantity\030\002 \001(\005R\010quantityBw\n\032com.a" +
-      "cme.proto.acme.oms.v1B\013ValuesProtoP\001\242\002\003A" +
-      "OX\252\002\013Acme.Oms.V1\312\002\013Acme\\Oms\\V1\342\002\027Acme\\Om" +
-      "s\\V1\\GPBMetadata\352\002\rAcme::Oms::V1b\006proto3"
+      "hippingAddress\022J\n\021selected_shipment\030\004 \001(" +
+      "\0132\030.acme.common.v1.ShipmentH\000R\020selectedS" +
+      "hipment\210\001\001B\024\n\022_selected_shipment\"J\n\007Paym" +
+      "ent\022\020\n\003rrn\030\001 \001(\tR\003rrn\022-\n\006amount\030\002 \001(\0132\025." +
+      "acme.common.v1.MoneyR\006amount\";\n\004Item\022\027\n\007" +
+      "item_id\030\001 \001(\tR\006itemId\022\032\n\010quantity\030\002 \001(\005R" +
+      "\010quantityBw\n\032com.acme.proto.acme.oms.v1B" +
+      "\013ValuesProtoP\001\242\002\003AOX\252\002\013Acme.Oms.V1\312\002\013Acm" +
+      "e\\Oms\\V1\342\002\027Acme\\Oms\\V1\\GPBMetadata\352\002\rAcm" +
+      "e::Oms::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -73,7 +76,7 @@ public final class ValuesProto extends com.google.protobuf.GeneratedFile {
     internal_static_acme_oms_v1_Order_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_oms_v1_Order_descriptor,
-        new java.lang.String[] { "OrderId", "Items", "ShippingAddress", });
+        new java.lang.String[] { "OrderId", "Items", "ShippingAddress", "SelectedShipment", });
     internal_static_acme_oms_v1_Payment_descriptor =
       getDescriptor().getMessageType(1);
     internal_static_acme_oms_v1_Payment_fieldAccessorTable = new

@@ -111,10 +111,16 @@ public class OrderActivitiesImpl implements OrderActivities {
                 .setQuantity((int) (Math.random() * 10) + 1)
                 .build();
 
+        var selectedShipment = com.acme.proto.acme.apps.api.orders.v1.SelectedShipment.newBuilder()
+                .setPaidPriceCents(1)
+                .setCurrency("USD")
+                .build();
+
         var order = Order.newBuilder()
                 .setOrderId(orderId)
                 .addItems(item)
                 .setShippingAddress(shippingAddress)
+                .setSelectedShipment(selectedShipment)
                 .build();
 
         var req = SubmitOrderRequest.newBuilder()

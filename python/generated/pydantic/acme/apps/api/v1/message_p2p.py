@@ -20,10 +20,21 @@ class ShippingAddress(BaseModel):
     postal_code: str = Field(default="")
     country: str = Field(default="")
 
+class SelectedShipment(BaseModel):
+    """
+     SelectedShipment carries the customer's checkout selection for margin and SLA reasoning.
+    """
+
+    paid_price_cents: int = Field(default=0)# customer's paid price in minor currency units
+    currency: str = Field(default="")# ISO 4217; defaults to USD if empty
+    delivery_days: typing.Optional[int] = Field(default=0)# agreed transit days (SLA)
+    rate_id: str = Field(default="")# EasyPost rate ID of the selected option
+
 class Order(BaseModel):
     order_id: str = Field(default="")
     items: typing.List[Item] = Field(default_factory=list)
     shipping_address: ShippingAddress = Field(default_factory=ShippingAddress)
+    selected_shipment: typing.Optional[SelectedShipment] = Field(default_factory=SelectedShipment)
 
 class SubmitOrderRequest(BaseModel):
     """

@@ -15,6 +15,15 @@ message Order {
   string order_id = 1;
   repeated Item items = 2;
   ShippingAddress shipping_address = 3;
+  optional SelectedShipment selected_shipment = 4;
+}
+
+// SelectedShipment carries the customer's checkout selection for margin and SLA reasoning.
+message SelectedShipment {
+  int64 paid_price_cents = 1;  // customer's paid price in minor currency units
+  string currency = 2;          // ISO 4217; defaults to USD if empty
+  optional int32 delivery_days = 3;  // agreed transit days (SLA)
+  string rate_id = 4;           // EasyPost rate ID of the selected option
 }
 
 message ShippingAddress {

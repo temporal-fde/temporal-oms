@@ -49,14 +49,14 @@ private static final long serialVersionUID = 0L;
   }
 
   private int bitField0_;
-  public static final int EASYPOST_FIELD_NUMBER = 7;
+  public static final int EASYPOST_FIELD_NUMBER = 1;
   private com.acme.proto.acme.common.v1.EasyPostAddress easypost_;
   /**
    * <pre>
    * populated after EasyPost verification
    * </pre>
    *
-   * <code>optional .acme.common.v1.EasyPostAddress easypost = 7 [json_name = "easypost"];</code>
+   * <code>optional .acme.common.v1.EasyPostAddress easypost = 1 [json_name = "easypost"];</code>
    * @return Whether the easypost field is set.
    */
   @java.lang.Override
@@ -68,7 +68,7 @@ private static final long serialVersionUID = 0L;
    * populated after EasyPost verification
    * </pre>
    *
-   * <code>optional .acme.common.v1.EasyPostAddress easypost = 7 [json_name = "easypost"];</code>
+   * <code>optional .acme.common.v1.EasyPostAddress easypost = 1 [json_name = "easypost"];</code>
    * @return The easypost.
    */
   @java.lang.Override
@@ -80,7 +80,7 @@ private static final long serialVersionUID = 0L;
    * populated after EasyPost verification
    * </pre>
    *
-   * <code>optional .acme.common.v1.EasyPostAddress easypost = 7 [json_name = "easypost"];</code>
+   * <code>optional .acme.common.v1.EasyPostAddress easypost = 1 [json_name = "easypost"];</code>
    */
   @java.lang.Override
   public com.acme.proto.acme.common.v1.EasyPostAddressOrBuilder getEasypostOrBuilder() {
@@ -102,7 +102,7 @@ private static final long serialVersionUID = 0L;
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
     if (((bitField0_ & 0x00000001) != 0)) {
-      output.writeMessage(7, getEasypost());
+      output.writeMessage(1, getEasypost());
     }
     getUnknownFields().writeTo(output);
   }
@@ -115,7 +115,7 @@ private static final long serialVersionUID = 0L;
     size = 0;
     if (((bitField0_ & 0x00000001) != 0)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(7, getEasypost());
+        .computeMessageSize(1, getEasypost());
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -378,13 +378,13 @@ private static final long serialVersionUID = 0L;
             case 0:
               done = true;
               break;
-            case 58: {
+            case 10: {
               input.readMessage(
                   internalGetEasypostFieldBuilder().getBuilder(),
                   extensionRegistry);
               bitField0_ |= 0x00000001;
               break;
-            } // case 58
+            } // case 10
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -410,7 +410,7 @@ private static final long serialVersionUID = 0L;
      * populated after EasyPost verification
      * </pre>
      *
-     * <code>optional .acme.common.v1.EasyPostAddress easypost = 7 [json_name = "easypost"];</code>
+     * <code>optional .acme.common.v1.EasyPostAddress easypost = 1 [json_name = "easypost"];</code>
      * @return Whether the easypost field is set.
      */
     public boolean hasEasypost() {
@@ -421,7 +421,7 @@ private static final long serialVersionUID = 0L;
      * populated after EasyPost verification
      * </pre>
      *
-     * <code>optional .acme.common.v1.EasyPostAddress easypost = 7 [json_name = "easypost"];</code>
+     * <code>optional .acme.common.v1.EasyPostAddress easypost = 1 [json_name = "easypost"];</code>
      * @return The easypost.
      */
     public com.acme.proto.acme.common.v1.EasyPostAddress getEasypost() {
@@ -436,7 +436,7 @@ private static final long serialVersionUID = 0L;
      * populated after EasyPost verification
      * </pre>
      *
-     * <code>optional .acme.common.v1.EasyPostAddress easypost = 7 [json_name = "easypost"];</code>
+     * <code>optional .acme.common.v1.EasyPostAddress easypost = 1 [json_name = "easypost"];</code>
      */
     public Builder setEasypost(com.acme.proto.acme.common.v1.EasyPostAddress value) {
       if (easypostBuilder_ == null) {
@@ -456,7 +456,7 @@ private static final long serialVersionUID = 0L;
      * populated after EasyPost verification
      * </pre>
      *
-     * <code>optional .acme.common.v1.EasyPostAddress easypost = 7 [json_name = "easypost"];</code>
+     * <code>optional .acme.common.v1.EasyPostAddress easypost = 1 [json_name = "easypost"];</code>
      */
     public Builder setEasypost(
         com.acme.proto.acme.common.v1.EasyPostAddress.Builder builderForValue) {
@@ -474,7 +474,7 @@ private static final long serialVersionUID = 0L;
      * populated after EasyPost verification
      * </pre>
      *
-     * <code>optional .acme.common.v1.EasyPostAddress easypost = 7 [json_name = "easypost"];</code>
+     * <code>optional .acme.common.v1.EasyPostAddress easypost = 1 [json_name = "easypost"];</code>
      */
     public Builder mergeEasypost(com.acme.proto.acme.common.v1.EasyPostAddress value) {
       if (easypostBuilder_ == null) {
@@ -499,7 +499,7 @@ private static final long serialVersionUID = 0L;
      * populated after EasyPost verification
      * </pre>
      *
-     * <code>optional .acme.common.v1.EasyPostAddress easypost = 7 [json_name = "easypost"];</code>
+     * <code>optional .acme.common.v1.EasyPostAddress easypost = 1 [json_name = "easypost"];</code>
      */
     public Builder clearEasypost() {
       bitField0_ = (bitField0_ & ~0x00000001);
@@ -516,7 +516,7 @@ private static final long serialVersionUID = 0L;
      * populated after EasyPost verification
      * </pre>
      *
-     * <code>optional .acme.common.v1.EasyPostAddress easypost = 7 [json_name = "easypost"];</code>
+     * <code>optional .acme.common.v1.EasyPostAddress easypost = 1 [json_name = "easypost"];</code>
      */
     public com.acme.proto.acme.common.v1.EasyPostAddress.Builder getEasypostBuilder() {
       bitField0_ |= 0x00000001;
@@ -528,7 +528,7 @@ private static final long serialVersionUID = 0L;
      * populated after EasyPost verification
      * </pre>
      *
-     * <code>optional .acme.common.v1.EasyPostAddress easypost = 7 [json_name = "easypost"];</code>
+     * <code>optional .acme.common.v1.EasyPostAddress easypost = 1 [json_name = "easypost"];</code>
      */
     public com.acme.proto.acme.common.v1.EasyPostAddressOrBuilder getEasypostOrBuilder() {
       if (easypostBuilder_ != null) {
@@ -543,7 +543,7 @@ private static final long serialVersionUID = 0L;
      * populated after EasyPost verification
      * </pre>
      *
-     * <code>optional .acme.common.v1.EasyPostAddress easypost = 7 [json_name = "easypost"];</code>
+     * <code>optional .acme.common.v1.EasyPostAddress easypost = 1 [json_name = "easypost"];</code>
      */
     private com.google.protobuf.SingleFieldBuilder<
         com.acme.proto.acme.common.v1.EasyPostAddress, com.acme.proto.acme.common.v1.EasyPostAddress.Builder, com.acme.proto.acme.common.v1.EasyPostAddressOrBuilder> 

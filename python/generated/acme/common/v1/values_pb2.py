@@ -25,7 +25,7 @@ _sym_db = _symbol_database.Default()
 from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1b\x61\x63me/common/v1/values.proto\x12\x0e\x61\x63me.common.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"9\n\x05Money\x12\x1a\n\x08\x63urrency\x18\x01 \x01(\tR\x08\x63urrency\x12\x14\n\x05units\x18\x02 \x01(\x03R\x05units\"\xe8\x02\n\x0f\x45\x61syPostAddress\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\x12\x18\n\x07street1\x18\x02 \x01(\tR\x07street1\x12\x18\n\x07street2\x18\x03 \x01(\tR\x07street2\x12\x12\n\x04\x63ity\x18\x04 \x01(\tR\x04\x63ity\x12\x14\n\x05state\x18\x05 \x01(\tR\x05state\x12\x10\n\x03zip\x18\x06 \x01(\tR\x03zip\x12\x18\n\x07\x63ountry\x18\x07 \x01(\tR\x07\x63ountry\x12%\n\x0bresidential\x18\x08 \x01(\x08H\x00R\x0bresidential\x88\x01\x01\x12?\n\ncoordinate\x18\t \x01(\x0b\x32\x1a.acme.common.v1.CoordinateH\x01R\ncoordinate\x88\x01\x01\x12\x1a\n\x08timezone\x18\n \x01(\tR\x08timezone\x12\x18\n\x07\x63ompany\x18\x0b \x01(\tR\x07\x63ompanyB\x0e\n\x0c_residentialB\r\n\x0b_coordinate\"X\n\x07\x41\x64\x64ress\x12@\n\x08\x65\x61sypost\x18\x07 \x01(\x0b\x32\x1f.acme.common.v1.EasyPostAddressH\x00R\x08\x65\x61sypost\x88\x01\x01\x42\x0b\n\t_easypost\"k\n\tTimeRange\x12\x30\n\x05start\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\x05start\x12,\n\x03\x65nd\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\x03\x65nd\"H\n\nPagination\x12\x1b\n\tpage_size\x18\x01 \x01(\x05R\x08pageSize\x12\x1d\n\npage_token\x18\x02 \x01(\tR\tpageToken\"\xc1\x01\n\x0c\x45rrorDetails\x12\x12\n\x04\x63ode\x18\x01 \x01(\tR\x04\x63ode\x12\x18\n\x07message\x18\x02 \x01(\tR\x07message\x12\x46\n\x08metadata\x18\x03 \x03(\x0b\x32*.acme.common.v1.ErrorDetails.MetadataEntryR\x08metadata\x1a;\n\rMetadataEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"F\n\nCoordinate\x12\x1a\n\x08latitude\x18\x01 \x01(\x01R\x08latitude\x12\x1c\n\tlongitude\x18\x02 \x01(\x01R\tlongitudeB\x86\x01\n\x1d\x63om.acme.proto.acme.common.v1B\x0bValuesProtoP\x01\xa2\x02\x03\x41\x43X\xaa\x02\x0e\x41\x63me.Common.V1\xca\x02\x0e\x41\x63me\\Common\\V1\xe2\x02\x1a\x41\x63me\\Common\\V1\\GPBMetadata\xea\x02\x10\x41\x63me::Common::V1b\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1b\x61\x63me/common/v1/values.proto\x12\x0e\x61\x63me.common.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"9\n\x05Money\x12\x1a\n\x08\x63urrency\x18\x01 \x01(\tR\x08\x63urrency\x12\x14\n\x05units\x18\x02 \x01(\x03R\x05units\"\xe8\x02\n\x0f\x45\x61syPostAddress\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\x12\x18\n\x07street1\x18\x02 \x01(\tR\x07street1\x12\x18\n\x07street2\x18\x03 \x01(\tR\x07street2\x12\x12\n\x04\x63ity\x18\x04 \x01(\tR\x04\x63ity\x12\x14\n\x05state\x18\x05 \x01(\tR\x05state\x12\x10\n\x03zip\x18\x06 \x01(\tR\x03zip\x12\x18\n\x07\x63ountry\x18\x07 \x01(\tR\x07\x63ountry\x12%\n\x0bresidential\x18\x08 \x01(\x08H\x00R\x0bresidential\x88\x01\x01\x12?\n\ncoordinate\x18\t \x01(\x0b\x32\x1a.acme.common.v1.CoordinateH\x01R\ncoordinate\x88\x01\x01\x12\x1a\n\x08timezone\x18\n \x01(\tR\x08timezone\x12\x18\n\x07\x63ompany\x18\x0b \x01(\tR\x07\x63ompanyB\x0e\n\x0c_residentialB\r\n\x0b_coordinate\"\xf5\x01\n\x0c\x45\x61syPostRate\x12\x17\n\x07rate_id\x18\x01 \x01(\tR\x06rateId\x12(\n\rdelivery_days\x18\x02 \x01(\x03H\x00R\x0c\x64\x65liveryDays\x88\x01\x01\x12\x44\n\rdelivery_date\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.TimestampH\x01R\x0c\x64\x65liveryDate\x88\x01\x01\x12\x38\n\x18\x64\x65livery_date_guaranteed\x18\x04 \x01(\x08R\x16\x64\x65liveryDateGuaranteedB\x10\n\x0e_delivery_daysB\x10\n\x0e_delivery_date\"v\n\x10\x45\x61syPostShipment\x12\x1f\n\x0bshipment_id\x18\x01 \x01(\tR\nshipmentId\x12\x41\n\rselected_rate\x18\x02 \x01(\x0b\x32\x1c.acme.common.v1.EasyPostRateR\x0cselectedRate\"X\n\x07\x41\x64\x64ress\x12@\n\x08\x65\x61sypost\x18\x01 \x01(\x0b\x32\x1f.acme.common.v1.EasyPostAddressH\x00R\x08\x65\x61sypost\x88\x01\x01\x42\x0b\n\t_easypost\"\xfc\x01\n\x08Shipment\x12\x41\n\x08\x65\x61sypost\x18\x01 \x01(\x0b\x32 .acme.common.v1.EasyPostShipmentH\x00R\x08\x65\x61sypost\x88\x01\x01\x12\x39\n\npaid_price\x18\x02 \x01(\x0b\x32\x15.acme.common.v1.MoneyH\x01R\tpaidPrice\x88\x01\x01\x12\x44\n\rdelivery_date\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.TimestampH\x02R\x0c\x64\x65liveryDate\x88\x01\x01\x42\x0b\n\t_easypostB\r\n\x0b_paid_priceB\x10\n\x0e_delivery_date\"k\n\tTimeRange\x12\x30\n\x05start\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\x05start\x12,\n\x03\x65nd\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\x03\x65nd\"H\n\nPagination\x12\x1b\n\tpage_size\x18\x01 \x01(\x05R\x08pageSize\x12\x1d\n\npage_token\x18\x02 \x01(\tR\tpageToken\"\xc1\x01\n\x0c\x45rrorDetails\x12\x12\n\x04\x63ode\x18\x01 \x01(\tR\x04\x63ode\x12\x18\n\x07message\x18\x02 \x01(\tR\x07message\x12\x46\n\x08metadata\x18\x03 \x03(\x0b\x32*.acme.common.v1.ErrorDetails.MetadataEntryR\x08metadata\x1a;\n\rMetadataEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"F\n\nCoordinate\x12\x1a\n\x08latitude\x18\x01 \x01(\x01R\x08latitude\x12\x1c\n\tlongitude\x18\x02 \x01(\x01R\tlongitudeB\x86\x01\n\x1d\x63om.acme.proto.acme.common.v1B\x0bValuesProtoP\x01\xa2\x02\x03\x41\x43X\xaa\x02\x0e\x41\x63me.Common.V1\xca\x02\x0e\x41\x63me\\Common\\V1\xe2\x02\x1a\x41\x63me\\Common\\V1\\GPBMetadata\xea\x02\x10\x41\x63me::Common::V1b\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -39,16 +39,22 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_MONEY']._serialized_end=137
   _globals['_EASYPOSTADDRESS']._serialized_start=140
   _globals['_EASYPOSTADDRESS']._serialized_end=500
-  _globals['_ADDRESS']._serialized_start=502
-  _globals['_ADDRESS']._serialized_end=590
-  _globals['_TIMERANGE']._serialized_start=592
-  _globals['_TIMERANGE']._serialized_end=699
-  _globals['_PAGINATION']._serialized_start=701
-  _globals['_PAGINATION']._serialized_end=773
-  _globals['_ERRORDETAILS']._serialized_start=776
-  _globals['_ERRORDETAILS']._serialized_end=969
-  _globals['_ERRORDETAILS_METADATAENTRY']._serialized_start=910
-  _globals['_ERRORDETAILS_METADATAENTRY']._serialized_end=969
-  _globals['_COORDINATE']._serialized_start=971
-  _globals['_COORDINATE']._serialized_end=1041
+  _globals['_EASYPOSTRATE']._serialized_start=503
+  _globals['_EASYPOSTRATE']._serialized_end=748
+  _globals['_EASYPOSTSHIPMENT']._serialized_start=750
+  _globals['_EASYPOSTSHIPMENT']._serialized_end=868
+  _globals['_ADDRESS']._serialized_start=870
+  _globals['_ADDRESS']._serialized_end=958
+  _globals['_SHIPMENT']._serialized_start=961
+  _globals['_SHIPMENT']._serialized_end=1213
+  _globals['_TIMERANGE']._serialized_start=1215
+  _globals['_TIMERANGE']._serialized_end=1322
+  _globals['_PAGINATION']._serialized_start=1324
+  _globals['_PAGINATION']._serialized_end=1396
+  _globals['_ERRORDETAILS']._serialized_start=1399
+  _globals['_ERRORDETAILS']._serialized_end=1592
+  _globals['_ERRORDETAILS_METADATAENTRY']._serialized_start=1533
+  _globals['_ERRORDETAILS_METADATAENTRY']._serialized_end=1592
+  _globals['_COORDINATE']._serialized_start=1594
+  _globals['_COORDINATE']._serialized_end=1664
 # @@protoc_insertion_point(module_scope)

@@ -32,8 +32,9 @@ import java.util.List;
  */
 public class OrderImpl implements Order {
 
-    // margin_leak registered in fulfillment namespace as --type Int (maps to Long in Java SDK)
-    private static final SearchAttributeKey<Long> MARGIN_LEAK = SearchAttributeKey.forLong("margin_leak");
+    // margin_leak / sla_breach_days registered in fulfillment namespace as --type Int (maps to Long in Java SDK)
+    private static final SearchAttributeKey<Long> MARGIN_LEAK     = SearchAttributeKey.forLong("margin_leak");
+    private static final SearchAttributeKey<Long> SLA_BREACH_DAYS = SearchAttributeKey.forLong("sla_breach_days");
     private static final long DEFAULT_FULFILLMENT_TIMEOUT_SECS = 86_400L; // 24 hours
 
     private final Carriers carriers;
@@ -224,21 +225,33 @@ public class OrderImpl implements Order {
                 : state.getArgs().getSelectedShipping().getOptionId();
 
         // Get AI-driven shipping recommendation via ShippingAgent Nexus operation (UpdateWithStart)
-        var shippingResponse = shippingAgent.calculateShippingOptions(
-                CalculateShippingOptionsRequest.newBuilder()
+        var shippingRequestBuilder = CalculateShippingOptionsRequest.newBuilder()
                         .setOrderId(orderId)
                         .setCustomerId(request.getProcessedOrder().getCustomerId())
                         .setToAddress(state.getValidatedAddress())
                         .addAllItems(convertToShippingLineItems(request.getProcessedOrder()))
                         .setSelectedShippingOptionId(selectedOptionId)
-                        .setCustomerPaidPrice(state.getArgs().getSelectedShipping().getPrice())
-                        .build());
+                        .setCustomerPaidPrice(state.getArgs().getSelectedShipping().getPrice());
+
+        if (state.getArgs().getSelectedShipping().hasDeliveryDays()) {
+            shippingRequestBuilder.setDeliveryDaysSla(state.getArgs().getSelectedShipping().getDeliveryDays());
+        }
+
+        var shippingResponse = shippingAgent.calculateShippingOptions(shippingRequestBuilder.build());
 
         // Apply recommendation: select rate and compute margin delta
         var selection = applyRecommendation(shippingResponse, state.getOptions().getShippingMargin());
 
         if (selection.getMarginDeltaCents() > 0) {
             Workflow.upsertTypedSearchAttributes(MARGIN_LEAK.valueSet(selection.getMarginDeltaCents()));
+        }
+
+        if (shippingResponse.getRecommendation().getOutcome() == RecommendationOutcome.SLA_BREACH
+                && state.getArgs().getSelectedShipping().hasDeliveryDays()) {
+            int promisedDays = state.getArgs().getSelectedShipping().getDeliveryDays();
+            int actualDays   = findOption(shippingResponse, selection.getOptionId()).getEstimatedDays();
+            long breachDays  = Math.max(0L, (long)(actualDays - promisedDays));
+            Workflow.upsertTypedSearchAttributes(SLA_BREACH_DAYS.valueSet(breachDays));
         }
 
         this.state = this.state.toBuilder().setShippingSelection(selection).build();
@@ -320,17 +333,23 @@ public class OrderImpl implements Order {
     }
 
     private ShippingSelection applyRecommendation(CalculateShippingOptionsResponse response, Money shippingMargin) {
-        var rec = response.getRecommendation();
+        var rec    = response.getRecommendation();
         var option = findOption(response, rec.getRecommendedOptionId());
         long delta = Math.max(0L, option.getCost().getUnits() - shippingMargin.getUnits());
-        return ShippingSelection.newBuilder()
+        boolean isFallback = rec.getOutcome() == RecommendationOutcome.MARGIN_SPIKE
+                          || rec.getOutcome() == RecommendationOutcome.SLA_BREACH;
+        var builder = ShippingSelection.newBuilder()
                 .setOptionId(rec.getRecommendedOptionId())
                 .setRateId(option.getRateId())
                 .setCarrier(option.getCarrier())
                 .setServiceLevel(option.getServiceLevel())
                 .setActualPrice(option.getCost())
                 .setMarginDeltaCents(delta)
-                .build();
+                .setIsFallback(isFallback);
+        if (isFallback) {
+            builder.setFallbackReason(rec.getOutcome().name() + ": " + rec.getReasoning());
+        }
+        return builder.build();
     }
 
     private List<ShippingLineItem> convertToShippingLineItems(ProcessedOrder processedOrder) {

@@ -149,6 +149,7 @@ class SelectedShippingOption(BaseModel):
     option_id: str = Field(default="")
     price: Money = Field(default_factory=Money)
     expected_ship_date: datetime = Field(default_factory=datetime.now)
+    delivery_days: typing.Optional[int] = Field(default=0)
 
 class FulfillmentItem(BaseModel):
     """

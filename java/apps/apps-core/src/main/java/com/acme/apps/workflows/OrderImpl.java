@@ -120,21 +120,41 @@ public class OrderImpl implements Order {
             return;
         }
 
-        var fulfillmentStartRequest = StartOrderFulfillmentRequest.newBuilder()
+        var order = this.state.getProcessOrder().getOrder();
+        var fulfillmentStartBuilder = StartOrderFulfillmentRequest.newBuilder()
                 .setOrderId(this.state.getArgs().getOrderId())
                 .setCustomerId(this.state.getArgs().getCustomerId())
                 .setPlacedOrder(PlacedOrder.newBuilder()
                         .setOrderId(this.state.getArgs().getOrderId())
                         .setCustomerId(this.state.getArgs().getCustomerId())
-                        .addAllItems(this.state.getProcessOrder().getOrder().getItemsList().stream()
+                        .addAllItems(order.getItemsList().stream()
                                 .map(item -> FulfillmentItem.newBuilder()
                                         .setItemId(item.getItemId())
                                         .setQuantity(item.getQuantity())
                                         .build())
                                 .toList())
-                        .setShippingAddress(this.state.getProcessOrder().getOrder().getShippingAddress())
-                        .build())
-                .build();
+                        .setShippingAddress(order.getShippingAddress())
+                        .build());
+
+        if (order.hasSelectedShipment()) {
+            var s = order.getSelectedShipment();
+            var selectedShipping = SelectedShippingOption.newBuilder();
+            if (s.hasPaidPrice()) {
+                selectedShipping.setPrice(s.getPaidPrice());
+            }
+            if (s.hasEasypost()) {
+                var rate = s.getEasypost().getSelectedRate();
+                if (!rate.getRateId().isBlank()) {
+                    selectedShipping.setOptionId(rate.getRateId());
+                }
+                if (rate.hasDeliveryDays()) {
+                    selectedShipping.setDeliveryDays((int) rate.getDeliveryDays());
+                }
+            }
+            fulfillmentStartBuilder.setSelectedShipping(selectedShipping.build());
+        }
+
+        var fulfillmentStartRequest = fulfillmentStartBuilder.build();
 
         // Launch validateOrder Nexus (starts fulfillment.Order + verifies address) concurrently with processOrder
         var validatePromise = Async.function(this.fulfillment::validateOrder, fulfillmentStartRequest);

@@ -22,10 +22,24 @@ class Order(_message.Message):
     ORDER_ID_FIELD_NUMBER: _ClassVar[int]
     ITEMS_FIELD_NUMBER: _ClassVar[int]
     SHIPPING_ADDRESS_FIELD_NUMBER: _ClassVar[int]
+    SELECTED_SHIPMENT_FIELD_NUMBER: _ClassVar[int]
     order_id: str
     items: _containers.RepeatedCompositeFieldContainer[Item]
     shipping_address: ShippingAddress
-    def __init__(self, order_id: _Optional[str] = ..., items: _Optional[_Iterable[_Union[Item, _Mapping]]] = ..., shipping_address: _Optional[_Union[ShippingAddress, _Mapping]] = ...) -> None: ...
+    selected_shipment: SelectedShipment
+    def __init__(self, order_id: _Optional[str] = ..., items: _Optional[_Iterable[_Union[Item, _Mapping]]] = ..., shipping_address: _Optional[_Union[ShippingAddress, _Mapping]] = ..., selected_shipment: _Optional[_Union[SelectedShipment, _Mapping]] = ...) -> None: ...
+
+class SelectedShipment(_message.Message):
+    __slots__ = ()
+    PAID_PRICE_CENTS_FIELD_NUMBER: _ClassVar[int]
+    CURRENCY_FIELD_NUMBER: _ClassVar[int]
+    DELIVERY_DAYS_FIELD_NUMBER: _ClassVar[int]
+    RATE_ID_FIELD_NUMBER: _ClassVar[int]
+    paid_price_cents: int
+    currency: str
+    delivery_days: int
+    rate_id: str
+    def __init__(self, paid_price_cents: _Optional[int] = ..., currency: _Optional[str] = ..., delivery_days: _Optional[int] = ..., rate_id: _Optional[str] = ...) -> None: ...
 
 class ShippingAddress(_message.Message):
     __slots__ = ()

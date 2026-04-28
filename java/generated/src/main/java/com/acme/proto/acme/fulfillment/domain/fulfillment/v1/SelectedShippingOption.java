@@ -146,6 +146,25 @@ private static final long serialVersionUID = 0L;
     return expectedShipDate_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : expectedShipDate_;
   }
 
+  public static final int DELIVERY_DAYS_FIELD_NUMBER = 4;
+  private int deliveryDays_ = 0;
+  /**
+   * <code>optional int32 delivery_days = 4 [json_name = "deliveryDays"];</code>
+   * @return Whether the deliveryDays field is set.
+   */
+  @java.lang.Override
+  public boolean hasDeliveryDays() {
+    return ((bitField0_ & 0x00000004) != 0);
+  }
+  /**
+   * <code>optional int32 delivery_days = 4 [json_name = "deliveryDays"];</code>
+   * @return The deliveryDays.
+   */
+  @java.lang.Override
+  public int getDeliveryDays() {
+    return deliveryDays_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -169,6 +188,9 @@ private static final long serialVersionUID = 0L;
     if (((bitField0_ & 0x00000002) != 0)) {
       output.writeMessage(3, getExpectedShipDate());
     }
+    if (((bitField0_ & 0x00000004) != 0)) {
+      output.writeInt32(4, deliveryDays_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -188,6 +210,10 @@ private static final long serialVersionUID = 0L;
     if (((bitField0_ & 0x00000002) != 0)) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(3, getExpectedShipDate());
+    }
+    if (((bitField0_ & 0x00000004) != 0)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(4, deliveryDays_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -216,6 +242,11 @@ private static final long serialVersionUID = 0L;
       if (!getExpectedShipDate()
           .equals(other.getExpectedShipDate())) return false;
     }
+    if (hasDeliveryDays() != other.hasDeliveryDays()) return false;
+    if (hasDeliveryDays()) {
+      if (getDeliveryDays()
+          != other.getDeliveryDays()) return false;
+    }
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -236,6 +267,10 @@ private static final long serialVersionUID = 0L;
     if (hasExpectedShipDate()) {
       hash = (37 * hash) + EXPECTED_SHIP_DATE_FIELD_NUMBER;
       hash = (53 * hash) + getExpectedShipDate().hashCode();
+    }
+    if (hasDeliveryDays()) {
+      hash = (37 * hash) + DELIVERY_DAYS_FIELD_NUMBER;
+      hash = (53 * hash) + getDeliveryDays();
     }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
@@ -391,6 +426,7 @@ private static final long serialVersionUID = 0L;
         expectedShipDateBuilder_.dispose();
         expectedShipDateBuilder_ = null;
       }
+      deliveryDays_ = 0;
       return this;
     }
 
@@ -440,6 +476,10 @@ private static final long serialVersionUID = 0L;
             : expectedShipDateBuilder_.build();
         to_bitField0_ |= 0x00000002;
       }
+      if (((from_bitField0_ & 0x00000008) != 0)) {
+        result.deliveryDays_ = deliveryDays_;
+        to_bitField0_ |= 0x00000004;
+      }
       result.bitField0_ |= to_bitField0_;
     }
 
@@ -465,6 +505,9 @@ private static final long serialVersionUID = 0L;
       }
       if (other.hasExpectedShipDate()) {
         mergeExpectedShipDate(other.getExpectedShipDate());
+      }
+      if (other.hasDeliveryDays()) {
+        setDeliveryDays(other.getDeliveryDays());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -511,6 +554,11 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000004;
               break;
             } // case 26
+            case 32: {
+              deliveryDays_ = input.readInt32();
+              bitField0_ |= 0x00000008;
+              break;
+            } // case 32
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -840,6 +888,46 @@ private static final long serialVersionUID = 0L;
         expectedShipDate_ = null;
       }
       return expectedShipDateBuilder_;
+    }
+
+    private int deliveryDays_ ;
+    /**
+     * <code>optional int32 delivery_days = 4 [json_name = "deliveryDays"];</code>
+     * @return Whether the deliveryDays field is set.
+     */
+    @java.lang.Override
+    public boolean hasDeliveryDays() {
+      return ((bitField0_ & 0x00000008) != 0);
+    }
+    /**
+     * <code>optional int32 delivery_days = 4 [json_name = "deliveryDays"];</code>
+     * @return The deliveryDays.
+     */
+    @java.lang.Override
+    public int getDeliveryDays() {
+      return deliveryDays_;
+    }
+    /**
+     * <code>optional int32 delivery_days = 4 [json_name = "deliveryDays"];</code>
+     * @param value The deliveryDays to set.
+     * @return This builder for chaining.
+     */
+    public Builder setDeliveryDays(int value) {
+
+      deliveryDays_ = value;
+      bitField0_ |= 0x00000008;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional int32 delivery_days = 4 [json_name = "deliveryDays"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearDeliveryDays() {
+      bitField0_ = (bitField0_ & ~0x00000008);
+      deliveryDays_ = 0;
+      onChanged();
+      return this;
     }
 
     // @@protoc_insertion_point(builder_scope:acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption)

@@ -60,4 +60,19 @@ public interface OrderOrBuilder extends
    * <code>.acme.common.v1.Address shipping_address = 3 [json_name = "shippingAddress"];</code>
    */
   com.acme.proto.acme.common.v1.AddressOrBuilder getShippingAddressOrBuilder();
+
+  /**
+   * <code>optional .acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+   * @return Whether the selectedShipment field is set.
+   */
+  boolean hasSelectedShipment();
+  /**
+   * <code>optional .acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+   * @return The selectedShipment.
+   */
+  com.acme.proto.acme.common.v1.Shipment getSelectedShipment();
+  /**
+   * <code>optional .acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+   */
+  com.acme.proto.acme.common.v1.ShipmentOrBuilder getSelectedShipmentOrBuilder();
 }

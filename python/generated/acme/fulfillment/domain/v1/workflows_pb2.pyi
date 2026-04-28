@@ -231,10 +231,12 @@ class SelectedShippingOption(_message.Message):
     OPTION_ID_FIELD_NUMBER: _ClassVar[int]
     PRICE_FIELD_NUMBER: _ClassVar[int]
     EXPECTED_SHIP_DATE_FIELD_NUMBER: _ClassVar[int]
+    DELIVERY_DAYS_FIELD_NUMBER: _ClassVar[int]
     option_id: str
     price: _values_pb2.Money
     expected_ship_date: _timestamp_pb2.Timestamp
-    def __init__(self, option_id: _Optional[str] = ..., price: _Optional[_Union[_values_pb2.Money, _Mapping]] = ..., expected_ship_date: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
+    delivery_days: int
+    def __init__(self, option_id: _Optional[str] = ..., price: _Optional[_Union[_values_pb2.Money, _Mapping]] = ..., expected_ship_date: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., delivery_days: _Optional[int] = ...) -> None: ...
 
 class ValidateOrderRequest(_message.Message):
     __slots__ = ()

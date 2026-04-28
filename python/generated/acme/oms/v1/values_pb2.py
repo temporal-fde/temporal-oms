@@ -25,7 +25,7 @@ _sym_db = _symbol_database.Default()
 from acme.common.v1 import values_pb2 as acme_dot_common_dot_v1_dot_values__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x18\x61\x63me/oms/v1/values.proto\x12\x0b\x61\x63me.oms.v1\x1a\x1b\x61\x63me/common/v1/values.proto\"\x8f\x01\n\x05Order\x12\x19\n\x08order_id\x18\x01 \x01(\tR\x07orderId\x12\'\n\x05items\x18\x02 \x03(\x0b\x32\x11.acme.oms.v1.ItemR\x05items\x12\x42\n\x10shipping_address\x18\x03 \x01(\x0b\x32\x17.acme.common.v1.AddressR\x0fshippingAddress\"J\n\x07Payment\x12\x10\n\x03rrn\x18\x01 \x01(\tR\x03rrn\x12-\n\x06\x61mount\x18\x02 \x01(\x0b\x32\x15.acme.common.v1.MoneyR\x06\x61mount\";\n\x04Item\x12\x17\n\x07item_id\x18\x01 \x01(\tR\x06itemId\x12\x1a\n\x08quantity\x18\x02 \x01(\x05R\x08quantityBw\n\x1a\x63om.acme.proto.acme.oms.v1B\x0bValuesProtoP\x01\xa2\x02\x03\x41OX\xaa\x02\x0b\x41\x63me.Oms.V1\xca\x02\x0b\x41\x63me\\Oms\\V1\xe2\x02\x17\x41\x63me\\Oms\\V1\\GPBMetadata\xea\x02\rAcme::Oms::V1b\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x18\x61\x63me/oms/v1/values.proto\x12\x0b\x61\x63me.oms.v1\x1a\x1b\x61\x63me/common/v1/values.proto\"\xf1\x01\n\x05Order\x12\x19\n\x08order_id\x18\x01 \x01(\tR\x07orderId\x12\'\n\x05items\x18\x02 \x03(\x0b\x32\x11.acme.oms.v1.ItemR\x05items\x12\x42\n\x10shipping_address\x18\x03 \x01(\x0b\x32\x17.acme.common.v1.AddressR\x0fshippingAddress\x12J\n\x11selected_shipment\x18\x04 \x01(\x0b\x32\x18.acme.common.v1.ShipmentH\x00R\x10selectedShipment\x88\x01\x01\x42\x14\n\x12_selected_shipment\"J\n\x07Payment\x12\x10\n\x03rrn\x18\x01 \x01(\tR\x03rrn\x12-\n\x06\x61mount\x18\x02 \x01(\x0b\x32\x15.acme.common.v1.MoneyR\x06\x61mount\";\n\x04Item\x12\x17\n\x07item_id\x18\x01 \x01(\tR\x06itemId\x12\x1a\n\x08quantity\x18\x02 \x01(\x05R\x08quantityBw\n\x1a\x63om.acme.proto.acme.oms.v1B\x0bValuesProtoP\x01\xa2\x02\x03\x41OX\xaa\x02\x0b\x41\x63me.Oms.V1\xca\x02\x0b\x41\x63me\\Oms\\V1\xe2\x02\x17\x41\x63me\\Oms\\V1\\GPBMetadata\xea\x02\rAcme::Oms::V1b\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -34,9 +34,9 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'\n\032com.acme.proto.acme.oms.v1B\013ValuesProtoP\001\242\002\003AOX\252\002\013Acme.Oms.V1\312\002\013Acme\\Oms\\V1\342\002\027Acme\\Oms\\V1\\GPBMetadata\352\002\rAcme::Oms::V1'
   _globals['_ORDER']._serialized_start=71
-  _globals['_ORDER']._serialized_end=214
-  _globals['_PAYMENT']._serialized_start=216
-  _globals['_PAYMENT']._serialized_end=290
-  _globals['_ITEM']._serialized_start=292
-  _globals['_ITEM']._serialized_end=351
+  _globals['_ORDER']._serialized_end=312
+  _globals['_PAYMENT']._serialized_start=314
+  _globals['_PAYMENT']._serialized_end=388
+  _globals['_ITEM']._serialized_start=390
+  _globals['_ITEM']._serialized_end=449
 # @@protoc_insertion_point(module_scope)

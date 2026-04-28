@@ -43,11 +43,41 @@ class EasyPostAddress(_message.Message):
     company: str
     def __init__(self, id: _Optional[str] = ..., street1: _Optional[str] = ..., street2: _Optional[str] = ..., city: _Optional[str] = ..., state: _Optional[str] = ..., zip: _Optional[str] = ..., country: _Optional[str] = ..., residential: _Optional[bool] = ..., coordinate: _Optional[_Union[Coordinate, _Mapping]] = ..., timezone: _Optional[str] = ..., company: _Optional[str] = ...) -> None: ...
 
+class EasyPostRate(_message.Message):
+    __slots__ = ()
+    RATE_ID_FIELD_NUMBER: _ClassVar[int]
+    DELIVERY_DAYS_FIELD_NUMBER: _ClassVar[int]
+    DELIVERY_DATE_FIELD_NUMBER: _ClassVar[int]
+    DELIVERY_DATE_GUARANTEED_FIELD_NUMBER: _ClassVar[int]
+    rate_id: str
+    delivery_days: int
+    delivery_date: _timestamp_pb2.Timestamp
+    delivery_date_guaranteed: bool
+    def __init__(self, rate_id: _Optional[str] = ..., delivery_days: _Optional[int] = ..., delivery_date: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., delivery_date_guaranteed: _Optional[bool] = ...) -> None: ...
+
+class EasyPostShipment(_message.Message):
+    __slots__ = ()
+    SHIPMENT_ID_FIELD_NUMBER: _ClassVar[int]
+    SELECTED_RATE_FIELD_NUMBER: _ClassVar[int]
+    shipment_id: str
+    selected_rate: EasyPostRate
+    def __init__(self, shipment_id: _Optional[str] = ..., selected_rate: _Optional[_Union[EasyPostRate, _Mapping]] = ...) -> None: ...
+
 class Address(_message.Message):
     __slots__ = ()
     EASYPOST_FIELD_NUMBER: _ClassVar[int]
     easypost: EasyPostAddress
     def __init__(self, easypost: _Optional[_Union[EasyPostAddress, _Mapping]] = ...) -> None: ...
+
+class Shipment(_message.Message):
+    __slots__ = ()
+    EASYPOST_FIELD_NUMBER: _ClassVar[int]
+    PAID_PRICE_FIELD_NUMBER: _ClassVar[int]
+    DELIVERY_DATE_FIELD_NUMBER: _ClassVar[int]
+    easypost: EasyPostShipment
+    paid_price: Money
+    delivery_date: _timestamp_pb2.Timestamp
+    def __init__(self, easypost: _Optional[_Union[EasyPostShipment, _Mapping]] = ..., paid_price: _Optional[_Union[Money, _Mapping]] = ..., delivery_date: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class TimeRange(_message.Message):
     __slots__ = ()

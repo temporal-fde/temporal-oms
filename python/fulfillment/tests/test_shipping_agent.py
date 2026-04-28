@@ -148,7 +148,7 @@ def _tool_use_response(calls: list[tuple[str, str, dict]]) -> LlmResponse:
 def _base_request(
     *,
     customer_paid_price: Money | None = None,
-    transit_days_sla: int = 0,
+    delivery_days_sla: int = 0,
 ) -> CalculateShippingOptionsRequest:
     return CalculateShippingOptionsRequest(
         order_id=_ORDER_ID,
@@ -156,7 +156,7 @@ def _base_request(
         to_address=_TO_ADDRESS,
         items=_ITEMS,
         customer_paid_price=customer_paid_price,
-        transit_days_sla=transit_days_sla,
+        delivery_days_sla=delivery_days_sla,
     )
 
 
@@ -570,17 +570,25 @@ async def test_proceed_outcome() -> None:
 
 @pytest.mark.asyncio
 async def test_margin_spike_outcome() -> None:
+    """MARGIN_SPIKE accepted after find_alternate_warehouse is called first."""
+    turn = 0
+
     @activity.defn(name="call_llm")
     async def margin_llm(messages: list, tools: list) -> LlmResponse:
+        nonlocal turn
+        turn += 1
+        if turn == 1:
+            return _tool_use_response([
+                ("tu_alt", "find_alternate_warehouse",
+                 {"items": [{"sku_id": "ELEC-001", "quantity": 2}], "current_address_id": "adr_wh_east_01"}),
+            ])
         return _finalize_response(_MARGIN_SPIKE_INPUT)
 
     async with _test_env() as env:
         workers = _make_workers(env.client, margin_llm)
         async with workers[0], workers[1], workers[2]:
             handle = await _start_agent(env.client)
-            req = _base_request(
-                customer_paid_price=Money(currency="USD", units=1000),
-            )
+            req = _base_request(customer_paid_price=Money(currency="USD", units=1))
             resp = await handle.execute_update(ShippingAgent.calculate_shipping_options, req)
 
     assert resp.recommendation.outcome == RecommendationOutcome.MARGIN_SPIKE
@@ -589,23 +597,146 @@ async def test_margin_spike_outcome() -> None:
 
 @pytest.mark.asyncio
 async def test_sla_breach_outcome() -> None:
-    """SLA_BREACH is returned to caller — not raised as an exception."""
+    """SLA_BREACH accepted after find_alternate_warehouse is called first."""
+    turn = 0
+
     @activity.defn(name="call_llm")
     async def sla_llm(messages: list, tools: list) -> LlmResponse:
+        nonlocal turn
+        turn += 1
+        if turn == 1:
+            return _tool_use_response([
+                ("tu_alt", "find_alternate_warehouse",
+                 {"items": [{"sku_id": "ELEC-001", "quantity": 2}], "current_address_id": "adr_wh_east_01"}),
+            ])
         return _finalize_response(_SLA_BREACH_INPUT)
 
     async with _test_env() as env:
         workers = _make_workers(env.client, sla_llm)
         async with workers[0], workers[1], workers[2]:
             handle = await _start_agent(env.client)
-            req = _base_request(
-                transit_days_sla=2,
-            )
+            req = _base_request(delivery_days_sla=2)
             resp = await handle.execute_update(ShippingAgent.calculate_shipping_options, req)
 
-    # Returned as recommendation — fulfillment.Order decides what to do
     assert resp.recommendation.outcome == RecommendationOutcome.SLA_BREACH
     assert resp.cache_hit is False
+
+
+@pytest.mark.asyncio
+async def test_margin_spike_enforces_alternate_warehouse() -> None:
+    """MARGIN_SPIKE finalize without find_alternate_warehouse is rejected; second attempt accepted."""
+    finalize_attempts = 0
+    alternate_called = False
+    turn = 0
+
+    @service_handler(service=InventoryService)
+    class TrackingInventory:
+        @sync_operation
+        async def lookupInventoryAddress(
+            self, ctx: StartOperationContext, req: LookupInventoryAddressRequest
+        ) -> LookupInventoryAddressResponse:
+            return _LOOKUP_RESULT
+
+        @sync_operation
+        async def findAlternateWarehouse(
+            self, ctx: StartOperationContext, req: FindAlternateWarehouseRequest
+        ) -> FindAlternateWarehouseResponse:
+            nonlocal alternate_called
+            alternate_called = True
+            return FindAlternateWarehouseResponse()
+
+    @activity.defn(name="call_llm")
+    async def enforced_llm(messages: list, tools: list) -> LlmResponse:
+        nonlocal finalize_attempts, turn
+        turn += 1
+        # Turn 1: try to finalize MARGIN_SPIKE without calling find_alternate_warehouse
+        if turn == 1:
+            finalize_attempts += 1
+            return _finalize_response(_MARGIN_SPIKE_INPUT, tool_id="tu_rejected")
+        # Turn 2: after receiving rejection, call find_alternate_warehouse
+        if turn == 2:
+            return _tool_use_response([
+                ("tu_alt", "find_alternate_warehouse",
+                 {"items": [{"sku_id": "ELEC-001", "quantity": 2}], "current_address_id": "adr_wh_east_01"}),
+            ])
+        # Turn 3: finalize accepted now that find_alternate_warehouse was called
+        finalize_attempts += 1
+        return _finalize_response(_MARGIN_SPIKE_INPUT, tool_id="tu_accepted")
+
+    async with _test_env() as env:
+        common = [mock_build_system_prompt, mock_verify_address, mock_get_carrier_rates,
+                  mock_get_location_events, enforced_llm]
+        async with (
+            Worker(env.client, task_queue="fulfillment", workflows=[ShippingAgent],
+                   activities=common, nexus_service_handlers=[TrackingInventory()],
+                   workflow_failure_exception_types=[Exception]),
+            Worker(env.client, task_queue="fulfillment-easypost", activities=common),
+            Worker(env.client, task_queue="fulfillment-predicthq", activities=common),
+        ):
+            handle = await _start_agent(env.client)
+            req = _base_request(customer_paid_price=Money(currency="USD", units=1))
+            resp = await handle.execute_update(ShippingAgent.calculate_shipping_options, req)
+
+    assert resp.recommendation.outcome == RecommendationOutcome.MARGIN_SPIKE
+    assert alternate_called, "find_alternate_warehouse must have been called"
+    assert finalize_attempts == 2, "first finalize rejected, second accepted"
+
+
+@pytest.mark.asyncio
+async def test_sla_breach_enforces_alternate_warehouse() -> None:
+    """SLA_BREACH finalize without find_alternate_warehouse is rejected; second attempt accepted."""
+    finalize_attempts = 0
+    alternate_called = False
+    turn = 0
+
+    @service_handler(service=InventoryService)
+    class TrackingInventory:
+        @sync_operation
+        async def lookupInventoryAddress(
+            self, ctx: StartOperationContext, req: LookupInventoryAddressRequest
+        ) -> LookupInventoryAddressResponse:
+            return _LOOKUP_RESULT
+
+        @sync_operation
+        async def findAlternateWarehouse(
+            self, ctx: StartOperationContext, req: FindAlternateWarehouseRequest
+        ) -> FindAlternateWarehouseResponse:
+            nonlocal alternate_called
+            alternate_called = True
+            return FindAlternateWarehouseResponse()
+
+    @activity.defn(name="call_llm")
+    async def enforced_sla_llm(messages: list, tools: list) -> LlmResponse:
+        nonlocal finalize_attempts, turn
+        turn += 1
+        if turn == 1:
+            finalize_attempts += 1
+            return _finalize_response(_SLA_BREACH_INPUT, tool_id="tu_rejected")
+        if turn == 2:
+            return _tool_use_response([
+                ("tu_alt", "find_alternate_warehouse",
+                 {"items": [{"sku_id": "ELEC-001", "quantity": 2}], "current_address_id": "adr_wh_east_01"}),
+            ])
+        finalize_attempts += 1
+        return _finalize_response(_SLA_BREACH_INPUT, tool_id="tu_accepted")
+
+    async with _test_env() as env:
+        common = [mock_build_system_prompt, mock_verify_address, mock_get_carrier_rates,
+                  mock_get_location_events, enforced_sla_llm]
+        async with (
+            Worker(env.client, task_queue="fulfillment", workflows=[ShippingAgent],
+                   activities=common, nexus_service_handlers=[TrackingInventory()],
+                   workflow_failure_exception_types=[Exception]),
+            Worker(env.client, task_queue="fulfillment-easypost", activities=common),
+            Worker(env.client, task_queue="fulfillment-predicthq", activities=common),
+        ):
+            handle = await _start_agent(env.client)
+            req = _base_request(delivery_days_sla=2)
+            resp = await handle.execute_update(ShippingAgent.calculate_shipping_options, req)
+
+    assert resp.recommendation.outcome == RecommendationOutcome.SLA_BREACH
+    assert alternate_called, "find_alternate_warehouse must have been called"
+    assert finalize_attempts == 2, "first finalize rejected, second accepted"
 
 
 @pytest.mark.asyncio

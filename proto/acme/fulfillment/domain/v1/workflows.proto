@@ -140,6 +140,7 @@ message SelectedShippingOption {
   string option_id = 1;
   acme.common.v1.Money price = 2;
   google.protobuf.Timestamp expected_ship_date = 3;
+  optional int32 delivery_days = 4;
 }
 
 // ── validateOrder Update / Nexus operation ────────────────────────────────────
