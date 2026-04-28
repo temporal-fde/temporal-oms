@@ -469,43 +469,6 @@ delivery date.
 - SLA and margin scenarios are now driven by `selected_shipment` fields, but the spec needs to
   describe those triggers so fixture behavior and prompts stay aligned
 
----
-
-## Ideas
-
-* We could have a single Integrations workflow per Order.
-  * PROS:
-    * Since the "order_id" is the same across all Namespaces that would solve the concurrent Update limits (10).
-  * CONS:
-    * If the workflow owns large fixture state, we may duplicate address/rate/label catalogs per
-      order unless the catalog is loaded from a shared file/service
-    * If inventory remains a singleton but shipping is per-order, the architecture becomes split
-      across two stub hosting models
-* We could have a single Integrations gRPC service that does all the things and abandon using a
-  Temporal workflow as the object host.
-  * PROS:
-    * No Temporal Update limits to consider
-  * CONS:
-    * Have to host a gRPC service that is reachable by all workers
-    * Visibility into this service is log-based, not Temporal UI
-* We could keep Nexus operations backed by Spring services and load the fixture catalog into a
-  Spring cache, with optional REST controllers exposing the same methods.
-  * PROS:
-    * Avoids single-workflow concurrent Update limits for high-volume workshop runs
-    * Lets activities and Nexus operations share one Java implementation
-    * Makes manual fixture inspection simple through REST
-  * CONS:
-    * Less Temporal UI visibility for each fixture lookup unless callers still invoke through
-      workflow-backed Nexus handlers
-    * Need to decide which calls are workflow history vs plain service calls
-* We could shard `apps.Integrations` by deterministic key such as `customer_id`, `order_id`, or
-  `scenario`.
-  * PROS:
-    * Preserves workflow-backed visibility while raising practical concurrency beyond one workflow
-  * CONS:
-    * Query/reset story becomes less simple than one singleton workflow
-    * Shared inventory or catalog state needs to be loaded consistently into each shard
-
 ## Desired State (To-Be)
 
 ### Architecture Overview
@@ -513,7 +476,7 @@ delivery date.
 The integration layer becomes the workshop's shared external-system simulator. Each service keeps a
 domain-shaped API, but responses come from deterministic seeded data rather than real vendors.
 
-The default target is:
+The converged target is:
 
 ```text
 callers
@@ -523,10 +486,10 @@ callers
   -> current protobuf response type
 ```
 
-For services where Temporal visibility is valuable, the Nexus operation may still route through an
-`apps.Integrations` workflow Update. For high-volume fixture lookups, especially shipping rates,
-the implementation can be plain Spring service backed by cache while keeping the same request and
-response messages.
+Shipping fixture lookups should be implemented as a shared Spring service backed by cache. Nexus
+handlers and REST controllers should be thin access paths over that service. `apps.Integrations`
+can continue to host existing workflow-backed stubs where workflow history is useful, but shipping
+catalog reads should not depend on a single workflow's concurrent Update capacity.
 
 ### Key Capabilities
 
@@ -858,11 +821,9 @@ Deliverables:
 
 - [ ] Review this spec and confirm the in-scope services
 - [ ] Decide whether payments stays registered but out of the workshop narrative
-- [ ] Confirm whether `apps.Integrations` remains singleton, becomes sharded, or whether shipping
-      fixture lookup moves to plain Spring service/cache
-- [ ] Confirm whether REST endpoints are required for the first implementation pass
-- [ ] Decide whether `location-events` should move fully behind Nexus or remain an activity for
-      the first workshop pass
+- [ ] Confirm the shared Spring service/cache shape for shipping catalog runtime lookups
+- [ ] Confirm the REST endpoint names and whether they ship in the first implementation pass
+- [ ] Confirm the Nexus service names for shipping catalog and location-events
 - [ ] Define the minimum seeded scenarios needed for the workshop
 
 ### Phase 2: EasyPost Fixture Capture
@@ -890,9 +851,8 @@ Deliverables:
 - [ ] Optionally implement `getCarrierRates(GetCarrierRatesRequest)` as a compatibility wrapper
 - [ ] Add deterministic scenario mutation for `paid_price.units=1` and explicit
       `delivery_days=0`
-- [ ] Decide whether the service is called directly by activities, through Nexus operations, or
-      both
-- [ ] Add optional REST controller endpoints for manual use and workshop scripts
+- [ ] Expose the same implementation through Nexus operations and Spring REST endpoints
+- [ ] Add REST controller endpoints for manual use and workshop scripts
 
 ### Phase 4: Location-Events Integration Service
 
@@ -1062,13 +1022,12 @@ To Modify:
 
 ### Rollout Blockers
 
-- Confirm whether `location-events` must be a Nexus service for the workshop or can remain an
-  activity with improved seeded behavior
+- Confirm the Java/Python Nexus wiring for the new `location-events` service
 - Confirm the seeded risk scenarios and how they map to exercise outcomes
 - Confirm whether generated code can reference `GetLocationEventsRequest/Response` from the Java
   apps module without additional build changes
-- Confirm whether shipping catalog is workflow-backed, plain Spring service/cache, or both
-- Confirm whether REST endpoints are required in the first implementation pass
+- Confirm the shared Spring service/cache boundaries for shipping catalog and its Nexus/REST
+  adapters
 - Confirm where the canonical fixture JSON should live and how it is refreshed
 
 ---
@@ -1077,8 +1036,8 @@ To Modify:
 
 ### Questions for Review
 
-- [ ] Should `location-events` move behind `apps.Integrations`, or should the first workshop keep
-      it as an agent activity and only document it as an integration dependency?
+- [ ] Should `location-events` be backed by the same shared Spring service/cache pattern, or remain
+      workflow-backed through `apps.Integrations`?
 - [ ] Which seeded location-risk scenarios do we need: margin spike, SLA breach, or both?
 - [ ] Should `GetIntegrationsStateResponse` expose location event seeds, or is warehouse state
       enough for the first exercise?
@@ -1086,8 +1045,6 @@ To Modify:
       fixed in code like the current item catalog?
 - [ ] Should payments be removed from the integrations worker registration for the workshop, or
       left registered but out of scope?
-- [ ] Should shipping catalog operations be Update handlers on `apps.Integrations`, plain Spring
-      service methods, or both?
 - [ ] Should fixture selection use an explicit global `scenarios` input now, or should we start
       with request-field triggers and add global scenarios later?
 - [ ] What is the minimum destination-address set needed for realistic-looking captured payloads
