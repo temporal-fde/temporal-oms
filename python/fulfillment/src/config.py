@@ -24,7 +24,6 @@ class Settings(BaseSettings):
     temporal_fulfillment_namespace: str = "fulfillment"
     anthropic_api_key: str = ""
     easypost_api_key: str = ""
-    predicthq_api_key: str = ""
     integrations_endpoint: str = "oms-integrations-v1"
 
 

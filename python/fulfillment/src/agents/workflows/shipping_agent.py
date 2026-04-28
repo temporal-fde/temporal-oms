@@ -80,7 +80,7 @@ _TOOLS = ToolSpecs(
     ),
     activity_tool(
         activity_name(LocationEventsActivities.get_location_events),
-        "Query PredictHQ for supply chain risk events near a coordinate "
+        "Query for supply chain risk events near a coordinate "
         "(severe weather, disasters, airport delays, etc.) within the ship-to-delivery window. "
         "Call for BOTH origin and destination. "
         "Always use within_km=50.0. "
@@ -89,7 +89,7 @@ _TOOLS = ToolSpecs(
         LocationEventsActivities.get_location_events,
         GetLocationEventsRequest,
         GetLocationEventsResponse,
-        task_queue="fulfillment-predicthq",
+        task_queue="agents",
         start_to_close_timeout=_ACTIVITY_TIMEOUT,
         retry_policy=_ACTIVITY_RETRY,
     ),

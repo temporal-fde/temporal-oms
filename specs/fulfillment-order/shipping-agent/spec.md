@@ -27,7 +27,7 @@ The agent uses Claude (Anthropic API) with five registered Temporal activities a
 - `lookup_inventory_address` — resolve sku_ids to a warehouse address
 - `verify_address` — verify a raw address via EasyPost (returns `easypost_address.id` + coordinate)
 - `get_carrier_rates` — create an EasyPost Shipment and retrieve carrier rates
-- `get_location_events` — query PredictHQ for supply chain risk events at an address
+- `get_location_events` — query for supply chain risk events at an address
 - `find_alternate_warehouse` — locate a different warehouse when all rates fail margin or SLA
 
 Claude dispatches these tools in whatever order and concurrency it determines appropriate. When
@@ -92,8 +92,8 @@ request — warehouse resolution is the agent's job regardless of caller.
   with no SCRM data, no inventory location reasoning, and no LLM
 - `shipping_agent.proto` exists with `StartShippingAgentRequest`, a partially-defined
   `CalculateShippingOptionsRequest/Response`, and `GetLocationEventsRequest/Response`
-- `values.proto` has `LocationEvent`, `LocationRiskSummary`, and `RiskLevel` — the PredictHQ
-  data model is already designed
+- `values.proto` has `LocationEvent`, `LocationRiskSummary`, and `RiskLevel` — data model is
+  already designed
 - `ShippingAgent` workflow is not implemented; Python fulfillment module skeleton exists at
   `python/fulfillment/`
 
@@ -227,7 +227,7 @@ Cache key: `fn(sorted(from_easypost_ids), sorted([(skuId, qty)]), destinationPos
 | Concurrency from multi-tool LLM responses | Claude returns multiple `tool_use` blocks in one response when it recognizes no dependency; implementation dispatches them as concurrent activities | Sequential tool dispatch — loses latency benefit, doesn't demonstrate Temporal's concurrent activity pattern |
 | ShippingAgent recommends, `fulfillment.Order` decides | Keeps the agent focused on logistics reasoning; business rules (margin policy, SLA enforcement) stay in `fulfillment.Order` | Agent makes the final selection — couples business rules to the Python agent |
 | `lookup_inventory_location` always called; no `from_address` in request | Caller provides `sku_id`s — warehouse resolution is the agent's responsibility regardless of whether the caller is `fulfillment.Order` (EnrichedItem skus) or cart (cart item skus). Avoids a two-path design where callers must know about warehouse assignment. | Pre-resolve warehouse in caller and pass `from_address` — couples callers to inventory logic and creates a split path with different LLM behaviour |
-| Separate `fulfillment-easypost` (5 rps) and `fulfillment-predicthq` (50 rps) task queues | EasyPost and PredictHQ limits differ by 10×; sharing one queue forces both to the 5 rps floor, wasting 45 rps of PredictHQ capacity | Single shared queue — simpler setup but throttles PredictHQ to EasyPost's limit |
+| Separate `fulfillment-easypost` (5 rps) task queue | EasyPost rate limit is a hard constraint; EasyPost activities run on their own queue to avoid interfering with other activities | Single shared queue — simpler but risks throttling non-EasyPost activities |
 | Worker Versioning (new build-id) for V2 cutover | `fulfillment.Order` is PINNED and has no history to bridge; old workflows complete on V1 workers, new ones pick up V2 cleanly | `Workflow.getVersion()` — unnecessary for a new workflow with no pre-existing history |
 | System prompt built in `build_system_prompt` LocalActivity (not inline workflow code) | LocalActivity result is memoized in event history; on replay, Temporal returns the memoized value and ignores the current implementation. Prompt text can be updated and redeployed without a build-id bump — in-flight workflows replay against the original prompt from history. Inline function: any text change produces different `call_llm` args than history → non-determinism error on replay. | Inline `_build_system_prompt` function — simple but couples prompt iteration to build-id lifecycle |
 | Structured output via `finalize_recommendation` tool, not raw JSON text parsing | Observed in production: models (especially smaller ones like `claude-haiku-4-5`) frequently add preamble, analysis prose, or markdown code fences before or instead of the requested JSON, causing `json.loads()` to fail non-retryably. Tool call inputs are always SDK-serialized, structurally valid JSON — prose contamination is impossible. This is Anthropic's recommended approach for guaranteed structured output: define a tool the model must call to submit its answer, give it a strict JSON Schema with enum constraints, and extract the recommendation directly from `block.tool_use.input`. The `finalize_recommendation` tool is never dispatched to an activity; the loop detects it by name and exits. | System prompt instruction "output only raw JSON — no preamble, no markdown": the model can and does ignore this under certain prompting conditions; failures accumulate silently until a retry happens to comply |
@@ -251,21 +251,16 @@ Cache key: `fn(sorted(from_easypost_ids), sorted([(skuId, qty)]), destinationPos
 
 #### Activity Task Queues & Rate Limits
 
-EasyPost and PredictHQ have very different published rate limits, so activities that call them
-run on dedicated task queues with per-queue rate limiting. The main `fulfillment` queue is used
-for activities that call no external rate-limited API.
+EasyPost activities run on a dedicated queue with per-queue rate limiting. All other activities
+run on the main `agents` queue.
 
 | Activity | Task Queue | Rate Limit | Rationale |
 |---|---|---|---|
-| `lookup_inventory_location` | `fulfillment` | none | Internal config / inventory service; no external rate limit |
-| `call_llm` | `fulfillment` | none | Anthropic API; rate limit managed separately at LLM tier |
+| `lookup_inventory_location` | `agents` | none | Internal config / inventory service; no external rate limit |
+| `call_llm` | `agents` | none | Anthropic API; rate limit managed separately at LLM tier |
+| `get_location_events` | `agents` | none | Stubbed — no external API; see location-events spec |
 | `verify_address` | `fulfillment-easypost` | 5 rps | EasyPost index ops: 5 rps documented; write ops load-based — 5 rps is the conservative safe bound |
 | `get_carrier_rates` | `fulfillment-easypost` | 5 rps | Same EasyPost account quota; shares the 5 rps budget |
-| `get_location_events` | `fulfillment-predicthq` | 50 rps | PredictHQ documented limit |
-
-EasyPost and PredictHQ limits differ by 10×; sharing a single queue would cap PredictHQ at
-EasyPost's 5 rps floor, wasting 45 rps of headroom. Separate queues let each API run at its
-actual limit.
 
 Worker configuration for each queue sets `max_activities_per_second` on the worker (or
 `maxTaskQueueActivitiesPerSecond` server-side) to enforce the limit. Activity options in the
@@ -312,10 +307,10 @@ to its designated task queue via `ActivityOptions(task_queue=...)`.
 - Wraps EasyPost Shipment creation + rate retrieval
 
 **`get_location_events`**
-- **Task Queue:** `fulfillment-predicthq` (50 rps)
+- **Task Queue:** `agents`
 - Input: `Coordinate`, `within_km`, `active_from`, `active_to`, `timezone`
 - Output: `LocationRiskSummary`, `[LocationEvent]`
-- Wraps PredictHQ Events API
+- Currently stubbed — returns no events; see `specs/fulfillment/location-events/spec.md` for planned implementation
 - Called twice per calculation (origin + destination) — expected to run concurrently
 
 **`find_alternate_warehouse`**
@@ -361,8 +356,8 @@ Proto definitions are the source of truth. This section describes intent only.
 - `recommended_option_id`: string
 - `reasoning`: string (LLM explanation, for logging and support visibility)
 - `margin_delta_cents`: int64 (positive = over margin, negative = savings)
-- `origin_risk_level`: `RiskLevel` (from `from_address` PredictHQ)
-- `destination_risk_level`: `RiskLevel` (from `to_address` PredictHQ)
+- `origin_risk_level`: `RiskLevel` (from `from_address` location events)
+- `destination_risk_level`: `RiskLevel` (from `to_address` location events)
 
 **`StartShippingAgentRequest`** — extend `ShippingAgentExecutionOptions` with:
 - `cache_ttl_secs`: optional int64
@@ -413,12 +408,11 @@ added in Phase 1 alongside the `shipping_agent.proto` changes.
 - [ ] `lookup_inventory_location` — returns `[{address, items}]` groups; V1 static TOML config returns one group (all items → single warehouse); agent handles any number of groups without changes
 - [ ] `verify_address` — EasyPost `AddressService.createAndVerify()`; populate `coordinate` from response
 - [ ] `get_carrier_rates` — EasyPost Shipment creation + rate retrieval (already exists as `DeliveryService` in Java; Python version needed)
-- [ ] `get_location_events` — PredictHQ Events API (already has proto definition; implement Python activity)
+- [ ] `get_location_events` — stubbed; returns no events (see `specs/fulfillment/location-events/` for planned real implementation)
 - [ ] `call_llm` — Anthropic API activity: sends messages + tool definitions to Claude, returns response
 - [ ] Register activities on the correct workers per task queue:
-  - `lookup_inventory_location` + `call_llm` → `fulfillment` worker (no external rate limit)
+  - `lookup_inventory_location` + `call_llm` + `get_location_events` → `agents` worker (no external rate limit)
   - `verify_address` + `get_carrier_rates` → `fulfillment-easypost` worker (`max_activities_per_second=5`)
-  - `get_location_events` → `fulfillment-predicthq` worker (`max_activities_per_second=50`)
 
 ### Phase 3 — ShippingAgent Workflow
 
@@ -520,7 +514,7 @@ alternate warehouse path is reliably exercised and structurally enforced rather 
 | LLM response structure is unpredictable — `ShippingRecommendation` parsing fails | High | Low | Mitigated by the `finalize_recommendation` tool (forced tool use for structured output): the final answer is always submitted as a tool call input, never as free-form text. Tool inputs are SDK-serialized JSON; prose and markdown contamination are structurally impossible. See Design Decisions. |
 | Inventory Locations spec not ready — `lookup_inventory_location` has nothing to query | High | High | V1 workaround: static config with hardcoded warehouse(s); unblock Workshop with seed data |
 | EasyPost write-op rate limit undocumented — actual limit for `createAndVerify` / Shipment creation may differ from the 5 rps index limit | Medium | Medium | 5 rps is the safe conservative bound; monitor 429 responses in workshop and raise if sustained throttling is observed |
-| PredictHQ API latency spikes degrade UpdateWithStart round-trip | Medium | Low | Set activity `start_to_close_timeout`; LLM can reason with partial data if one tool times out |
+| Location events tool returns no risk data (stubbed) | Low | — | By design until real implementation lands; LLM reasons correctly with RISK_LEVEL_NONE |
 | `EasyPostAddress` missing `coordinate` — `get_location_events` cannot run | High | Medium | Noted in Data Model section; must be added in Phase 1 before Phase 3 can proceed |
 | Long-running `ShippingAgent` accumulates unbounded cache entries | Low | Medium | TTL eviction on cache reads; `continue_as_new` if cache map exceeds size threshold |
 | LLM skips `find_alternate_warehouse` despite prompt instruction | Medium | Medium | Post-loop enforcement in Phase 6: the workflow rejects a premature MARGIN_SPIKE/SLA_BREACH finalize and forces another loop iteration; the LLM cannot skip the tool without receiving an explicit rejection |
@@ -532,7 +526,7 @@ alternate warehouse path is reliably exercised and structurally enforced rather 
 
 All open questions resolved:
 
-- [x] What is the PredictHQ `within_km` radius default for Workshop demos? **50km**
+- [x] What is the `within_km` radius default for Workshop demos? **50km**
 - [x] What is the default `cache_ttl_secs`? **1800 (30 minutes)**
 - [x] Should `SLA_BREACH` signal a support workflow directly from `ShippingAgent`, or return the outcome and let `fulfillment.Order` decide? **`fulfillment.Order` handles it** — ShippingAgent returns `SLA_BREACH` with the fastest available `recommended_option_id`; `fulfillment.Order` ships best-effort, records the breach via `sla_breach_days` SA, and marks the selection `is_fallback=true`. Human-in-the-loop escalation is deferred (see Deferred Work).
 
@@ -618,4 +612,4 @@ slow to respond.
 - [`fulfillment.Order` spec](../fulfillment-order-workflow/spec.md) — Phase 7: V2 wiring
 - [Temporal AI Cookbook — Agentic Loop with Claude (Python)](https://docs.temporal.io/ai-cookbook/agentic-loop-tool-call-claude-python)
 - [EasyPost Java SDK — AddressService](https://easypost.github.io/easypost-java/com/easypost/service/AddressService.html)
-- [PredictHQ Events API](https://docs.predicthq.com/api/events)
+- [Location Events spec](../../fulfillment/location-events/spec.md)

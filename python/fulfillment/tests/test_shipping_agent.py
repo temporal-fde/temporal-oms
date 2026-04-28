@@ -301,7 +301,7 @@ def _make_workers(
         ),
         Worker(
             client,
-            task_queue="fulfillment-predicthq",
+            task_queue="agents",
             activities=common_activities,
         ),
     ]
@@ -373,7 +373,7 @@ async def test_lookup_always_called() -> None:
                    activities=common, nexus_service_handlers=[TrackingInventory()],
                    workflow_failure_exception_types=[Exception]),
             Worker(env.client, task_queue="fulfillment-easypost", activities=common),
-            Worker(env.client, task_queue="fulfillment-predicthq", activities=common),
+            Worker(env.client, task_queue="agents", activities=common),
         ):
             handle = await _start_agent(env.client)
             req = _base_request()
@@ -422,7 +422,7 @@ async def test_cart_path_calls_lookup() -> None:
                    activities=common, nexus_service_handlers=[TrackingInventory()],
                    workflow_failure_exception_types=[Exception]),
             Worker(env.client, task_queue="fulfillment-easypost", activities=common),
-            Worker(env.client, task_queue="fulfillment-predicthq", activities=common),
+            Worker(env.client, task_queue="agents", activities=common),
         ):
             handle = await _start_agent(env.client)
             # Cart path: no from_address
@@ -483,7 +483,7 @@ async def test_sequential_tool_dispatch() -> None:
                    activities=common, nexus_service_handlers=[TrackingInventory()],
                    workflow_failure_exception_types=[Exception]),
             Worker(env.client, task_queue="fulfillment-easypost", activities=common),
-            Worker(env.client, task_queue="fulfillment-predicthq", activities=common),
+            Worker(env.client, task_queue="agents", activities=common),
         ):
             handle = await _start_agent(env.client)
             req = _base_request()
@@ -542,7 +542,7 @@ async def test_concurrent_activity_dispatch() -> None:
                    activities=common, nexus_service_handlers=[MockInventoryService()],
                    workflow_failure_exception_types=[Exception]),
             Worker(env.client, task_queue="fulfillment-easypost", activities=common),
-            Worker(env.client, task_queue="fulfillment-predicthq", activities=common),
+            Worker(env.client, task_queue="agents", activities=common),
         ):
             handle = await _start_agent(env.client)
             req = _base_request()
@@ -671,7 +671,7 @@ async def test_margin_spike_enforces_alternate_warehouse() -> None:
                    activities=common, nexus_service_handlers=[TrackingInventory()],
                    workflow_failure_exception_types=[Exception]),
             Worker(env.client, task_queue="fulfillment-easypost", activities=common),
-            Worker(env.client, task_queue="fulfillment-predicthq", activities=common),
+            Worker(env.client, task_queue="agents", activities=common),
         ):
             handle = await _start_agent(env.client)
             req = _base_request(customer_paid_price=Money(currency="USD", units=1))
@@ -728,7 +728,7 @@ async def test_sla_breach_enforces_alternate_warehouse() -> None:
                    activities=common, nexus_service_handlers=[TrackingInventory()],
                    workflow_failure_exception_types=[Exception]),
             Worker(env.client, task_queue="fulfillment-easypost", activities=common),
-            Worker(env.client, task_queue="fulfillment-predicthq", activities=common),
+            Worker(env.client, task_queue="agents", activities=common),
         ):
             handle = await _start_agent(env.client)
             req = _base_request(delivery_days_sla=2)

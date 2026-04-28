@@ -20,7 +20,7 @@
 - [x] `python/fulfillment/src/converter/_converters.py` created
 - [x] `fulfillment_worker.py` updated
 - [x] `easypost_worker.py` updated
-- [x] `predicthq_worker.py` updated
+- [x] ~~`predicthq_worker.py`~~ removed (PredictHQ replaced — see `specs/fulfillment/location-events/`)
 - [x] `tests/test_converter.py` written and passing (15/15)
 - [x] Registry completeness test passing
 - [x] Existing tests (`test_shipping_agent.py`, `test_tool_dispatch.py`) still passing (22/22)

@@ -21,7 +21,7 @@ class Errors(IntEnum):
 
 class RiskLevel(IntEnum):
     """
-     RiskLevel normalizes PredictHQ rank (0–100) into tiers the agent can reason about.
+     RiskLevel represents supply chain risk tiers the agent can reason about.
     """
     RISK_LEVEL_UNSPECIFIED = 0
     RISK_LEVEL_NONE = 1
@@ -39,9 +39,9 @@ class LocationEvent(BaseModel):
     id: str = Field(default="")
     title: str = Field(default="")
     description: typing.Optional[str] = Field(default="")
-# PredictHQ category string (e.g. "severe-weather", "airport-delays", "disasters").
+# Event category string (e.g. "severe-weather", "airport-delays", "disasters").
     category: str = Field(default="")
-# PredictHQ Rank (0–100): overall significance of the event.
+# Rank (0–100): overall significance of the event.
     rank: int = Field(default=0)
     local_rank: typing.Optional[int] = Field(default=0)
 # True when the event is unscheduled/emergent:
@@ -62,7 +62,7 @@ class LocationRiskSummary(BaseModel):
     peak_rank: int = Field(default=0)
     total_event_count: int = Field(default=0)
     unscheduled_event_count: int = Field(default=0)
-# Count of events per PredictHQ category string
+# Count of events per category string
 # (e.g. {"severe-weather": 2, "airport-delays": 1}).
     events_by_category: "typing.Dict[str, int]" = Field(default_factory=dict)
 

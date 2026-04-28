@@ -16,13 +16,11 @@ message GetLocationEventsRequest {
   double within_km = 2;
 
   // Delivery window: events active at any point between ship and delivery dates.
-  // Maps to active.gte / active.lte on the PredictHQ Events API.
   google.protobuf.Timestamp active_from = 3; // ship date
   google.protobuf.Timestamp active_to   = 4; // expected delivery date
 
   // IANA TZ Database identifier for the destination (e.g. "America/New_York").
   // From EasyPost verifications.delivery.details.time_zone.
-  // Maps to active.tz on the PredictHQ Events API.
   string timezone = 5;
 }
 

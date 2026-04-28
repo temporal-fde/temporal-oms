@@ -25,7 +25,7 @@
 
 | Question | Needed By | Status |
 |----------|-----------|--------|
-| PredictHQ `within_km` default for Workshop demos | Phase 2 | ✅ Resolved: 50km |
+| `within_km` default for Workshop demos | Phase 2 | ✅ Resolved: 50km |
 | Default `cache_ttl_secs` | Phase 3 | ✅ Resolved: 1800 (30 minutes) |
 | `SLA_BREACH` — signal support from ShippingAgent or return to `fulfillment.Order`? | Phase 3 | ✅ Resolved: return to `fulfillment.Order`; agent recommends, caller decides |
 
@@ -156,9 +156,9 @@ Identified during planning; all resolved.
     - Return `GetShippingRatesResponse` with `shipment_id` and `options`
   - EasyPost API key from env var `EASYPOST_API_KEY`
 
-#### 2c — `fulfillment-predicthq` task queue activity (50 rps limit)
+#### 2c — `get_location_events` activity (stubbed)
 
-- `get_location_events` already implemented in `python/fulfillment/src/agents/activities/location_events.py` — no new code needed; task is registration only (covered in 2d)
+- `get_location_events` stubbed in `python/fulfillment/src/agents/activities/location_events.py` — returns no events; registered on `agents` task queue; see `specs/fulfillment/location-events/` for planned real implementation
 
 #### 2d — Worker registration
 
@@ -171,13 +171,7 @@ Identified during planning; all resolved.
   - Register `EasyPostActivities`
   - `max_activities_per_second=5.0`
 
-- [x] `python/fulfillment/src/workers/predicthq_worker.py`: Temporal worker for `fulfillment-predicthq` task queue
-  - Register `LocationEventsActivities`
-  - `max_activities_per_second=50.0`
-
-- [x] `python/fulfillment/src/worker.py`: entry point (`python -m src.worker`) per Dockerfile — create this file (does not currently exist)
-  - Start all 3 workers concurrently in one process using `asyncio.gather` over the three worker `run()` coroutines
-  - Single `Dockerfile` is retained; no separate containers needed
+- [x] `python/fulfillment/src/worker.py`: entry point (`python -m src.worker`) per Dockerfile — starts `agents` + `fulfillment-easypost` workers concurrently; no separate containers needed
 
 ---
 
@@ -233,7 +227,7 @@ Identified during planning; all resolved.
     2. If `response.stop_reason == LlmStopReason.LLM_STOP_REASON_TOOL_USE`:
        - Collect all blocks where `block.type == "tool_use"`
        - Dispatch all as concurrent activities using `asyncio.gather` over `workflow.execute_activity()` calls
-       - Route per `block.tool_use.name`: `verify_address` / `get_carrier_rates` → `task_queue="fulfillment-easypost"`; `get_location_events` → `task_queue="fulfillment-predicthq"`; `lookup_inventory_location` → `task_queue="fulfillment"`
+       - Route per `block.tool_use.name`: `verify_address` / `get_carrier_rates` → `task_queue="fulfillment-easypost"`; `get_location_events` + `lookup_inventory_location` → `task_queue="agents"`
        - Each activity uses `ActivityOptions` with appropriate `start_to_close_timeout`
        - Append all `tool_result` blocks to messages in the same order as `tool_use` blocks
        - If `lookup_inventory_location` was called in this turn: extract `location_id` from its result; compute cache key and check cache (cart path cache check — can only happen after location resolves)

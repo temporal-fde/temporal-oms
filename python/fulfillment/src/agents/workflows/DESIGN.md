@@ -61,4 +61,4 @@ and may branch differently on the second attempt.
 With Temporal the message history is the event log. The agent resumes
 mid-conversation with every prior tool result intact — the LLM does not
 re-evaluate decisions it already made, and completed activities (EasyPost calls,
-PredictHQ queries) are not re-executed.
+location event lookups) are not re-executed.

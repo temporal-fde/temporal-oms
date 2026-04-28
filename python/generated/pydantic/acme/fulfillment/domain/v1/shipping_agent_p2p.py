@@ -39,12 +39,12 @@ class GetLocationEventsRequest(BaseModel):
 # Value is in kilometers (e.g. 2.0).
     within_km: float = Field(default=0.0)
 # Delivery window: events active at any point between ship and delivery dates.
-# Maps to active.gte / active.lte on the PredictHQ Events API.
+
     active_from: datetime = Field(default_factory=datetime.now)# ship date
     active_to: datetime = Field(default_factory=datetime.now)# expected delivery date
 # IANA TZ Database identifier for the destination (e.g. "America/New_York").
 # From EasyPost verifications.delivery.details.time_zone.
-# Maps to active.tz on the PredictHQ Events API.
+
     timezone: str = Field(default="")
 
 class GetLocationEventsResponse(BaseModel):
