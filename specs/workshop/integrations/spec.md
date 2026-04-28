@@ -503,8 +503,9 @@ catalog reads should not depend on a single workflow's concurrent Update capacit
   printing are served from a local catalog instead of EasyPost
 - **Dual access path:** core shipping operations can be exposed as both Nexus operations and Spring
   REST endpoints over the same implementation
-- **Risk-aware shipping demos:** `location-events` can return seeded risk summaries that make
-  ShippingAgent recommendations more interesting than "always no risk"
+- **Location-events on the same foundation:** `location-events` should use the same shared Spring
+  service/cache pattern. The first pass returns an empty event list; later enrichment can use
+  request inputs to hint at risk scenarios.
 
 ### EasyPost Replacement / Shipping Catalog
 
@@ -550,8 +551,8 @@ The fixture capture script should:
   and timezone when available
 - For each interesting origin/destination pair, create a shipment with the current default parcel
   assumptions and capture all returned rates
-- For each captured rate, buy/create the test label once and persist the response payload needed
-  to answer `PrintShippingLabelResponse`
+- For each captured rate, synthesize a deterministic label/tracking fixture from
+  `shipment_id + rate_id`. The capture script does not need to buy labels from EasyPost.
 - Write a JSON fixture database that the Java integrations service can load with stable IDs
 - Avoid hand-editing captured payloads except for documented scenario fixtures
 
@@ -562,11 +563,12 @@ The runtime fixture loader should expose queryable metadata:
 - rates available per shipment, including `carrier`, `service_level`, `cost`, `estimated_days`,
   `rate_id`, and `shipment_id`
 - labels available per `shipment_id + rate_id`, including tracking number and label URL
+- location-event fixture configuration, even though the first pass returns an empty event list
 - scenario overrides applied to a request
 
 ### Shipping Catalog APIs
 
-The same backing implementation should be callable through Nexus and, if useful, Spring REST.
+The same backing implementation should be callable through Nexus and Spring REST.
 The preferred operations are:
 
 ```java
@@ -581,7 +583,7 @@ Optional compatibility operation:
 GetCarrierRatesResponse getCarrierRates(GetCarrierRatesRequest request);
 ```
 
-Optional REST endpoints over the same implementation:
+REST endpoints over the same implementation:
 
 ```http
 POST /api/v1/integrations/shipping/verify-address
@@ -604,7 +606,7 @@ can derive scenarios from already-threaded request fields:
 | Margin leak/spike | `selected_shipment.paid_price.units == 1` | `getShippingRates` returns rates that all exceed paid price; prompt/rule returns `MARGIN_SPIKE` |
 | SLA breach | explicit `selected_shipment.easypost.selected_rate.delivery_days == 0` | `getShippingRates` returns no acceptable rate within the selected SLA; prompt/rule returns `SLA_BREACH` |
 | Alternate warehouse | `findAlternateWarehouse` with current address ID | returns another catalog warehouse matching item prefixes and excluding current origin |
-| Location risk | coordinate/date window matches a seed | `getLocationEvents` returns non-empty events and risk summary |
+| Location risk | future input-derived hint, TBD | first pass returns empty events; later enrichment can return risk summaries from the same fixture/cache layer |
 
 If/when global scenarios are added, they should be explicit metadata on the top-level order or
 integration request rather than magic substrings. Until then, request-field triggers are acceptable
@@ -622,18 +624,9 @@ public interface LocationEventsService {
 }
 ```
 
-Add matching workflow update methods:
-
-```java
-@UpdateMethod
-GetLocationEventsResponse getLocationEvents(GetLocationEventsRequest request);
-
-@UpdateValidatorMethod(updateName = "getLocationEvents")
-void validateGetLocationEvents(GetLocationEventsRequest request);
-```
-
-The ShippingAgent tool can then switch from an activity tool to a Nexus tool while keeping the LLM
-tool name `get_location_events` and the existing proto request/response types.
+The service implementation should use the same shared Spring service/cache pattern as the shipping
+catalog. The ShippingAgent tool can then switch from an activity tool to a Nexus tool while keeping
+the LLM tool name `get_location_events` and the existing proto request/response types.
 
 ---
 
@@ -643,17 +636,19 @@ tool name `get_location_events` and the existing proto request/response types.
 
 | Decision | Rationale | Alternative Considered |
 |----------|-----------|------------------------|
-| Back workshop integrations with one singleton workflow | Keeps stub state durable, queryable, and visible in Temporal UI; mirrors external service boundaries without provisioning vendors | In-memory static mocks in each worker - easier initially, harder to inspect and coordinate |
+| Keep existing workflow-backed stubs where useful, but use Spring cache for catalog reads | Existing commerce/PIMS/inventory workflow history remains visible; high-volume shipping and location fixture reads avoid single-workflow Update limits | Force every stub through one singleton workflow - simpler story but hits Update concurrency limits |
 | Keep service-shaped Nexus APIs | Callers exercise the same cross-namespace shape they would use with real services | Direct workflow calls from every domain - couples callers to workshop implementation details |
-| Use `UpdateWithStart` for all integration operations | The integration workflow starts lazily and callers do not need a separate bootstrap step | Explicit startup script - another workshop ordering dependency |
-| Treat `location-events` as an integration service | Risk data is external-domain context like inventory and PIMS; bringing it together clarifies the workshop architecture | Keep it as a Python activity - simpler short-term but splits the integration story |
+| Use `UpdateWithStart` for workflow-backed integration operations | The integration workflow starts lazily for commerce/PIMS/inventory callers that use workflow-backed stubs | Explicit startup script - another workshop ordering dependency |
+| Treat `location-events` as an integration service using the shared Spring service/cache pattern | Risk data is external-domain context like inventory and PIMS; bringing it together clarifies the workshop architecture and avoids Python-only fixture logic | Keep it as a Python activity - simpler short-term but splits the integration story |
 | Preserve the existing `get_location_events` tool name | Avoids retraining the LLM prompt and keeps ShippingAgent history readable | Rename to Java-style `getLocationEvents` - leaks service implementation style into agent tools |
-| Keep payments out of the initial workshop scope | The current workshop path focuses on order validation, enrichment, inventory, and shipping risk | Include payments now - expands scope without improving the integration lesson |
+| Remove payments from the workshop integration path | The order workflow path does not depend on payments; keeping it registered adds noise without workshop value | Keep payments registered but undocumented - low effort, but leaves an unused service in the story |
 | Replace runtime EasyPost calls with fixture catalog reads | Removes API keys, network variance, rate limits, and live label purchasing from workshop execution | Continue using EasyPost test mode - realistic but slow, brittle, and hard to reset |
 | Preserve current protobuf request/response contracts | Keeps Java workflows, Python agent tools, and REST/Nexus callers aligned while internals change | Introduce workshop-only DTOs - easier fixture modeling but creates contract drift |
 | Capture all rates per shipment | The LLM may choose any rate depending on margin, SLA, or risk context | Persist only the cheapest/selected rate - insufficient for fallback and recommendation paths |
 | Use `selected_shipment` as the scenario context | The values already flow from checkout to ShippingAgent and rates; no magic order ID parsing is needed for margin/SLA | Add hidden scenario strings to order IDs - convenient but opaque and easy to forget |
 | Allow Nexus and REST over the same shipping implementation | Activities and Nexus operations can share fixture logic, while REST makes manual testing easier | Implement separate activity and controller logic - faster initially but guarantees drift |
+| Synthesize label responses from shipment/rate fixtures | The workflow only needs deterministic tracking and label URL data; buying labels adds unnecessary capture cost and API coupling | Buy test labels for every captured rate - more realistic, but not needed for the demo |
+| Expose demo fixture data for inspection | Workshop operators should be able to see addresses, shipments, rates, labels, and location-event fixture config | Keep fixture data private - simpler API surface, harder to debug demos |
 
 ### Component Design
 
@@ -664,13 +659,13 @@ tool name `get_location_events` and the existing proto request/response types.
 - **Interfaces:**
   - `execute(StartIntegrationsRequest)`
   - `getState() -> GetIntegrationsStateResponse`
-  - Update handlers for commerce-app, PIMS, inventory, and location-events
+  - Update handlers for commerce-app, PIMS, and inventory
 
 #### Service Handlers
 
 - **Purpose:** Preserve Nexus service boundaries for callers
-- **Responsibilities:** Implement sync Nexus operations, call `executeUpdateWithStart`, wait for
-  Update completion
+- **Responsibilities:** Implement sync Nexus operations. Workflow-backed stubs call
+  `executeUpdateWithStart`; catalog-backed stubs call the shared Spring service/cache directly.
 - **Interfaces:** Java Nexus service implementations in `java/apps/apps-core/.../services/`
 
 #### Shipping Catalog Service
@@ -681,7 +676,7 @@ tool name `get_location_events` and the existing proto request/response types.
 - **Interfaces:**
   - Nexus operations for `verifyAddress`, `getShippingRates`, and `printShippingLabel`
   - Optional compatibility Nexus operation for `getCarrierRates`
-  - Optional Spring REST controller over the same service methods
+  - Spring REST controller over the same service methods
   - JSON fixture database loaded into Spring cache at startup
 
 #### ShippingAgent Tool Dispatch
@@ -719,8 +714,9 @@ message GetIntegrationsStateResponse {
 }
 ```
 
-This is optional. We can keep event seed data private initially and add query visibility once the
-scenario requirements are stable.
+The workshop-facing state/query or REST inspection endpoint should expose all reference/demo data
+needed to explain a run: warehouses, shipping addresses, shipments, rates, synthesized labels, and
+location-event fixture configuration.
 
 Proposed JSON fixture shape:
 
@@ -758,6 +754,7 @@ Proposed JSON fixture shape:
       "labels": [
         {
           "rate_id": "rate_ups_ground_nyc_01",
+          "source": "synthetic",
           "tracking_number": "1ZFIXTURE000000001",
           "label_url": "https://example.invalid/labels/1ZFIXTURE000000001.pdf"
         }
@@ -792,11 +789,13 @@ Planned addition:
       nexus-service-beans:
         - commerce-app-service
         - pims-service
-        - payments-service
         - inventory-service
         - location-events-service
         - shipping-catalog-service
 ```
+
+Payments is intentionally omitted from the workshop integration registration unless a future
+exercise introduces payment validation.
 
 Shipping catalog configuration:
 
@@ -820,10 +819,11 @@ capture script or a deliberate developer task.
 Deliverables:
 
 - [ ] Review this spec and confirm the in-scope services
-- [ ] Decide whether payments stays registered but out of the workshop narrative
-- [ ] Confirm the shared Spring service/cache shape for shipping catalog runtime lookups
-- [ ] Confirm the REST endpoint names and whether they ship in the first implementation pass
-- [ ] Confirm the Nexus service names for shipping catalog and location-events
+- [ ] Remove payments from the workshop integration narrative and registration unless a future
+      exercise needs it
+- [ ] Document the shared Spring service/cache shape for shipping catalog runtime lookups
+- [ ] Document the REST endpoint names under `apps-api`
+- [ ] Document the Nexus service names for shipping catalog and location-events
 - [ ] Define the minimum seeded scenarios needed for the workshop
 
 ### Phase 2: EasyPost Fixture Capture
@@ -835,7 +835,8 @@ Deliverables:
 - [ ] Write a capture script that verifies addresses through EasyPost and persists address
       payloads, coordinates, and timezones
 - [ ] For each configured origin/destination pair, capture shipment and all returned rates
-- [ ] For every captured rate, capture a deterministic label/tracking payload in EasyPost test mode
+- [ ] For every captured rate, generate a deterministic synthetic label/tracking payload from
+      `shipment_id + rate_id`
 - [ ] Write `shipping-catalog.json` with stable IDs and enough raw payload detail to debug fixture
       mismatches
 - [ ] Document how to refresh fixtures intentionally without changing runtime behavior
@@ -859,9 +860,9 @@ Deliverables:
 Deliverables:
 
 - [ ] Create `LocationEventsService` Nexus interface
-- [ ] Create `LocationEventsServiceImpl` in `apps-core`
-- [ ] Add `getLocationEvents` Update + validator to `Integrations`
-- [ ] Add stubbed location event rules to `IntegrationsImpl`
+- [ ] Create `LocationEventsServiceImpl` backed by the shared Spring service/cache pattern
+- [ ] Return empty events and `RISK_LEVEL_NONE` in the first pass
+- [ ] Leave room for future input-derived risk hints without adding scenario fields now
 - [ ] Register `location-events-service` on the `integrations` worker
 
 ### Phase 5: ShippingAgent Dispatch Migration
@@ -887,6 +888,10 @@ Deliverables:
 - [ ] Remove EasyPost key as a runtime requirement for local/workshop fulfillment workers
 - [ ] Keep failure behavior for invalid address/rate IDs deterministic and non-retryable
 
+Initial implementation should deliver Phases 2-6 together. Splitting `location-events` from
+EasyPost replacement would leave the workshop dependent on the same scattered integration paths
+this spec is intended to remove.
+
 ### Phase 7: Workshop Exercise Material
 
 Deliverables:
@@ -909,8 +914,8 @@ To Create:
   Nexus handler
 - `java/apps/apps-core/src/main/java/com/acme/apps/services/ShippingCatalogServiceImpl.java` -
   Nexus handler or shared service adapter
-- `java/apps/apps-core/src/main/java/com/acme/apps/controllers/ShippingCatalogController.java` -
-  optional REST controller
+- `java/apps/apps-api/src/main/java/com/acme/apps/controllers/ShippingCatalogController.java` -
+  REST controller
 - `java/apps/apps-core/src/main/resources/fixtures/shipping-catalog.json` - captured fixture
   database
 - `scripts/capture-easypost-fixtures.*` - offline fixture capture script
@@ -919,11 +924,12 @@ To Create:
 
 To Modify:
 
-- `java/apps/apps-core/src/main/java/com/acme/apps/workflows/Integrations.java` - add location
-  events and shipping catalog Update contracts if workflow-backed
-- `java/apps/apps-core/src/main/java/com/acme/apps/workflows/IntegrationsImpl.java` - implement
-  seeded location events and/or delegate shipping catalog calls
-- `java/apps/apps-core/src/main/resources/acme.apps.yaml` - register location-events service bean
+- `java/apps/apps-core/src/main/java/com/acme/apps/workflows/Integrations.java` - keep existing
+  workflow-backed commerce/PIMS/inventory update contracts
+- `java/apps/apps-core/src/main/java/com/acme/apps/workflows/IntegrationsImpl.java` - expose
+  queryable demo data as needed for workshop inspection
+- `java/apps/apps-core/src/main/resources/acme.apps.yaml` - register location-events and
+  shipping-catalog service beans; omit payments for workshop mode
 - `java/fulfillment/fulfillment-core/src/main/java/com/acme/fulfillment/workflows/activities/CarriersImpl.java` -
   replace EasyPost address and label calls with fixture-backed service calls
 - `python/fulfillment/src/agents/workflows/shipping_agent.py` - switch tool dispatch to Nexus
@@ -957,8 +963,10 @@ To Modify:
   preserved and triggers SLA-breach fixture behavior
 - Shipping catalog: `selected_shipment.paid_price.units=1` triggers margin leak/spike fixture
   behavior without changing message contracts
-- Location-events: seeded coordinate/date window returns expected risk summary and event list
-- Location-events: no matching seed returns `RISK_LEVEL_NONE` and no events
+- Location-events: first pass returns `RISK_LEVEL_NONE`, empty events, and echoes the request
+  window/timezone
+- Location-events: fixture configuration is visible for future enrichment even when no events are
+  returned
 
 ### Integration Tests
 
@@ -971,6 +979,7 @@ To Modify:
   `recommended_option_id`
 - REST and Nexus shipping catalog calls return identical payloads for the same request when both
   access paths are enabled
+- REST and Nexus location-events calls return identical empty-risk payloads in the first pass
 - `apps.Integrations` starts lazily through `UpdateWithStart` and remains queryable
 
 ### Validation Checklist
@@ -980,7 +989,8 @@ To Modify:
 - [ ] ShippingAgent tests pass with fixture-backed `get_carrier_rates`
 - [ ] Fulfillment label-printing tests pass without EasyPost
 - [ ] Temporal UI shows one long-running `apps.Integrations` workflow
-- [ ] Workshop scenario can demonstrate at least one non-empty location risk result
+- [ ] Workshop can inspect location-event fixture configuration even though first pass returns no
+      events
 - [ ] Workshop scenario can demonstrate margin leak/spike with `paid_price.units=1`
 - [ ] Workshop scenario can demonstrate SLA breach with explicit `delivery_days=0`
 - [ ] Local startup succeeds without `EASYPOST_API_KEY` in fixture mode
@@ -991,15 +1001,15 @@ To Modify:
 
 | Risk | Impact | Likelihood | Mitigation |
 |------|--------|------------|-----------|
-| `location-events` migration introduces cross-language Nexus friction | Medium | Medium | Keep the current Python activity until the Nexus path has parity tests |
+| `location-events` migration introduces cross-language Nexus friction | Medium | Medium | Implement it through the same shared Spring service/cache pattern and add parity tests before removing the Python activity |
 | Single integration workflow becomes a dumping ground | Medium | Medium | Limit it to workshop stubs and document promotion criteria for real services |
-| Seeded behavior becomes too artificial for the ShippingAgent prompt | Medium | Medium | Use realistic event titles, categories, ranks, and windows even when data is static |
+| Seeded behavior becomes too artificial for the ShippingAgent prompt | Medium | Medium | Keep first-pass location events empty; add realistic event titles, categories, ranks, and windows only when enrichment is designed |
 | EasyPost warehouse verification slows or blocks workshop startup | High | Medium | Remove runtime verification; load precomputed address fixtures |
 | Fixture capture script accidentally changes stable IDs | Medium | Medium | Generate deterministic IDs from address/route/rate keys and review fixture diffs |
 | Captured rates do not naturally match a desired SLA scenario | Medium | Medium | Mutate copied rate payloads on demand based on scenario inputs |
 | REST and Nexus implementations drift | Medium | Medium | Put fixture logic in one Spring service and keep controllers/handlers thin |
 | Removing EasyPost hides real integration errors | Low | Medium | Keep capture mode documented and make fixture failures explicit/non-retryable |
-| Payments remains registered but undocumented in the exercise | Low | High | Explicitly call payments out as out of scope unless the workshop narrative needs it |
+| Payments remains registered but undocumented in the exercise | Low | High | Remove payments from workshop registration unless the workshop narrative needs it |
 
 ---
 
@@ -1023,36 +1033,30 @@ To Modify:
 ### Rollout Blockers
 
 - Confirm the Java/Python Nexus wiring for the new `location-events` service
-- Confirm the seeded risk scenarios and how they map to exercise outcomes
 - Confirm whether generated code can reference `GetLocationEventsRequest/Response` from the Java
   apps module without additional build changes
-- Confirm the shared Spring service/cache boundaries for shipping catalog and its Nexus/REST
-  adapters
-- Confirm where the canonical fixture JSON should live and how it is refreshed
 
 ---
 
-## Open Questions & Notes
+## Resolved Decisions & Notes
 
-### Questions for Review
+### Resolved Decisions
 
-- [ ] Should `location-events` be backed by the same shared Spring service/cache pattern, or remain
-      workflow-backed through `apps.Integrations`?
-- [ ] Which seeded location-risk scenarios do we need: margin spike, SLA breach, or both?
-- [ ] Should `GetIntegrationsStateResponse` expose location event seeds, or is warehouse state
-      enough for the first exercise?
-- [ ] Do we want an environment variable override for seeded scenarios, or should scenario data be
-      fixed in code like the current item catalog?
-- [ ] Should payments be removed from the integrations worker registration for the workshop, or
-      left registered but out of scope?
-- [ ] Should fixture selection use an explicit global `scenarios` input now, or should we start
-      with request-field triggers and add global scenarios later?
-- [ ] What is the minimum destination-address set needed for realistic-looking captured payloads
-      now that delivery-day scenarios can be produced by runtime mutation?
-- [ ] Should the fixture capture script buy test labels for every captured rate, or synthesize
-      label responses from rate IDs after capturing rates?
-- [ ] Should REST endpoints live in `apps-api` or `apps-core`, given the catalog may serve both
-      Nexus and local worker activities?
+- [x] `location-events` uses the same shared Spring service/cache pattern as shipping catalog
+- [x] first-pass `location-events` returns `RISK_LEVEL_NONE` and an empty event list; risk
+      enrichment is deferred
+- [x] all demo/reference fixture data should be inspectable: warehouses, addresses, shipments,
+      rates, labels, and location-event fixture configuration
+- [x] scenario behavior starts with request-field triggers, not a global `scenarios` input
+- [x] payments is removed from the workshop integration path unless a future exercise needs it
+- [x] fixture capture should add roughly 10 legitimate destination addresses that EasyPost accepts
+      for variety
+- [x] labels are synthesized deterministically from `shipment_id + rate_id`; the capture script
+      does not need to buy labels
+- [x] REST endpoints live in `apps-api`
+- [x] canonical fixture JSON lives under `apps-core/src/main/resources/fixtures` so it is packaged
+      for local and Kubernetes runs
+- [x] EasyPost replacement and `location-events` migration should be delivered together
 
 ### Implementation Notes
 
