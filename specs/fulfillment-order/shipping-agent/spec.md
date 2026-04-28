@@ -4,7 +4,7 @@
 **Status:** Draft
 **Owner:** Temporal FDE Team
 **Created:** 2026-04-15
-**Updated:** 2026-04-15
+**Updated:** 2026-04-25
 
 ---
 
@@ -22,12 +22,13 @@ The workflow is keyed on `customer_id` and never concludes. It caches shipping c
 a content hash of the request inputs so repeated calls for the same order characteristics are
 served from state without re-invoking the LLM or external APIs.
 
-The agent uses Claude (Anthropic API) with four registered Temporal activities as tools:
+The agent uses Claude (Anthropic API) with five registered Temporal activities as tools:
 
-- `lookup_inventory_location` — resolve sku_ids to a warehouse address
+- `lookup_inventory_address` — resolve sku_ids to a warehouse address
 - `verify_address` — verify a raw address via EasyPost (returns `easypost_address.id` + coordinate)
 - `get_carrier_rates` — create an EasyPost Shipment and retrieve carrier rates
-- `get_location_events` — query PredictHQ for supply chain risk events at an address
+- `get_location_events` — query for supply chain risk events at an address
+- `find_alternate_warehouse` — locate a different warehouse when all rates fail margin or SLA
 
 Claude dispatches these tools in whatever order and concurrency it determines appropriate. When
 multiple tool calls are returned in a single LLM response, the implementation dispatches them as
@@ -77,6 +78,11 @@ request — warehouse resolution is the agent's job regardless of caller.
 - [ ] `fulfillment.Order` V2 receives the recommendation and applies its own decision logic
 - [ ] Old `fulfillment.Order` V1 workflows (PINNED) complete unaffected on V1 workers; V2 is a
       clean new build-id — no `getVersion()` branching needed
+- [ ] `find_alternate_warehouse` is called before any `MARGIN_SPIKE` or `SLA_BREACH` finalize
+- [ ] Post-loop rejection re-invokes the LLM when `MARGIN_SPIKE`/`SLA_BREACH` is finalized
+      without a prior `find_alternate_warehouse` call; second finalize is accepted once the
+      tool has been called
+- [ ] `MARGIN_SPIKE` path is reliably exercised in tests by setting `customer_paid_price.units=1`
 
 ---
 
@@ -86,8 +92,8 @@ request — warehouse resolution is the agent's job regardless of caller.
   with no SCRM data, no inventory location reasoning, and no LLM
 - `shipping_agent.proto` exists with `StartShippingAgentRequest`, a partially-defined
   `CalculateShippingOptionsRequest/Response`, and `GetLocationEventsRequest/Response`
-- `values.proto` has `LocationEvent`, `LocationRiskSummary`, and `RiskLevel` — the PredictHQ
-  data model is already designed
+- `values.proto` has `LocationEvent`, `LocationRiskSummary`, and `RiskLevel` — data model is
+  already designed
 - `ShippingAgent` workflow is not implemented; Python fulfillment module skeleton exists at
   `python/fulfillment/`
 
@@ -149,12 +155,23 @@ The workflow runs a standard hand-rolled agentic loop:
    the system prompt string. Includes: margin threshold rule, SLA rule, path instruction
    (warehouse resolution vs. pre-verified `from_address`), concurrency instruction, and final
    JSON output format.
-3. Build tool definitions for the four registered activities
+3. Build tool definitions: the four registered activity tools plus a fifth internal-only
+   `finalize_recommendation` tool (see Design Decisions — Structured output via `finalize_recommendation`)
 4. Iterate:
    a. Call Claude (via `call_llm` activity — Anthropic API)
-   b. If response contains `tool_use` blocks: dispatch all as concurrent Temporal activities,
-      append all `tool_result` blocks to messages, continue loop
-   c. If response is text: parse `ShippingRecommendation`, exit loop
+   b. If response contains `tool_use` blocks and one block is `finalize_recommendation`:
+      - If outcome is `MARGIN_SPIKE` or `SLA_BREACH` and `find_alternate_warehouse` was
+        not called in any prior turn: inject a `tool_result` rejection block and continue
+        the loop — the LLM is forced to call the tool before the outcome is accepted
+        (see Phase 6 Hardening — post-loop enforcement)
+      - Otherwise: extract `ShippingRecommendation` directly from the tool input dict
+        (always valid SDK-serialized JSON — no text parsing) and exit the loop
+   c. If response contains `tool_use` blocks with no `finalize_recommendation`: dispatch
+      all real activity tools as concurrent Temporal activities, track any
+      `find_alternate_warehouse` calls, append all `tool_result` blocks to messages,
+      continue loop
+   d. If `END_TURN` fires without a preceding `finalize_recommendation` call: raise a
+      retryable `ApplicationError` — the LLM did not follow instructions
 5. Cache result keyed by content hash with TTL
 6. Return `CalculateShippingOptionsResponse`
 
@@ -165,11 +182,21 @@ The workflow runs a standard hand-rolled agentic loop:
 | `PROCEED` | Original rate valid, within margin, SLA met | Use original option |
 | `CHEAPER_AVAILABLE` | A cheaper option meets the SLA | Consider substituting; margin saved |
 | `FASTER_AVAILABLE` | A faster option is within margin | Surface as upgrade; caller decides |
-| `MARGIN_SPIKE` | Original cost exceeds `customer_paid_price` + threshold | Use recommended fallback; set `margin_leak` SA |
-| `SLA_BREACH` | No available option meets `transit_days_sla` | Escalate; `fulfillment.Order` signals support |
+| `MARGIN_SPIKE` | All rates exceed `customer_paid_price`; no alternate warehouse saves it | Use recommended fallback; set `margin_leak` SA |
+| `SLA_BREACH` | No rate meets `transit_days_sla`; no alternate warehouse offers a faster option | Use fastest available rate (best-effort); `fulfillment.Order` sets `sla_breach_days` SA (actual_days − promised_days); `is_fallback=true` on `ShippingSelection` |
 
-The LLM reasons across origin SCRM, destination SCRM, and carrier rates to arrive at one of
-these outcomes and a `recommended_option_id`.
+Before finalizing `MARGIN_SPIKE` or `SLA_BREACH`, the agent **must** call `find_alternate_warehouse`.
+A warehouse closer to the destination may offer rates that resolve the margin overage or meet
+the SLA — the outcome should only be `MARGIN_SPIKE`/`SLA_BREACH` once that possibility is
+exhausted. This requirement is enforced at two levels: the system prompt makes it explicit, and
+the workflow loop rejects a premature finalize and re-invokes the LLM (see Phase 6 Hardening).
+
+The LLM reasons across origin SCRM, destination SCRM, carrier rates, and (when needed) the
+alternate warehouse response to arrive at one of these outcomes and a `recommended_option_id`.
+For `MARGIN_SPIKE`, `recommended_option_id` is the cheapest available rate (even if it exceeds
+the paid price). For `SLA_BREACH`, `recommended_option_id` is the fastest available rate (even
+if it misses the SLA) — the order still ships, it just ships late. `recommended_option_id` is
+never empty.
 
 ### Caching
 
@@ -200,9 +227,12 @@ Cache key: `fn(sorted(from_easypost_ids), sorted([(skuId, qty)]), destinationPos
 | Concurrency from multi-tool LLM responses | Claude returns multiple `tool_use` blocks in one response when it recognizes no dependency; implementation dispatches them as concurrent activities | Sequential tool dispatch — loses latency benefit, doesn't demonstrate Temporal's concurrent activity pattern |
 | ShippingAgent recommends, `fulfillment.Order` decides | Keeps the agent focused on logistics reasoning; business rules (margin policy, SLA enforcement) stay in `fulfillment.Order` | Agent makes the final selection — couples business rules to the Python agent |
 | `lookup_inventory_location` always called; no `from_address` in request | Caller provides `sku_id`s — warehouse resolution is the agent's responsibility regardless of whether the caller is `fulfillment.Order` (EnrichedItem skus) or cart (cart item skus). Avoids a two-path design where callers must know about warehouse assignment. | Pre-resolve warehouse in caller and pass `from_address` — couples callers to inventory logic and creates a split path with different LLM behaviour |
-| Separate `fulfillment-easypost` (5 rps) and `fulfillment-predicthq` (50 rps) task queues | EasyPost and PredictHQ limits differ by 10×; sharing one queue forces both to the 5 rps floor, wasting 45 rps of PredictHQ capacity | Single shared queue — simpler setup but throttles PredictHQ to EasyPost's limit |
+| Separate `fulfillment-easypost` (5 rps) task queue | EasyPost rate limit is a hard constraint; EasyPost activities run on their own queue to avoid interfering with other activities | Single shared queue — simpler but risks throttling non-EasyPost activities |
 | Worker Versioning (new build-id) for V2 cutover | `fulfillment.Order` is PINNED and has no history to bridge; old workflows complete on V1 workers, new ones pick up V2 cleanly | `Workflow.getVersion()` — unnecessary for a new workflow with no pre-existing history |
 | System prompt built in `build_system_prompt` LocalActivity (not inline workflow code) | LocalActivity result is memoized in event history; on replay, Temporal returns the memoized value and ignores the current implementation. Prompt text can be updated and redeployed without a build-id bump — in-flight workflows replay against the original prompt from history. Inline function: any text change produces different `call_llm` args than history → non-determinism error on replay. | Inline `_build_system_prompt` function — simple but couples prompt iteration to build-id lifecycle |
+| Structured output via `finalize_recommendation` tool, not raw JSON text parsing | Observed in production: models (especially smaller ones like `claude-haiku-4-5`) frequently add preamble, analysis prose, or markdown code fences before or instead of the requested JSON, causing `json.loads()` to fail non-retryably. Tool call inputs are always SDK-serialized, structurally valid JSON — prose contamination is impossible. This is Anthropic's recommended approach for guaranteed structured output: define a tool the model must call to submit its answer, give it a strict JSON Schema with enum constraints, and extract the recommendation directly from `block.tool_use.input`. The `finalize_recommendation` tool is never dispatched to an activity; the loop detects it by name and exits. | System prompt instruction "output only raw JSON — no preamble, no markdown": the model can and does ignore this under certain prompting conditions; failures accumulate silently until a retry happens to comply |
+| Post-loop rejection enforces `find_alternate_warehouse` before MARGIN_SPIKE/SLA_BREACH | Prompt-only instructions are stochastic — the LLM may skip the tool call, especially under token pressure or on less capable models. The workflow loop tracks a `alternate_warehouse_called` boolean; if `finalize_recommendation` arrives with a negative outcome before the tool was called, the loop injects a `tool_result` rejection and re-invokes the LLM. This is a hard workflow-layer guarantee that requires zero prompt compliance. | Prompt instruction only ("MANDATORY: call find_alternate_warehouse first") — works in most cases but not all; failures are silent and produce incorrect outcomes rather than retryable errors |
+| Test trigger via `customer_paid_price=1` (1 cent), not SKU-based rate injection | To exercise the `find_alternate_warehouse` path, the MARGIN_SPIKE condition must be reliably induced. `customer_paid_price` is already the direct trigger in the system prompt margin rule — setting it to 1 cent ensures every real EasyPost rate exceeds it deterministically. SKU-based rate injection would require threading the original item list through the dispatch layer to conditionally override EasyPost responses, adding test-specific logic to a production path. `customer_paid_price=1` requires no code changes. | Intercept `get_carrier_rates` dispatch and return synthetic high rates for test SKU prefixes — adds production-path complexity, creates a maintenance surface, and only works in test |
 
 ### Component Design
 
@@ -221,21 +251,16 @@ Cache key: `fn(sorted(from_easypost_ids), sorted([(skuId, qty)]), destinationPos
 
 #### Activity Task Queues & Rate Limits
 
-EasyPost and PredictHQ have very different published rate limits, so activities that call them
-run on dedicated task queues with per-queue rate limiting. The main `fulfillment` queue is used
-for activities that call no external rate-limited API.
+EasyPost activities run on a dedicated queue with per-queue rate limiting. All other activities
+run on the main `agents` queue.
 
 | Activity | Task Queue | Rate Limit | Rationale |
 |---|---|---|---|
-| `lookup_inventory_location` | `fulfillment` | none | Internal config / inventory service; no external rate limit |
-| `call_llm` | `fulfillment` | none | Anthropic API; rate limit managed separately at LLM tier |
+| `lookup_inventory_location` | `agents` | none | Internal config / inventory service; no external rate limit |
+| `call_llm` | `agents` | none | Anthropic API; rate limit managed separately at LLM tier |
+| `get_location_events` | `agents` | none | Stubbed — no external API; see location-events spec |
 | `verify_address` | `fulfillment-easypost` | 5 rps | EasyPost index ops: 5 rps documented; write ops load-based — 5 rps is the conservative safe bound |
 | `get_carrier_rates` | `fulfillment-easypost` | 5 rps | Same EasyPost account quota; shares the 5 rps budget |
-| `get_location_events` | `fulfillment-predicthq` | 50 rps | PredictHQ documented limit |
-
-EasyPost and PredictHQ limits differ by 10×; sharing a single queue would cap PredictHQ at
-EasyPost's 5 rps floor, wasting 45 rps of headroom. Separate queues let each API run at its
-actual limit.
 
 Worker configuration for each queue sets `max_activities_per_second` on the worker (or
 `maxTaskQueueActivitiesPerSecond` server-side) to enforce the limit. Activity options in the
@@ -282,11 +307,19 @@ to its designated task queue via `ActivityOptions(task_queue=...)`.
 - Wraps EasyPost Shipment creation + rate retrieval
 
 **`get_location_events`**
-- **Task Queue:** `fulfillment-predicthq` (50 rps)
+- **Task Queue:** `agents`
 - Input: `Coordinate`, `within_km`, `active_from`, `active_to`, `timezone`
 - Output: `LocationRiskSummary`, `[LocationEvent]`
-- Wraps PredictHQ Events API
+- Currently stubbed — returns no events; see `specs/fulfillment/location-events/spec.md` for planned implementation
 - Called twice per calculation (origin + destination) — expected to run concurrently
+
+**`find_alternate_warehouse`**
+- **Task Queue:** Nexus (`fulfillment` namespace via `integrations` endpoint)
+- Input: `FindAlternateWarehouseRequest` — `items: [ShippingLineItem]`, `exclude_address` (the warehouse already tried)
+- Output: `FindAlternateWarehouseResponse` — `address: Address` (empty if none available)
+- Calls the Integrations API (Nexus) to locate a different warehouse that can fulfill the same items
+- Called at most once per agentic loop execution — only when a MARGIN_SPIKE or SLA_BREACH condition is detected before finalizing
+- An empty `address` in the response is a valid outcome; it confirms no alternate exists and the agent proceeds to finalize the negative outcome
 
 #### Nexus Service
 
@@ -323,8 +356,8 @@ Proto definitions are the source of truth. This section describes intent only.
 - `recommended_option_id`: string
 - `reasoning`: string (LLM explanation, for logging and support visibility)
 - `margin_delta_cents`: int64 (positive = over margin, negative = savings)
-- `origin_risk_level`: `RiskLevel` (from `from_address` PredictHQ)
-- `destination_risk_level`: `RiskLevel` (from `to_address` PredictHQ)
+- `origin_risk_level`: `RiskLevel` (from `from_address` location events)
+- `destination_risk_level`: `RiskLevel` (from `to_address` location events)
 
 **`StartShippingAgentRequest`** — extend `ShippingAgentExecutionOptions` with:
 - `cache_ttl_secs`: optional int64
@@ -375,12 +408,11 @@ added in Phase 1 alongside the `shipping_agent.proto` changes.
 - [ ] `lookup_inventory_location` — returns `[{address, items}]` groups; V1 static TOML config returns one group (all items → single warehouse); agent handles any number of groups without changes
 - [ ] `verify_address` — EasyPost `AddressService.createAndVerify()`; populate `coordinate` from response
 - [ ] `get_carrier_rates` — EasyPost Shipment creation + rate retrieval (already exists as `DeliveryService` in Java; Python version needed)
-- [ ] `get_location_events` — PredictHQ Events API (already has proto definition; implement Python activity)
+- [ ] `get_location_events` — stubbed; returns no events (see `specs/fulfillment/location-events/` for planned real implementation)
 - [ ] `call_llm` — Anthropic API activity: sends messages + tool definitions to Claude, returns response
 - [ ] Register activities on the correct workers per task queue:
-  - `lookup_inventory_location` + `call_llm` → `fulfillment` worker (no external rate limit)
+  - `lookup_inventory_location` + `call_llm` + `get_location_events` → `agents` worker (no external rate limit)
   - `verify_address` + `get_carrier_rates` → `fulfillment-easypost` worker (`max_activities_per_second=5`)
-  - `get_location_events` → `fulfillment-predicthq` worker (`max_activities_per_second=50`)
 
 ### Phase 3 — ShippingAgent Workflow
 
@@ -413,8 +445,40 @@ added in Phase 1 alongside the `shipping_agent.proto` changes.
 - [ ] Python `ShippingAgentImpl` Nexus handler: UpdateWithStart on `ShippingAgent` workflow with `WORKFLOW_ID_CONFLICT_POLICY_USE_EXISTING`
 - [ ] Register `shipping-agent` Nexus endpoint in Temporal cluster
 - [ ] `fulfillment.Order` V2: replace `DeliveryService.getCarrierRates()` in `fulfillOrder` handler with `ShippingAgent` Nexus call
-- [ ] `fulfillment.Order` applies `ShippingRecommendation`: selects rate, sets `margin_leak` SA on `MARGIN_SPIKE`, signals support on `SLA_BREACH`
+- [ ] `fulfillment.Order` applies `ShippingRecommendation`: selects rate, sets `margin_leak` SA on `MARGIN_SPIKE`, sets `sla_breach_days` SA (actual_days − promised_days) and `is_fallback=true` on `SLA_BREACH`
 - [ ] Deploy `fulfillment-workers` (Python) with new build-id; mark as default
+
+### Phase 6 — Alternate Warehouse Path Hardening
+
+This phase hardens the `find_alternate_warehouse` requirement from a behavioral nudge into a
+workflow-layer guarantee. The agent is already working end-to-end; this phase ensures the
+alternate warehouse path is reliably exercised and structurally enforced rather than prompt-dependent.
+
+- [ ] **Prompt hardening** (`llm.py` — `build_system_prompt`)
+  - Change `"RECOMMENDED ACTIONS:"` heading to `"MANDATORY ACTIONS:"`
+  - Replace the soft "call before returning MARGIN_SPIKE or SLA_BREACH" language with explicit
+    mandatory framing: you MUST call `find_alternate_warehouse` before calling
+    `finalize_recommendation` with either outcome; the system will reject a premature finalize
+  - Both the `find_alternate_warehouse` tool description and the system prompt rule should be
+    consistent: the tool description already says "Call before returning MARGIN_SPIKE or
+    SLA_BREACH" — tighten to "You MUST call this before returning MARGIN_SPIKE or SLA_BREACH"
+
+- [ ] **Post-loop enforcement** (`shipping_agent.py` — `_run_react_loop`)
+  - Add `alternate_warehouse_called: bool = False` tracking variable at the top of the loop
+  - Set it to `True` when a `find_alternate_warehouse` block appears in any tool dispatch batch
+  - When `finalize_recommendation` is detected with `outcome` of `MARGIN_SPIKE` or `SLA_BREACH`
+    and `alternate_warehouse_called` is `False`:
+    - Do **not** break the loop
+    - Append a `tool_result` message for the `finalize_recommendation` block with content:
+      `{"error": "REJECTED: You must call find_alternate_warehouse before returning MARGIN_SPIKE or SLA_BREACH. Call it now, then re-submit your recommendation."}`
+    - Continue the loop — the LLM will see its finalize was refused and must call the tool
+  - When `alternate_warehouse_called` is `True`: accept the finalize as normal
+
+- [ ] **Unit tests** (`tests/test_shipping_agent.py`)
+  - `MARGIN_SPIKE` + no alternate call → rejection injected → LLM calls `find_alternate_warehouse` → finalize accepted
+  - `SLA_BREACH` + no alternate call → same rejection pattern
+  - `MARGIN_SPIKE` + alternate call already in history → finalize accepted without rejection
+  - `customer_paid_price=1` integration smoke: use a real or mocked EasyPost rate ≥ 1 cent to confirm the MARGIN_SPIKE path is triggered deterministically
 
 ### Phase 5 — Workshop Scenarios
 
@@ -447,12 +511,14 @@ added in Phase 1 alongside the `shipping_agent.proto` changes.
 
 | Risk | Impact | Likelihood | Mitigation |
 |---|---|---|---|
-| LLM response structure is unpredictable — `ShippingRecommendation` parsing fails | High | Medium | Use structured output / JSON mode in Claude API call; validate schema before caching |
+| LLM response structure is unpredictable — `ShippingRecommendation` parsing fails | High | Low | Mitigated by the `finalize_recommendation` tool (forced tool use for structured output): the final answer is always submitted as a tool call input, never as free-form text. Tool inputs are SDK-serialized JSON; prose and markdown contamination are structurally impossible. See Design Decisions. |
 | Inventory Locations spec not ready — `lookup_inventory_location` has nothing to query | High | High | V1 workaround: static config with hardcoded warehouse(s); unblock Workshop with seed data |
 | EasyPost write-op rate limit undocumented — actual limit for `createAndVerify` / Shipment creation may differ from the 5 rps index limit | Medium | Medium | 5 rps is the safe conservative bound; monitor 429 responses in workshop and raise if sustained throttling is observed |
-| PredictHQ API latency spikes degrade UpdateWithStart round-trip | Medium | Low | Set activity `start_to_close_timeout`; LLM can reason with partial data if one tool times out |
+| Location events tool returns no risk data (stubbed) | Low | — | By design until real implementation lands; LLM reasons correctly with RISK_LEVEL_NONE |
 | `EasyPostAddress` missing `coordinate` — `get_location_events` cannot run | High | Medium | Noted in Data Model section; must be added in Phase 1 before Phase 3 can proceed |
 | Long-running `ShippingAgent` accumulates unbounded cache entries | Low | Medium | TTL eviction on cache reads; `continue_as_new` if cache map exceeds size threshold |
+| LLM skips `find_alternate_warehouse` despite prompt instruction | Medium | Medium | Post-loop enforcement in Phase 6: the workflow rejects a premature MARGIN_SPIKE/SLA_BREACH finalize and forces another loop iteration; the LLM cannot skip the tool without receiving an explicit rejection |
+| Post-loop rejection loops indefinitely if LLM ignores the correction | Low | Low | The existing `ApplicationError` on `END_TURN` without finalize already surfaces as a retryable failure; a loop guard (max iterations counter) can be added if observed in practice |
 
 ---
 
@@ -460,9 +526,9 @@ added in Phase 1 alongside the `shipping_agent.proto` changes.
 
 All open questions resolved:
 
-- [x] What is the PredictHQ `within_km` radius default for Workshop demos? **50km**
+- [x] What is the `within_km` radius default for Workshop demos? **50km**
 - [x] What is the default `cache_ttl_secs`? **1800 (30 minutes)**
-- [x] Should `SLA_BREACH` signal a support workflow directly from `ShippingAgent`, or return the outcome and let `fulfillment.Order` decide? **`fulfillment.Order` handles it** — ShippingAgent returns the `SLA_BREACH` outcome; `fulfillment.Order` decides what to do (consistent with "recommends, not decides" principle)
+- [x] Should `SLA_BREACH` signal a support workflow directly from `ShippingAgent`, or return the outcome and let `fulfillment.Order` decide? **`fulfillment.Order` handles it** — ShippingAgent returns `SLA_BREACH` with the fastest available `recommended_option_id`; `fulfillment.Order` ships best-effort, records the breach via `sla_breach_days` SA, and marks the selection `is_fallback=true`. Human-in-the-loop escalation is deferred (see Deferred Work).
 
 ---
 
@@ -518,6 +584,27 @@ in its own right and warrants a dedicated spec.
 
 ---
 
+### Human-in-the-Loop SLA Breach Escalation
+
+**What:** When `SLA_BREACH` is confirmed (after `find_alternate_warehouse` is exhausted),
+pause the `fulfillment.Order` workflow and wait for a Temporal Signal from a support agent
+before printing the label. The support agent can approve the fastest available rate (current
+behaviour), override the rate selection, or cancel the order. The `sla_breach_days` SA makes
+breached workflows easily discoverable from the Temporal UI or via search.
+
+**Why deferred:** The current best-effort approach (ship fastest, record the breach) is the
+right default for automation at scale — a human decision gate adds latency and requires a
+support queue integration that is out of scope for the Workshop. The `sla_breach_days` SA
+provides the observability needed to identify and process breaches asynchronously.
+
+**Consideration for production:** A dedicated `SupportEscalation` workflow (or Signal handler
+on `fulfillment.Order`) could consume the breach event, page on-call, and inject the support
+decision back as a Signal. The `Workflow.await()` hold with a configurable timeout (auto-approve
+fastest rate if no Signal arrives within N minutes) keeps the order moving even if support is
+slow to respond.
+
+---
+
 ## References
 
 - [`shipping_agent.proto`](../../../proto/acme/fulfillment/domain/v1/shipping_agent.proto)
@@ -525,4 +612,4 @@ in its own right and warrants a dedicated spec.
 - [`fulfillment.Order` spec](../fulfillment-order-workflow/spec.md) — Phase 7: V2 wiring
 - [Temporal AI Cookbook — Agentic Loop with Claude (Python)](https://docs.temporal.io/ai-cookbook/agentic-loop-tool-call-claude-python)
 - [EasyPost Java SDK — AddressService](https://easypost.github.io/easypost-java/com/easypost/service/AddressService.html)
-- [PredictHQ Events API](https://docs.predicthq.com/api/events)
+- [Location Events spec](../../fulfillment/location-events/spec.md)

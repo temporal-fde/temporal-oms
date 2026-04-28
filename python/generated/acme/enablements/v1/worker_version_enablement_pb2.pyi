@@ -12,7 +12,7 @@ from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class StartWorkerVersionEnablementRequest(_message.Message):
-    __slots__ = ("enablement_id", "order_count", "submit_rate_per_min", "timeout", "order_id_seed")
+    __slots__ = ()
     ENABLEMENT_ID_FIELD_NUMBER: _ClassVar[int]
     ORDER_COUNT_FIELD_NUMBER: _ClassVar[int]
     SUBMIT_RATE_PER_MIN_FIELD_NUMBER: _ClassVar[int]
@@ -26,7 +26,7 @@ class StartWorkerVersionEnablementRequest(_message.Message):
     def __init__(self, enablement_id: _Optional[str] = ..., order_count: _Optional[int] = ..., submit_rate_per_min: _Optional[int] = ..., timeout: _Optional[_Union[datetime.timedelta, _duration_pb2.Duration, _Mapping]] = ..., order_id_seed: _Optional[str] = ...) -> None: ...
 
 class WorkerVersionEnablementState(_message.Message):
-    __slots__ = ("enablement_id", "args", "current_phase", "orders_submitted_count", "orders_per_minute", "active_versions", "last_transition_at", "deploy_requests", "deployments")
+    __slots__ = ()
     class DemoPhase(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         DEMO_PHASE_UNSPECIFIED: _ClassVar[WorkerVersionEnablementState.DemoPhase]
@@ -60,7 +60,7 @@ class WorkerVersionEnablementState(_message.Message):
     def __init__(self, enablement_id: _Optional[str] = ..., args: _Optional[_Union[StartWorkerVersionEnablementRequest, _Mapping]] = ..., current_phase: _Optional[_Union[WorkerVersionEnablementState.DemoPhase, str]] = ..., orders_submitted_count: _Optional[int] = ..., orders_per_minute: _Optional[float] = ..., active_versions: _Optional[_Iterable[str]] = ..., last_transition_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., deploy_requests: _Optional[_Iterable[_Union[DeployWorkerVersionRequest, _Mapping]]] = ..., deployments: _Optional[_Iterable[_Union[DeployWorkerVersionResponse, _Mapping]]] = ...) -> None: ...
 
 class SubmitOrdersRequest(_message.Message):
-    __slots__ = ("enablement_id", "submit_rate_per_min", "order_id_seed")
+    __slots__ = ()
     ENABLEMENT_ID_FIELD_NUMBER: _ClassVar[int]
     SUBMIT_RATE_PER_MIN_FIELD_NUMBER: _ClassVar[int]
     ORDER_ID_SEED_FIELD_NUMBER: _ClassVar[int]
@@ -70,13 +70,13 @@ class SubmitOrdersRequest(_message.Message):
     def __init__(self, enablement_id: _Optional[str] = ..., submit_rate_per_min: _Optional[int] = ..., order_id_seed: _Optional[str] = ...) -> None: ...
 
 class SubmitOrdersResponse(_message.Message):
-    __slots__ = ("orders_submitted_count",)
+    __slots__ = ()
     ORDERS_SUBMITTED_COUNT_FIELD_NUMBER: _ClassVar[int]
     orders_submitted_count: str
     def __init__(self, orders_submitted_count: _Optional[str] = ...) -> None: ...
 
 class DeployWorkerVersionRequest(_message.Message):
-    __slots__ = ("deployment_name", "build_id", "version", "replica_count")
+    __slots__ = ()
     DEPLOYMENT_NAME_FIELD_NUMBER: _ClassVar[int]
     BUILD_ID_FIELD_NUMBER: _ClassVar[int]
     VERSION_FIELD_NUMBER: _ClassVar[int]

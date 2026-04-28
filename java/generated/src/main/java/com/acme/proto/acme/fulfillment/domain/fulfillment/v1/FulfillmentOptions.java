@@ -10,6 +10,8 @@ package com.acme.proto.acme.fulfillment.domain.fulfillment.v1;
  * FulfillmentOptions carries policy loaded at workflow start via LocalActivity.
  * shipping_margin is the maximum acceptable shipping cost; amounts above it
  * are recorded in the margin_leak SearchAttribute.
+ * integrations_endpoint is the Nexus endpoint name for the apps InventoryService.
+ * shipping_agent_endpoint is the Nexus endpoint name for the ShippingAgent service.
  * </pre>
  *
  * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.FulfillmentOptions}
@@ -34,6 +36,8 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private FulfillmentOptions() {
+    integrationsEndpoint_ = "";
+    shippingAgentEndpoint_ = "";
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
@@ -81,6 +85,84 @@ private static final long serialVersionUID = 0L;
     return shippingMargin_ == null ? com.acme.proto.acme.common.v1.Money.getDefaultInstance() : shippingMargin_;
   }
 
+  public static final int INTEGRATIONS_ENDPOINT_FIELD_NUMBER = 2;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object integrationsEndpoint_ = "";
+  /**
+   * <code>string integrations_endpoint = 2 [json_name = "integrationsEndpoint"];</code>
+   * @return The integrationsEndpoint.
+   */
+  @java.lang.Override
+  public java.lang.String getIntegrationsEndpoint() {
+    java.lang.Object ref = integrationsEndpoint_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      integrationsEndpoint_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string integrations_endpoint = 2 [json_name = "integrationsEndpoint"];</code>
+   * @return The bytes for integrationsEndpoint.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getIntegrationsEndpointBytes() {
+    java.lang.Object ref = integrationsEndpoint_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      integrationsEndpoint_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  public static final int SHIPPING_AGENT_ENDPOINT_FIELD_NUMBER = 3;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object shippingAgentEndpoint_ = "";
+  /**
+   * <code>string shipping_agent_endpoint = 3 [json_name = "shippingAgentEndpoint"];</code>
+   * @return The shippingAgentEndpoint.
+   */
+  @java.lang.Override
+  public java.lang.String getShippingAgentEndpoint() {
+    java.lang.Object ref = shippingAgentEndpoint_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      shippingAgentEndpoint_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string shipping_agent_endpoint = 3 [json_name = "shippingAgentEndpoint"];</code>
+   * @return The bytes for shippingAgentEndpoint.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getShippingAgentEndpointBytes() {
+    java.lang.Object ref = shippingAgentEndpoint_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      shippingAgentEndpoint_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -98,6 +180,12 @@ private static final long serialVersionUID = 0L;
     if (((bitField0_ & 0x00000001) != 0)) {
       output.writeMessage(1, getShippingMargin());
     }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(integrationsEndpoint_)) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 2, integrationsEndpoint_);
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(shippingAgentEndpoint_)) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 3, shippingAgentEndpoint_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -110,6 +198,12 @@ private static final long serialVersionUID = 0L;
     if (((bitField0_ & 0x00000001) != 0)) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(1, getShippingMargin());
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(integrationsEndpoint_)) {
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(2, integrationsEndpoint_);
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(shippingAgentEndpoint_)) {
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(3, shippingAgentEndpoint_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -131,6 +225,10 @@ private static final long serialVersionUID = 0L;
       if (!getShippingMargin()
           .equals(other.getShippingMargin())) return false;
     }
+    if (!getIntegrationsEndpoint()
+        .equals(other.getIntegrationsEndpoint())) return false;
+    if (!getShippingAgentEndpoint()
+        .equals(other.getShippingAgentEndpoint())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -146,6 +244,10 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + SHIPPING_MARGIN_FIELD_NUMBER;
       hash = (53 * hash) + getShippingMargin().hashCode();
     }
+    hash = (37 * hash) + INTEGRATIONS_ENDPOINT_FIELD_NUMBER;
+    hash = (53 * hash) + getIntegrationsEndpoint().hashCode();
+    hash = (37 * hash) + SHIPPING_AGENT_ENDPOINT_FIELD_NUMBER;
+    hash = (53 * hash) + getShippingAgentEndpoint().hashCode();
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -248,6 +350,8 @@ private static final long serialVersionUID = 0L;
    * FulfillmentOptions carries policy loaded at workflow start via LocalActivity.
    * shipping_margin is the maximum acceptable shipping cost; amounts above it
    * are recorded in the margin_leak SearchAttribute.
+   * integrations_endpoint is the Nexus endpoint name for the apps InventoryService.
+   * shipping_agent_endpoint is the Nexus endpoint name for the ShippingAgent service.
    * </pre>
    *
    * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.FulfillmentOptions}
@@ -294,6 +398,8 @@ private static final long serialVersionUID = 0L;
         shippingMarginBuilder_.dispose();
         shippingMarginBuilder_ = null;
       }
+      integrationsEndpoint_ = "";
+      shippingAgentEndpoint_ = "";
       return this;
     }
 
@@ -334,6 +440,12 @@ private static final long serialVersionUID = 0L;
             : shippingMarginBuilder_.build();
         to_bitField0_ |= 0x00000001;
       }
+      if (((from_bitField0_ & 0x00000002) != 0)) {
+        result.integrationsEndpoint_ = integrationsEndpoint_;
+      }
+      if (((from_bitField0_ & 0x00000004) != 0)) {
+        result.shippingAgentEndpoint_ = shippingAgentEndpoint_;
+      }
       result.bitField0_ |= to_bitField0_;
     }
 
@@ -351,6 +463,16 @@ private static final long serialVersionUID = 0L;
       if (other == com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillmentOptions.getDefaultInstance()) return this;
       if (other.hasShippingMargin()) {
         mergeShippingMargin(other.getShippingMargin());
+      }
+      if (!other.getIntegrationsEndpoint().isEmpty()) {
+        integrationsEndpoint_ = other.integrationsEndpoint_;
+        bitField0_ |= 0x00000002;
+        onChanged();
+      }
+      if (!other.getShippingAgentEndpoint().isEmpty()) {
+        shippingAgentEndpoint_ = other.shippingAgentEndpoint_;
+        bitField0_ |= 0x00000004;
+        onChanged();
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -385,6 +507,16 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000001;
               break;
             } // case 10
+            case 18: {
+              integrationsEndpoint_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000002;
+              break;
+            } // case 18
+            case 26: {
+              shippingAgentEndpoint_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000004;
+              break;
+            } // case 26
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -521,6 +653,150 @@ private static final long serialVersionUID = 0L;
         shippingMargin_ = null;
       }
       return shippingMarginBuilder_;
+    }
+
+    private java.lang.Object integrationsEndpoint_ = "";
+    /**
+     * <code>string integrations_endpoint = 2 [json_name = "integrationsEndpoint"];</code>
+     * @return The integrationsEndpoint.
+     */
+    public java.lang.String getIntegrationsEndpoint() {
+      java.lang.Object ref = integrationsEndpoint_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        integrationsEndpoint_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string integrations_endpoint = 2 [json_name = "integrationsEndpoint"];</code>
+     * @return The bytes for integrationsEndpoint.
+     */
+    public com.google.protobuf.ByteString
+        getIntegrationsEndpointBytes() {
+      java.lang.Object ref = integrationsEndpoint_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        integrationsEndpoint_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string integrations_endpoint = 2 [json_name = "integrationsEndpoint"];</code>
+     * @param value The integrationsEndpoint to set.
+     * @return This builder for chaining.
+     */
+    public Builder setIntegrationsEndpoint(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      integrationsEndpoint_ = value;
+      bitField0_ |= 0x00000002;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string integrations_endpoint = 2 [json_name = "integrationsEndpoint"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearIntegrationsEndpoint() {
+      integrationsEndpoint_ = getDefaultInstance().getIntegrationsEndpoint();
+      bitField0_ = (bitField0_ & ~0x00000002);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string integrations_endpoint = 2 [json_name = "integrationsEndpoint"];</code>
+     * @param value The bytes for integrationsEndpoint to set.
+     * @return This builder for chaining.
+     */
+    public Builder setIntegrationsEndpointBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      integrationsEndpoint_ = value;
+      bitField0_ |= 0x00000002;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object shippingAgentEndpoint_ = "";
+    /**
+     * <code>string shipping_agent_endpoint = 3 [json_name = "shippingAgentEndpoint"];</code>
+     * @return The shippingAgentEndpoint.
+     */
+    public java.lang.String getShippingAgentEndpoint() {
+      java.lang.Object ref = shippingAgentEndpoint_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        shippingAgentEndpoint_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string shipping_agent_endpoint = 3 [json_name = "shippingAgentEndpoint"];</code>
+     * @return The bytes for shippingAgentEndpoint.
+     */
+    public com.google.protobuf.ByteString
+        getShippingAgentEndpointBytes() {
+      java.lang.Object ref = shippingAgentEndpoint_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        shippingAgentEndpoint_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string shipping_agent_endpoint = 3 [json_name = "shippingAgentEndpoint"];</code>
+     * @param value The shippingAgentEndpoint to set.
+     * @return This builder for chaining.
+     */
+    public Builder setShippingAgentEndpoint(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      shippingAgentEndpoint_ = value;
+      bitField0_ |= 0x00000004;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string shipping_agent_endpoint = 3 [json_name = "shippingAgentEndpoint"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearShippingAgentEndpoint() {
+      shippingAgentEndpoint_ = getDefaultInstance().getShippingAgentEndpoint();
+      bitField0_ = (bitField0_ & ~0x00000004);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string shipping_agent_endpoint = 3 [json_name = "shippingAgentEndpoint"];</code>
+     * @param value The bytes for shippingAgentEndpoint to set.
+     * @return This builder for chaining.
+     */
+    public Builder setShippingAgentEndpointBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      shippingAgentEndpoint_ = value;
+      bitField0_ |= 0x00000004;
+      onChanged();
+      return this;
     }
 
     // @@protoc_insertion_point(builder_scope:acme.fulfillment.domain.fulfillment.v1.FulfillmentOptions)

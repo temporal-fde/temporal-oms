@@ -3,7 +3,7 @@ package com.acme.enablements.activities;
 import com.acme.proto.acme.apps.api.orders.v1.MakePaymentRequest;
 import com.acme.proto.acme.apps.api.orders.v1.Metadata;
 import com.acme.proto.acme.apps.api.orders.v1.Order;
-import com.acme.proto.acme.common.v1.Address;
+import com.acme.proto.acme.apps.api.orders.v1.ShippingAddress;
 import com.acme.proto.acme.apps.api.orders.v1.SubmitOrderRequest;
 import com.acme.proto.acme.enablements.v1.SubmitOrdersRequest;
 import com.acme.proto.acme.enablements.v1.SubmitOrdersResponse;
@@ -56,9 +56,10 @@ public class OrderActivitiesImpl implements OrderActivities {
                 String orderId = cmd.getOrderIdSeed() + "-" + enablementId + "-" + timestamp;
 
                 try {
+                    String customerId = "enablements-customer-" + UUID.randomUUID().toString();
                     // Call /api/v1/orders/{orderId} endpoint
-                    callOrderEndpoint(orderId);
-                    callPaymentEndpoint(orderId);
+                    callOrderEndpoint(orderId, customerId);
+                    callPaymentEndpoint(orderId, customerId);
                     if(cmd.getOrderIdSeed().contains("invalid")) {
                         scheduleValidation(orderId);
                     }
@@ -95,29 +96,35 @@ public class OrderActivitiesImpl implements OrderActivities {
                 .build();
     }
 
-    private void callOrderEndpoint(String orderId) {
-        var shippingAddress = Address.newBuilder()
-                .setEasypost(com.acme.proto.acme.common.v1.EasyPostAddress.newBuilder()
-                        .setStreet1(orderId + "-street-" + UUID.randomUUID())
-                        .setCity(orderId + "-city-" + UUID.randomUUID().toString().substring(0, 8))
-                        .setState(orderId + "-state")
-                        .setZip(orderId + "-" + System.currentTimeMillis())
-                        .setCountry("US"))
+    private void callOrderEndpoint(String orderId, String customerId) {
+        // see com/acme/apps/workflows/activities/IntegrationsSetupImpl.java:40
+        var shippingAddress = ShippingAddress.newBuilder()
+                .setStreet("388 Townsend St")
+                .setCity("San Francisco")
+                .setState("CA")
+                .setPostalCode("94107")
+                .setCountry("US")
                 .build();
 
         var item = com.acme.proto.acme.apps.api.orders.v1.Item.newBuilder()
-                .setItemId(orderId + "-item-" + UUID.randomUUID().toString().substring(0, 8))
+                .setItemId("HOME-" + UUID.randomUUID().toString().substring(0, 8))
                 .setQuantity((int) (Math.random() * 10) + 1)
+                .build();
+
+        var selectedShipment = com.acme.proto.acme.apps.api.orders.v1.SelectedShipment.newBuilder()
+                .setPaidPriceCents(1)
+                .setCurrency("USD")
                 .build();
 
         var order = Order.newBuilder()
                 .setOrderId(orderId)
                 .addItems(item)
                 .setShippingAddress(shippingAddress)
+                .setSelectedShipment(selectedShipment)
                 .build();
 
         var req = SubmitOrderRequest.newBuilder()
-                .setCustomerId("enablements")
+                .setCustomerId(customerId)
                 .setOrder(order)
                 .build();
 
@@ -139,9 +146,9 @@ public class OrderActivitiesImpl implements OrderActivities {
         }
     }
 
-    private void callPaymentEndpoint(String orderId) {
+    private void callPaymentEndpoint(String orderId, String customerId) {
         var req = MakePaymentRequest.newBuilder()
-                .setCustomerId("enablements")
+                .setCustomerId(customerId)
                 .setRrn(UUID.randomUUID().toString())
                 .setAmountCents((long) (Math.random() * 10000) + 100)
                 .setMetadata(Metadata.newBuilder().setOrderId(orderId).build())

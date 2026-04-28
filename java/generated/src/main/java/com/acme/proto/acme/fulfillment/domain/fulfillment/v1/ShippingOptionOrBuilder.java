@@ -78,4 +78,16 @@ public interface ShippingOptionOrBuilder extends
    */
   com.google.protobuf.ByteString
       getRateIdBytes();
+
+  /**
+   * <code>string shipment_id = 7 [json_name = "shipmentId"];</code>
+   * @return The shipmentId.
+   */
+  java.lang.String getShipmentId();
+  /**
+   * <code>string shipment_id = 7 [json_name = "shipmentId"];</code>
+   * @return The bytes for shipmentId.
+   */
+  com.google.protobuf.ByteString
+      getShipmentIdBytes();
 }

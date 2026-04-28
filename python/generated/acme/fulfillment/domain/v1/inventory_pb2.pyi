@@ -14,7 +14,7 @@ class StartInventoryRequest(_message.Message):
     def __init__(self) -> None: ...
 
 class LookupInventoryAddressRequest(_message.Message):
-    __slots__ = ("items", "address_id")
+    __slots__ = ()
     ITEMS_FIELD_NUMBER: _ClassVar[int]
     ADDRESS_ID_FIELD_NUMBER: _ClassVar[int]
     items: _containers.RepeatedCompositeFieldContainer[_values_pb2.ShippingLineItem]
@@ -22,13 +22,13 @@ class LookupInventoryAddressRequest(_message.Message):
     def __init__(self, items: _Optional[_Iterable[_Union[_values_pb2.ShippingLineItem, _Mapping]]] = ..., address_id: _Optional[str] = ...) -> None: ...
 
 class LookupInventoryAddressResponse(_message.Message):
-    __slots__ = ("address",)
+    __slots__ = ()
     ADDRESS_FIELD_NUMBER: _ClassVar[int]
     address: _values_pb2_1.Address
     def __init__(self, address: _Optional[_Union[_values_pb2_1.Address, _Mapping]] = ...) -> None: ...
 
 class FindAlternateWarehouseRequest(_message.Message):
-    __slots__ = ("items", "current_address_id", "to_address_id")
+    __slots__ = ()
     ITEMS_FIELD_NUMBER: _ClassVar[int]
     CURRENT_ADDRESS_ID_FIELD_NUMBER: _ClassVar[int]
     TO_ADDRESS_ID_FIELD_NUMBER: _ClassVar[int]
@@ -38,7 +38,7 @@ class FindAlternateWarehouseRequest(_message.Message):
     def __init__(self, items: _Optional[_Iterable[_Union[_values_pb2.ShippingLineItem, _Mapping]]] = ..., current_address_id: _Optional[str] = ..., to_address_id: _Optional[str] = ...) -> None: ...
 
 class FindAlternateWarehouseResponse(_message.Message):
-    __slots__ = ("address",)
+    __slots__ = ()
     ADDRESS_FIELD_NUMBER: _ClassVar[int]
     address: _values_pb2_1.Address
     def __init__(self, address: _Optional[_Union[_values_pb2_1.Address, _Mapping]] = ...) -> None: ...

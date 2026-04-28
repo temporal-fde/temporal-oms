@@ -100,13 +100,19 @@ public class OrderImpl implements Order {
                     pimService.enrichOrder(EnrichOrderRequest.newBuilder()
                             .setOrder(request.getOrder()).build())).build();
 
-            try {
-                this.state = this.state.toBuilder().setFulfillment(this.fulfillments.fulfillOrder(FulfillOrderRequest.newBuilder()
-                        .setOrder(request.getOrder()).addAllItems(this.state.getEnrichment().getItemsList()).build())).build();
-            } catch (ApplicationFailure e) {
-                if (e.isNonRetryable()) {
-                    // permanent failure
-                    // move this to the support workflow
+            // V1: publish to Kafka fulfillment topic (legacy path)
+            // V2 (new build-id): skip — fulfillment.Order is started by apps.Order via Nexus
+            int removeKafkaFulfillmentVersion = Workflow.getVersion(
+                    "remove-kafka-fulfillment", Workflow.DEFAULT_VERSION, 1);
+            if (removeKafkaFulfillmentVersion == Workflow.DEFAULT_VERSION) {
+                try {
+                    this.state = this.state.toBuilder().setFulfillment(this.fulfillments.fulfillOrder(FulfillOrderRequest.newBuilder()
+                            .setOrder(request.getOrder()).addAllItems(this.state.getEnrichment().getItemsList()).build())).build();
+                } catch (ApplicationFailure e) {
+                    if (e.isNonRetryable()) {
+                        // permanent failure
+                        // move this to the support workflow
+                    }
                 }
             }
         });

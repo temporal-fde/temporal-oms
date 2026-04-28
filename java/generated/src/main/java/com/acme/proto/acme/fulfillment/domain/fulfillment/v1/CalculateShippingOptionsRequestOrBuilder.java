@@ -118,13 +118,13 @@ public interface CalculateShippingOptionsRequestOrBuilder extends
   com.acme.proto.acme.common.v1.MoneyOrBuilder getCustomerPaidPriceOrBuilder();
 
   /**
-   * <code>optional int32 transit_days_sla = 7 [json_name = "transitDaysSla"];</code>
-   * @return Whether the transitDaysSla field is set.
+   * <code>optional int32 delivery_days_sla = 7 [json_name = "deliveryDaysSla"];</code>
+   * @return Whether the deliveryDaysSla field is set.
    */
-  boolean hasTransitDaysSla();
+  boolean hasDeliveryDaysSla();
   /**
-   * <code>optional int32 transit_days_sla = 7 [json_name = "transitDaysSla"];</code>
-   * @return The transitDaysSla.
+   * <code>optional int32 delivery_days_sla = 7 [json_name = "deliveryDaysSla"];</code>
+   * @return The deliveryDaysSla.
    */
-  int getTransitDaysSla();
+  int getDeliveryDaysSla();
 }

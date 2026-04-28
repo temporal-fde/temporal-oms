@@ -35,17 +35,26 @@ public interface ProcessedOrderOrBuilder extends
       getCustomerIdBytes();
 
   /**
-   * <code>.acme.processing.domain.processing.v1.GetProcessOrderStateResponse state = 3 [json_name = "state"];</code>
-   * @return Whether the state field is set.
+   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.FulfillmentItem items = 3 [json_name = "items"];</code>
    */
-  boolean hasState();
+  java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillmentItem> 
+      getItemsList();
   /**
-   * <code>.acme.processing.domain.processing.v1.GetProcessOrderStateResponse state = 3 [json_name = "state"];</code>
-   * @return The state.
+   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.FulfillmentItem items = 3 [json_name = "items"];</code>
    */
-  com.acme.proto.acme.processing.domain.processing.v1.GetProcessOrderStateResponse getState();
+  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillmentItem getItems(int index);
   /**
-   * <code>.acme.processing.domain.processing.v1.GetProcessOrderStateResponse state = 3 [json_name = "state"];</code>
+   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.FulfillmentItem items = 3 [json_name = "items"];</code>
    */
-  com.acme.proto.acme.processing.domain.processing.v1.GetProcessOrderStateResponseOrBuilder getStateOrBuilder();
+  int getItemsCount();
+  /**
+   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.FulfillmentItem items = 3 [json_name = "items"];</code>
+   */
+  java.util.List<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillmentItemOrBuilder> 
+      getItemsOrBuilderList();
+  /**
+   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.FulfillmentItem items = 3 [json_name = "items"];</code>
+   */
+  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillmentItemOrBuilder getItemsOrBuilder(
+      int index);
 }

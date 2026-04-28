@@ -10,8 +10,6 @@ from google.protobuf.message import Message  # type: ignore
 from pydantic import BaseModel
 from pydantic import ConfigDict
 from pydantic import Field
-from workflows_p2p import CompleteOrderRequest
-from workflows_p2p import GetProcessOrderStateResponse
 import typing
 
 class Status(IntEnum):
@@ -40,22 +38,14 @@ class FulfillmentStatus(IntEnum):
     FULFILLMENT_STATUS_FAILED = 7
 
 class Item(BaseModel):
+    """
+     Order Fulfillment AI Agent Workflow (Python-era)
+    """
+
     item_id: str = Field(default="")
     sku_id: str = Field(default="")
     brand_code: str = Field(default="")
     quantity: int = Field(default=0)
-
-class FulfillOrderRequest(BaseModel):
-    """
-     Order Fulfillment AI Agent Workflow
-    """
-
-    order_id: str = Field(default="")
-    customer_id: str = Field(default="")
-    items: typing.List[Item] = Field(default_factory=list)
-    payment_rrn: str = Field(default="")
-    shipping_address: Address = Field(default_factory=Address)
-    created_at: datetime = Field(default_factory=datetime.now)
 
 class ShippingDetails(BaseModel):
     carrier: str = Field(default="")
@@ -70,14 +60,6 @@ class AllocatedItem(BaseModel):
     quantity: int = Field(default=0)
     warehouse_id: str = Field(default="")
     warehouse_location: str = Field(default="")
-
-class FulfillOrderResponse(BaseModel):
-    model_config = ConfigDict(validate_default=True)
-    order_id: str = Field(default="")
-    status: Status = Field(default=0)
-    shipping: ShippingDetails = Field(default_factory=ShippingDetails)
-    allocated_items: typing.List[AllocatedItem] = Field(default_factory=list)
-    completed_at: datetime = Field(default_factory=datetime.now)
 
 class FindOptimalShippingRequest(BaseModel):
     """
@@ -167,11 +149,37 @@ class SelectedShippingOption(BaseModel):
     option_id: str = Field(default="")
     price: Money = Field(default_factory=Money)
     expected_ship_date: datetime = Field(default_factory=datetime.now)
+    delivery_days: typing.Optional[int] = Field(default=0)
+
+class FulfillmentItem(BaseModel):
+    """
+     FulfillmentItem is the line-item type for fulfillment activities.
+ Name is distinct from the Python-era Item in this package.
+ warehouse_id and warehouse_location are populated after processing completes.
+    """
+
+    item_id: str = Field(default="")
+    sku_id: str = Field(default="")
+    brand_code: str = Field(default="")
+    quantity: int = Field(default=0)
+    warehouse_id: typing.Optional[str] = Field(default="")
+    warehouse_location: typing.Optional[str] = Field(default="")
+
+class PlacedOrder(BaseModel):
+    """
+     PlacedOrder is fulfillment's own view of the order at workflow start.
+ Populated by apps.Order from the submitted order before calling validateOrder.
+    """
+
+    order_id: str = Field(default="")
+    customer_id: str = Field(default="")
+    items: typing.List[FulfillmentItem] = Field(default_factory=list)
+    shipping_address: Address = Field(default_factory=Address)
 
 class StartOrderFulfillmentRequest(BaseModel):
     """
      StartOrderFulfillmentRequest is the input to fulfillment.Order execute().
- Carries the full placed order from the apps domain and the customer's
+ Carries fulfillment's own view of the placed order and the customer's
  selected shipping option at order time.
     """
 
@@ -179,7 +187,7 @@ class StartOrderFulfillmentRequest(BaseModel):
     customer_id: str = Field(default="")
     options: typing.Optional[StartOrderFulfillmentOptions] = Field(default_factory=StartOrderFulfillmentOptions)
     selected_shipping: SelectedShippingOption = Field(default_factory=SelectedShippingOption)
-    placed_order: CompleteOrderRequest = Field(default_factory=CompleteOrderRequest)
+    placed_order: PlacedOrder = Field(default_factory=PlacedOrder)
 
 class ValidateOrderRequest(BaseModel):
     """
@@ -202,6 +210,7 @@ class ValidateOrderResponse(BaseModel):
 
 class VerifyAddressRequest(BaseModel):
     address: Address = Field(default_factory=Address)
+    customer_id: str = Field(default="")
 
 class VerifyAddressResponse(BaseModel):
     address: Address = Field(default_factory=Address)# easypost_address populated after verification
@@ -214,27 +223,41 @@ class FulfillmentOptions(BaseModel):
      FulfillmentOptions carries policy loaded at workflow start via LocalActivity.
  shipping_margin is the maximum acceptable shipping cost; amounts above it
  are recorded in the margin_leak SearchAttribute.
+ integrations_endpoint is the Nexus endpoint name for the apps InventoryService.
+ shipping_agent_endpoint is the Nexus endpoint name for the ShippingAgent service.
     """
 
     shipping_margin: Money = Field(default_factory=Money)
+    integrations_endpoint: str = Field(default="")
+    shipping_agent_endpoint: str = Field(default="")
 
 class ProcessedOrder(BaseModel):
     """
-     ProcessedOrder carries the result of processing.Order for use in fulfillment
- activities (carrier rates, label printing, inventory deduction).
+     ProcessedOrder carries fulfillment's own view of the processing result.
+ Populated by apps.Order by mapping enriched items from processing.Order state.
     """
 
     order_id: str = Field(default="")
     customer_id: str = Field(default="")
-    state: GetProcessOrderStateResponse = Field(default_factory=GetProcessOrderStateResponse)
+    items: typing.List[FulfillmentItem] = Field(default_factory=list)
 
-class OrderFulfillRequest(BaseModel):
+class NotifyDeliveryStatusRequest(BaseModel):
+    model_config = ConfigDict(validate_default=True)
+    order_id: str = Field(default="")
+    delivery_status: DeliveryStatus = Field(default=0)
+    carrier_tracking_id: typing.Optional[str] = Field(default="")
+    failure_reason: typing.Optional[str] = Field(default="")
+
+class FulfillOrderRequest(BaseModel):
     """
-     OrderFulfillRequest is the input to the fulfillOrder Update handler.
- Name is distinct from the Python-era FulfillOrderRequest in this package.
+     FulfillOrderRequest is the input to the fulfillOrder Update handler.
     """
 
     processed_order: ProcessedOrder = Field(default_factory=ProcessedOrder)
+    delivery_status_request: typing.Optional[NotifyDeliveryStatusRequest] = Field(default_factory=NotifyDeliveryStatusRequest)
+# selected_shipping_option_id is the customer's original rate selection.
+# If absent, fulfillment.Order falls back to state.args.selected_shipping.option_id.
+    selected_shipping_option_id: typing.Optional[str] = Field(default="")
 
 class ShippingSelection(BaseModel):
     """
@@ -252,10 +275,9 @@ class ShippingSelection(BaseModel):
     is_fallback: bool = Field(default=False)
     fallback_reason: str = Field(default="")
 
-class OrderFulfillResponse(BaseModel):
+class FulfillOrderResponse(BaseModel):
     """
-     OrderFulfillResponse is returned to the fulfillOrder Update caller (apps.Order).
- Name is distinct from the Python-era FulfillOrderResponse in this package.
+     FulfillOrderResponse is returned to the fulfillOrder Update caller (apps.Order).
     """
 
     tracking_number: str = Field(default="")
@@ -265,38 +287,18 @@ class CancelFulfillmentOrderRequest(BaseModel):
     order_id: str = Field(default="")
     reason: str = Field(default="")
 
-class DeliveryStatusNotification(BaseModel):
-    model_config = ConfigDict(validate_default=True)
-    order_id: str = Field(default="")
-    delivery_status: DeliveryStatus = Field(default=0)
-    carrier_tracking_id: typing.Optional[str] = Field(default="")
-    failure_reason: typing.Optional[str] = Field(default="")
-
 class GetFulfillmentOrderStateResponse(BaseModel):
     model_config = ConfigDict(validate_default=True)
     args: StartOrderFulfillmentRequest = Field(default_factory=StartOrderFulfillmentRequest)
     options: FulfillmentOptions = Field(default_factory=FulfillmentOptions)
     validated_address: Address = Field(default_factory=Address)
-    fulfillment_request: OrderFulfillRequest = Field(default_factory=OrderFulfillRequest)
+    fulfillment_request: FulfillOrderRequest = Field(default_factory=FulfillOrderRequest)
     shipping_selection: ShippingSelection = Field(default_factory=ShippingSelection)
     tracking_number: str = Field(default="")
     status: FulfillmentStatus = Field(default=0)
     delivery_status: DeliveryStatus = Field(default=0)
     errors: typing.List[str] = Field(default_factory=list)
-
-class FulfillmentItem(BaseModel):
-    """
-     FulfillmentItem is the line-item type for fulfillment activities.
- Name is distinct from the Python-era Item in this package.
- warehouse_id and warehouse_location are populated after processing completes.
-    """
-
-    item_id: str = Field(default="")
-    sku_id: str = Field(default="")
-    brand_code: str = Field(default="")
-    quantity: int = Field(default=0)
-    warehouse_id: typing.Optional[str] = Field(default="")
-    warehouse_location: typing.Optional[str] = Field(default="")
+    notify_delivery_status: typing.Optional[NotifyDeliveryStatusRequest] = Field(default_factory=NotifyDeliveryStatusRequest)
 
 class HoldItemsRequest(BaseModel):
     order_id: str = Field(default="")

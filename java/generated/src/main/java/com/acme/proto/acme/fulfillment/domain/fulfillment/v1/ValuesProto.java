@@ -79,21 +79,22 @@ public final class ValuesProto extends com.google.protobuf.GeneratedFile {
       "tegory\032C\n\025EventsByCategoryEntry\022\020\n\003key\030\001" +
       " \001(\tR\003key\022\024\n\005value\030\002 \001(\005R\005value:\0028\001\"E\n\020S" +
       "hippingLineItem\022\025\n\006sku_id\030\001 \001(\tR\005skuId\022\032" +
-      "\n\010quantity\030\002 \001(\005R\010quantity*\204\001\n\006Errors\022\025\n" +
+      "\n\010quantity\030\002 \001(\005R\010quantity*\234\001\n\006Errors\022\025\n" +
       "\021ERROR_UNSPECIFIED\020\000\022\026\n\022ERROR_UNAUTHORIZ" +
       "ED\020\001\022\023\n\017ERROR_FORBIDDEN\020\002\022\025\n\021ERROR_BAD_R" +
       "EQUEST\020\003\022\037\n\033ERROR_ADDRESS_VERIFY_FAILED\020" +
-      "\004*\227\001\n\tRiskLevel\022\032\n\026RISK_LEVEL_UNSPECIFIE" +
-      "D\020\000\022\023\n\017RISK_LEVEL_NONE\020\001\022\022\n\016RISK_LEVEL_L" +
-      "OW\020\002\022\027\n\023RISK_LEVEL_MODERATE\020\003\022\023\n\017RISK_LE" +
-      "VEL_HIGH\020\004\022\027\n\023RISK_LEVEL_CRITICAL\020\005B\201\002\n5" +
-      "com.acme.proto.acme.fulfillment.domain.f" +
-      "ulfillment.v1B\013ValuesProtoP\001\242\002\004AFDF\252\002&Ac" +
-      "me.Fulfillment.Domain.Fulfillment.V1\312\002&A" +
-      "cme\\Fulfillment\\Domain\\Fulfillment\\V1\342\0022" +
-      "Acme\\Fulfillment\\Domain\\Fulfillment\\V1\\G" +
-      "PBMetadata\352\002*Acme::Fulfillment::Domain::" +
-      "Fulfillment::V1b\006proto3"
+      "\004\022\026\n\022ERROR_INVALID_RATE\020\005*\227\001\n\tRiskLevel\022" +
+      "\032\n\026RISK_LEVEL_UNSPECIFIED\020\000\022\023\n\017RISK_LEVE" +
+      "L_NONE\020\001\022\022\n\016RISK_LEVEL_LOW\020\002\022\027\n\023RISK_LEV" +
+      "EL_MODERATE\020\003\022\023\n\017RISK_LEVEL_HIGH\020\004\022\027\n\023RI" +
+      "SK_LEVEL_CRITICAL\020\005B\201\002\n5com.acme.proto.a" +
+      "cme.fulfillment.domain.fulfillment.v1B\013V" +
+      "aluesProtoP\001\242\002\004AFDF\252\002&Acme.Fulfillment.D" +
+      "omain.Fulfillment.V1\312\002&Acme\\Fulfillment\\" +
+      "Domain\\Fulfillment\\V1\342\0022Acme\\Fulfillment" +
+      "\\Domain\\Fulfillment\\V1\\GPBMetadata\352\002*Acm" +
+      "e::Fulfillment::Domain::Fulfillment::V1b" +
+      "\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

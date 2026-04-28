@@ -293,23 +293,23 @@ private static final long serialVersionUID = 0L;
     return customerPaidPrice_ == null ? com.acme.proto.acme.common.v1.Money.getDefaultInstance() : customerPaidPrice_;
   }
 
-  public static final int TRANSIT_DAYS_SLA_FIELD_NUMBER = 7;
-  private int transitDaysSla_ = 0;
+  public static final int DELIVERY_DAYS_SLA_FIELD_NUMBER = 7;
+  private int deliveryDaysSla_ = 0;
   /**
-   * <code>optional int32 transit_days_sla = 7 [json_name = "transitDaysSla"];</code>
-   * @return Whether the transitDaysSla field is set.
+   * <code>optional int32 delivery_days_sla = 7 [json_name = "deliveryDaysSla"];</code>
+   * @return Whether the deliveryDaysSla field is set.
    */
   @java.lang.Override
-  public boolean hasTransitDaysSla() {
+  public boolean hasDeliveryDaysSla() {
     return ((bitField0_ & 0x00000008) != 0);
   }
   /**
-   * <code>optional int32 transit_days_sla = 7 [json_name = "transitDaysSla"];</code>
-   * @return The transitDaysSla.
+   * <code>optional int32 delivery_days_sla = 7 [json_name = "deliveryDaysSla"];</code>
+   * @return The deliveryDaysSla.
    */
   @java.lang.Override
-  public int getTransitDaysSla() {
-    return transitDaysSla_;
+  public int getDeliveryDaysSla() {
+    return deliveryDaysSla_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -345,7 +345,7 @@ private static final long serialVersionUID = 0L;
       output.writeMessage(6, getCustomerPaidPrice());
     }
     if (((bitField0_ & 0x00000008) != 0)) {
-      output.writeInt32(7, transitDaysSla_);
+      output.writeInt32(7, deliveryDaysSla_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -384,7 +384,7 @@ private static final long serialVersionUID = 0L;
     }
     if (((bitField0_ & 0x00000008) != 0)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeInt32Size(7, transitDaysSla_);
+        .computeInt32Size(7, deliveryDaysSla_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -422,10 +422,10 @@ private static final long serialVersionUID = 0L;
       if (!getCustomerPaidPrice()
           .equals(other.getCustomerPaidPrice())) return false;
     }
-    if (hasTransitDaysSla() != other.hasTransitDaysSla()) return false;
-    if (hasTransitDaysSla()) {
-      if (getTransitDaysSla()
-          != other.getTransitDaysSla()) return false;
+    if (hasDeliveryDaysSla() != other.hasDeliveryDaysSla()) return false;
+    if (hasDeliveryDaysSla()) {
+      if (getDeliveryDaysSla()
+          != other.getDeliveryDaysSla()) return false;
     }
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
@@ -458,9 +458,9 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + CUSTOMER_PAID_PRICE_FIELD_NUMBER;
       hash = (53 * hash) + getCustomerPaidPrice().hashCode();
     }
-    if (hasTransitDaysSla()) {
-      hash = (37 * hash) + TRANSIT_DAYS_SLA_FIELD_NUMBER;
-      hash = (53 * hash) + getTransitDaysSla();
+    if (hasDeliveryDaysSla()) {
+      hash = (37 * hash) + DELIVERY_DAYS_SLA_FIELD_NUMBER;
+      hash = (53 * hash) + getDeliveryDaysSla();
     }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
@@ -631,7 +631,7 @@ private static final long serialVersionUID = 0L;
         customerPaidPriceBuilder_.dispose();
         customerPaidPriceBuilder_ = null;
       }
-      transitDaysSla_ = 0;
+      deliveryDaysSla_ = 0;
       return this;
     }
 
@@ -702,7 +702,7 @@ private static final long serialVersionUID = 0L;
         to_bitField0_ |= 0x00000004;
       }
       if (((from_bitField0_ & 0x00000040) != 0)) {
-        result.transitDaysSla_ = transitDaysSla_;
+        result.deliveryDaysSla_ = deliveryDaysSla_;
         to_bitField0_ |= 0x00000008;
       }
       result.bitField0_ |= to_bitField0_;
@@ -767,8 +767,8 @@ private static final long serialVersionUID = 0L;
       if (other.hasCustomerPaidPrice()) {
         mergeCustomerPaidPrice(other.getCustomerPaidPrice());
       }
-      if (other.hasTransitDaysSla()) {
-        setTransitDaysSla(other.getTransitDaysSla());
+      if (other.hasDeliveryDaysSla()) {
+        setDeliveryDaysSla(other.getDeliveryDaysSla());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -839,7 +839,7 @@ private static final long serialVersionUID = 0L;
               break;
             } // case 50
             case 56: {
-              transitDaysSla_ = input.readInt32();
+              deliveryDaysSla_ = input.readInt32();
               bitField0_ |= 0x00000040;
               break;
             } // case 56
@@ -1601,42 +1601,42 @@ private static final long serialVersionUID = 0L;
       return customerPaidPriceBuilder_;
     }
 
-    private int transitDaysSla_ ;
+    private int deliveryDaysSla_ ;
     /**
-     * <code>optional int32 transit_days_sla = 7 [json_name = "transitDaysSla"];</code>
-     * @return Whether the transitDaysSla field is set.
+     * <code>optional int32 delivery_days_sla = 7 [json_name = "deliveryDaysSla"];</code>
+     * @return Whether the deliveryDaysSla field is set.
      */
     @java.lang.Override
-    public boolean hasTransitDaysSla() {
+    public boolean hasDeliveryDaysSla() {
       return ((bitField0_ & 0x00000040) != 0);
     }
     /**
-     * <code>optional int32 transit_days_sla = 7 [json_name = "transitDaysSla"];</code>
-     * @return The transitDaysSla.
+     * <code>optional int32 delivery_days_sla = 7 [json_name = "deliveryDaysSla"];</code>
+     * @return The deliveryDaysSla.
      */
     @java.lang.Override
-    public int getTransitDaysSla() {
-      return transitDaysSla_;
+    public int getDeliveryDaysSla() {
+      return deliveryDaysSla_;
     }
     /**
-     * <code>optional int32 transit_days_sla = 7 [json_name = "transitDaysSla"];</code>
-     * @param value The transitDaysSla to set.
+     * <code>optional int32 delivery_days_sla = 7 [json_name = "deliveryDaysSla"];</code>
+     * @param value The deliveryDaysSla to set.
      * @return This builder for chaining.
      */
-    public Builder setTransitDaysSla(int value) {
+    public Builder setDeliveryDaysSla(int value) {
 
-      transitDaysSla_ = value;
+      deliveryDaysSla_ = value;
       bitField0_ |= 0x00000040;
       onChanged();
       return this;
     }
     /**
-     * <code>optional int32 transit_days_sla = 7 [json_name = "transitDaysSla"];</code>
+     * <code>optional int32 delivery_days_sla = 7 [json_name = "deliveryDaysSla"];</code>
      * @return This builder for chaining.
      */
-    public Builder clearTransitDaysSla() {
+    public Builder clearDeliveryDaysSla() {
       bitField0_ = (bitField0_ & ~0x00000040);
-      transitDaysSla_ = 0;
+      deliveryDaysSla_ = 0;
       onChanged();
       return this;
     }

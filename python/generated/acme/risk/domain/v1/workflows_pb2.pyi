@@ -24,7 +24,7 @@ STATUS_FLAGGED: Status
 STATUS_BLOCKED: Status
 
 class DetectFraudRequest(_message.Message):
-    __slots__ = ("order_id", "customer_id", "context", "created_at")
+    __slots__ = ()
     ORDER_ID_FIELD_NUMBER: _ClassVar[int]
     CUSTOMER_ID_FIELD_NUMBER: _ClassVar[int]
     CONTEXT_FIELD_NUMBER: _ClassVar[int]
@@ -36,7 +36,7 @@ class DetectFraudRequest(_message.Message):
     def __init__(self, order_id: _Optional[str] = ..., customer_id: _Optional[str] = ..., context: _Optional[_Union[FraudCheckContext, _Mapping]] = ..., created_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class DetectFraudResponse(_message.Message):
-    __slots__ = ("order_id", "status", "risk_score", "flags", "completed_at")
+    __slots__ = ()
     ORDER_ID_FIELD_NUMBER: _ClassVar[int]
     STATUS_FIELD_NUMBER: _ClassVar[int]
     RISK_SCORE_FIELD_NUMBER: _ClassVar[int]
@@ -50,7 +50,7 @@ class DetectFraudResponse(_message.Message):
     def __init__(self, order_id: _Optional[str] = ..., status: _Optional[_Union[Status, str]] = ..., risk_score: _Optional[float] = ..., flags: _Optional[_Iterable[str]] = ..., completed_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class FraudCheckContext(_message.Message):
-    __slots__ = ("payment", "address", "customer")
+    __slots__ = ()
     PAYMENT_FIELD_NUMBER: _ClassVar[int]
     ADDRESS_FIELD_NUMBER: _ClassVar[int]
     CUSTOMER_FIELD_NUMBER: _ClassVar[int]
@@ -60,7 +60,7 @@ class FraudCheckContext(_message.Message):
     def __init__(self, payment: _Optional[_Union[PaymentContext, _Mapping]] = ..., address: _Optional[_Union[AddressContext, _Mapping]] = ..., customer: _Optional[_Union[CustomerContext, _Mapping]] = ...) -> None: ...
 
 class PaymentContext(_message.Message):
-    __slots__ = ("rrn", "amount_cents", "payment_method")
+    __slots__ = ()
     RRN_FIELD_NUMBER: _ClassVar[int]
     AMOUNT_CENTS_FIELD_NUMBER: _ClassVar[int]
     PAYMENT_METHOD_FIELD_NUMBER: _ClassVar[int]
@@ -70,7 +70,7 @@ class PaymentContext(_message.Message):
     def __init__(self, rrn: _Optional[str] = ..., amount_cents: _Optional[int] = ..., payment_method: _Optional[str] = ...) -> None: ...
 
 class AddressContext(_message.Message):
-    __slots__ = ("street", "city", "state", "postal_code", "country")
+    __slots__ = ()
     STREET_FIELD_NUMBER: _ClassVar[int]
     CITY_FIELD_NUMBER: _ClassVar[int]
     STATE_FIELD_NUMBER: _ClassVar[int]
@@ -84,7 +84,7 @@ class AddressContext(_message.Message):
     def __init__(self, street: _Optional[str] = ..., city: _Optional[str] = ..., state: _Optional[str] = ..., postal_code: _Optional[str] = ..., country: _Optional[str] = ...) -> None: ...
 
 class CustomerContext(_message.Message):
-    __slots__ = ("customer_id", "previous_order_count", "account_created_at")
+    __slots__ = ()
     CUSTOMER_ID_FIELD_NUMBER: _ClassVar[int]
     PREVIOUS_ORDER_COUNT_FIELD_NUMBER: _ClassVar[int]
     ACCOUNT_CREATED_AT_FIELD_NUMBER: _ClassVar[int]
@@ -94,13 +94,13 @@ class CustomerContext(_message.Message):
     def __init__(self, customer_id: _Optional[str] = ..., previous_order_count: _Optional[int] = ..., account_created_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class PerformFraudCheckRequest(_message.Message):
-    __slots__ = ("context",)
+    __slots__ = ()
     CONTEXT_FIELD_NUMBER: _ClassVar[int]
     context: FraudCheckContext
     def __init__(self, context: _Optional[_Union[FraudCheckContext, _Mapping]] = ...) -> None: ...
 
 class PerformFraudCheckResponse(_message.Message):
-    __slots__ = ("passed", "risk_score", "flags", "recommendation")
+    __slots__ = ()
     PASSED_FIELD_NUMBER: _ClassVar[int]
     RISK_SCORE_FIELD_NUMBER: _ClassVar[int]
     FLAGS_FIELD_NUMBER: _ClassVar[int]
@@ -112,13 +112,13 @@ class PerformFraudCheckResponse(_message.Message):
     def __init__(self, passed: _Optional[bool] = ..., risk_score: _Optional[float] = ..., flags: _Optional[_Iterable[str]] = ..., recommendation: _Optional[str] = ...) -> None: ...
 
 class CheckAddressFraudRequest(_message.Message):
-    __slots__ = ("address",)
+    __slots__ = ()
     ADDRESS_FIELD_NUMBER: _ClassVar[int]
     address: AddressContext
     def __init__(self, address: _Optional[_Union[AddressContext, _Mapping]] = ...) -> None: ...
 
 class CheckAddressFraudResponse(_message.Message):
-    __slots__ = ("is_fraudulent", "address_risk_score", "flags")
+    __slots__ = ()
     IS_FRAUDULENT_FIELD_NUMBER: _ClassVar[int]
     ADDRESS_RISK_SCORE_FIELD_NUMBER: _ClassVar[int]
     FLAGS_FIELD_NUMBER: _ClassVar[int]
@@ -128,7 +128,7 @@ class CheckAddressFraudResponse(_message.Message):
     def __init__(self, is_fraudulent: _Optional[bool] = ..., address_risk_score: _Optional[float] = ..., flags: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class CheckPaymentFraudRequest(_message.Message):
-    __slots__ = ("payment", "customer_id")
+    __slots__ = ()
     PAYMENT_FIELD_NUMBER: _ClassVar[int]
     CUSTOMER_ID_FIELD_NUMBER: _ClassVar[int]
     payment: PaymentContext
@@ -136,7 +136,7 @@ class CheckPaymentFraudRequest(_message.Message):
     def __init__(self, payment: _Optional[_Union[PaymentContext, _Mapping]] = ..., customer_id: _Optional[str] = ...) -> None: ...
 
 class CheckPaymentFraudResponse(_message.Message):
-    __slots__ = ("is_fraudulent", "payment_risk_score", "flags")
+    __slots__ = ()
     IS_FRAUDULENT_FIELD_NUMBER: _ClassVar[int]
     PAYMENT_RISK_SCORE_FIELD_NUMBER: _ClassVar[int]
     FLAGS_FIELD_NUMBER: _ClassVar[int]
@@ -146,13 +146,13 @@ class CheckPaymentFraudResponse(_message.Message):
     def __init__(self, is_fraudulent: _Optional[bool] = ..., payment_risk_score: _Optional[float] = ..., flags: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class GetCustomerRiskProfileRequest(_message.Message):
-    __slots__ = ("customer_id",)
+    __slots__ = ()
     CUSTOMER_ID_FIELD_NUMBER: _ClassVar[int]
     customer_id: str
     def __init__(self, customer_id: _Optional[str] = ...) -> None: ...
 
 class GetCustomerRiskProfileResponse(_message.Message):
-    __slots__ = ("customer_id", "historical_risk_score", "fraud_incident_count", "successful_order_count", "last_order_at")
+    __slots__ = ()
     CUSTOMER_ID_FIELD_NUMBER: _ClassVar[int]
     HISTORICAL_RISK_SCORE_FIELD_NUMBER: _ClassVar[int]
     FRAUD_INCIDENT_COUNT_FIELD_NUMBER: _ClassVar[int]

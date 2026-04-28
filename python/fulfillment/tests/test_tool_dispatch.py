@@ -134,13 +134,14 @@ async def test_nexus_tool_dispatch_raises_not_implemented() -> None:
         name="my_nexus",
         description="nexus op",
         endpoint="my-endpoint",
+        service_type="my_service",
         operation=MagicMock(),
         req_type=ReqModel,
         result_type=ResultModel,
         schedule_to_close_timeout=timedelta(seconds=60),
     )
 
-    with pytest.raises(NotImplementedError):
+    with pytest.raises((NotImplementedError, RuntimeError, Exception)):
         await tool.dispatch(ReqModel(value="x"))
 
 

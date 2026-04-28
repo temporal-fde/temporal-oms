@@ -7,6 +7,11 @@ management.server.port: 9071
 
 server.port: 8060
 
+easypost:
+  api-key: ${EASYPOST_API_KEY}
+  warehouse:
+    from-address-id: ${EASYPOST_WAREHOUSE_FROM_ADDRESS_ID:}
+
 springdoc:
   api-docs:
     path: /v3/api-docs

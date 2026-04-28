@@ -1,0 +1,32 @@
+#!/bin/bash
+# Scenario: Margin Spike — ShippingAgent Alternate Warehouse Path
+# Step 2: Capture Payment
+#
+# Payment triggers order processing. Once enriched, fulfillment.Order calls
+# ShippingAgent via Nexus. Watch the fulfillment namespace in Temporal UI:
+#
+#   get_carrier_rates       — fetches real EasyPost rates (all > 1 cent)
+#   get_location_events     — origin + destination SCRM (concurrent)
+#   finalize_recommendation — REJECTED (find_alternate_warehouse not called yet)
+#   find_alternate_warehouse — returns empty (no alternate in seed data)
+#   finalize_recommendation — ACCEPTED with outcome=MARGIN_SPIKE
+#
+# The margin_leak search attribute is set on the fulfillment.Order workflow.
+
+set -e
+
+echo "Capturing payment for margin-spike-123..."
+echo ""
+
+xh POST http://localhost:8080/api/v1/payments-app/orders \
+  customerId="cust-001" \
+  rrn="payment-margin-spike" \
+  amountCents=9999 \
+  metadata:='{"orderId":"margin-spike-123"}'
+
+echo ""
+echo "Payment captured — order is now processing"
+echo ""
+echo "Watch Temporal UI (fulfillment namespace) for:"
+echo "  ShippingAgent workflow ID: cust-001"
+echo "  Outcome: MARGIN_SPIKE after find_alternate_warehouse returns empty"

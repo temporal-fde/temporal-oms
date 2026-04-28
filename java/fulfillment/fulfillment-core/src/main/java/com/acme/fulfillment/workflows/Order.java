@@ -28,7 +28,7 @@ public interface Order {
      * Update: Verify the shipping address via EasyPost.
      * Called by apps.Order via the validateOrder Nexus operation (UpdateWithStart).
      * Stores the verified Address (with easypost_address) in workflow state for
-     * downstream use in getCarrierRates.
+     * downstream use in ShippingAgent.calculateShippingOptions.
      */
     @UpdateMethod
     ValidateOrderResponse validateOrder(ValidateOrderRequest request);
@@ -42,10 +42,10 @@ public interface Order {
      * Drives carrier rate selection, label printing, and inventory deduction.
      */
     @UpdateMethod
-    OrderFulfillResponse fulfillOrder(OrderFulfillRequest request);
+    FulfillOrderResponse fulfillOrder(FulfillOrderRequest request);
 
     @UpdateValidatorMethod(updateName = "fulfillOrder")
-    void validateFulfillOrder(OrderFulfillRequest request);
+    void validateFulfillOrder(FulfillOrderRequest request);
 
     /**
      * Signal: Cancel the fulfillment order.
@@ -59,7 +59,7 @@ public interface Order {
      * DELIVERED → complete workflow. CANCELED → notify customer, complete workflow.
      */
     @SignalMethod
-    void notifyDeliveryStatus(DeliveryStatusNotification notification);
+    void notifyDeliveryStatus(NotifyDeliveryStatusRequest request);
 
     /**
      * Query: Return the current fulfillment order state.

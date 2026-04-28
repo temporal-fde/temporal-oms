@@ -4,7 +4,6 @@ syntax = "proto3";
 package acme.apps.api.orders.v1;
 
 import "google/protobuf/timestamp.proto";
-import "acme/common/v1/values.proto";
 
 // PUT /api/v1/commerce-app/orders/{order_id}
 message SubmitOrderRequest {
@@ -15,7 +14,24 @@ message SubmitOrderRequest {
 message Order {
   string order_id = 1;
   repeated Item items = 2;
-  acme.common.v1.Address shipping_address = 3;
+  ShippingAddress shipping_address = 3;
+  optional SelectedShipment selected_shipment = 4;
+}
+
+// SelectedShipment carries the customer's checkout selection for margin and SLA reasoning.
+message SelectedShipment {
+  int64 paid_price_cents = 1;  // customer's paid price in minor currency units
+  string currency = 2;          // ISO 4217; defaults to USD if empty
+  optional int32 delivery_days = 3;  // agreed transit days (SLA)
+  string rate_id = 4;           // EasyPost rate ID of the selected option
+}
+
+message ShippingAddress {
+  string street = 1;
+  string city = 2;
+  string state = 3;
+  string postal_code = 4;
+  string country = 5;
 }
 
 message Item {

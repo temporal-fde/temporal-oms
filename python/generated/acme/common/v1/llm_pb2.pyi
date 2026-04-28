@@ -27,13 +27,13 @@ LLM_STOP_REASON_END_TURN: LlmStopReason
 LLM_STOP_REASON_TOOL_USE: LlmStopReason
 
 class LlmTextBlock(_message.Message):
-    __slots__ = ("text",)
+    __slots__ = ()
     TEXT_FIELD_NUMBER: _ClassVar[int]
     text: str
     def __init__(self, text: _Optional[str] = ...) -> None: ...
 
 class LlmToolUseBlock(_message.Message):
-    __slots__ = ("id", "name", "input")
+    __slots__ = ()
     ID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     INPUT_FIELD_NUMBER: _ClassVar[int]
@@ -43,7 +43,7 @@ class LlmToolUseBlock(_message.Message):
     def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., input: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ...) -> None: ...
 
 class LlmToolResultBlock(_message.Message):
-    __slots__ = ("tool_use_id", "content")
+    __slots__ = ()
     TOOL_USE_ID_FIELD_NUMBER: _ClassVar[int]
     CONTENT_FIELD_NUMBER: _ClassVar[int]
     tool_use_id: str
@@ -51,7 +51,7 @@ class LlmToolResultBlock(_message.Message):
     def __init__(self, tool_use_id: _Optional[str] = ..., content: _Optional[str] = ...) -> None: ...
 
 class LlmContentBlock(_message.Message):
-    __slots__ = ("type", "text", "tool_use", "tool_result")
+    __slots__ = ()
     TYPE_FIELD_NUMBER: _ClassVar[int]
     TEXT_FIELD_NUMBER: _ClassVar[int]
     TOOL_USE_FIELD_NUMBER: _ClassVar[int]
@@ -63,7 +63,7 @@ class LlmContentBlock(_message.Message):
     def __init__(self, type: _Optional[str] = ..., text: _Optional[_Union[LlmTextBlock, _Mapping]] = ..., tool_use: _Optional[_Union[LlmToolUseBlock, _Mapping]] = ..., tool_result: _Optional[_Union[LlmToolResultBlock, _Mapping]] = ...) -> None: ...
 
 class LlmMessage(_message.Message):
-    __slots__ = ("role", "content")
+    __slots__ = ()
     ROLE_FIELD_NUMBER: _ClassVar[int]
     CONTENT_FIELD_NUMBER: _ClassVar[int]
     role: LlmRole
@@ -71,7 +71,7 @@ class LlmMessage(_message.Message):
     def __init__(self, role: _Optional[_Union[LlmRole, str]] = ..., content: _Optional[_Iterable[_Union[LlmContentBlock, _Mapping]]] = ...) -> None: ...
 
 class LlmResponse(_message.Message):
-    __slots__ = ("content", "stop_reason")
+    __slots__ = ()
     CONTENT_FIELD_NUMBER: _ClassVar[int]
     STOP_REASON_FIELD_NUMBER: _ClassVar[int]
     content: _containers.RepeatedCompositeFieldContainer[LlmContentBlock]
@@ -79,7 +79,7 @@ class LlmResponse(_message.Message):
     def __init__(self, content: _Optional[_Iterable[_Union[LlmContentBlock, _Mapping]]] = ..., stop_reason: _Optional[_Union[LlmStopReason, str]] = ...) -> None: ...
 
 class LlmToolDefinition(_message.Message):
-    __slots__ = ("name", "description", "input_schema")
+    __slots__ = ()
     NAME_FIELD_NUMBER: _ClassVar[int]
     DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
     INPUT_SCHEMA_FIELD_NUMBER: _ClassVar[int]

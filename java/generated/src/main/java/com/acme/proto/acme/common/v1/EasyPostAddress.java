@@ -40,6 +40,8 @@ private static final long serialVersionUID = 0L;
     state_ = "";
     zip_ = "";
     country_ = "";
+    timezone_ = "";
+    company_ = "";
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
@@ -407,6 +409,100 @@ private static final long serialVersionUID = 0L;
     return coordinate_ == null ? com.acme.proto.acme.common.v1.Coordinate.getDefaultInstance() : coordinate_;
   }
 
+  public static final int TIMEZONE_FIELD_NUMBER = 10;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object timezone_ = "";
+  /**
+   * <pre>
+   * IANA tz identifier from verifications.delivery.details.time_zone (e.g. "America/New_York")
+   * </pre>
+   *
+   * <code>string timezone = 10 [json_name = "timezone"];</code>
+   * @return The timezone.
+   */
+  @java.lang.Override
+  public java.lang.String getTimezone() {
+    java.lang.Object ref = timezone_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      timezone_ = s;
+      return s;
+    }
+  }
+  /**
+   * <pre>
+   * IANA tz identifier from verifications.delivery.details.time_zone (e.g. "America/New_York")
+   * </pre>
+   *
+   * <code>string timezone = 10 [json_name = "timezone"];</code>
+   * @return The bytes for timezone.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getTimezoneBytes() {
+    java.lang.Object ref = timezone_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      timezone_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  public static final int COMPANY_FIELD_NUMBER = 11;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object company_ = "";
+  /**
+   * <pre>
+   * company name on the address (required by carriers for from_address)
+   * </pre>
+   *
+   * <code>string company = 11 [json_name = "company"];</code>
+   * @return The company.
+   */
+  @java.lang.Override
+  public java.lang.String getCompany() {
+    java.lang.Object ref = company_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      company_ = s;
+      return s;
+    }
+  }
+  /**
+   * <pre>
+   * company name on the address (required by carriers for from_address)
+   * </pre>
+   *
+   * <code>string company = 11 [json_name = "company"];</code>
+   * @return The bytes for company.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getCompanyBytes() {
+    java.lang.Object ref = company_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      company_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -448,6 +544,12 @@ private static final long serialVersionUID = 0L;
     if (((bitField0_ & 0x00000002) != 0)) {
       output.writeMessage(9, getCoordinate());
     }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(timezone_)) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 10, timezone_);
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(company_)) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 11, company_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -485,6 +587,12 @@ private static final long serialVersionUID = 0L;
     if (((bitField0_ & 0x00000002) != 0)) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(9, getCoordinate());
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(timezone_)) {
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(10, timezone_);
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(company_)) {
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(11, company_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -525,6 +633,10 @@ private static final long serialVersionUID = 0L;
       if (!getCoordinate()
           .equals(other.getCoordinate())) return false;
     }
+    if (!getTimezone()
+        .equals(other.getTimezone())) return false;
+    if (!getCompany()
+        .equals(other.getCompany())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -559,6 +671,10 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + COORDINATE_FIELD_NUMBER;
       hash = (53 * hash) + getCoordinate().hashCode();
     }
+    hash = (37 * hash) + TIMEZONE_FIELD_NUMBER;
+    hash = (53 * hash) + getTimezone().hashCode();
+    hash = (37 * hash) + COMPANY_FIELD_NUMBER;
+    hash = (53 * hash) + getCompany().hashCode();
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -714,6 +830,8 @@ private static final long serialVersionUID = 0L;
         coordinateBuilder_.dispose();
         coordinateBuilder_ = null;
       }
+      timezone_ = "";
+      company_ = "";
       return this;
     }
 
@@ -779,6 +897,12 @@ private static final long serialVersionUID = 0L;
             : coordinateBuilder_.build();
         to_bitField0_ |= 0x00000002;
       }
+      if (((from_bitField0_ & 0x00000200) != 0)) {
+        result.timezone_ = timezone_;
+      }
+      if (((from_bitField0_ & 0x00000400) != 0)) {
+        result.company_ = company_;
+      }
       result.bitField0_ |= to_bitField0_;
     }
 
@@ -834,6 +958,16 @@ private static final long serialVersionUID = 0L;
       }
       if (other.hasCoordinate()) {
         mergeCoordinate(other.getCoordinate());
+      }
+      if (!other.getTimezone().isEmpty()) {
+        timezone_ = other.timezone_;
+        bitField0_ |= 0x00000200;
+        onChanged();
+      }
+      if (!other.getCompany().isEmpty()) {
+        company_ = other.company_;
+        bitField0_ |= 0x00000400;
+        onChanged();
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -908,6 +1042,16 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000100;
               break;
             } // case 74
+            case 82: {
+              timezone_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000200;
+              break;
+            } // case 82
+            case 90: {
+              company_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000400;
+              break;
+            } // case 90
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -1660,6 +1804,190 @@ private static final long serialVersionUID = 0L;
         coordinate_ = null;
       }
       return coordinateBuilder_;
+    }
+
+    private java.lang.Object timezone_ = "";
+    /**
+     * <pre>
+     * IANA tz identifier from verifications.delivery.details.time_zone (e.g. "America/New_York")
+     * </pre>
+     *
+     * <code>string timezone = 10 [json_name = "timezone"];</code>
+     * @return The timezone.
+     */
+    public java.lang.String getTimezone() {
+      java.lang.Object ref = timezone_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        timezone_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <pre>
+     * IANA tz identifier from verifications.delivery.details.time_zone (e.g. "America/New_York")
+     * </pre>
+     *
+     * <code>string timezone = 10 [json_name = "timezone"];</code>
+     * @return The bytes for timezone.
+     */
+    public com.google.protobuf.ByteString
+        getTimezoneBytes() {
+      java.lang.Object ref = timezone_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        timezone_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <pre>
+     * IANA tz identifier from verifications.delivery.details.time_zone (e.g. "America/New_York")
+     * </pre>
+     *
+     * <code>string timezone = 10 [json_name = "timezone"];</code>
+     * @param value The timezone to set.
+     * @return This builder for chaining.
+     */
+    public Builder setTimezone(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      timezone_ = value;
+      bitField0_ |= 0x00000200;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * IANA tz identifier from verifications.delivery.details.time_zone (e.g. "America/New_York")
+     * </pre>
+     *
+     * <code>string timezone = 10 [json_name = "timezone"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearTimezone() {
+      timezone_ = getDefaultInstance().getTimezone();
+      bitField0_ = (bitField0_ & ~0x00000200);
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * IANA tz identifier from verifications.delivery.details.time_zone (e.g. "America/New_York")
+     * </pre>
+     *
+     * <code>string timezone = 10 [json_name = "timezone"];</code>
+     * @param value The bytes for timezone to set.
+     * @return This builder for chaining.
+     */
+    public Builder setTimezoneBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      timezone_ = value;
+      bitField0_ |= 0x00000200;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object company_ = "";
+    /**
+     * <pre>
+     * company name on the address (required by carriers for from_address)
+     * </pre>
+     *
+     * <code>string company = 11 [json_name = "company"];</code>
+     * @return The company.
+     */
+    public java.lang.String getCompany() {
+      java.lang.Object ref = company_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        company_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <pre>
+     * company name on the address (required by carriers for from_address)
+     * </pre>
+     *
+     * <code>string company = 11 [json_name = "company"];</code>
+     * @return The bytes for company.
+     */
+    public com.google.protobuf.ByteString
+        getCompanyBytes() {
+      java.lang.Object ref = company_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        company_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <pre>
+     * company name on the address (required by carriers for from_address)
+     * </pre>
+     *
+     * <code>string company = 11 [json_name = "company"];</code>
+     * @param value The company to set.
+     * @return This builder for chaining.
+     */
+    public Builder setCompany(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      company_ = value;
+      bitField0_ |= 0x00000400;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * company name on the address (required by carriers for from_address)
+     * </pre>
+     *
+     * <code>string company = 11 [json_name = "company"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearCompany() {
+      company_ = getDefaultInstance().getCompany();
+      bitField0_ = (bitField0_ & ~0x00000400);
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * company name on the address (required by carriers for from_address)
+     * </pre>
+     *
+     * <code>string company = 11 [json_name = "company"];</code>
+     * @param value The bytes for company to set.
+     * @return This builder for chaining.
+     */
+    public Builder setCompanyBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      company_ = value;
+      bitField0_ |= 0x00000400;
+      onChanged();
+      return this;
     }
 
     // @@protoc_insertion_point(builder_scope:acme.common.v1.EasyPostAddress)

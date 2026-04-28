@@ -2,7 +2,6 @@
 # gen by protobuf_to_pydantic[v0.3.3.1](https://github.com/so1n/protobuf_to_pydantic)
 # Protobuf Version: 6.33.6 
 # Pydantic Version: 2.13.0 
-from ....common.v1.values_p2p import Address
 from datetime import datetime
 from google.protobuf.message import Message  # type: ignore
 from pydantic import BaseModel
@@ -14,10 +13,28 @@ class Item(BaseModel):
     item_id: str = Field(default="")
     quantity: int = Field(default=0)
 
+class ShippingAddress(BaseModel):
+    street: str = Field(default="")
+    city: str = Field(default="")
+    state: str = Field(default="")
+    postal_code: str = Field(default="")
+    country: str = Field(default="")
+
+class SelectedShipment(BaseModel):
+    """
+     SelectedShipment carries the customer's checkout selection for margin and SLA reasoning.
+    """
+
+    paid_price_cents: int = Field(default=0)# customer's paid price in minor currency units
+    currency: str = Field(default="")# ISO 4217; defaults to USD if empty
+    delivery_days: typing.Optional[int] = Field(default=0)# agreed transit days (SLA)
+    rate_id: str = Field(default="")# EasyPost rate ID of the selected option
+
 class Order(BaseModel):
     order_id: str = Field(default="")
     items: typing.List[Item] = Field(default_factory=list)
-    shipping_address: Address = Field(default_factory=Address)
+    shipping_address: ShippingAddress = Field(default_factory=ShippingAddress)
+    selected_shipment: typing.Optional[SelectedShipment] = Field(default_factory=SelectedShipment)
 
 class SubmitOrderRequest(BaseModel):
     """

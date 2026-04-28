@@ -9,6 +9,7 @@ package com.acme.proto.acme.fulfillment.domain.fulfillment.v1;
  * <pre>
  * ShippingOption is a single carrier rate returned by get_carrier_rates.
  * id is set to rate_id so the LLM can cross-reference recommended_option_id back to the rate.
+ * shipment_id is the EasyPost Shipment ID — needed by fulfillment.Order to call printShippingLabel.
  * </pre>
  *
  * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.ShippingOption}
@@ -37,6 +38,7 @@ private static final long serialVersionUID = 0L;
     carrier_ = "";
     serviceLevel_ = "";
     rateId_ = "";
+    shipmentId_ = "";
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
@@ -251,6 +253,45 @@ private static final long serialVersionUID = 0L;
     }
   }
 
+  public static final int SHIPMENT_ID_FIELD_NUMBER = 7;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object shipmentId_ = "";
+  /**
+   * <code>string shipment_id = 7 [json_name = "shipmentId"];</code>
+   * @return The shipmentId.
+   */
+  @java.lang.Override
+  public java.lang.String getShipmentId() {
+    java.lang.Object ref = shipmentId_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      shipmentId_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string shipment_id = 7 [json_name = "shipmentId"];</code>
+   * @return The bytes for shipmentId.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getShipmentIdBytes() {
+    java.lang.Object ref = shipmentId_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      shipmentId_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -283,6 +324,9 @@ private static final long serialVersionUID = 0L;
     if (!com.google.protobuf.GeneratedMessage.isStringEmpty(rateId_)) {
       com.google.protobuf.GeneratedMessage.writeString(output, 6, rateId_);
     }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(shipmentId_)) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 7, shipmentId_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -311,6 +355,9 @@ private static final long serialVersionUID = 0L;
     }
     if (!com.google.protobuf.GeneratedMessage.isStringEmpty(rateId_)) {
       size += com.google.protobuf.GeneratedMessage.computeStringSize(6, rateId_);
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(shipmentId_)) {
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(7, shipmentId_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -342,6 +389,8 @@ private static final long serialVersionUID = 0L;
         != other.getEstimatedDays()) return false;
     if (!getRateId()
         .equals(other.getRateId())) return false;
+    if (!getShipmentId()
+        .equals(other.getShipmentId())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -367,6 +416,8 @@ private static final long serialVersionUID = 0L;
     hash = (53 * hash) + getEstimatedDays();
     hash = (37 * hash) + RATE_ID_FIELD_NUMBER;
     hash = (53 * hash) + getRateId().hashCode();
+    hash = (37 * hash) + SHIPMENT_ID_FIELD_NUMBER;
+    hash = (53 * hash) + getShipmentId().hashCode();
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -468,6 +519,7 @@ private static final long serialVersionUID = 0L;
    * <pre>
    * ShippingOption is a single carrier rate returned by get_carrier_rates.
    * id is set to rate_id so the LLM can cross-reference recommended_option_id back to the rate.
+   * shipment_id is the EasyPost Shipment ID — needed by fulfillment.Order to call printShippingLabel.
    * </pre>
    *
    * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.ShippingOption}
@@ -519,6 +571,7 @@ private static final long serialVersionUID = 0L;
       }
       estimatedDays_ = 0;
       rateId_ = "";
+      shipmentId_ = "";
       return this;
     }
 
@@ -574,6 +627,9 @@ private static final long serialVersionUID = 0L;
       if (((from_bitField0_ & 0x00000020) != 0)) {
         result.rateId_ = rateId_;
       }
+      if (((from_bitField0_ & 0x00000040) != 0)) {
+        result.shipmentId_ = shipmentId_;
+      }
       result.bitField0_ |= to_bitField0_;
     }
 
@@ -613,6 +669,11 @@ private static final long serialVersionUID = 0L;
       if (!other.getRateId().isEmpty()) {
         rateId_ = other.rateId_;
         bitField0_ |= 0x00000020;
+        onChanged();
+      }
+      if (!other.getShipmentId().isEmpty()) {
+        shipmentId_ = other.shipmentId_;
+        bitField0_ |= 0x00000040;
         onChanged();
       }
       this.mergeUnknownFields(other.getUnknownFields());
@@ -673,6 +734,11 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000020;
               break;
             } // case 50
+            case 58: {
+              shipmentId_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000040;
+              break;
+            } // case 58
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -1127,6 +1193,78 @@ private static final long serialVersionUID = 0L;
       checkByteStringIsUtf8(value);
       rateId_ = value;
       bitField0_ |= 0x00000020;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object shipmentId_ = "";
+    /**
+     * <code>string shipment_id = 7 [json_name = "shipmentId"];</code>
+     * @return The shipmentId.
+     */
+    public java.lang.String getShipmentId() {
+      java.lang.Object ref = shipmentId_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        shipmentId_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string shipment_id = 7 [json_name = "shipmentId"];</code>
+     * @return The bytes for shipmentId.
+     */
+    public com.google.protobuf.ByteString
+        getShipmentIdBytes() {
+      java.lang.Object ref = shipmentId_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        shipmentId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string shipment_id = 7 [json_name = "shipmentId"];</code>
+     * @param value The shipmentId to set.
+     * @return This builder for chaining.
+     */
+    public Builder setShipmentId(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      shipmentId_ = value;
+      bitField0_ |= 0x00000040;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string shipment_id = 7 [json_name = "shipmentId"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearShipmentId() {
+      shipmentId_ = getDefaultInstance().getShipmentId();
+      bitField0_ = (bitField0_ & ~0x00000040);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string shipment_id = 7 [json_name = "shipmentId"];</code>
+     * @param value The bytes for shipmentId to set.
+     * @return This builder for chaining.
+     */
+    public Builder setShipmentIdBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      shipmentId_ = value;
+      bitField0_ |= 0x00000040;
       onChanged();
       return this;
     }

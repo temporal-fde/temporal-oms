@@ -39,12 +39,12 @@ class GetLocationEventsRequest(BaseModel):
 # Value is in kilometers (e.g. 2.0).
     within_km: float = Field(default=0.0)
 # Delivery window: events active at any point between ship and delivery dates.
-# Maps to active.gte / active.lte on the PredictHQ Events API.
+
     active_from: datetime = Field(default_factory=datetime.now)# ship date
     active_to: datetime = Field(default_factory=datetime.now)# expected delivery date
 # IANA TZ Database identifier for the destination (e.g. "America/New_York").
 # From EasyPost verifications.delivery.details.time_zone.
-# Maps to active.tz on the PredictHQ Events API.
+
     timezone: str = Field(default="")
 
 class GetLocationEventsResponse(BaseModel):
@@ -64,6 +64,7 @@ class ShippingOption(BaseModel):
     """
      ShippingOption is a single carrier rate returned by get_carrier_rates.
  id is set to rate_id so the LLM can cross-reference recommended_option_id back to the rate.
+ shipment_id is the EasyPost Shipment ID — needed by fulfillment.Order to call printShippingLabel.
     """
 
     id: str = Field(default="")
@@ -72,6 +73,7 @@ class ShippingOption(BaseModel):
     cost: Money = Field(default_factory=Money)
     estimated_days: int = Field(default=0)
     rate_id: str = Field(default="")
+    shipment_id: str = Field(default="")
 
 class ShippingRecommendation(BaseModel):
     """
@@ -117,7 +119,7 @@ class CalculateShippingOptionsRequest(BaseModel):
     items: typing.List[ShippingLineItem] = Field(default_factory=list)
     selected_shipping_option_id: typing.Optional[str] = Field(default="")
     customer_paid_price: typing.Optional[Money] = Field(default_factory=Money)
-    transit_days_sla: typing.Optional[int] = Field(default=0)
+    delivery_days_sla: typing.Optional[int] = Field(default=0)
 
 class CalculateShippingOptionsResponse(BaseModel):
     """

@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import re
-
 import anthropic
 from temporalio import activity
 
@@ -55,10 +53,6 @@ def _to_tool_param(tool: LlmToolDefinition) -> anthropic.types.ToolParam:
     }
 
 
-def _extract_text(text: str) -> str:
-    match = re.search(r"```(?:json)?\s*\n(.*?)\n\s*```", text, re.DOTALL)
-    return match.group(1).strip() if match else text
-
 
 def _to_llm_response(resp: anthropic.types.Message) -> LlmResponse:
     stop_reason = (
@@ -71,7 +65,7 @@ def _to_llm_response(resp: anthropic.types.Message) -> LlmResponse:
         if block_obj.type == "text":
             blocks.append(LlmContentBlock(
                 type="text",
-                text=LlmTextBlock(text=_extract_text(block_obj.text)),
+                text=LlmTextBlock(text=block_obj.text),
             ))
         elif block_obj.type == "tool_use":
             blocks.append(LlmContentBlock(
@@ -110,9 +104,12 @@ class LlmActivities:
         )
 
         sla_rule = (
-            f"SLA RULE: If no rate delivers within {r.transit_days_sla} days, outcome MUST be SLA_BREACH."
-            if (r.transit_days_sla and r.transit_days_sla > 0)
-            else "SLA RULE: No transit SLA specified."
+            f"SLA RULE: If no rate that costs at or below the customer paid price "
+            f"delivers within {r.delivery_days_sla} days, outcome MUST be SLA_BREACH. "
+            f"Set recommended_option_id to the rate ID of the fastest available option "
+            f"(minimise delivery delay even if the SLA cannot be met)."
+            if r.delivery_days_sla is not None
+            else "SLA RULE: No delivery days SLA specified."
         )
 
         priority_rule = (
@@ -131,6 +128,13 @@ class LlmActivities:
 
         prompt = "\n\n".join([
             "You are a shipping advisor for an e-commerce fulfillment system. All provided addresses are pre-verified as valid and deliverable.",
+            (
+                "MANDATORY BEHAVIOR: You MUST always respond with either (a) tool calls to gather data, "
+                "or (b) the final JSON recommendation. Never ask for clarification, request additional "
+                "information, or explain that data is missing or incomplete. If any address field appears "
+                "empty or stub-like, proceed with the tool calls using whatever data is provided — "
+                "the system guarantees the addresses are actionable."
+            ),
             margin_rule,
             sla_rule,
             priority_rule,
@@ -145,12 +149,17 @@ class LlmActivities:
                 "between them (e.g. get_location_events for origin AND get_location_events for destination simultaneously)."
             ),
             (
-                "RECOMMENDED ACTIONS:\n"
-                "- If all carrier rates exceed the customer paid price, call find_alternate_warehouse "
-                "before returning MARGIN_SPIKE. Only return MARGIN_SPIKE if no alternate warehouse "
-                "exists or its rates also exceed the paid price.\n"
-                "- If no rate meets the transit SLA, call find_alternate_warehouse before returning "
-                "SLA_BREACH. A closer warehouse may offer faster options."
+                "MANDATORY ACTIONS:\n"
+                "- If all carrier rates exceed the customer paid price, you MUST call "
+                "find_alternate_warehouse before calling finalize_recommendation with MARGIN_SPIKE. "
+                "Only return MARGIN_SPIKE if no alternate warehouse exists or its rates also exceed "
+                "the paid price.\n"
+                "- If no rate meets the transit SLA, you MUST call find_alternate_warehouse before "
+                "calling finalize_recommendation with SLA_BREACH. A closer warehouse may offer "
+                "faster options.\n"
+                "Attempting to finalize with MARGIN_SPIKE or SLA_BREACH without first calling "
+                "find_alternate_warehouse will result in a rejection and you will be required to "
+                "call it anyway."
             ),
             (
                 "LIMITATIONS:\n"
@@ -158,12 +167,9 @@ class LlmActivities:
                 "skip get_location_events for that address entirely — do not attempt it."
             ),
             (
-                "FINAL RESPONSE: When you have all data, respond with ONLY a JSON object:\n"
-                '{"outcome":"<PROCEED|CHEAPER_AVAILABLE|FASTER_AVAILABLE|MARGIN_SPIKE|SLA_BREACH>",'
-                '"recommended_option_id":"<id>","reasoning":"<text>",'
-                '"margin_delta_cents":<int>,'
-                '"origin_risk_level":"<RISK_LEVEL_NONE|RISK_LEVEL_LOW|RISK_LEVEL_MODERATE|RISK_LEVEL_HIGH|RISK_LEVEL_CRITICAL>",'
-                '"destination_risk_level":"<RISK_LEVEL_NONE|RISK_LEVEL_LOW|RISK_LEVEL_MODERATE|RISK_LEVEL_HIGH|RISK_LEVEL_CRITICAL>"}'
+                "FINAL RESPONSE: When you have called all relevant tools and are ready to submit "
+                "your recommendation, call the `finalize_recommendation` tool. "
+                "Do not output text — call the tool."
             ),
         ])
         return BuildSystemPromptResponse(system_prompt=prompt)

@@ -16,13 +16,11 @@ message GetLocationEventsRequest {
   double within_km = 2;
 
   // Delivery window: events active at any point between ship and delivery dates.
-  // Maps to active.gte / active.lte on the PredictHQ Events API.
   google.protobuf.Timestamp active_from = 3; // ship date
   google.protobuf.Timestamp active_to   = 4; // expected delivery date
 
   // IANA TZ Database identifier for the destination (e.g. "America/New_York").
   // From EasyPost verifications.delivery.details.time_zone.
-  // Maps to active.tz on the PredictHQ Events API.
   string timezone = 5;
 }
 
@@ -41,6 +39,7 @@ message GetLocationEventsResponse {
 
 // ShippingOption is a single carrier rate returned by get_carrier_rates.
 // id is set to rate_id so the LLM can cross-reference recommended_option_id back to the rate.
+// shipment_id is the EasyPost Shipment ID — needed by fulfillment.Order to call printShippingLabel.
 message ShippingOption {
   string              id             = 1;
   string              carrier        = 2;
@@ -48,6 +47,7 @@ message ShippingOption {
   acme.common.v1.Money cost          = 4;
   int32               estimated_days = 5;
   string              rate_id        = 6;
+  string              shipment_id    = 7;
 }
 
 // RecommendationOutcome is the LLM's decision about the shipping situation.
@@ -97,7 +97,7 @@ message CalculateShippingOptionsRequest {
   repeated ShippingLineItem items        = 4;
   optional string           selected_shipping_option_id = 5;
   optional acme.common.v1.Money   customer_paid_price   = 6;
-  optional int32                  transit_days_sla      = 7;
+  optional int32                  delivery_days_sla     = 7;
 }
 
 // CalculateShippingOptionsResponse is the Update response from the ShippingAgent.

@@ -118,7 +118,7 @@ ShippingAgent (consumer — worked example)
 │         task_queue="fulfillment", ...),
 │     activity_tool(..., task_queue="fulfillment-easypost", ...),   # verify_address
 │     activity_tool(..., task_queue="fulfillment-easypost", ...),   # get_carrier_rates
-│     activity_tool(..., task_queue="fulfillment-predicthq", ...),  # get_location_events
+│     activity_tool(..., task_queue="agents", ...),                  # get_location_events
 │   )
 │
 ├── tools = _TOOLS.definitions()                             # called once before the loop

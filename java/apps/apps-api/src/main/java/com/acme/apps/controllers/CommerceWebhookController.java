@@ -69,26 +69,46 @@ public class CommerceWebhookController {
 
         try {
             // Prepare update request using protobuf builders
-            var updateRequest = com.acme.proto.acme.apps.domain.apps.v1.SubmitOrderRequest.newBuilder()
-                .setOrder(
-                    com.acme.proto.acme.oms.v1.Order.newBuilder()
-                        .setOrderId(request.getOrder().getOrderId())
-                        .addAllItems(request.getOrder().getItemsList().stream()
-                            .map(item -> com.acme.proto.acme.oms.v1.Item.newBuilder()
-                                .setItemId(item.getItemId())
-                                .setQuantity(item.getQuantity())
-                                .build())
-                            .toList())
-                        .setShippingAddress(
-                            com.acme.proto.acme.common.v1.Address.newBuilder()
-                                .setEasypost(com.acme.proto.acme.common.v1.EasyPostAddress.newBuilder()
-                                    .setStreet1(request.getOrder().getShippingAddress().getEasypost().getStreet1())
-                                    .setCity(request.getOrder().getShippingAddress().getEasypost().getCity())
-                                    .setState(request.getOrder().getShippingAddress().getEasypost().getState())
-                                    .setZip(request.getOrder().getShippingAddress().getEasypost().getZip())
-                                    .setCountry(request.getOrder().getShippingAddress().getEasypost().getCountry()))
-                                .build())
+            var domainOrderBuilder = com.acme.proto.acme.oms.v1.Order.newBuilder()
+                .setOrderId(request.getOrder().getOrderId())
+                .addAllItems(request.getOrder().getItemsList().stream()
+                    .map(item -> com.acme.proto.acme.oms.v1.Item.newBuilder()
+                        .setItemId(item.getItemId())
+                        .setQuantity(item.getQuantity())
                         .build())
+                    .toList())
+                .setShippingAddress(
+                    com.acme.proto.acme.common.v1.Address.newBuilder()
+                        .setEasypost(com.acme.proto.acme.common.v1.EasyPostAddress.newBuilder()
+                            .setStreet1(request.getOrder().getShippingAddress().getStreet())
+                            .setCity(request.getOrder().getShippingAddress().getCity())
+                            .setState(request.getOrder().getShippingAddress().getState())
+                            .setZip(request.getOrder().getShippingAddress().getPostalCode())
+                            .setCountry(request.getOrder().getShippingAddress().getCountry()))
+                        .build());
+
+            if (request.getOrder().hasSelectedShipment()) {
+                var s = request.getOrder().getSelectedShipment();
+                var shipmentBuilder = com.acme.proto.acme.common.v1.Shipment.newBuilder();
+                if (s.getPaidPriceCents() > 0) {
+                    shipmentBuilder.setPaidPrice(com.acme.proto.acme.common.v1.Money.newBuilder()
+                        .setUnits(s.getPaidPriceCents())
+                        .setCurrency(s.getCurrency().isBlank() ? "USD" : s.getCurrency())
+                        .build());
+                }
+                if (s.hasDeliveryDays() || !s.getRateId().isBlank()) {
+                    shipmentBuilder.setEasypost(com.acme.proto.acme.common.v1.EasyPostShipment.newBuilder()
+                        .setSelectedRate(com.acme.proto.acme.common.v1.EasyPostRate.newBuilder()
+                            .setDeliveryDays(s.getDeliveryDays())
+                            .setRateId(s.getRateId())
+                            .build())
+                        .build());
+                }
+                domainOrderBuilder.setSelectedShipment(shipmentBuilder.build());
+            }
+
+            var updateRequest = com.acme.proto.acme.apps.domain.apps.v1.SubmitOrderRequest.newBuilder()
+                .setOrder(domainOrderBuilder.build())
                 .build();
 
             // Prepare workflow start request

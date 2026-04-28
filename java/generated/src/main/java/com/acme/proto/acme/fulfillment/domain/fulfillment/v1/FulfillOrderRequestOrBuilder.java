@@ -11,92 +11,64 @@ public interface FulfillOrderRequestOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>string order_id = 1 [json_name = "orderId"];</code>
-   * @return The orderId.
+   * <code>.acme.fulfillment.domain.fulfillment.v1.ProcessedOrder processed_order = 1 [json_name = "processedOrder"];</code>
+   * @return Whether the processedOrder field is set.
    */
-  java.lang.String getOrderId();
+  boolean hasProcessedOrder();
   /**
-   * <code>string order_id = 1 [json_name = "orderId"];</code>
-   * @return The bytes for orderId.
+   * <code>.acme.fulfillment.domain.fulfillment.v1.ProcessedOrder processed_order = 1 [json_name = "processedOrder"];</code>
+   * @return The processedOrder.
+   */
+  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ProcessedOrder getProcessedOrder();
+  /**
+   * <code>.acme.fulfillment.domain.fulfillment.v1.ProcessedOrder processed_order = 1 [json_name = "processedOrder"];</code>
+   */
+  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ProcessedOrderOrBuilder getProcessedOrderOrBuilder();
+
+  /**
+   * <code>optional .acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest delivery_status_request = 2 [json_name = "deliveryStatusRequest"];</code>
+   * @return Whether the deliveryStatusRequest field is set.
+   */
+  boolean hasDeliveryStatusRequest();
+  /**
+   * <code>optional .acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest delivery_status_request = 2 [json_name = "deliveryStatusRequest"];</code>
+   * @return The deliveryStatusRequest.
+   */
+  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest getDeliveryStatusRequest();
+  /**
+   * <code>optional .acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest delivery_status_request = 2 [json_name = "deliveryStatusRequest"];</code>
+   */
+  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequestOrBuilder getDeliveryStatusRequestOrBuilder();
+
+  /**
+   * <pre>
+   * selected_shipping_option_id is the customer's original rate selection.
+   * If absent, fulfillment.Order falls back to state.args.selected_shipping.option_id.
+   * </pre>
+   *
+   * <code>optional string selected_shipping_option_id = 3 [json_name = "selectedShippingOptionId"];</code>
+   * @return Whether the selectedShippingOptionId field is set.
+   */
+  boolean hasSelectedShippingOptionId();
+  /**
+   * <pre>
+   * selected_shipping_option_id is the customer's original rate selection.
+   * If absent, fulfillment.Order falls back to state.args.selected_shipping.option_id.
+   * </pre>
+   *
+   * <code>optional string selected_shipping_option_id = 3 [json_name = "selectedShippingOptionId"];</code>
+   * @return The selectedShippingOptionId.
+   */
+  java.lang.String getSelectedShippingOptionId();
+  /**
+   * <pre>
+   * selected_shipping_option_id is the customer's original rate selection.
+   * If absent, fulfillment.Order falls back to state.args.selected_shipping.option_id.
+   * </pre>
+   *
+   * <code>optional string selected_shipping_option_id = 3 [json_name = "selectedShippingOptionId"];</code>
+   * @return The bytes for selectedShippingOptionId.
    */
   com.google.protobuf.ByteString
-      getOrderIdBytes();
-
-  /**
-   * <code>string customer_id = 2 [json_name = "customerId"];</code>
-   * @return The customerId.
-   */
-  java.lang.String getCustomerId();
-  /**
-   * <code>string customer_id = 2 [json_name = "customerId"];</code>
-   * @return The bytes for customerId.
-   */
-  com.google.protobuf.ByteString
-      getCustomerIdBytes();
-
-  /**
-   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.Item items = 3 [json_name = "items"];</code>
-   */
-  java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.Item> 
-      getItemsList();
-  /**
-   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.Item items = 3 [json_name = "items"];</code>
-   */
-  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.Item getItems(int index);
-  /**
-   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.Item items = 3 [json_name = "items"];</code>
-   */
-  int getItemsCount();
-  /**
-   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.Item items = 3 [json_name = "items"];</code>
-   */
-  java.util.List<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ItemOrBuilder> 
-      getItemsOrBuilderList();
-  /**
-   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.Item items = 3 [json_name = "items"];</code>
-   */
-  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ItemOrBuilder getItemsOrBuilder(
-      int index);
-
-  /**
-   * <code>string payment_rrn = 4 [json_name = "paymentRrn"];</code>
-   * @return The paymentRrn.
-   */
-  java.lang.String getPaymentRrn();
-  /**
-   * <code>string payment_rrn = 4 [json_name = "paymentRrn"];</code>
-   * @return The bytes for paymentRrn.
-   */
-  com.google.protobuf.ByteString
-      getPaymentRrnBytes();
-
-  /**
-   * <code>.acme.common.v1.Address shipping_address = 5 [json_name = "shippingAddress"];</code>
-   * @return Whether the shippingAddress field is set.
-   */
-  boolean hasShippingAddress();
-  /**
-   * <code>.acme.common.v1.Address shipping_address = 5 [json_name = "shippingAddress"];</code>
-   * @return The shippingAddress.
-   */
-  com.acme.proto.acme.common.v1.Address getShippingAddress();
-  /**
-   * <code>.acme.common.v1.Address shipping_address = 5 [json_name = "shippingAddress"];</code>
-   */
-  com.acme.proto.acme.common.v1.AddressOrBuilder getShippingAddressOrBuilder();
-
-  /**
-   * <code>.google.protobuf.Timestamp created_at = 6 [json_name = "createdAt"];</code>
-   * @return Whether the createdAt field is set.
-   */
-  boolean hasCreatedAt();
-  /**
-   * <code>.google.protobuf.Timestamp created_at = 6 [json_name = "createdAt"];</code>
-   * @return The createdAt.
-   */
-  com.google.protobuf.Timestamp getCreatedAt();
-  /**
-   * <code>.google.protobuf.Timestamp created_at = 6 [json_name = "createdAt"];</code>
-   */
-  com.google.protobuf.TimestampOrBuilder getCreatedAtOrBuilder();
+      getSelectedShippingOptionIdBytes();
 }

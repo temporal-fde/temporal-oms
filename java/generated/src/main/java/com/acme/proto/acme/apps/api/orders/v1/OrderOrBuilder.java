@@ -47,17 +47,32 @@ public interface OrderOrBuilder extends
       int index);
 
   /**
-   * <code>.acme.common.v1.Address shipping_address = 3 [json_name = "shippingAddress"];</code>
+   * <code>.acme.apps.api.orders.v1.ShippingAddress shipping_address = 3 [json_name = "shippingAddress"];</code>
    * @return Whether the shippingAddress field is set.
    */
   boolean hasShippingAddress();
   /**
-   * <code>.acme.common.v1.Address shipping_address = 3 [json_name = "shippingAddress"];</code>
+   * <code>.acme.apps.api.orders.v1.ShippingAddress shipping_address = 3 [json_name = "shippingAddress"];</code>
    * @return The shippingAddress.
    */
-  com.acme.proto.acme.common.v1.Address getShippingAddress();
+  com.acme.proto.acme.apps.api.orders.v1.ShippingAddress getShippingAddress();
   /**
-   * <code>.acme.common.v1.Address shipping_address = 3 [json_name = "shippingAddress"];</code>
+   * <code>.acme.apps.api.orders.v1.ShippingAddress shipping_address = 3 [json_name = "shippingAddress"];</code>
    */
-  com.acme.proto.acme.common.v1.AddressOrBuilder getShippingAddressOrBuilder();
+  com.acme.proto.acme.apps.api.orders.v1.ShippingAddressOrBuilder getShippingAddressOrBuilder();
+
+  /**
+   * <code>optional .acme.apps.api.orders.v1.SelectedShipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+   * @return Whether the selectedShipment field is set.
+   */
+  boolean hasSelectedShipment();
+  /**
+   * <code>optional .acme.apps.api.orders.v1.SelectedShipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+   * @return The selectedShipment.
+   */
+  com.acme.proto.acme.apps.api.orders.v1.SelectedShipment getSelectedShipment();
+  /**
+   * <code>optional .acme.apps.api.orders.v1.SelectedShipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+   */
+  com.acme.proto.acme.apps.api.orders.v1.SelectedShipmentOrBuilder getSelectedShipmentOrBuilder();
 }

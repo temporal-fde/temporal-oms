@@ -87,6 +87,13 @@ Provide feedback in PROGRESS.md → Feedback Items section.
 
 ## Current Specs
 
+### Workshop: Augment with AI
+- **Status:** Draft
+- **Goal:** Codespaces-based workshop teaching safe traffic migration (Kafka → Nexus) and AI-augmented Temporal workflows; exercise series for teams evaluating the new architecture
+- **Owner:** Temporal FDE Team
+- **Spec:** `specs/workshop/augment-with-ai/`
+- **Next:** Tech lead review — confirm exercise list and Codespaces machine/key requirements
+
 ### 🆕 fulfillment.Order (initiative)
 
 #### fulfillment.Order Workflow

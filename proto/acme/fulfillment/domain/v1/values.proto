@@ -10,16 +10,17 @@ enum Errors {
   ERROR_FORBIDDEN = 2;
   ERROR_BAD_REQUEST = 3;
   ERROR_ADDRESS_VERIFY_FAILED = 4;
+  ERROR_INVALID_RATE = 5;
 }
 
-// RiskLevel normalizes PredictHQ rank (0–100) into tiers the agent can reason about.
+// RiskLevel represents supply chain risk tiers the agent can reason about.
 enum RiskLevel {
   RISK_LEVEL_UNSPECIFIED = 0;
   RISK_LEVEL_NONE        = 1; // no notable events
-  RISK_LEVEL_LOW         = 2; // rank 1–30
-  RISK_LEVEL_MODERATE    = 3; // rank 31–60
-  RISK_LEVEL_HIGH        = 4; // rank 61–80
-  RISK_LEVEL_CRITICAL    = 5; // rank 81–100
+  RISK_LEVEL_LOW         = 2;
+  RISK_LEVEL_MODERATE    = 3;
+  RISK_LEVEL_HIGH        = 4;
+  RISK_LEVEL_CRITICAL    = 5;
 }
 
 // LocationEvent is a distilled event record for LLM risk reasoning.
@@ -29,10 +30,10 @@ message LocationEvent {
   string          title       = 2;
   optional string description = 3;
 
-  // PredictHQ category string (e.g. "severe-weather", "airport-delays", "disasters").
+  // Event category string (e.g. "severe-weather", "airport-delays", "disasters").
   string category = 4;
 
-  // PredictHQ Rank (0–100): overall significance of the event.
+  // Rank (0–100): overall significance of the event.
   int32          rank       = 5;
   optional int32 local_rank = 6;
 
@@ -55,7 +56,7 @@ message LocationRiskSummary {
   int32 total_event_count       = 3;
   int32 unscheduled_event_count = 4;
 
-  // Count of events per PredictHQ category string
+  // Count of events per category string
   // (e.g. {"severe-weather": 2, "airport-delays": 1}).
   map<string, int32> events_by_category = 5;
 }

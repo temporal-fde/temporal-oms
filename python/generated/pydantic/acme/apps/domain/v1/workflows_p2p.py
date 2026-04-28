@@ -2,6 +2,7 @@
 # gen by protobuf_to_pydantic[v0.3.3.1](https://github.com/so1n/protobuf_to_pydantic)
 # Protobuf Version: 6.33.6 
 # Pydantic Version: 2.13.0 
+from ....common.v1.values_p2p import Address
 from ....oms.v1.message_p2p import OmsProperties
 from ....oms.v1.values_p2p import Order
 from ....oms.v1.values_p2p import Payment
@@ -9,8 +10,8 @@ from datetime import datetime
 from google.protobuf.message import Message  # type: ignore
 from pydantic import BaseModel
 from pydantic import Field
-from workflows_p2p import GetProcessOrderStateResponse
-from workflows_p2p import ProcessOrderRequest
+from ....processing.domain.v1.workflows_p2p import GetProcessOrderStateResponse
+from ....processing.domain.v1.workflows_p2p import ProcessOrderRequest
 import typing
 
 
@@ -58,3 +59,11 @@ class CancelOrderResponse(BaseModel):
 
 class StartIntegrationsRequest(BaseModel):
     pass
+
+class WarehouseEntry(BaseModel):
+    warehouse_id: str = Field(default="")
+    sku_prefixes: typing.List[str] = Field(default_factory=list)
+    address: Address = Field(default_factory=Address)
+
+class GetIntegrationsStateResponse(BaseModel):
+    warehouses: WarehouseEntry = Field(default_factory=WarehouseEntry)

@@ -12,6 +12,7 @@ import io.temporal.client.UpdateOptions;
 import io.temporal.client.WithStartWorkflowOperation;
 import io.temporal.client.WorkflowClient;
 import io.temporal.client.WorkflowOptions;
+import io.temporal.client.WorkflowStub;
 import io.temporal.client.WorkflowUpdateStage;
 import io.temporal.nexus.Nexus;
 import org.slf4j.Logger;
@@ -60,15 +61,31 @@ public class FulfillmentImpl {
         });
     }
 
+    @OperationImpl
+    public OperationHandler<FulfillOrderRequest, FulfillOrderResponse> fulfillOrder() {
+        // Dispatch fulfillOrder Update to the running fulfillment.Order workflow.
+        // We wait only for ACCEPTED — fulfillOrder awaits delivery status (long-running)
+        // and apps.Order does not need the result; fulfillment.Order is the source of truth.
+        return OperationHandler.sync((ctx, details, request) -> {
+            var orderId = request.getProcessedOrder().getOrderId();
+            logger.info("fulfillOrder Nexus operation for order_id={}", orderId);
+
+            WorkflowClient client = Nexus.getOperationContext().getWorkflowClient();
+            Order orderWorkflow = client.newWorkflowStub(Order.class, orderId);
+
+            WorkflowStub.fromTyped(orderWorkflow).startUpdate(
+                    UpdateOptions.<FulfillOrderResponse>newBuilder()
+                            .setUpdateName("fulfillOrder")
+                            .setResultClass(FulfillOrderResponse.class)
+                            .setWaitForStage(WorkflowUpdateStage.ACCEPTED)
+                            .build(),
+                    request);
+
+            return FulfillOrderResponse.getDefaultInstance();
+        });
+    }
+
     private com.acme.proto.acme.common.v1.Address toCommonAddress(StartOrderFulfillmentRequest request) {
-        var shipping = request.getPlacedOrder().getProcessOrder().getOrder().getShippingAddress();
-        return com.acme.proto.acme.common.v1.Address.newBuilder()
-                .setEasypost(com.acme.proto.acme.common.v1.EasyPostAddress.newBuilder()
-                        .setStreet1(shipping.getEasypost().getStreet1())
-                        .setCity(shipping.getEasypost().getCity())
-                        .setState(shipping.getEasypost().getState())
-                        .setZip(shipping.getEasypost().getZip())
-                        .setCountry(shipping.getEasypost().getCountry()))
-                .build();
+        return request.getPlacedOrder().getShippingAddress();
     }
 }

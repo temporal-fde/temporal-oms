@@ -6,6 +6,10 @@
 package com.acme.proto.acme.fulfillment.domain.fulfillment.v1;
 
 /**
+ * <pre>
+ * FulfillOrderResponse is returned to the fulfillOrder Update caller (apps.Order).
+ * </pre>
+ *
  * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.FulfillOrderResponse}
  */
 @com.google.protobuf.Generated
@@ -28,9 +32,7 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private FulfillOrderResponse() {
-    orderId_ = "";
-    status_ = 0;
-    allocatedItems_ = java.util.Collections.emptyList();
+    trackingNumber_ = "";
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
@@ -52,154 +54,69 @@ private static final long serialVersionUID = 0L;
   }
 
   private int bitField0_;
-  public static final int ORDER_ID_FIELD_NUMBER = 1;
+  public static final int TRACKING_NUMBER_FIELD_NUMBER = 1;
   @SuppressWarnings("serial")
-  private volatile java.lang.Object orderId_ = "";
+  private volatile java.lang.Object trackingNumber_ = "";
   /**
-   * <code>string order_id = 1 [json_name = "orderId"];</code>
-   * @return The orderId.
+   * <code>string tracking_number = 1 [json_name = "trackingNumber"];</code>
+   * @return The trackingNumber.
    */
   @java.lang.Override
-  public java.lang.String getOrderId() {
-    java.lang.Object ref = orderId_;
+  public java.lang.String getTrackingNumber() {
+    java.lang.Object ref = trackingNumber_;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
       com.google.protobuf.ByteString bs = 
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
-      orderId_ = s;
+      trackingNumber_ = s;
       return s;
     }
   }
   /**
-   * <code>string order_id = 1 [json_name = "orderId"];</code>
-   * @return The bytes for orderId.
+   * <code>string tracking_number = 1 [json_name = "trackingNumber"];</code>
+   * @return The bytes for trackingNumber.
    */
   @java.lang.Override
   public com.google.protobuf.ByteString
-      getOrderIdBytes() {
-    java.lang.Object ref = orderId_;
+      getTrackingNumberBytes() {
+    java.lang.Object ref = trackingNumber_;
     if (ref instanceof java.lang.String) {
       com.google.protobuf.ByteString b = 
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
-      orderId_ = b;
+      trackingNumber_ = b;
       return b;
     } else {
       return (com.google.protobuf.ByteString) ref;
     }
   }
 
-  public static final int STATUS_FIELD_NUMBER = 2;
-  private int status_ = 0;
+  public static final int SHIPPING_SELECTION_FIELD_NUMBER = 2;
+  private com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingSelection shippingSelection_;
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.Status status = 2 [json_name = "status"];</code>
-   * @return The enum numeric value on the wire for status.
-   */
-  @java.lang.Override public int getStatusValue() {
-    return status_;
-  }
-  /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.Status status = 2 [json_name = "status"];</code>
-   * @return The status.
-   */
-  @java.lang.Override public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.Status getStatus() {
-    com.acme.proto.acme.fulfillment.domain.fulfillment.v1.Status result = com.acme.proto.acme.fulfillment.domain.fulfillment.v1.Status.forNumber(status_);
-    return result == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.Status.UNRECOGNIZED : result;
-  }
-
-  public static final int SHIPPING_FIELD_NUMBER = 3;
-  private com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingDetails shipping_;
-  /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingDetails shipping = 3 [json_name = "shipping"];</code>
-   * @return Whether the shipping field is set.
+   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingSelection shipping_selection = 2 [json_name = "shippingSelection"];</code>
+   * @return Whether the shippingSelection field is set.
    */
   @java.lang.Override
-  public boolean hasShipping() {
+  public boolean hasShippingSelection() {
     return ((bitField0_ & 0x00000001) != 0);
   }
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingDetails shipping = 3 [json_name = "shipping"];</code>
-   * @return The shipping.
+   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingSelection shipping_selection = 2 [json_name = "shippingSelection"];</code>
+   * @return The shippingSelection.
    */
   @java.lang.Override
-  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingDetails getShipping() {
-    return shipping_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingDetails.getDefaultInstance() : shipping_;
+  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingSelection getShippingSelection() {
+    return shippingSelection_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingSelection.getDefaultInstance() : shippingSelection_;
   }
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingDetails shipping = 3 [json_name = "shipping"];</code>
+   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingSelection shipping_selection = 2 [json_name = "shippingSelection"];</code>
    */
   @java.lang.Override
-  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingDetailsOrBuilder getShippingOrBuilder() {
-    return shipping_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingDetails.getDefaultInstance() : shipping_;
-  }
-
-  public static final int ALLOCATED_ITEMS_FIELD_NUMBER = 4;
-  @SuppressWarnings("serial")
-  private java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItem> allocatedItems_;
-  /**
-   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.AllocatedItem allocated_items = 4 [json_name = "allocatedItems"];</code>
-   */
-  @java.lang.Override
-  public java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItem> getAllocatedItemsList() {
-    return allocatedItems_;
-  }
-  /**
-   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.AllocatedItem allocated_items = 4 [json_name = "allocatedItems"];</code>
-   */
-  @java.lang.Override
-  public java.util.List<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItemOrBuilder> 
-      getAllocatedItemsOrBuilderList() {
-    return allocatedItems_;
-  }
-  /**
-   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.AllocatedItem allocated_items = 4 [json_name = "allocatedItems"];</code>
-   */
-  @java.lang.Override
-  public int getAllocatedItemsCount() {
-    return allocatedItems_.size();
-  }
-  /**
-   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.AllocatedItem allocated_items = 4 [json_name = "allocatedItems"];</code>
-   */
-  @java.lang.Override
-  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItem getAllocatedItems(int index) {
-    return allocatedItems_.get(index);
-  }
-  /**
-   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.AllocatedItem allocated_items = 4 [json_name = "allocatedItems"];</code>
-   */
-  @java.lang.Override
-  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItemOrBuilder getAllocatedItemsOrBuilder(
-      int index) {
-    return allocatedItems_.get(index);
-  }
-
-  public static final int COMPLETED_AT_FIELD_NUMBER = 5;
-  private com.google.protobuf.Timestamp completedAt_;
-  /**
-   * <code>.google.protobuf.Timestamp completed_at = 5 [json_name = "completedAt"];</code>
-   * @return Whether the completedAt field is set.
-   */
-  @java.lang.Override
-  public boolean hasCompletedAt() {
-    return ((bitField0_ & 0x00000002) != 0);
-  }
-  /**
-   * <code>.google.protobuf.Timestamp completed_at = 5 [json_name = "completedAt"];</code>
-   * @return The completedAt.
-   */
-  @java.lang.Override
-  public com.google.protobuf.Timestamp getCompletedAt() {
-    return completedAt_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : completedAt_;
-  }
-  /**
-   * <code>.google.protobuf.Timestamp completed_at = 5 [json_name = "completedAt"];</code>
-   */
-  @java.lang.Override
-  public com.google.protobuf.TimestampOrBuilder getCompletedAtOrBuilder() {
-    return completedAt_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : completedAt_;
+  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingSelectionOrBuilder getShippingSelectionOrBuilder() {
+    return shippingSelection_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingSelection.getDefaultInstance() : shippingSelection_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -216,20 +133,11 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(orderId_)) {
-      com.google.protobuf.GeneratedMessage.writeString(output, 1, orderId_);
-    }
-    if (status_ != com.acme.proto.acme.fulfillment.domain.fulfillment.v1.Status.STATUS_UNSPECIFIED.getNumber()) {
-      output.writeEnum(2, status_);
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(trackingNumber_)) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 1, trackingNumber_);
     }
     if (((bitField0_ & 0x00000001) != 0)) {
-      output.writeMessage(3, getShipping());
-    }
-    for (int i = 0; i < allocatedItems_.size(); i++) {
-      output.writeMessage(4, allocatedItems_.get(i));
-    }
-    if (((bitField0_ & 0x00000002) != 0)) {
-      output.writeMessage(5, getCompletedAt());
+      output.writeMessage(2, getShippingSelection());
     }
     getUnknownFields().writeTo(output);
   }
@@ -240,29 +148,12 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(orderId_)) {
-      size += com.google.protobuf.GeneratedMessage.computeStringSize(1, orderId_);
-    }
-    if (status_ != com.acme.proto.acme.fulfillment.domain.fulfillment.v1.Status.STATUS_UNSPECIFIED.getNumber()) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeEnumSize(2, status_);
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(trackingNumber_)) {
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(1, trackingNumber_);
     }
     if (((bitField0_ & 0x00000001) != 0)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(3, getShipping());
-    }
-
-        {
-          final int count = allocatedItems_.size();
-          for (int i = 0; i < count; i++) {
-            size += com.google.protobuf.CodedOutputStream
-              .computeMessageSizeNoTag(allocatedItems_.get(i));
-          }
-          size += 1 * count;
-        }
-    if (((bitField0_ & 0x00000002) != 0)) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(5, getCompletedAt());
+        .computeMessageSize(2, getShippingSelection());
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -279,20 +170,12 @@ private static final long serialVersionUID = 0L;
     }
     com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderResponse other = (com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderResponse) obj;
 
-    if (!getOrderId()
-        .equals(other.getOrderId())) return false;
-    if (status_ != other.status_) return false;
-    if (hasShipping() != other.hasShipping()) return false;
-    if (hasShipping()) {
-      if (!getShipping()
-          .equals(other.getShipping())) return false;
-    }
-    if (!getAllocatedItemsList()
-        .equals(other.getAllocatedItemsList())) return false;
-    if (hasCompletedAt() != other.hasCompletedAt()) return false;
-    if (hasCompletedAt()) {
-      if (!getCompletedAt()
-          .equals(other.getCompletedAt())) return false;
+    if (!getTrackingNumber()
+        .equals(other.getTrackingNumber())) return false;
+    if (hasShippingSelection() != other.hasShippingSelection()) return false;
+    if (hasShippingSelection()) {
+      if (!getShippingSelection()
+          .equals(other.getShippingSelection())) return false;
     }
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
@@ -305,21 +188,11 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    hash = (37 * hash) + ORDER_ID_FIELD_NUMBER;
-    hash = (53 * hash) + getOrderId().hashCode();
-    hash = (37 * hash) + STATUS_FIELD_NUMBER;
-    hash = (53 * hash) + status_;
-    if (hasShipping()) {
-      hash = (37 * hash) + SHIPPING_FIELD_NUMBER;
-      hash = (53 * hash) + getShipping().hashCode();
-    }
-    if (getAllocatedItemsCount() > 0) {
-      hash = (37 * hash) + ALLOCATED_ITEMS_FIELD_NUMBER;
-      hash = (53 * hash) + getAllocatedItemsList().hashCode();
-    }
-    if (hasCompletedAt()) {
-      hash = (37 * hash) + COMPLETED_AT_FIELD_NUMBER;
-      hash = (53 * hash) + getCompletedAt().hashCode();
+    hash = (37 * hash) + TRACKING_NUMBER_FIELD_NUMBER;
+    hash = (53 * hash) + getTrackingNumber().hashCode();
+    if (hasShippingSelection()) {
+      hash = (37 * hash) + SHIPPING_SELECTION_FIELD_NUMBER;
+      hash = (53 * hash) + getShippingSelection().hashCode();
     }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
@@ -419,6 +292,10 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
+   * <pre>
+   * FulfillOrderResponse is returned to the fulfillOrder Update caller (apps.Order).
+   * </pre>
+   *
    * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.FulfillOrderResponse}
    */
   public static final class Builder extends
@@ -451,33 +328,18 @@ private static final long serialVersionUID = 0L;
     private void maybeForceBuilderInitialization() {
       if (com.google.protobuf.GeneratedMessage
               .alwaysUseFieldBuilders) {
-        internalGetShippingFieldBuilder();
-        internalGetAllocatedItemsFieldBuilder();
-        internalGetCompletedAtFieldBuilder();
+        internalGetShippingSelectionFieldBuilder();
       }
     }
     @java.lang.Override
     public Builder clear() {
       super.clear();
       bitField0_ = 0;
-      orderId_ = "";
-      status_ = 0;
-      shipping_ = null;
-      if (shippingBuilder_ != null) {
-        shippingBuilder_.dispose();
-        shippingBuilder_ = null;
-      }
-      if (allocatedItemsBuilder_ == null) {
-        allocatedItems_ = java.util.Collections.emptyList();
-      } else {
-        allocatedItems_ = null;
-        allocatedItemsBuilder_.clear();
-      }
-      bitField0_ = (bitField0_ & ~0x00000008);
-      completedAt_ = null;
-      if (completedAtBuilder_ != null) {
-        completedAtBuilder_.dispose();
-        completedAtBuilder_ = null;
+      trackingNumber_ = "";
+      shippingSelection_ = null;
+      if (shippingSelectionBuilder_ != null) {
+        shippingSelectionBuilder_.dispose();
+        shippingSelectionBuilder_ = null;
       }
       return this;
     }
@@ -505,44 +367,22 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderResponse buildPartial() {
       com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderResponse result = new com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderResponse(this);
-      buildPartialRepeatedFields(result);
       if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
     }
 
-    private void buildPartialRepeatedFields(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderResponse result) {
-      if (allocatedItemsBuilder_ == null) {
-        if (((bitField0_ & 0x00000008) != 0)) {
-          allocatedItems_ = java.util.Collections.unmodifiableList(allocatedItems_);
-          bitField0_ = (bitField0_ & ~0x00000008);
-        }
-        result.allocatedItems_ = allocatedItems_;
-      } else {
-        result.allocatedItems_ = allocatedItemsBuilder_.build();
-      }
-    }
-
     private void buildPartial0(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderResponse result) {
       int from_bitField0_ = bitField0_;
       if (((from_bitField0_ & 0x00000001) != 0)) {
-        result.orderId_ = orderId_;
-      }
-      if (((from_bitField0_ & 0x00000002) != 0)) {
-        result.status_ = status_;
+        result.trackingNumber_ = trackingNumber_;
       }
       int to_bitField0_ = 0;
-      if (((from_bitField0_ & 0x00000004) != 0)) {
-        result.shipping_ = shippingBuilder_ == null
-            ? shipping_
-            : shippingBuilder_.build();
+      if (((from_bitField0_ & 0x00000002) != 0)) {
+        result.shippingSelection_ = shippingSelectionBuilder_ == null
+            ? shippingSelection_
+            : shippingSelectionBuilder_.build();
         to_bitField0_ |= 0x00000001;
-      }
-      if (((from_bitField0_ & 0x00000010) != 0)) {
-        result.completedAt_ = completedAtBuilder_ == null
-            ? completedAt_
-            : completedAtBuilder_.build();
-        to_bitField0_ |= 0x00000002;
       }
       result.bitField0_ |= to_bitField0_;
     }
@@ -559,45 +399,13 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderResponse other) {
       if (other == com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderResponse.getDefaultInstance()) return this;
-      if (!other.getOrderId().isEmpty()) {
-        orderId_ = other.orderId_;
+      if (!other.getTrackingNumber().isEmpty()) {
+        trackingNumber_ = other.trackingNumber_;
         bitField0_ |= 0x00000001;
         onChanged();
       }
-      if (other.status_ != 0) {
-        setStatusValue(other.getStatusValue());
-      }
-      if (other.hasShipping()) {
-        mergeShipping(other.getShipping());
-      }
-      if (allocatedItemsBuilder_ == null) {
-        if (!other.allocatedItems_.isEmpty()) {
-          if (allocatedItems_.isEmpty()) {
-            allocatedItems_ = other.allocatedItems_;
-            bitField0_ = (bitField0_ & ~0x00000008);
-          } else {
-            ensureAllocatedItemsIsMutable();
-            allocatedItems_.addAll(other.allocatedItems_);
-          }
-          onChanged();
-        }
-      } else {
-        if (!other.allocatedItems_.isEmpty()) {
-          if (allocatedItemsBuilder_.isEmpty()) {
-            allocatedItemsBuilder_.dispose();
-            allocatedItemsBuilder_ = null;
-            allocatedItems_ = other.allocatedItems_;
-            bitField0_ = (bitField0_ & ~0x00000008);
-            allocatedItemsBuilder_ = 
-              com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
-                 internalGetAllocatedItemsFieldBuilder() : null;
-          } else {
-            allocatedItemsBuilder_.addAllMessages(other.allocatedItems_);
-          }
-        }
-      }
-      if (other.hasCompletedAt()) {
-        mergeCompletedAt(other.getCompletedAt());
+      if (other.hasShippingSelection()) {
+        mergeShippingSelection(other.getShippingSelection());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -626,42 +434,17 @@ private static final long serialVersionUID = 0L;
               done = true;
               break;
             case 10: {
-              orderId_ = input.readStringRequireUtf8();
+              trackingNumber_ = input.readStringRequireUtf8();
               bitField0_ |= 0x00000001;
               break;
             } // case 10
-            case 16: {
-              status_ = input.readEnum();
+            case 18: {
+              input.readMessage(
+                  internalGetShippingSelectionFieldBuilder().getBuilder(),
+                  extensionRegistry);
               bitField0_ |= 0x00000002;
               break;
-            } // case 16
-            case 26: {
-              input.readMessage(
-                  internalGetShippingFieldBuilder().getBuilder(),
-                  extensionRegistry);
-              bitField0_ |= 0x00000004;
-              break;
-            } // case 26
-            case 34: {
-              com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItem m =
-                  input.readMessage(
-                      com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItem.parser(),
-                      extensionRegistry);
-              if (allocatedItemsBuilder_ == null) {
-                ensureAllocatedItemsIsMutable();
-                allocatedItems_.add(m);
-              } else {
-                allocatedItemsBuilder_.addMessage(m);
-              }
-              break;
-            } // case 34
-            case 42: {
-              input.readMessage(
-                  internalGetCompletedAtFieldBuilder().getBuilder(),
-                  extensionRegistry);
-              bitField0_ |= 0x00000010;
-              break;
-            } // case 42
+            } // case 18
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -679,610 +462,197 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private java.lang.Object orderId_ = "";
+    private java.lang.Object trackingNumber_ = "";
     /**
-     * <code>string order_id = 1 [json_name = "orderId"];</code>
-     * @return The orderId.
+     * <code>string tracking_number = 1 [json_name = "trackingNumber"];</code>
+     * @return The trackingNumber.
      */
-    public java.lang.String getOrderId() {
-      java.lang.Object ref = orderId_;
+    public java.lang.String getTrackingNumber() {
+      java.lang.Object ref = trackingNumber_;
       if (!(ref instanceof java.lang.String)) {
         com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        orderId_ = s;
+        trackingNumber_ = s;
         return s;
       } else {
         return (java.lang.String) ref;
       }
     }
     /**
-     * <code>string order_id = 1 [json_name = "orderId"];</code>
-     * @return The bytes for orderId.
+     * <code>string tracking_number = 1 [json_name = "trackingNumber"];</code>
+     * @return The bytes for trackingNumber.
      */
     public com.google.protobuf.ByteString
-        getOrderIdBytes() {
-      java.lang.Object ref = orderId_;
+        getTrackingNumberBytes() {
+      java.lang.Object ref = trackingNumber_;
       if (ref instanceof String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        orderId_ = b;
+        trackingNumber_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
     /**
-     * <code>string order_id = 1 [json_name = "orderId"];</code>
-     * @param value The orderId to set.
+     * <code>string tracking_number = 1 [json_name = "trackingNumber"];</code>
+     * @param value The trackingNumber to set.
      * @return This builder for chaining.
      */
-    public Builder setOrderId(
+    public Builder setTrackingNumber(
         java.lang.String value) {
       if (value == null) { throw new NullPointerException(); }
-      orderId_ = value;
+      trackingNumber_ = value;
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>string order_id = 1 [json_name = "orderId"];</code>
+     * <code>string tracking_number = 1 [json_name = "trackingNumber"];</code>
      * @return This builder for chaining.
      */
-    public Builder clearOrderId() {
-      orderId_ = getDefaultInstance().getOrderId();
+    public Builder clearTrackingNumber() {
+      trackingNumber_ = getDefaultInstance().getTrackingNumber();
       bitField0_ = (bitField0_ & ~0x00000001);
       onChanged();
       return this;
     }
     /**
-     * <code>string order_id = 1 [json_name = "orderId"];</code>
-     * @param value The bytes for orderId to set.
+     * <code>string tracking_number = 1 [json_name = "trackingNumber"];</code>
+     * @param value The bytes for trackingNumber to set.
      * @return This builder for chaining.
      */
-    public Builder setOrderIdBytes(
+    public Builder setTrackingNumberBytes(
         com.google.protobuf.ByteString value) {
       if (value == null) { throw new NullPointerException(); }
       checkByteStringIsUtf8(value);
-      orderId_ = value;
+      trackingNumber_ = value;
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
 
-    private int status_ = 0;
+    private com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingSelection shippingSelection_;
+    private com.google.protobuf.SingleFieldBuilder<
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingSelection, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingSelection.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingSelectionOrBuilder> shippingSelectionBuilder_;
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.Status status = 2 [json_name = "status"];</code>
-     * @return The enum numeric value on the wire for status.
+     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingSelection shipping_selection = 2 [json_name = "shippingSelection"];</code>
+     * @return Whether the shippingSelection field is set.
      */
-    @java.lang.Override public int getStatusValue() {
-      return status_;
+    public boolean hasShippingSelection() {
+      return ((bitField0_ & 0x00000002) != 0);
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.Status status = 2 [json_name = "status"];</code>
-     * @param value The enum numeric value on the wire for status to set.
-     * @throws IllegalArgumentException if UNRECOGNIZED is provided.
-     * @return This builder for chaining.
+     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingSelection shipping_selection = 2 [json_name = "shippingSelection"];</code>
+     * @return The shippingSelection.
      */
-    public Builder setStatusValue(int value) {
-      status_ = value;
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingSelection getShippingSelection() {
+      if (shippingSelectionBuilder_ == null) {
+        return shippingSelection_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingSelection.getDefaultInstance() : shippingSelection_;
+      } else {
+        return shippingSelectionBuilder_.getMessage();
+      }
+    }
+    /**
+     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingSelection shipping_selection = 2 [json_name = "shippingSelection"];</code>
+     */
+    public Builder setShippingSelection(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingSelection value) {
+      if (shippingSelectionBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        shippingSelection_ = value;
+      } else {
+        shippingSelectionBuilder_.setMessage(value);
+      }
       bitField0_ |= 0x00000002;
       onChanged();
       return this;
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.Status status = 2 [json_name = "status"];</code>
-     * @return The status.
+     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingSelection shipping_selection = 2 [json_name = "shippingSelection"];</code>
      */
-    @java.lang.Override
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.Status getStatus() {
-      com.acme.proto.acme.fulfillment.domain.fulfillment.v1.Status result = com.acme.proto.acme.fulfillment.domain.fulfillment.v1.Status.forNumber(status_);
-      return result == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.Status.UNRECOGNIZED : result;
-    }
-    /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.Status status = 2 [json_name = "status"];</code>
-     * @param value The status to set.
-     * @return This builder for chaining.
-     */
-    public Builder setStatus(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.Status value) {
-      if (value == null) { throw new NullPointerException(); }
+    public Builder setShippingSelection(
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingSelection.Builder builderForValue) {
+      if (shippingSelectionBuilder_ == null) {
+        shippingSelection_ = builderForValue.build();
+      } else {
+        shippingSelectionBuilder_.setMessage(builderForValue.build());
+      }
       bitField0_ |= 0x00000002;
-      status_ = value.getNumber();
       onChanged();
       return this;
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.Status status = 2 [json_name = "status"];</code>
-     * @return This builder for chaining.
+     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingSelection shipping_selection = 2 [json_name = "shippingSelection"];</code>
      */
-    public Builder clearStatus() {
+    public Builder mergeShippingSelection(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingSelection value) {
+      if (shippingSelectionBuilder_ == null) {
+        if (((bitField0_ & 0x00000002) != 0) &&
+          shippingSelection_ != null &&
+          shippingSelection_ != com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingSelection.getDefaultInstance()) {
+          getShippingSelectionBuilder().mergeFrom(value);
+        } else {
+          shippingSelection_ = value;
+        }
+      } else {
+        shippingSelectionBuilder_.mergeFrom(value);
+      }
+      if (shippingSelection_ != null) {
+        bitField0_ |= 0x00000002;
+        onChanged();
+      }
+      return this;
+    }
+    /**
+     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingSelection shipping_selection = 2 [json_name = "shippingSelection"];</code>
+     */
+    public Builder clearShippingSelection() {
       bitField0_ = (bitField0_ & ~0x00000002);
-      status_ = 0;
-      onChanged();
-      return this;
-    }
-
-    private com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingDetails shipping_;
-    private com.google.protobuf.SingleFieldBuilder<
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingDetails, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingDetails.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingDetailsOrBuilder> shippingBuilder_;
-    /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingDetails shipping = 3 [json_name = "shipping"];</code>
-     * @return Whether the shipping field is set.
-     */
-    public boolean hasShipping() {
-      return ((bitField0_ & 0x00000004) != 0);
-    }
-    /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingDetails shipping = 3 [json_name = "shipping"];</code>
-     * @return The shipping.
-     */
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingDetails getShipping() {
-      if (shippingBuilder_ == null) {
-        return shipping_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingDetails.getDefaultInstance() : shipping_;
-      } else {
-        return shippingBuilder_.getMessage();
-      }
-    }
-    /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingDetails shipping = 3 [json_name = "shipping"];</code>
-     */
-    public Builder setShipping(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingDetails value) {
-      if (shippingBuilder_ == null) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        shipping_ = value;
-      } else {
-        shippingBuilder_.setMessage(value);
-      }
-      bitField0_ |= 0x00000004;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingDetails shipping = 3 [json_name = "shipping"];</code>
-     */
-    public Builder setShipping(
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingDetails.Builder builderForValue) {
-      if (shippingBuilder_ == null) {
-        shipping_ = builderForValue.build();
-      } else {
-        shippingBuilder_.setMessage(builderForValue.build());
-      }
-      bitField0_ |= 0x00000004;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingDetails shipping = 3 [json_name = "shipping"];</code>
-     */
-    public Builder mergeShipping(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingDetails value) {
-      if (shippingBuilder_ == null) {
-        if (((bitField0_ & 0x00000004) != 0) &&
-          shipping_ != null &&
-          shipping_ != com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingDetails.getDefaultInstance()) {
-          getShippingBuilder().mergeFrom(value);
-        } else {
-          shipping_ = value;
-        }
-      } else {
-        shippingBuilder_.mergeFrom(value);
-      }
-      if (shipping_ != null) {
-        bitField0_ |= 0x00000004;
-        onChanged();
-      }
-      return this;
-    }
-    /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingDetails shipping = 3 [json_name = "shipping"];</code>
-     */
-    public Builder clearShipping() {
-      bitField0_ = (bitField0_ & ~0x00000004);
-      shipping_ = null;
-      if (shippingBuilder_ != null) {
-        shippingBuilder_.dispose();
-        shippingBuilder_ = null;
+      shippingSelection_ = null;
+      if (shippingSelectionBuilder_ != null) {
+        shippingSelectionBuilder_.dispose();
+        shippingSelectionBuilder_ = null;
       }
       onChanged();
       return this;
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingDetails shipping = 3 [json_name = "shipping"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingSelection shipping_selection = 2 [json_name = "shippingSelection"];</code>
      */
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingDetails.Builder getShippingBuilder() {
-      bitField0_ |= 0x00000004;
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingSelection.Builder getShippingSelectionBuilder() {
+      bitField0_ |= 0x00000002;
       onChanged();
-      return internalGetShippingFieldBuilder().getBuilder();
+      return internalGetShippingSelectionFieldBuilder().getBuilder();
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingDetails shipping = 3 [json_name = "shipping"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingSelection shipping_selection = 2 [json_name = "shippingSelection"];</code>
      */
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingDetailsOrBuilder getShippingOrBuilder() {
-      if (shippingBuilder_ != null) {
-        return shippingBuilder_.getMessageOrBuilder();
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingSelectionOrBuilder getShippingSelectionOrBuilder() {
+      if (shippingSelectionBuilder_ != null) {
+        return shippingSelectionBuilder_.getMessageOrBuilder();
       } else {
-        return shipping_ == null ?
-            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingDetails.getDefaultInstance() : shipping_;
+        return shippingSelection_ == null ?
+            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingSelection.getDefaultInstance() : shippingSelection_;
       }
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingDetails shipping = 3 [json_name = "shipping"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingSelection shipping_selection = 2 [json_name = "shippingSelection"];</code>
      */
     private com.google.protobuf.SingleFieldBuilder<
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingDetails, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingDetails.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingDetailsOrBuilder> 
-        internalGetShippingFieldBuilder() {
-      if (shippingBuilder_ == null) {
-        shippingBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingDetails, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingDetails.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingDetailsOrBuilder>(
-                getShipping(),
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingSelection, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingSelection.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingSelectionOrBuilder> 
+        internalGetShippingSelectionFieldBuilder() {
+      if (shippingSelectionBuilder_ == null) {
+        shippingSelectionBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingSelection, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingSelection.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingSelectionOrBuilder>(
+                getShippingSelection(),
                 getParentForChildren(),
                 isClean());
-        shipping_ = null;
+        shippingSelection_ = null;
       }
-      return shippingBuilder_;
-    }
-
-    private java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItem> allocatedItems_ =
-      java.util.Collections.emptyList();
-    private void ensureAllocatedItemsIsMutable() {
-      if (!((bitField0_ & 0x00000008) != 0)) {
-        allocatedItems_ = new java.util.ArrayList<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItem>(allocatedItems_);
-        bitField0_ |= 0x00000008;
-       }
-    }
-
-    private com.google.protobuf.RepeatedFieldBuilder<
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItem, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItem.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItemOrBuilder> allocatedItemsBuilder_;
-
-    /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.AllocatedItem allocated_items = 4 [json_name = "allocatedItems"];</code>
-     */
-    public java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItem> getAllocatedItemsList() {
-      if (allocatedItemsBuilder_ == null) {
-        return java.util.Collections.unmodifiableList(allocatedItems_);
-      } else {
-        return allocatedItemsBuilder_.getMessageList();
-      }
-    }
-    /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.AllocatedItem allocated_items = 4 [json_name = "allocatedItems"];</code>
-     */
-    public int getAllocatedItemsCount() {
-      if (allocatedItemsBuilder_ == null) {
-        return allocatedItems_.size();
-      } else {
-        return allocatedItemsBuilder_.getCount();
-      }
-    }
-    /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.AllocatedItem allocated_items = 4 [json_name = "allocatedItems"];</code>
-     */
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItem getAllocatedItems(int index) {
-      if (allocatedItemsBuilder_ == null) {
-        return allocatedItems_.get(index);
-      } else {
-        return allocatedItemsBuilder_.getMessage(index);
-      }
-    }
-    /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.AllocatedItem allocated_items = 4 [json_name = "allocatedItems"];</code>
-     */
-    public Builder setAllocatedItems(
-        int index, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItem value) {
-      if (allocatedItemsBuilder_ == null) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        ensureAllocatedItemsIsMutable();
-        allocatedItems_.set(index, value);
-        onChanged();
-      } else {
-        allocatedItemsBuilder_.setMessage(index, value);
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.AllocatedItem allocated_items = 4 [json_name = "allocatedItems"];</code>
-     */
-    public Builder setAllocatedItems(
-        int index, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItem.Builder builderForValue) {
-      if (allocatedItemsBuilder_ == null) {
-        ensureAllocatedItemsIsMutable();
-        allocatedItems_.set(index, builderForValue.build());
-        onChanged();
-      } else {
-        allocatedItemsBuilder_.setMessage(index, builderForValue.build());
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.AllocatedItem allocated_items = 4 [json_name = "allocatedItems"];</code>
-     */
-    public Builder addAllocatedItems(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItem value) {
-      if (allocatedItemsBuilder_ == null) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        ensureAllocatedItemsIsMutable();
-        allocatedItems_.add(value);
-        onChanged();
-      } else {
-        allocatedItemsBuilder_.addMessage(value);
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.AllocatedItem allocated_items = 4 [json_name = "allocatedItems"];</code>
-     */
-    public Builder addAllocatedItems(
-        int index, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItem value) {
-      if (allocatedItemsBuilder_ == null) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        ensureAllocatedItemsIsMutable();
-        allocatedItems_.add(index, value);
-        onChanged();
-      } else {
-        allocatedItemsBuilder_.addMessage(index, value);
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.AllocatedItem allocated_items = 4 [json_name = "allocatedItems"];</code>
-     */
-    public Builder addAllocatedItems(
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItem.Builder builderForValue) {
-      if (allocatedItemsBuilder_ == null) {
-        ensureAllocatedItemsIsMutable();
-        allocatedItems_.add(builderForValue.build());
-        onChanged();
-      } else {
-        allocatedItemsBuilder_.addMessage(builderForValue.build());
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.AllocatedItem allocated_items = 4 [json_name = "allocatedItems"];</code>
-     */
-    public Builder addAllocatedItems(
-        int index, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItem.Builder builderForValue) {
-      if (allocatedItemsBuilder_ == null) {
-        ensureAllocatedItemsIsMutable();
-        allocatedItems_.add(index, builderForValue.build());
-        onChanged();
-      } else {
-        allocatedItemsBuilder_.addMessage(index, builderForValue.build());
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.AllocatedItem allocated_items = 4 [json_name = "allocatedItems"];</code>
-     */
-    public Builder addAllAllocatedItems(
-        java.lang.Iterable<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItem> values) {
-      if (allocatedItemsBuilder_ == null) {
-        ensureAllocatedItemsIsMutable();
-        com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, allocatedItems_);
-        onChanged();
-      } else {
-        allocatedItemsBuilder_.addAllMessages(values);
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.AllocatedItem allocated_items = 4 [json_name = "allocatedItems"];</code>
-     */
-    public Builder clearAllocatedItems() {
-      if (allocatedItemsBuilder_ == null) {
-        allocatedItems_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000008);
-        onChanged();
-      } else {
-        allocatedItemsBuilder_.clear();
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.AllocatedItem allocated_items = 4 [json_name = "allocatedItems"];</code>
-     */
-    public Builder removeAllocatedItems(int index) {
-      if (allocatedItemsBuilder_ == null) {
-        ensureAllocatedItemsIsMutable();
-        allocatedItems_.remove(index);
-        onChanged();
-      } else {
-        allocatedItemsBuilder_.remove(index);
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.AllocatedItem allocated_items = 4 [json_name = "allocatedItems"];</code>
-     */
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItem.Builder getAllocatedItemsBuilder(
-        int index) {
-      return internalGetAllocatedItemsFieldBuilder().getBuilder(index);
-    }
-    /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.AllocatedItem allocated_items = 4 [json_name = "allocatedItems"];</code>
-     */
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItemOrBuilder getAllocatedItemsOrBuilder(
-        int index) {
-      if (allocatedItemsBuilder_ == null) {
-        return allocatedItems_.get(index);  } else {
-        return allocatedItemsBuilder_.getMessageOrBuilder(index);
-      }
-    }
-    /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.AllocatedItem allocated_items = 4 [json_name = "allocatedItems"];</code>
-     */
-    public java.util.List<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItemOrBuilder> 
-         getAllocatedItemsOrBuilderList() {
-      if (allocatedItemsBuilder_ != null) {
-        return allocatedItemsBuilder_.getMessageOrBuilderList();
-      } else {
-        return java.util.Collections.unmodifiableList(allocatedItems_);
-      }
-    }
-    /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.AllocatedItem allocated_items = 4 [json_name = "allocatedItems"];</code>
-     */
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItem.Builder addAllocatedItemsBuilder() {
-      return internalGetAllocatedItemsFieldBuilder().addBuilder(
-          com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItem.getDefaultInstance());
-    }
-    /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.AllocatedItem allocated_items = 4 [json_name = "allocatedItems"];</code>
-     */
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItem.Builder addAllocatedItemsBuilder(
-        int index) {
-      return internalGetAllocatedItemsFieldBuilder().addBuilder(
-          index, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItem.getDefaultInstance());
-    }
-    /**
-     * <code>repeated .acme.fulfillment.domain.fulfillment.v1.AllocatedItem allocated_items = 4 [json_name = "allocatedItems"];</code>
-     */
-    public java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItem.Builder> 
-         getAllocatedItemsBuilderList() {
-      return internalGetAllocatedItemsFieldBuilder().getBuilderList();
-    }
-    private com.google.protobuf.RepeatedFieldBuilder<
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItem, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItem.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItemOrBuilder> 
-        internalGetAllocatedItemsFieldBuilder() {
-      if (allocatedItemsBuilder_ == null) {
-        allocatedItemsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
-            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItem, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItem.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItemOrBuilder>(
-                allocatedItems_,
-                ((bitField0_ & 0x00000008) != 0),
-                getParentForChildren(),
-                isClean());
-        allocatedItems_ = null;
-      }
-      return allocatedItemsBuilder_;
-    }
-
-    private com.google.protobuf.Timestamp completedAt_;
-    private com.google.protobuf.SingleFieldBuilder<
-        com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> completedAtBuilder_;
-    /**
-     * <code>.google.protobuf.Timestamp completed_at = 5 [json_name = "completedAt"];</code>
-     * @return Whether the completedAt field is set.
-     */
-    public boolean hasCompletedAt() {
-      return ((bitField0_ & 0x00000010) != 0);
-    }
-    /**
-     * <code>.google.protobuf.Timestamp completed_at = 5 [json_name = "completedAt"];</code>
-     * @return The completedAt.
-     */
-    public com.google.protobuf.Timestamp getCompletedAt() {
-      if (completedAtBuilder_ == null) {
-        return completedAt_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : completedAt_;
-      } else {
-        return completedAtBuilder_.getMessage();
-      }
-    }
-    /**
-     * <code>.google.protobuf.Timestamp completed_at = 5 [json_name = "completedAt"];</code>
-     */
-    public Builder setCompletedAt(com.google.protobuf.Timestamp value) {
-      if (completedAtBuilder_ == null) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        completedAt_ = value;
-      } else {
-        completedAtBuilder_.setMessage(value);
-      }
-      bitField0_ |= 0x00000010;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>.google.protobuf.Timestamp completed_at = 5 [json_name = "completedAt"];</code>
-     */
-    public Builder setCompletedAt(
-        com.google.protobuf.Timestamp.Builder builderForValue) {
-      if (completedAtBuilder_ == null) {
-        completedAt_ = builderForValue.build();
-      } else {
-        completedAtBuilder_.setMessage(builderForValue.build());
-      }
-      bitField0_ |= 0x00000010;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>.google.protobuf.Timestamp completed_at = 5 [json_name = "completedAt"];</code>
-     */
-    public Builder mergeCompletedAt(com.google.protobuf.Timestamp value) {
-      if (completedAtBuilder_ == null) {
-        if (((bitField0_ & 0x00000010) != 0) &&
-          completedAt_ != null &&
-          completedAt_ != com.google.protobuf.Timestamp.getDefaultInstance()) {
-          getCompletedAtBuilder().mergeFrom(value);
-        } else {
-          completedAt_ = value;
-        }
-      } else {
-        completedAtBuilder_.mergeFrom(value);
-      }
-      if (completedAt_ != null) {
-        bitField0_ |= 0x00000010;
-        onChanged();
-      }
-      return this;
-    }
-    /**
-     * <code>.google.protobuf.Timestamp completed_at = 5 [json_name = "completedAt"];</code>
-     */
-    public Builder clearCompletedAt() {
-      bitField0_ = (bitField0_ & ~0x00000010);
-      completedAt_ = null;
-      if (completedAtBuilder_ != null) {
-        completedAtBuilder_.dispose();
-        completedAtBuilder_ = null;
-      }
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>.google.protobuf.Timestamp completed_at = 5 [json_name = "completedAt"];</code>
-     */
-    public com.google.protobuf.Timestamp.Builder getCompletedAtBuilder() {
-      bitField0_ |= 0x00000010;
-      onChanged();
-      return internalGetCompletedAtFieldBuilder().getBuilder();
-    }
-    /**
-     * <code>.google.protobuf.Timestamp completed_at = 5 [json_name = "completedAt"];</code>
-     */
-    public com.google.protobuf.TimestampOrBuilder getCompletedAtOrBuilder() {
-      if (completedAtBuilder_ != null) {
-        return completedAtBuilder_.getMessageOrBuilder();
-      } else {
-        return completedAt_ == null ?
-            com.google.protobuf.Timestamp.getDefaultInstance() : completedAt_;
-      }
-    }
-    /**
-     * <code>.google.protobuf.Timestamp completed_at = 5 [json_name = "completedAt"];</code>
-     */
-    private com.google.protobuf.SingleFieldBuilder<
-        com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> 
-        internalGetCompletedAtFieldBuilder() {
-      if (completedAtBuilder_ == null) {
-        completedAtBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-            com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder>(
-                getCompletedAt(),
-                getParentForChildren(),
-                isClean());
-        completedAt_ = null;
-      }
-      return completedAtBuilder_;
+      return shippingSelectionBuilder_;
     }
 
     // @@protoc_insertion_point(builder_scope:acme.fulfillment.domain.fulfillment.v1.FulfillOrderResponse)

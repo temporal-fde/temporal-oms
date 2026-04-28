@@ -8,13 +8,13 @@ from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class OmsProperties(_message.Message):
-    __slots__ = ("apps", "processing", "risk")
+    __slots__ = ()
     class BoundedContextConfig(_message.Message):
-        __slots__ = ("nexus",)
+        __slots__ = ()
         class NexusConfig(_message.Message):
-            __slots__ = ("endpoints",)
+            __slots__ = ()
             class EndpointsEntry(_message.Message):
-                __slots__ = ("key", "value")
+                __slots__ = ()
                 KEY_FIELD_NUMBER: _ClassVar[int]
                 VALUE_FIELD_NUMBER: _ClassVar[int]
                 key: str

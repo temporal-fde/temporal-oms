@@ -5,8 +5,9 @@
 from google.protobuf.message import Message  # type: ignore
 from pydantic import BaseModel
 from pydantic import Field
-from values_p2p import Address
-from values_p2p import Money
+from ...common.v1.values_p2p import Address
+from ...common.v1.values_p2p import Money
+from ...common.v1.values_p2p import Shipment
 import typing
 
 
@@ -18,6 +19,7 @@ class Order(BaseModel):
     order_id: str = Field(default="")
     items: typing.List[Item] = Field(default_factory=list)
     shipping_address: Address = Field(default_factory=Address)
+    selected_shipment: typing.Optional[Shipment] = Field(default_factory=Shipment)
 
 class Payment(BaseModel):
     rrn: str = Field(default="")

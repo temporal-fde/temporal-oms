@@ -47,6 +47,17 @@ def _extract_coordinate(ep_addr: object) -> Coordinate | None:
     return Coordinate(latitude=float(lat), longitude=float(lng) if lng else 0.0)  # type: ignore[arg-type]
 
 
+def _extract_timezone(ep_addr: object) -> str:
+    verifications = _ep_get(ep_addr, "verifications")
+    for key in ("delivery", "zip4"):
+        details = _ep_get(_ep_get(verifications, key), "details")
+        if details:
+            tz = _ep_get(details, "time_zone")
+            if tz:
+                return str(tz)
+    return ""
+
+
 def _get_client() -> easypost.EasyPostClient:
     return easypost.EasyPostClient(settings.easypost_api_key)
 
@@ -81,6 +92,7 @@ class EasyPostActivities:
 
         activity.logger.info(f"Verified address: {ep_addr}")
         coordinate = _extract_coordinate(ep_addr)
+        timezone = _extract_timezone(ep_addr)
 
         return VerifyAddressResponse(
             address=Address(
@@ -94,6 +106,7 @@ class EasyPostActivities:
                     country=getattr(ep_addr, "country", ep.country),
                     residential=bool(getattr(ep_addr, "residential", False)),
                     coordinate=coordinate,
+                    timezone=timezone,
                 ),
             ),
         )
@@ -132,6 +145,7 @@ class EasyPostActivities:
                 cost=Money(currency=getattr(rate, "currency", "USD"), units=cost_units),
                 estimated_days=int(getattr(rate, "est_delivery_days", 0) or 0),
                 rate_id=rate.id,
+                shipment_id=shipment.id,
             ))
 
         return GetShippingRatesResponse(

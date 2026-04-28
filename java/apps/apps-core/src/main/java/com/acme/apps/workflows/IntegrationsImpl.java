@@ -1,13 +1,23 @@
 package com.acme.apps.workflows;
 
 import com.acme.apps.workflows.activities.IntegrationsSetup;
+import com.acme.proto.acme.apps.domain.apps.v1.GetIntegrationsStateResponse;
 import com.acme.proto.acme.apps.domain.apps.v1.StartIntegrationsRequest;
+import com.acme.proto.acme.apps.domain.apps.v1.WarehouseEntry;
 import com.acme.proto.acme.common.v1.Address;
 import com.acme.proto.acme.common.v1.EasyPostAddress;
+import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeductInventoryRequest;
+import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.DeductInventoryResponse;
 import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FindAlternateWarehouseRequest;
 import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FindAlternateWarehouseResponse;
+import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.HoldItemsRequest;
+import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.HoldItemsResponse;
 import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressRequest;
 import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.LookupInventoryAddressResponse;
+import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ReleaseHoldRequest;
+import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ReleaseHoldResponse;
+import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ReserveItemsRequest;
+import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ReserveItemsResponse;
 import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItem;
 import com.acme.proto.acme.processing.domain.processing.v1.EnrichOrderRequest;
 import com.acme.proto.acme.processing.domain.processing.v1.EnrichOrderResponse;
@@ -67,6 +77,21 @@ public class IntegrationsImpl implements Integrations {
         this.warehouses = setup.preloadWarehouseAddresses();
         logger.info("apps.Integrations ready with {} warehouses", warehouses.size());
         Workflow.await(() -> false);
+    }
+
+    @Override
+    public GetIntegrationsStateResponse getState() {
+        if (warehouses == null) return GetIntegrationsStateResponse.getDefaultInstance();
+        List<WarehouseEntry> entries = warehouses.stream()
+                .map(wh -> WarehouseEntry.newBuilder()
+                        .setWarehouseId(wh.warehouseId())
+                        .addAllSkuPrefixes(wh.skuPrefixes())
+                        .setAddress(toAddress(wh))
+                        .build())
+                .toList();
+        return GetIntegrationsStateResponse.newBuilder()
+                .addAllWarehouses(entries)
+                .build();
     }
 
     // ── CommerceApp ───────────────────────────────────────────────────────────
@@ -189,6 +214,52 @@ public class IntegrationsImpl implements Integrations {
         return resp.build();
     }
 
+    // ── Inventory lifecycle ───────────────────────────────────────────────────
+
+    @Override
+    public void validateHoldItems(HoldItemsRequest request) {}
+
+    @Override
+    public HoldItemsResponse holdItems(HoldItemsRequest request) {
+        logger.info("holdItems stub: order_id={}, items={}", request.getOrderId(), request.getItemsCount());
+        return HoldItemsResponse.newBuilder()
+                .setHoldId("hold_stub_" + request.getOrderId())
+                .build();
+    }
+
+    @Override
+    public void validateReserveItems(ReserveItemsRequest request) {}
+
+    @Override
+    public ReserveItemsResponse reserveItems(ReserveItemsRequest request) {
+        logger.info("reserveItems stub: order_id={}", request.getOrderId());
+        return ReserveItemsResponse.newBuilder()
+                .setReservationId("reservation_stub_" + request.getOrderId())
+                .build();
+    }
+
+    @Override
+    public void validateDeductInventory(DeductInventoryRequest request) {}
+
+    @Override
+    public DeductInventoryResponse deductInventory(DeductInventoryRequest request) {
+        logger.info("deductInventory stub: order_id={}", request.getOrderId());
+        return DeductInventoryResponse.newBuilder()
+                .setSuccess(true)
+                .build();
+    }
+
+    @Override
+    public void validateReleaseHold(ReleaseHoldRequest request) {}
+
+    @Override
+    public ReleaseHoldResponse releaseHold(ReleaseHoldRequest request) {
+        logger.info("releaseHold stub: order_id={}, hold_id={}", request.getOrderId(), request.getHoldId());
+        return ReleaseHoldResponse.newBuilder()
+                .setSuccess(true)
+                .build();
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     private static boolean handlesSkuId(PreloadedWarehouse wh, String skuId) {
@@ -200,6 +271,7 @@ public class IntegrationsImpl implements Integrations {
         return Address.newBuilder()
                 .setEasypost(EasyPostAddress.newBuilder()
                         .setId(wh.easypostId())
+                        .setCompany(wh.company())
                         .setStreet1(wh.street1())
                         .setCity(wh.city())
                         .setState(wh.state())

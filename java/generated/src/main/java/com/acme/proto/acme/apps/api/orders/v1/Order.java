@@ -132,9 +132,9 @@ private static final long serialVersionUID = 0L;
   }
 
   public static final int SHIPPING_ADDRESS_FIELD_NUMBER = 3;
-  private com.acme.proto.acme.common.v1.Address shippingAddress_;
+  private com.acme.proto.acme.apps.api.orders.v1.ShippingAddress shippingAddress_;
   /**
-   * <code>.acme.common.v1.Address shipping_address = 3 [json_name = "shippingAddress"];</code>
+   * <code>.acme.apps.api.orders.v1.ShippingAddress shipping_address = 3 [json_name = "shippingAddress"];</code>
    * @return Whether the shippingAddress field is set.
    */
   @java.lang.Override
@@ -142,19 +142,45 @@ private static final long serialVersionUID = 0L;
     return ((bitField0_ & 0x00000001) != 0);
   }
   /**
-   * <code>.acme.common.v1.Address shipping_address = 3 [json_name = "shippingAddress"];</code>
+   * <code>.acme.apps.api.orders.v1.ShippingAddress shipping_address = 3 [json_name = "shippingAddress"];</code>
    * @return The shippingAddress.
    */
   @java.lang.Override
-  public com.acme.proto.acme.common.v1.Address getShippingAddress() {
-    return shippingAddress_ == null ? com.acme.proto.acme.common.v1.Address.getDefaultInstance() : shippingAddress_;
+  public com.acme.proto.acme.apps.api.orders.v1.ShippingAddress getShippingAddress() {
+    return shippingAddress_ == null ? com.acme.proto.acme.apps.api.orders.v1.ShippingAddress.getDefaultInstance() : shippingAddress_;
   }
   /**
-   * <code>.acme.common.v1.Address shipping_address = 3 [json_name = "shippingAddress"];</code>
+   * <code>.acme.apps.api.orders.v1.ShippingAddress shipping_address = 3 [json_name = "shippingAddress"];</code>
    */
   @java.lang.Override
-  public com.acme.proto.acme.common.v1.AddressOrBuilder getShippingAddressOrBuilder() {
-    return shippingAddress_ == null ? com.acme.proto.acme.common.v1.Address.getDefaultInstance() : shippingAddress_;
+  public com.acme.proto.acme.apps.api.orders.v1.ShippingAddressOrBuilder getShippingAddressOrBuilder() {
+    return shippingAddress_ == null ? com.acme.proto.acme.apps.api.orders.v1.ShippingAddress.getDefaultInstance() : shippingAddress_;
+  }
+
+  public static final int SELECTED_SHIPMENT_FIELD_NUMBER = 4;
+  private com.acme.proto.acme.apps.api.orders.v1.SelectedShipment selectedShipment_;
+  /**
+   * <code>optional .acme.apps.api.orders.v1.SelectedShipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+   * @return Whether the selectedShipment field is set.
+   */
+  @java.lang.Override
+  public boolean hasSelectedShipment() {
+    return ((bitField0_ & 0x00000002) != 0);
+  }
+  /**
+   * <code>optional .acme.apps.api.orders.v1.SelectedShipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+   * @return The selectedShipment.
+   */
+  @java.lang.Override
+  public com.acme.proto.acme.apps.api.orders.v1.SelectedShipment getSelectedShipment() {
+    return selectedShipment_ == null ? com.acme.proto.acme.apps.api.orders.v1.SelectedShipment.getDefaultInstance() : selectedShipment_;
+  }
+  /**
+   * <code>optional .acme.apps.api.orders.v1.SelectedShipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+   */
+  @java.lang.Override
+  public com.acme.proto.acme.apps.api.orders.v1.SelectedShipmentOrBuilder getSelectedShipmentOrBuilder() {
+    return selectedShipment_ == null ? com.acme.proto.acme.apps.api.orders.v1.SelectedShipment.getDefaultInstance() : selectedShipment_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -179,6 +205,9 @@ private static final long serialVersionUID = 0L;
     }
     if (((bitField0_ & 0x00000001) != 0)) {
       output.writeMessage(3, getShippingAddress());
+    }
+    if (((bitField0_ & 0x00000002) != 0)) {
+      output.writeMessage(4, getSelectedShipment());
     }
     getUnknownFields().writeTo(output);
   }
@@ -205,6 +234,10 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(3, getShippingAddress());
     }
+    if (((bitField0_ & 0x00000002) != 0)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(4, getSelectedShipment());
+    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -229,6 +262,11 @@ private static final long serialVersionUID = 0L;
       if (!getShippingAddress()
           .equals(other.getShippingAddress())) return false;
     }
+    if (hasSelectedShipment() != other.hasSelectedShipment()) return false;
+    if (hasSelectedShipment()) {
+      if (!getSelectedShipment()
+          .equals(other.getSelectedShipment())) return false;
+    }
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -249,6 +287,10 @@ private static final long serialVersionUID = 0L;
     if (hasShippingAddress()) {
       hash = (37 * hash) + SHIPPING_ADDRESS_FIELD_NUMBER;
       hash = (53 * hash) + getShippingAddress().hashCode();
+    }
+    if (hasSelectedShipment()) {
+      hash = (37 * hash) + SELECTED_SHIPMENT_FIELD_NUMBER;
+      hash = (53 * hash) + getSelectedShipment().hashCode();
     }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
@@ -382,6 +424,7 @@ private static final long serialVersionUID = 0L;
               .alwaysUseFieldBuilders) {
         internalGetItemsFieldBuilder();
         internalGetShippingAddressFieldBuilder();
+        internalGetSelectedShipmentFieldBuilder();
       }
     }
     @java.lang.Override
@@ -400,6 +443,11 @@ private static final long serialVersionUID = 0L;
       if (shippingAddressBuilder_ != null) {
         shippingAddressBuilder_.dispose();
         shippingAddressBuilder_ = null;
+      }
+      selectedShipment_ = null;
+      if (selectedShipmentBuilder_ != null) {
+        selectedShipmentBuilder_.dispose();
+        selectedShipmentBuilder_ = null;
       }
       return this;
     }
@@ -457,6 +505,12 @@ private static final long serialVersionUID = 0L;
             : shippingAddressBuilder_.build();
         to_bitField0_ |= 0x00000001;
       }
+      if (((from_bitField0_ & 0x00000008) != 0)) {
+        result.selectedShipment_ = selectedShipmentBuilder_ == null
+            ? selectedShipment_
+            : selectedShipmentBuilder_.build();
+        to_bitField0_ |= 0x00000002;
+      }
       result.bitField0_ |= to_bitField0_;
     }
 
@@ -505,6 +559,9 @@ private static final long serialVersionUID = 0L;
       }
       if (other.hasShippingAddress()) {
         mergeShippingAddress(other.getShippingAddress());
+      }
+      if (other.hasSelectedShipment()) {
+        mergeSelectedShipment(other.getSelectedShipment());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -557,6 +614,13 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000004;
               break;
             } // case 26
+            case 34: {
+              input.readMessage(
+                  internalGetSelectedShipmentFieldBuilder().getBuilder(),
+                  extensionRegistry);
+              bitField0_ |= 0x00000008;
+              break;
+            } // case 34
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -886,31 +950,31 @@ private static final long serialVersionUID = 0L;
       return itemsBuilder_;
     }
 
-    private com.acme.proto.acme.common.v1.Address shippingAddress_;
+    private com.acme.proto.acme.apps.api.orders.v1.ShippingAddress shippingAddress_;
     private com.google.protobuf.SingleFieldBuilder<
-        com.acme.proto.acme.common.v1.Address, com.acme.proto.acme.common.v1.Address.Builder, com.acme.proto.acme.common.v1.AddressOrBuilder> shippingAddressBuilder_;
+        com.acme.proto.acme.apps.api.orders.v1.ShippingAddress, com.acme.proto.acme.apps.api.orders.v1.ShippingAddress.Builder, com.acme.proto.acme.apps.api.orders.v1.ShippingAddressOrBuilder> shippingAddressBuilder_;
     /**
-     * <code>.acme.common.v1.Address shipping_address = 3 [json_name = "shippingAddress"];</code>
+     * <code>.acme.apps.api.orders.v1.ShippingAddress shipping_address = 3 [json_name = "shippingAddress"];</code>
      * @return Whether the shippingAddress field is set.
      */
     public boolean hasShippingAddress() {
       return ((bitField0_ & 0x00000004) != 0);
     }
     /**
-     * <code>.acme.common.v1.Address shipping_address = 3 [json_name = "shippingAddress"];</code>
+     * <code>.acme.apps.api.orders.v1.ShippingAddress shipping_address = 3 [json_name = "shippingAddress"];</code>
      * @return The shippingAddress.
      */
-    public com.acme.proto.acme.common.v1.Address getShippingAddress() {
+    public com.acme.proto.acme.apps.api.orders.v1.ShippingAddress getShippingAddress() {
       if (shippingAddressBuilder_ == null) {
-        return shippingAddress_ == null ? com.acme.proto.acme.common.v1.Address.getDefaultInstance() : shippingAddress_;
+        return shippingAddress_ == null ? com.acme.proto.acme.apps.api.orders.v1.ShippingAddress.getDefaultInstance() : shippingAddress_;
       } else {
         return shippingAddressBuilder_.getMessage();
       }
     }
     /**
-     * <code>.acme.common.v1.Address shipping_address = 3 [json_name = "shippingAddress"];</code>
+     * <code>.acme.apps.api.orders.v1.ShippingAddress shipping_address = 3 [json_name = "shippingAddress"];</code>
      */
-    public Builder setShippingAddress(com.acme.proto.acme.common.v1.Address value) {
+    public Builder setShippingAddress(com.acme.proto.acme.apps.api.orders.v1.ShippingAddress value) {
       if (shippingAddressBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
@@ -924,10 +988,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.acme.common.v1.Address shipping_address = 3 [json_name = "shippingAddress"];</code>
+     * <code>.acme.apps.api.orders.v1.ShippingAddress shipping_address = 3 [json_name = "shippingAddress"];</code>
      */
     public Builder setShippingAddress(
-        com.acme.proto.acme.common.v1.Address.Builder builderForValue) {
+        com.acme.proto.acme.apps.api.orders.v1.ShippingAddress.Builder builderForValue) {
       if (shippingAddressBuilder_ == null) {
         shippingAddress_ = builderForValue.build();
       } else {
@@ -938,13 +1002,13 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.acme.common.v1.Address shipping_address = 3 [json_name = "shippingAddress"];</code>
+     * <code>.acme.apps.api.orders.v1.ShippingAddress shipping_address = 3 [json_name = "shippingAddress"];</code>
      */
-    public Builder mergeShippingAddress(com.acme.proto.acme.common.v1.Address value) {
+    public Builder mergeShippingAddress(com.acme.proto.acme.apps.api.orders.v1.ShippingAddress value) {
       if (shippingAddressBuilder_ == null) {
         if (((bitField0_ & 0x00000004) != 0) &&
           shippingAddress_ != null &&
-          shippingAddress_ != com.acme.proto.acme.common.v1.Address.getDefaultInstance()) {
+          shippingAddress_ != com.acme.proto.acme.apps.api.orders.v1.ShippingAddress.getDefaultInstance()) {
           getShippingAddressBuilder().mergeFrom(value);
         } else {
           shippingAddress_ = value;
@@ -959,7 +1023,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.acme.common.v1.Address shipping_address = 3 [json_name = "shippingAddress"];</code>
+     * <code>.acme.apps.api.orders.v1.ShippingAddress shipping_address = 3 [json_name = "shippingAddress"];</code>
      */
     public Builder clearShippingAddress() {
       bitField0_ = (bitField0_ & ~0x00000004);
@@ -972,39 +1036,160 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.acme.common.v1.Address shipping_address = 3 [json_name = "shippingAddress"];</code>
+     * <code>.acme.apps.api.orders.v1.ShippingAddress shipping_address = 3 [json_name = "shippingAddress"];</code>
      */
-    public com.acme.proto.acme.common.v1.Address.Builder getShippingAddressBuilder() {
+    public com.acme.proto.acme.apps.api.orders.v1.ShippingAddress.Builder getShippingAddressBuilder() {
       bitField0_ |= 0x00000004;
       onChanged();
       return internalGetShippingAddressFieldBuilder().getBuilder();
     }
     /**
-     * <code>.acme.common.v1.Address shipping_address = 3 [json_name = "shippingAddress"];</code>
+     * <code>.acme.apps.api.orders.v1.ShippingAddress shipping_address = 3 [json_name = "shippingAddress"];</code>
      */
-    public com.acme.proto.acme.common.v1.AddressOrBuilder getShippingAddressOrBuilder() {
+    public com.acme.proto.acme.apps.api.orders.v1.ShippingAddressOrBuilder getShippingAddressOrBuilder() {
       if (shippingAddressBuilder_ != null) {
         return shippingAddressBuilder_.getMessageOrBuilder();
       } else {
         return shippingAddress_ == null ?
-            com.acme.proto.acme.common.v1.Address.getDefaultInstance() : shippingAddress_;
+            com.acme.proto.acme.apps.api.orders.v1.ShippingAddress.getDefaultInstance() : shippingAddress_;
       }
     }
     /**
-     * <code>.acme.common.v1.Address shipping_address = 3 [json_name = "shippingAddress"];</code>
+     * <code>.acme.apps.api.orders.v1.ShippingAddress shipping_address = 3 [json_name = "shippingAddress"];</code>
      */
     private com.google.protobuf.SingleFieldBuilder<
-        com.acme.proto.acme.common.v1.Address, com.acme.proto.acme.common.v1.Address.Builder, com.acme.proto.acme.common.v1.AddressOrBuilder> 
+        com.acme.proto.acme.apps.api.orders.v1.ShippingAddress, com.acme.proto.acme.apps.api.orders.v1.ShippingAddress.Builder, com.acme.proto.acme.apps.api.orders.v1.ShippingAddressOrBuilder> 
         internalGetShippingAddressFieldBuilder() {
       if (shippingAddressBuilder_ == null) {
         shippingAddressBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-            com.acme.proto.acme.common.v1.Address, com.acme.proto.acme.common.v1.Address.Builder, com.acme.proto.acme.common.v1.AddressOrBuilder>(
+            com.acme.proto.acme.apps.api.orders.v1.ShippingAddress, com.acme.proto.acme.apps.api.orders.v1.ShippingAddress.Builder, com.acme.proto.acme.apps.api.orders.v1.ShippingAddressOrBuilder>(
                 getShippingAddress(),
                 getParentForChildren(),
                 isClean());
         shippingAddress_ = null;
       }
       return shippingAddressBuilder_;
+    }
+
+    private com.acme.proto.acme.apps.api.orders.v1.SelectedShipment selectedShipment_;
+    private com.google.protobuf.SingleFieldBuilder<
+        com.acme.proto.acme.apps.api.orders.v1.SelectedShipment, com.acme.proto.acme.apps.api.orders.v1.SelectedShipment.Builder, com.acme.proto.acme.apps.api.orders.v1.SelectedShipmentOrBuilder> selectedShipmentBuilder_;
+    /**
+     * <code>optional .acme.apps.api.orders.v1.SelectedShipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+     * @return Whether the selectedShipment field is set.
+     */
+    public boolean hasSelectedShipment() {
+      return ((bitField0_ & 0x00000008) != 0);
+    }
+    /**
+     * <code>optional .acme.apps.api.orders.v1.SelectedShipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+     * @return The selectedShipment.
+     */
+    public com.acme.proto.acme.apps.api.orders.v1.SelectedShipment getSelectedShipment() {
+      if (selectedShipmentBuilder_ == null) {
+        return selectedShipment_ == null ? com.acme.proto.acme.apps.api.orders.v1.SelectedShipment.getDefaultInstance() : selectedShipment_;
+      } else {
+        return selectedShipmentBuilder_.getMessage();
+      }
+    }
+    /**
+     * <code>optional .acme.apps.api.orders.v1.SelectedShipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+     */
+    public Builder setSelectedShipment(com.acme.proto.acme.apps.api.orders.v1.SelectedShipment value) {
+      if (selectedShipmentBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        selectedShipment_ = value;
+      } else {
+        selectedShipmentBuilder_.setMessage(value);
+      }
+      bitField0_ |= 0x00000008;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional .acme.apps.api.orders.v1.SelectedShipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+     */
+    public Builder setSelectedShipment(
+        com.acme.proto.acme.apps.api.orders.v1.SelectedShipment.Builder builderForValue) {
+      if (selectedShipmentBuilder_ == null) {
+        selectedShipment_ = builderForValue.build();
+      } else {
+        selectedShipmentBuilder_.setMessage(builderForValue.build());
+      }
+      bitField0_ |= 0x00000008;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional .acme.apps.api.orders.v1.SelectedShipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+     */
+    public Builder mergeSelectedShipment(com.acme.proto.acme.apps.api.orders.v1.SelectedShipment value) {
+      if (selectedShipmentBuilder_ == null) {
+        if (((bitField0_ & 0x00000008) != 0) &&
+          selectedShipment_ != null &&
+          selectedShipment_ != com.acme.proto.acme.apps.api.orders.v1.SelectedShipment.getDefaultInstance()) {
+          getSelectedShipmentBuilder().mergeFrom(value);
+        } else {
+          selectedShipment_ = value;
+        }
+      } else {
+        selectedShipmentBuilder_.mergeFrom(value);
+      }
+      if (selectedShipment_ != null) {
+        bitField0_ |= 0x00000008;
+        onChanged();
+      }
+      return this;
+    }
+    /**
+     * <code>optional .acme.apps.api.orders.v1.SelectedShipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+     */
+    public Builder clearSelectedShipment() {
+      bitField0_ = (bitField0_ & ~0x00000008);
+      selectedShipment_ = null;
+      if (selectedShipmentBuilder_ != null) {
+        selectedShipmentBuilder_.dispose();
+        selectedShipmentBuilder_ = null;
+      }
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional .acme.apps.api.orders.v1.SelectedShipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+     */
+    public com.acme.proto.acme.apps.api.orders.v1.SelectedShipment.Builder getSelectedShipmentBuilder() {
+      bitField0_ |= 0x00000008;
+      onChanged();
+      return internalGetSelectedShipmentFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>optional .acme.apps.api.orders.v1.SelectedShipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+     */
+    public com.acme.proto.acme.apps.api.orders.v1.SelectedShipmentOrBuilder getSelectedShipmentOrBuilder() {
+      if (selectedShipmentBuilder_ != null) {
+        return selectedShipmentBuilder_.getMessageOrBuilder();
+      } else {
+        return selectedShipment_ == null ?
+            com.acme.proto.acme.apps.api.orders.v1.SelectedShipment.getDefaultInstance() : selectedShipment_;
+      }
+    }
+    /**
+     * <code>optional .acme.apps.api.orders.v1.SelectedShipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+     */
+    private com.google.protobuf.SingleFieldBuilder<
+        com.acme.proto.acme.apps.api.orders.v1.SelectedShipment, com.acme.proto.acme.apps.api.orders.v1.SelectedShipment.Builder, com.acme.proto.acme.apps.api.orders.v1.SelectedShipmentOrBuilder> 
+        internalGetSelectedShipmentFieldBuilder() {
+      if (selectedShipmentBuilder_ == null) {
+        selectedShipmentBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+            com.acme.proto.acme.apps.api.orders.v1.SelectedShipment, com.acme.proto.acme.apps.api.orders.v1.SelectedShipment.Builder, com.acme.proto.acme.apps.api.orders.v1.SelectedShipmentOrBuilder>(
+                getSelectedShipment(),
+                getParentForChildren(),
+                isClean());
+        selectedShipment_ = null;
+      }
+      return selectedShipmentBuilder_;
     }
 
     // @@protoc_insertion_point(builder_scope:acme.apps.api.orders.v1.Order)

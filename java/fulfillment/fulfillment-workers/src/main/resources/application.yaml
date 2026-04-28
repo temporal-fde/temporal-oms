@@ -4,4 +4,7 @@ spring.application.name: fulfillment-workers
 spring.temporal.start-workers: true
 management.server.port: 9072
 server.port: 8061
-easypost.api-key: ${EASYPOST_API_KEY:}
+easypost:
+  api-key: ${EASYPOST_API_KEY}
+  warehouse:
+    from-address-id: ${EASYPOST_WAREHOUSE_FROM_ADDRESS_ID:}

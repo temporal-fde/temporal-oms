@@ -56,19 +56,19 @@ public interface GetFulfillmentOrderStateResponseOrBuilder extends
   com.acme.proto.acme.common.v1.AddressOrBuilder getValidatedAddressOrBuilder();
 
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest fulfillment_request = 4 [json_name = "fulfillmentRequest"];</code>
+   * <code>.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest fulfillment_request = 4 [json_name = "fulfillmentRequest"];</code>
    * @return Whether the fulfillmentRequest field is set.
    */
   boolean hasFulfillmentRequest();
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest fulfillment_request = 4 [json_name = "fulfillmentRequest"];</code>
+   * <code>.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest fulfillment_request = 4 [json_name = "fulfillmentRequest"];</code>
    * @return The fulfillmentRequest.
    */
-  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest getFulfillmentRequest();
+  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest getFulfillmentRequest();
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequest fulfillment_request = 4 [json_name = "fulfillmentRequest"];</code>
+   * <code>.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest fulfillment_request = 4 [json_name = "fulfillmentRequest"];</code>
    */
-  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.OrderFulfillRequestOrBuilder getFulfillmentRequestOrBuilder();
+  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequestOrBuilder getFulfillmentRequestOrBuilder();
 
   /**
    * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingSelection shipping_selection = 5 [json_name = "shippingSelection"];</code>
@@ -143,4 +143,19 @@ public interface GetFulfillmentOrderStateResponseOrBuilder extends
    */
   com.google.protobuf.ByteString
       getErrorsBytes(int index);
+
+  /**
+   * <code>optional .acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest notify_delivery_status = 10 [json_name = "notifyDeliveryStatus"];</code>
+   * @return Whether the notifyDeliveryStatus field is set.
+   */
+  boolean hasNotifyDeliveryStatus();
+  /**
+   * <code>optional .acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest notify_delivery_status = 10 [json_name = "notifyDeliveryStatus"];</code>
+   * @return The notifyDeliveryStatus.
+   */
+  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest getNotifyDeliveryStatus();
+  /**
+   * <code>optional .acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest notify_delivery_status = 10 [json_name = "notifyDeliveryStatus"];</code>
+   */
+  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequestOrBuilder getNotifyDeliveryStatusOrBuilder();
 }

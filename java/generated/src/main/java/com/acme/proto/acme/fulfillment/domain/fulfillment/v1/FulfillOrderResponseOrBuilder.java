@@ -11,79 +11,29 @@ public interface FulfillOrderResponseOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>string order_id = 1 [json_name = "orderId"];</code>
-   * @return The orderId.
+   * <code>string tracking_number = 1 [json_name = "trackingNumber"];</code>
+   * @return The trackingNumber.
    */
-  java.lang.String getOrderId();
+  java.lang.String getTrackingNumber();
   /**
-   * <code>string order_id = 1 [json_name = "orderId"];</code>
-   * @return The bytes for orderId.
+   * <code>string tracking_number = 1 [json_name = "trackingNumber"];</code>
+   * @return The bytes for trackingNumber.
    */
   com.google.protobuf.ByteString
-      getOrderIdBytes();
+      getTrackingNumberBytes();
 
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.Status status = 2 [json_name = "status"];</code>
-   * @return The enum numeric value on the wire for status.
+   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingSelection shipping_selection = 2 [json_name = "shippingSelection"];</code>
+   * @return Whether the shippingSelection field is set.
    */
-  int getStatusValue();
+  boolean hasShippingSelection();
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.Status status = 2 [json_name = "status"];</code>
-   * @return The status.
+   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingSelection shipping_selection = 2 [json_name = "shippingSelection"];</code>
+   * @return The shippingSelection.
    */
-  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.Status getStatus();
-
+  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingSelection getShippingSelection();
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingDetails shipping = 3 [json_name = "shipping"];</code>
-   * @return Whether the shipping field is set.
+   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingSelection shipping_selection = 2 [json_name = "shippingSelection"];</code>
    */
-  boolean hasShipping();
-  /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingDetails shipping = 3 [json_name = "shipping"];</code>
-   * @return The shipping.
-   */
-  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingDetails getShipping();
-  /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.ShippingDetails shipping = 3 [json_name = "shipping"];</code>
-   */
-  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingDetailsOrBuilder getShippingOrBuilder();
-
-  /**
-   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.AllocatedItem allocated_items = 4 [json_name = "allocatedItems"];</code>
-   */
-  java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItem> 
-      getAllocatedItemsList();
-  /**
-   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.AllocatedItem allocated_items = 4 [json_name = "allocatedItems"];</code>
-   */
-  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItem getAllocatedItems(int index);
-  /**
-   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.AllocatedItem allocated_items = 4 [json_name = "allocatedItems"];</code>
-   */
-  int getAllocatedItemsCount();
-  /**
-   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.AllocatedItem allocated_items = 4 [json_name = "allocatedItems"];</code>
-   */
-  java.util.List<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItemOrBuilder> 
-      getAllocatedItemsOrBuilderList();
-  /**
-   * <code>repeated .acme.fulfillment.domain.fulfillment.v1.AllocatedItem allocated_items = 4 [json_name = "allocatedItems"];</code>
-   */
-  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.AllocatedItemOrBuilder getAllocatedItemsOrBuilder(
-      int index);
-
-  /**
-   * <code>.google.protobuf.Timestamp completed_at = 5 [json_name = "completedAt"];</code>
-   * @return Whether the completedAt field is set.
-   */
-  boolean hasCompletedAt();
-  /**
-   * <code>.google.protobuf.Timestamp completed_at = 5 [json_name = "completedAt"];</code>
-   * @return The completedAt.
-   */
-  com.google.protobuf.Timestamp getCompletedAt();
-  /**
-   * <code>.google.protobuf.Timestamp completed_at = 5 [json_name = "completedAt"];</code>
-   */
-  com.google.protobuf.TimestampOrBuilder getCompletedAtOrBuilder();
+  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingSelectionOrBuilder getShippingSelectionOrBuilder();
 }

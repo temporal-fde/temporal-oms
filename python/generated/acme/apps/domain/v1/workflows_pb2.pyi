@@ -2,8 +2,9 @@ import datetime
 
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from acme.apps.domain.v1 import values_pb2 as _values_pb2
+from acme.common.v1 import values_pb2 as _values_pb2_1
 from acme.oms.v1 import message_pb2 as _message_pb2
-from acme.oms.v1 import values_pb2 as _values_pb2_1
+from acme.oms.v1 import values_pb2 as _values_pb2_1_1
 from acme.processing.domain.v1 import workflows_pb2 as _workflows_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
@@ -14,7 +15,7 @@ from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class CompleteOrderRequest(_message.Message):
-    __slots__ = ("timestamp", "options", "order_id", "customer_id", "process_order")
+    __slots__ = ()
     TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
     OPTIONS_FIELD_NUMBER: _ClassVar[int]
     ORDER_ID_FIELD_NUMBER: _ClassVar[int]
@@ -28,7 +29,7 @@ class CompleteOrderRequest(_message.Message):
     def __init__(self, timestamp: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., options: _Optional[_Union[CompleteOrderRequestExecutionOptions, _Mapping]] = ..., order_id: _Optional[str] = ..., customer_id: _Optional[str] = ..., process_order: _Optional[_Union[_workflows_pb2.ProcessOrderRequest, _Mapping]] = ...) -> None: ...
 
 class CompleteOrderRequestExecutionOptions(_message.Message):
-    __slots__ = ("completion_timeout_secs", "processing_timeout_secs", "oms_properties")
+    __slots__ = ()
     COMPLETION_TIMEOUT_SECS_FIELD_NUMBER: _ClassVar[int]
     PROCESSING_TIMEOUT_SECS_FIELD_NUMBER: _ClassVar[int]
     OMS_PROPERTIES_FIELD_NUMBER: _ClassVar[int]
@@ -38,7 +39,7 @@ class CompleteOrderRequestExecutionOptions(_message.Message):
     def __init__(self, completion_timeout_secs: _Optional[int] = ..., processing_timeout_secs: _Optional[int] = ..., oms_properties: _Optional[_Union[_message_pb2.OmsProperties, _Mapping]] = ...) -> None: ...
 
 class GetCompleteOrderStateResponse(_message.Message):
-    __slots__ = ("args", "options", "errors", "submitted_orders", "captured_payments", "cancellation", "process_order", "processed_order")
+    __slots__ = ()
     ARGS_FIELD_NUMBER: _ClassVar[int]
     OPTIONS_FIELD_NUMBER: _ClassVar[int]
     ERRORS_FIELD_NUMBER: _ClassVar[int]
@@ -58,7 +59,7 @@ class GetCompleteOrderStateResponse(_message.Message):
     def __init__(self, args: _Optional[_Union[CompleteOrderRequest, _Mapping]] = ..., options: _Optional[_Union[CompleteOrderRequestExecutionOptions, _Mapping]] = ..., errors: _Optional[_Iterable[str]] = ..., submitted_orders: _Optional[_Iterable[_Union[SubmitOrderRequest, _Mapping]]] = ..., captured_payments: _Optional[_Iterable[_Union[CapturePaymentRequest, _Mapping]]] = ..., cancellation: _Optional[_Union[CancelOrderRequest, _Mapping]] = ..., process_order: _Optional[_Union[_workflows_pb2.ProcessOrderRequest, _Mapping]] = ..., processed_order: _Optional[_Union[_workflows_pb2.GetProcessOrderStateResponse, _Mapping]] = ...) -> None: ...
 
 class GetOptionsRequest(_message.Message):
-    __slots__ = ("timestamp", "options")
+    __slots__ = ()
     TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
     OPTIONS_FIELD_NUMBER: _ClassVar[int]
     timestamp: _timestamp_pb2.Timestamp
@@ -66,7 +67,7 @@ class GetOptionsRequest(_message.Message):
     def __init__(self, timestamp: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., options: _Optional[_Union[CompleteOrderRequestExecutionOptions, _Mapping]] = ...) -> None: ...
 
 class CancelOrderRequest(_message.Message):
-    __slots__ = ("timestamp", "reason", "cancelled_by")
+    __slots__ = ()
     TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
     REASON_FIELD_NUMBER: _ClassVar[int]
     CANCELLED_BY_FIELD_NUMBER: _ClassVar[int]
@@ -80,21 +81,37 @@ class CancelOrderResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class SubmitOrderRequest(_message.Message):
-    __slots__ = ("timestamp", "order")
+    __slots__ = ()
     TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
     ORDER_FIELD_NUMBER: _ClassVar[int]
     timestamp: _timestamp_pb2.Timestamp
-    order: _values_pb2_1.Order
-    def __init__(self, timestamp: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., order: _Optional[_Union[_values_pb2_1.Order, _Mapping]] = ...) -> None: ...
+    order: _values_pb2_1_1.Order
+    def __init__(self, timestamp: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., order: _Optional[_Union[_values_pb2_1_1.Order, _Mapping]] = ...) -> None: ...
 
 class CapturePaymentRequest(_message.Message):
-    __slots__ = ("timestamp", "payment")
+    __slots__ = ()
     TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
     PAYMENT_FIELD_NUMBER: _ClassVar[int]
     timestamp: _timestamp_pb2.Timestamp
-    payment: _values_pb2_1.Payment
-    def __init__(self, timestamp: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., payment: _Optional[_Union[_values_pb2_1.Payment, _Mapping]] = ...) -> None: ...
+    payment: _values_pb2_1_1.Payment
+    def __init__(self, timestamp: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., payment: _Optional[_Union[_values_pb2_1_1.Payment, _Mapping]] = ...) -> None: ...
 
 class StartIntegrationsRequest(_message.Message):
     __slots__ = ()
     def __init__(self) -> None: ...
+
+class WarehouseEntry(_message.Message):
+    __slots__ = ()
+    WAREHOUSE_ID_FIELD_NUMBER: _ClassVar[int]
+    SKU_PREFIXES_FIELD_NUMBER: _ClassVar[int]
+    ADDRESS_FIELD_NUMBER: _ClassVar[int]
+    warehouse_id: str
+    sku_prefixes: _containers.RepeatedScalarFieldContainer[str]
+    address: _values_pb2_1.Address
+    def __init__(self, warehouse_id: _Optional[str] = ..., sku_prefixes: _Optional[_Iterable[str]] = ..., address: _Optional[_Union[_values_pb2_1.Address, _Mapping]] = ...) -> None: ...
+
+class GetIntegrationsStateResponse(_message.Message):
+    __slots__ = ()
+    WAREHOUSES_FIELD_NUMBER: _ClassVar[int]
+    warehouses: _containers.RepeatedCompositeFieldContainer[WarehouseEntry]
+    def __init__(self, warehouses: _Optional[_Iterable[_Union[WarehouseEntry, _Mapping]]] = ...) -> None: ...

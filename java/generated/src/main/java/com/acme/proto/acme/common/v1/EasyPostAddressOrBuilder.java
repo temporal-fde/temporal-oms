@@ -147,4 +147,44 @@ public interface EasyPostAddressOrBuilder extends
    * <code>optional .acme.common.v1.Coordinate coordinate = 9 [json_name = "coordinate"];</code>
    */
   com.acme.proto.acme.common.v1.CoordinateOrBuilder getCoordinateOrBuilder();
+
+  /**
+   * <pre>
+   * IANA tz identifier from verifications.delivery.details.time_zone (e.g. "America/New_York")
+   * </pre>
+   *
+   * <code>string timezone = 10 [json_name = "timezone"];</code>
+   * @return The timezone.
+   */
+  java.lang.String getTimezone();
+  /**
+   * <pre>
+   * IANA tz identifier from verifications.delivery.details.time_zone (e.g. "America/New_York")
+   * </pre>
+   *
+   * <code>string timezone = 10 [json_name = "timezone"];</code>
+   * @return The bytes for timezone.
+   */
+  com.google.protobuf.ByteString
+      getTimezoneBytes();
+
+  /**
+   * <pre>
+   * company name on the address (required by carriers for from_address)
+   * </pre>
+   *
+   * <code>string company = 11 [json_name = "company"];</code>
+   * @return The company.
+   */
+  java.lang.String getCompany();
+  /**
+   * <pre>
+   * company name on the address (required by carriers for from_address)
+   * </pre>
+   *
+   * <code>string company = 11 [json_name = "company"];</code>
+   * @return The bytes for company.
+   */
+  com.google.protobuf.ByteString
+      getCompanyBytes();
 }
