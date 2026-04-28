@@ -50,19 +50,19 @@ public interface StartOrderFulfillmentRequestOrBuilder extends
   com.acme.proto.acme.fulfillment.domain.fulfillment.v1.StartOrderFulfillmentOptionsOrBuilder getOptionsOrBuilder();
 
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption selected_shipping = 4 [json_name = "selectedShipping"];</code>
-   * @return Whether the selectedShipping field is set.
+   * <code>.acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+   * @return Whether the selectedShipment field is set.
    */
-  boolean hasSelectedShipping();
+  boolean hasSelectedShipment();
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption selected_shipping = 4 [json_name = "selectedShipping"];</code>
-   * @return The selectedShipping.
+   * <code>.acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+   * @return The selectedShipment.
    */
-  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption getSelectedShipping();
+  com.acme.proto.acme.common.v1.Shipment getSelectedShipment();
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption selected_shipping = 4 [json_name = "selectedShipping"];</code>
+   * <code>.acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
    */
-  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOptionOrBuilder getSelectedShippingOrBuilder();
+  com.acme.proto.acme.common.v1.ShipmentOrBuilder getSelectedShipmentOrBuilder();
 
   /**
    * <code>.acme.fulfillment.domain.fulfillment.v1.PlacedOrder placed_order = 5 [json_name = "placedOrder"];</code>

@@ -137,21 +137,7 @@ public class OrderImpl implements Order {
                         .build());
 
         if (order.hasSelectedShipment()) {
-            var s = order.getSelectedShipment();
-            var selectedShipping = SelectedShippingOption.newBuilder();
-            if (s.hasPaidPrice()) {
-                selectedShipping.setPrice(s.getPaidPrice());
-            }
-            if (s.hasEasypost()) {
-                var rate = s.getEasypost().getSelectedRate();
-                if (!rate.getRateId().isBlank()) {
-                    selectedShipping.setOptionId(rate.getRateId());
-                }
-                if (rate.hasDeliveryDays()) {
-                    selectedShipping.setDeliveryDays((int) rate.getDeliveryDays());
-                }
-            }
-            fulfillmentStartBuilder.setSelectedShipping(selectedShipping.build());
+            fulfillmentStartBuilder.setSelectedShipment(order.getSelectedShipment());
         }
 
         var fulfillmentStartRequest = fulfillmentStartBuilder.build();
@@ -189,7 +175,7 @@ public class OrderImpl implements Order {
 
             // Dispatch fulfillOrder to fulfillment.Order — fire-and-forward via Nexus
             // fulfillment.Order is the source of truth for fulfillment state after this point
-            this.fulfillment.fulfillOrder(FulfillOrderRequest.newBuilder()
+            var fulfillOrderBuilder = FulfillOrderRequest.newBuilder()
                     .setProcessedOrder(ProcessedOrder.newBuilder()
                             .setOrderId(this.state.getArgs().getOrderId())
                             .setCustomerId(this.state.getArgs().getCustomerId())
@@ -204,8 +190,13 @@ public class OrderImpl implements Order {
                             .build())
                     .setDeliveryStatusRequest(
                             NotifyDeliveryStatusRequest.newBuilder()
-                                    .setDeliveryStatusValue(DeliveryStatus.DELIVERY_STATUS_DELIVERED_VALUE))
-                    .build());
+                                    .setDeliveryStatusValue(DeliveryStatus.DELIVERY_STATUS_DELIVERED_VALUE));
+
+            if (order.hasSelectedShipment()) {
+                fulfillOrderBuilder.setSelectedShipment(order.getSelectedShipment());
+            }
+
+            this.fulfillment.fulfillOrder(fulfillOrderBuilder.build());
 
             Workflow.await(Workflow::isEveryHandlerFinished);
             return;

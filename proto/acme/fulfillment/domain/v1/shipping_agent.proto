@@ -95,9 +95,7 @@ message CalculateShippingOptionsRequest {
   // to_address: easypost_address pre-populated by fulfillment.Order validateOrder.
   acme.common.v1.Address    to_address   = 3;
   repeated ShippingLineItem items        = 4;
-  optional string           selected_shipping_option_id = 5;
-  optional acme.common.v1.Money   customer_paid_price   = 6;
-  optional int32                  delivery_days_sla     = 7;
+  acme.common.v1.Shipment selected_shipment = 5;
 }
 
 // CalculateShippingOptionsResponse is the Update response from the ShippingAgent.
@@ -130,6 +128,7 @@ message GetShippingRatesRequest {
   string from_easypost_id             = 1;
   string to_easypost_id               = 2;
   repeated ShippingLineItem items     = 3;
+  acme.common.v1.Shipment selected_shipment = 4;
 }
 
 message GetShippingRatesResponse {

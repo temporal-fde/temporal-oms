@@ -113,7 +113,6 @@ private static final long serialVersionUID = 0L;
   /**
    * <pre>
    * Delivery window: events active at any point between ship and delivery dates.
-   * Maps to active.gte / active.lte on the PredictHQ Events API.
    * </pre>
    *
    * <code>.google.protobuf.Timestamp active_from = 3 [json_name = "activeFrom"];</code>
@@ -126,7 +125,6 @@ private static final long serialVersionUID = 0L;
   /**
    * <pre>
    * Delivery window: events active at any point between ship and delivery dates.
-   * Maps to active.gte / active.lte on the PredictHQ Events API.
    * </pre>
    *
    * <code>.google.protobuf.Timestamp active_from = 3 [json_name = "activeFrom"];</code>
@@ -139,7 +137,6 @@ private static final long serialVersionUID = 0L;
   /**
    * <pre>
    * Delivery window: events active at any point between ship and delivery dates.
-   * Maps to active.gte / active.lte on the PredictHQ Events API.
    * </pre>
    *
    * <code>.google.protobuf.Timestamp active_from = 3 [json_name = "activeFrom"];</code>
@@ -194,7 +191,6 @@ private static final long serialVersionUID = 0L;
    * <pre>
    * IANA TZ Database identifier for the destination (e.g. "America/New_York").
    * From EasyPost verifications.delivery.details.time_zone.
-   * Maps to active.tz on the PredictHQ Events API.
    * </pre>
    *
    * <code>string timezone = 5 [json_name = "timezone"];</code>
@@ -217,7 +213,6 @@ private static final long serialVersionUID = 0L;
    * <pre>
    * IANA TZ Database identifier for the destination (e.g. "America/New_York").
    * From EasyPost verifications.delivery.details.time_zone.
-   * Maps to active.tz on the PredictHQ Events API.
    * </pre>
    *
    * <code>string timezone = 5 [json_name = "timezone"];</code>
@@ -892,7 +887,6 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * Delivery window: events active at any point between ship and delivery dates.
-     * Maps to active.gte / active.lte on the PredictHQ Events API.
      * </pre>
      *
      * <code>.google.protobuf.Timestamp active_from = 3 [json_name = "activeFrom"];</code>
@@ -904,7 +898,6 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * Delivery window: events active at any point between ship and delivery dates.
-     * Maps to active.gte / active.lte on the PredictHQ Events API.
      * </pre>
      *
      * <code>.google.protobuf.Timestamp active_from = 3 [json_name = "activeFrom"];</code>
@@ -920,7 +913,6 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * Delivery window: events active at any point between ship and delivery dates.
-     * Maps to active.gte / active.lte on the PredictHQ Events API.
      * </pre>
      *
      * <code>.google.protobuf.Timestamp active_from = 3 [json_name = "activeFrom"];</code>
@@ -941,7 +933,6 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * Delivery window: events active at any point between ship and delivery dates.
-     * Maps to active.gte / active.lte on the PredictHQ Events API.
      * </pre>
      *
      * <code>.google.protobuf.Timestamp active_from = 3 [json_name = "activeFrom"];</code>
@@ -960,7 +951,6 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * Delivery window: events active at any point between ship and delivery dates.
-     * Maps to active.gte / active.lte on the PredictHQ Events API.
      * </pre>
      *
      * <code>.google.protobuf.Timestamp active_from = 3 [json_name = "activeFrom"];</code>
@@ -986,7 +976,6 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * Delivery window: events active at any point between ship and delivery dates.
-     * Maps to active.gte / active.lte on the PredictHQ Events API.
      * </pre>
      *
      * <code>.google.protobuf.Timestamp active_from = 3 [json_name = "activeFrom"];</code>
@@ -1004,7 +993,6 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * Delivery window: events active at any point between ship and delivery dates.
-     * Maps to active.gte / active.lte on the PredictHQ Events API.
      * </pre>
      *
      * <code>.google.protobuf.Timestamp active_from = 3 [json_name = "activeFrom"];</code>
@@ -1017,7 +1005,6 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * Delivery window: events active at any point between ship and delivery dates.
-     * Maps to active.gte / active.lte on the PredictHQ Events API.
      * </pre>
      *
      * <code>.google.protobuf.Timestamp active_from = 3 [json_name = "activeFrom"];</code>
@@ -1033,7 +1020,6 @@ private static final long serialVersionUID = 0L;
     /**
      * <pre>
      * Delivery window: events active at any point between ship and delivery dates.
-     * Maps to active.gte / active.lte on the PredictHQ Events API.
      * </pre>
      *
      * <code>.google.protobuf.Timestamp active_from = 3 [json_name = "activeFrom"];</code>
@@ -1214,7 +1200,6 @@ private static final long serialVersionUID = 0L;
      * <pre>
      * IANA TZ Database identifier for the destination (e.g. "America/New_York").
      * From EasyPost verifications.delivery.details.time_zone.
-     * Maps to active.tz on the PredictHQ Events API.
      * </pre>
      *
      * <code>string timezone = 5 [json_name = "timezone"];</code>
@@ -1236,7 +1221,6 @@ private static final long serialVersionUID = 0L;
      * <pre>
      * IANA TZ Database identifier for the destination (e.g. "America/New_York").
      * From EasyPost verifications.delivery.details.time_zone.
-     * Maps to active.tz on the PredictHQ Events API.
      * </pre>
      *
      * <code>string timezone = 5 [json_name = "timezone"];</code>
@@ -1259,7 +1243,6 @@ private static final long serialVersionUID = 0L;
      * <pre>
      * IANA TZ Database identifier for the destination (e.g. "America/New_York").
      * From EasyPost verifications.delivery.details.time_zone.
-     * Maps to active.tz on the PredictHQ Events API.
      * </pre>
      *
      * <code>string timezone = 5 [json_name = "timezone"];</code>
@@ -1278,7 +1261,6 @@ private static final long serialVersionUID = 0L;
      * <pre>
      * IANA TZ Database identifier for the destination (e.g. "America/New_York").
      * From EasyPost verifications.delivery.details.time_zone.
-     * Maps to active.tz on the PredictHQ Events API.
      * </pre>
      *
      * <code>string timezone = 5 [json_name = "timezone"];</code>
@@ -1294,7 +1276,6 @@ private static final long serialVersionUID = 0L;
      * <pre>
      * IANA TZ Database identifier for the destination (e.g. "America/New_York").
      * From EasyPost verifications.delivery.details.time_zone.
-     * Maps to active.tz on the PredictHQ Events API.
      * </pre>
      *
      * <code>string timezone = 5 [json_name = "timezone"];</code>

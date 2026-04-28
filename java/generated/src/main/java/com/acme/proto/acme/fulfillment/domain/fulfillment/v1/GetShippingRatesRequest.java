@@ -57,6 +57,7 @@ private static final long serialVersionUID = 0L;
             com.acme.proto.acme.fulfillment.domain.fulfillment.v1.GetShippingRatesRequest.class, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.GetShippingRatesRequest.Builder.class);
   }
 
+  private int bitField0_;
   public static final int FROM_EASYPOST_ID_FIELD_NUMBER = 1;
   @SuppressWarnings("serial")
   private volatile java.lang.Object fromEasypostId_ = "";
@@ -70,7 +71,7 @@ private static final long serialVersionUID = 0L;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
-      com.google.protobuf.ByteString bs = 
+      com.google.protobuf.ByteString bs =
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
       fromEasypostId_ = s;
@@ -86,7 +87,7 @@ private static final long serialVersionUID = 0L;
       getFromEasypostIdBytes() {
     java.lang.Object ref = fromEasypostId_;
     if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
+      com.google.protobuf.ByteString b =
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
       fromEasypostId_ = b;
@@ -109,7 +110,7 @@ private static final long serialVersionUID = 0L;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
-      com.google.protobuf.ByteString bs = 
+      com.google.protobuf.ByteString bs =
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
       toEasypostId_ = s;
@@ -125,7 +126,7 @@ private static final long serialVersionUID = 0L;
       getToEasypostIdBytes() {
     java.lang.Object ref = toEasypostId_;
     if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
+      com.google.protobuf.ByteString b =
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
       toEasypostId_ = b;
@@ -149,7 +150,7 @@ private static final long serialVersionUID = 0L;
    * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingLineItem items = 3 [json_name = "items"];</code>
    */
   @java.lang.Override
-  public java.util.List<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItemOrBuilder> 
+  public java.util.List<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItemOrBuilder>
       getItemsOrBuilderList() {
     return items_;
   }
@@ -176,6 +177,32 @@ private static final long serialVersionUID = 0L;
     return items_.get(index);
   }
 
+  public static final int SELECTED_SHIPMENT_FIELD_NUMBER = 4;
+  private com.acme.proto.acme.common.v1.Shipment selectedShipment_;
+  /**
+   * <code>.acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+   * @return Whether the selectedShipment field is set.
+   */
+  @java.lang.Override
+  public boolean hasSelectedShipment() {
+    return ((bitField0_ & 0x00000001) != 0);
+  }
+  /**
+   * <code>.acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+   * @return The selectedShipment.
+   */
+  @java.lang.Override
+  public com.acme.proto.acme.common.v1.Shipment getSelectedShipment() {
+    return selectedShipment_ == null ? com.acme.proto.acme.common.v1.Shipment.getDefaultInstance() : selectedShipment_;
+  }
+  /**
+   * <code>.acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+   */
+  @java.lang.Override
+  public com.acme.proto.acme.common.v1.ShipmentOrBuilder getSelectedShipmentOrBuilder() {
+    return selectedShipment_ == null ? com.acme.proto.acme.common.v1.Shipment.getDefaultInstance() : selectedShipment_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -198,6 +225,9 @@ private static final long serialVersionUID = 0L;
     }
     for (int i = 0; i < items_.size(); i++) {
       output.writeMessage(3, items_.get(i));
+    }
+    if (((bitField0_ & 0x00000001) != 0)) {
+      output.writeMessage(4, getSelectedShipment());
     }
     getUnknownFields().writeTo(output);
   }
@@ -223,6 +253,10 @@ private static final long serialVersionUID = 0L;
           }
           size += 1 * count;
         }
+    if (((bitField0_ & 0x00000001) != 0)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(4, getSelectedShipment());
+    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -244,6 +278,11 @@ private static final long serialVersionUID = 0L;
         .equals(other.getToEasypostId())) return false;
     if (!getItemsList()
         .equals(other.getItemsList())) return false;
+    if (hasSelectedShipment() != other.hasSelectedShipment()) return false;
+    if (hasSelectedShipment()) {
+      if (!getSelectedShipment()
+          .equals(other.getSelectedShipment())) return false;
+    }
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -262,6 +301,10 @@ private static final long serialVersionUID = 0L;
     if (getItemsCount() > 0) {
       hash = (37 * hash) + ITEMS_FIELD_NUMBER;
       hash = (53 * hash) + getItemsList().hashCode();
+    }
+    if (hasSelectedShipment()) {
+      hash = (37 * hash) + SELECTED_SHIPMENT_FIELD_NUMBER;
+      hash = (53 * hash) + getSelectedShipment().hashCode();
     }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
@@ -388,13 +431,20 @@ private static final long serialVersionUID = 0L;
 
     // Construct using com.acme.proto.acme.fulfillment.domain.fulfillment.v1.GetShippingRatesRequest.newBuilder()
     private Builder() {
-
+      maybeForceBuilderInitialization();
     }
 
     private Builder(
         com.google.protobuf.GeneratedMessage.BuilderParent parent) {
       super(parent);
-
+      maybeForceBuilderInitialization();
+    }
+    private void maybeForceBuilderInitialization() {
+      if (com.google.protobuf.GeneratedMessage
+              .alwaysUseFieldBuilders) {
+        internalGetItemsFieldBuilder();
+        internalGetSelectedShipmentFieldBuilder();
+      }
     }
     @java.lang.Override
     public Builder clear() {
@@ -409,6 +459,11 @@ private static final long serialVersionUID = 0L;
         itemsBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000004);
+      selectedShipment_ = null;
+      if (selectedShipmentBuilder_ != null) {
+        selectedShipmentBuilder_.dispose();
+        selectedShipmentBuilder_ = null;
+      }
       return this;
     }
 
@@ -461,6 +516,14 @@ private static final long serialVersionUID = 0L;
       if (((from_bitField0_ & 0x00000002) != 0)) {
         result.toEasypostId_ = toEasypostId_;
       }
+      int to_bitField0_ = 0;
+      if (((from_bitField0_ & 0x00000008) != 0)) {
+        result.selectedShipment_ = selectedShipmentBuilder_ == null
+            ? selectedShipment_
+            : selectedShipmentBuilder_.build();
+        to_bitField0_ |= 0x00000001;
+      }
+      result.bitField0_ |= to_bitField0_;
     }
 
     @java.lang.Override
@@ -503,13 +566,16 @@ private static final long serialVersionUID = 0L;
             itemsBuilder_ = null;
             items_ = other.items_;
             bitField0_ = (bitField0_ & ~0x00000004);
-            itemsBuilder_ = 
+            itemsBuilder_ =
               com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                  internalGetItemsFieldBuilder() : null;
           } else {
             itemsBuilder_.addAllMessages(other.items_);
           }
         }
+      }
+      if (other.hasSelectedShipment()) {
+        mergeSelectedShipment(other.getSelectedShipment());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -560,6 +626,13 @@ private static final long serialVersionUID = 0L;
               }
               break;
             } // case 26
+            case 34: {
+              input.readMessage(
+                  internalGetSelectedShipmentFieldBuilder().getBuilder(),
+                  extensionRegistry);
+              bitField0_ |= 0x00000008;
+              break;
+            } // case 34
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -602,7 +675,7 @@ private static final long serialVersionUID = 0L;
         getFromEasypostIdBytes() {
       java.lang.Object ref = fromEasypostId_;
       if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         fromEasypostId_ = b;
@@ -674,7 +747,7 @@ private static final long serialVersionUID = 0L;
         getToEasypostIdBytes() {
       java.lang.Object ref = toEasypostId_;
       if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         toEasypostId_ = b;
@@ -916,7 +989,7 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingLineItem items = 3 [json_name = "items"];</code>
      */
-    public java.util.List<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItemOrBuilder> 
+    public java.util.List<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItemOrBuilder>
          getItemsOrBuilderList() {
       if (itemsBuilder_ != null) {
         return itemsBuilder_.getMessageOrBuilderList();
@@ -942,12 +1015,12 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingLineItem items = 3 [json_name = "items"];</code>
      */
-    public java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItem.Builder> 
+    public java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItem.Builder>
          getItemsBuilderList() {
       return internalGetItemsFieldBuilder().getBuilderList();
     }
     private com.google.protobuf.RepeatedFieldBuilder<
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItem, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItem.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItemOrBuilder> 
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItem, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItem.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItemOrBuilder>
         internalGetItemsFieldBuilder() {
       if (itemsBuilder_ == null) {
         itemsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -959,6 +1032,127 @@ private static final long serialVersionUID = 0L;
         items_ = null;
       }
       return itemsBuilder_;
+    }
+
+    private com.acme.proto.acme.common.v1.Shipment selectedShipment_;
+    private com.google.protobuf.SingleFieldBuilder<
+        com.acme.proto.acme.common.v1.Shipment, com.acme.proto.acme.common.v1.Shipment.Builder, com.acme.proto.acme.common.v1.ShipmentOrBuilder> selectedShipmentBuilder_;
+    /**
+     * <code>.acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+     * @return Whether the selectedShipment field is set.
+     */
+    public boolean hasSelectedShipment() {
+      return ((bitField0_ & 0x00000008) != 0);
+    }
+    /**
+     * <code>.acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+     * @return The selectedShipment.
+     */
+    public com.acme.proto.acme.common.v1.Shipment getSelectedShipment() {
+      if (selectedShipmentBuilder_ == null) {
+        return selectedShipment_ == null ? com.acme.proto.acme.common.v1.Shipment.getDefaultInstance() : selectedShipment_;
+      } else {
+        return selectedShipmentBuilder_.getMessage();
+      }
+    }
+    /**
+     * <code>.acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+     */
+    public Builder setSelectedShipment(com.acme.proto.acme.common.v1.Shipment value) {
+      if (selectedShipmentBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        selectedShipment_ = value;
+      } else {
+        selectedShipmentBuilder_.setMessage(value);
+      }
+      bitField0_ |= 0x00000008;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>.acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+     */
+    public Builder setSelectedShipment(
+        com.acme.proto.acme.common.v1.Shipment.Builder builderForValue) {
+      if (selectedShipmentBuilder_ == null) {
+        selectedShipment_ = builderForValue.build();
+      } else {
+        selectedShipmentBuilder_.setMessage(builderForValue.build());
+      }
+      bitField0_ |= 0x00000008;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>.acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+     */
+    public Builder mergeSelectedShipment(com.acme.proto.acme.common.v1.Shipment value) {
+      if (selectedShipmentBuilder_ == null) {
+        if (((bitField0_ & 0x00000008) != 0) &&
+          selectedShipment_ != null &&
+          selectedShipment_ != com.acme.proto.acme.common.v1.Shipment.getDefaultInstance()) {
+          getSelectedShipmentBuilder().mergeFrom(value);
+        } else {
+          selectedShipment_ = value;
+        }
+      } else {
+        selectedShipmentBuilder_.mergeFrom(value);
+      }
+      if (selectedShipment_ != null) {
+        bitField0_ |= 0x00000008;
+        onChanged();
+      }
+      return this;
+    }
+    /**
+     * <code>.acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+     */
+    public Builder clearSelectedShipment() {
+      bitField0_ = (bitField0_ & ~0x00000008);
+      selectedShipment_ = null;
+      if (selectedShipmentBuilder_ != null) {
+        selectedShipmentBuilder_.dispose();
+        selectedShipmentBuilder_ = null;
+      }
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>.acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+     */
+    public com.acme.proto.acme.common.v1.Shipment.Builder getSelectedShipmentBuilder() {
+      bitField0_ |= 0x00000008;
+      onChanged();
+      return internalGetSelectedShipmentFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>.acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+     */
+    public com.acme.proto.acme.common.v1.ShipmentOrBuilder getSelectedShipmentOrBuilder() {
+      if (selectedShipmentBuilder_ != null) {
+        return selectedShipmentBuilder_.getMessageOrBuilder();
+      } else {
+        return selectedShipment_ == null ?
+            com.acme.proto.acme.common.v1.Shipment.getDefaultInstance() : selectedShipment_;
+      }
+    }
+    /**
+     * <code>.acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+     */
+    private com.google.protobuf.SingleFieldBuilder<
+        com.acme.proto.acme.common.v1.Shipment, com.acme.proto.acme.common.v1.Shipment.Builder, com.acme.proto.acme.common.v1.ShipmentOrBuilder>
+        internalGetSelectedShipmentFieldBuilder() {
+      if (selectedShipmentBuilder_ == null) {
+        selectedShipmentBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+            com.acme.proto.acme.common.v1.Shipment, com.acme.proto.acme.common.v1.Shipment.Builder, com.acme.proto.acme.common.v1.ShipmentOrBuilder>(
+                getSelectedShipment(),
+                getParentForChildren(),
+                isClean());
+        selectedShipment_ = null;
+      }
+      return selectedShipmentBuilder_;
     }
 
     // @@protoc_insertion_point(builder_scope:acme.fulfillment.domain.fulfillment.v1.GetShippingRatesRequest)

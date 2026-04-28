@@ -188,7 +188,7 @@ private static final long serialVersionUID = 0L;
   private volatile java.lang.Object category_ = "";
   /**
    * <pre>
-   * PredictHQ category string (e.g. "severe-weather", "airport-delays", "disasters").
+   * Event category string (e.g. "severe-weather", "airport-delays", "disasters").
    * </pre>
    *
    * <code>string category = 4 [json_name = "category"];</code>
@@ -209,7 +209,7 @@ private static final long serialVersionUID = 0L;
   }
   /**
    * <pre>
-   * PredictHQ category string (e.g. "severe-weather", "airport-delays", "disasters").
+   * Event category string (e.g. "severe-weather", "airport-delays", "disasters").
    * </pre>
    *
    * <code>string category = 4 [json_name = "category"];</code>
@@ -234,7 +234,7 @@ private static final long serialVersionUID = 0L;
   private int rank_ = 0;
   /**
    * <pre>
-   * PredictHQ Rank (0–100): overall significance of the event.
+   * Rank (0–100): overall significance of the event.
    * </pre>
    *
    * <code>int32 rank = 5 [json_name = "rank"];</code>
@@ -1094,7 +1094,7 @@ private static final long serialVersionUID = 0L;
     private java.lang.Object category_ = "";
     /**
      * <pre>
-     * PredictHQ category string (e.g. "severe-weather", "airport-delays", "disasters").
+     * Event category string (e.g. "severe-weather", "airport-delays", "disasters").
      * </pre>
      *
      * <code>string category = 4 [json_name = "category"];</code>
@@ -1114,7 +1114,7 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
-     * PredictHQ category string (e.g. "severe-weather", "airport-delays", "disasters").
+     * Event category string (e.g. "severe-weather", "airport-delays", "disasters").
      * </pre>
      *
      * <code>string category = 4 [json_name = "category"];</code>
@@ -1135,7 +1135,7 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
-     * PredictHQ category string (e.g. "severe-weather", "airport-delays", "disasters").
+     * Event category string (e.g. "severe-weather", "airport-delays", "disasters").
      * </pre>
      *
      * <code>string category = 4 [json_name = "category"];</code>
@@ -1152,7 +1152,7 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
-     * PredictHQ category string (e.g. "severe-weather", "airport-delays", "disasters").
+     * Event category string (e.g. "severe-weather", "airport-delays", "disasters").
      * </pre>
      *
      * <code>string category = 4 [json_name = "category"];</code>
@@ -1166,7 +1166,7 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
-     * PredictHQ category string (e.g. "severe-weather", "airport-delays", "disasters").
+     * Event category string (e.g. "severe-weather", "airport-delays", "disasters").
      * </pre>
      *
      * <code>string category = 4 [json_name = "category"];</code>
@@ -1186,7 +1186,7 @@ private static final long serialVersionUID = 0L;
     private int rank_ ;
     /**
      * <pre>
-     * PredictHQ Rank (0–100): overall significance of the event.
+     * Rank (0–100): overall significance of the event.
      * </pre>
      *
      * <code>int32 rank = 5 [json_name = "rank"];</code>
@@ -1198,7 +1198,7 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
-     * PredictHQ Rank (0–100): overall significance of the event.
+     * Rank (0–100): overall significance of the event.
      * </pre>
      *
      * <code>int32 rank = 5 [json_name = "rank"];</code>
@@ -1214,7 +1214,7 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
-     * PredictHQ Rank (0–100): overall significance of the event.
+     * Rank (0–100): overall significance of the event.
      * </pre>
      *
      * <code>int32 rank = 5 [json_name = "rank"];</code>

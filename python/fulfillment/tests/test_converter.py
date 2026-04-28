@@ -26,9 +26,15 @@ from acme.fulfillment.domain.v1.workflows_p2p import (
     StartOrderFulfillmentRequest,
     PlacedOrder,
     FulfillmentItem,
-    SelectedShippingOption,
 )
-from acme.common.v1.values_p2p import Address, EasyPostAddress, Money
+from acme.common.v1.values_p2p import (
+    Address,
+    EasyPostAddress,
+    EasyPostRate,
+    EasyPostShipment,
+    Money,
+    Shipment,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -57,9 +63,12 @@ def nested_request() -> StartOrderFulfillmentRequest:
             ],
             shipping_address=Address(easypost=EasyPostAddress(city="Springfield")),
         ),
-        selected_shipping=SelectedShippingOption(
-            option_id="opt-1",
-            price=Money(amount=1099, currency_code="USD"),
+        selected_shipment=Shipment(
+            easypost=EasyPostShipment(
+                shipment_id="shp-1",
+                selected_rate=EasyPostRate(rate_id="rate-1", delivery_days=5),
+            ),
+            paid_price=Money(currency="USD", units=1099),
         ),
     )
 
@@ -100,6 +109,45 @@ def test_json_proto_payload_data_is_valid_json(simple_request):
     assert isinstance(data, dict)
     # camelCase keys — proto JSON standard (not snake_case)
     assert "orderId" in data or "order_id" in data  # either accepted; SDK uses camelCase
+
+
+def test_json_proto_omits_unset_selected_shipment(simple_request):
+    conv = PydanticJsonProtoPayloadConverter()
+    payload = conv.to_payload(simple_request)
+    data = json.loads(payload.data)
+
+    assert "selectedShipment" not in data
+
+    result = conv.from_payload(payload, type_hint=CalculateShippingOptionsRequest)
+
+    assert "selected_shipment" not in result.model_fields_set
+
+
+def test_json_proto_preserves_explicit_zero_delivery_days():
+    conv = PydanticJsonProtoPayloadConverter()
+    request = CalculateShippingOptionsRequest(
+        order_id="order-123",
+        customer_id="cust-456",
+        selected_shipment=Shipment(
+            easypost=EasyPostShipment(
+                shipment_id="shp-1",
+                selected_rate=EasyPostRate(rate_id="rate-1", delivery_days=0),
+            ),
+            paid_price=Money(currency="USD", units=1),
+        ),
+    )
+
+    payload = conv.to_payload(request)
+    data = json.loads(payload.data)
+
+    assert data["selectedShipment"]["easypost"]["selectedRate"]["deliveryDays"] == "0"
+
+    result = conv.from_payload(payload, type_hint=CalculateShippingOptionsRequest)
+    selected_rate = result.selected_shipment.easypost.selected_rate
+
+    assert "selected_shipment" in result.model_fields_set
+    assert "delivery_days" in selected_rate.model_fields_set
+    assert selected_rate.delivery_days == 0
 
 
 def test_json_proto_message_type_header(simple_request):

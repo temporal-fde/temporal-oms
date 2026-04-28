@@ -149,7 +149,7 @@ private static final long serialVersionUID = 0L;
   }
   /**
    * <pre>
-   * Count of events per PredictHQ category string
+   * Count of events per category string
    * (e.g. {"severe-weather": 2, "airport-delays": 1}).
    * </pre>
    *
@@ -171,7 +171,7 @@ private static final long serialVersionUID = 0L;
   }
   /**
    * <pre>
-   * Count of events per PredictHQ category string
+   * Count of events per category string
    * (e.g. {"severe-weather": 2, "airport-delays": 1}).
    * </pre>
    *
@@ -183,7 +183,7 @@ private static final long serialVersionUID = 0L;
   }
   /**
    * <pre>
-   * Count of events per PredictHQ category string
+   * Count of events per category string
    * (e.g. {"severe-weather": 2, "airport-delays": 1}).
    * </pre>
    *
@@ -200,7 +200,7 @@ private static final long serialVersionUID = 0L;
   }
   /**
    * <pre>
-   * Count of events per PredictHQ category string
+   * Count of events per category string
    * (e.g. {"severe-weather": 2, "airport-delays": 1}).
    * </pre>
    *
@@ -833,7 +833,7 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
-     * Count of events per PredictHQ category string
+     * Count of events per category string
      * (e.g. {"severe-weather": 2, "airport-delays": 1}).
      * </pre>
      *
@@ -855,7 +855,7 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
-     * Count of events per PredictHQ category string
+     * Count of events per category string
      * (e.g. {"severe-weather": 2, "airport-delays": 1}).
      * </pre>
      *
@@ -867,7 +867,7 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
-     * Count of events per PredictHQ category string
+     * Count of events per category string
      * (e.g. {"severe-weather": 2, "airport-delays": 1}).
      * </pre>
      *
@@ -884,7 +884,7 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
-     * Count of events per PredictHQ category string
+     * Count of events per category string
      * (e.g. {"severe-weather": 2, "airport-delays": 1}).
      * </pre>
      *
@@ -909,7 +909,7 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
-     * Count of events per PredictHQ category string
+     * Count of events per category string
      * (e.g. {"severe-weather": 2, "airport-delays": 1}).
      * </pre>
      *
@@ -933,7 +933,7 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
-     * Count of events per PredictHQ category string
+     * Count of events per category string
      * (e.g. {"severe-weather": 2, "airport-delays": 1}).
      * </pre>
      *
@@ -951,7 +951,7 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
-     * Count of events per PredictHQ category string
+     * Count of events per category string
      * (e.g. {"severe-weather": 2, "airport-delays": 1}).
      * </pre>
      *

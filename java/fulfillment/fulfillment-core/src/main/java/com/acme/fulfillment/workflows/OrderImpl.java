@@ -5,6 +5,7 @@ import com.acme.fulfillment.workflows.activities.FulfillmentOptionsLoader;
 import com.acme.oms.services.InventoryService;
 import com.acme.oms.services.ShippingAgent;
 import com.acme.proto.acme.common.v1.Money;
+import com.acme.proto.acme.common.v1.Shipment;
 import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.*;
 import io.temporal.activity.ActivityOptions;
 import io.temporal.activity.LocalActivityOptions;
@@ -219,22 +220,17 @@ public class OrderImpl implements Order {
                         .addAllItems(extractProcessedItems(request.getProcessedOrder()))
                         .build());
 
-        // Resolve selected option ID: prefer explicit override in request, else use order-start selection
-        String selectedOptionId = request.hasSelectedShippingOptionId()
-                ? request.getSelectedShippingOptionId()
-                : state.getArgs().getSelectedShipping().getOptionId();
+        Shipment selectedShipment = resolveSelectedShipment(request);
 
         // Get AI-driven shipping recommendation via ShippingAgent Nexus operation (UpdateWithStart)
         var shippingRequestBuilder = CalculateShippingOptionsRequest.newBuilder()
                         .setOrderId(orderId)
                         .setCustomerId(request.getProcessedOrder().getCustomerId())
                         .setToAddress(state.getValidatedAddress())
-                        .addAllItems(convertToShippingLineItems(request.getProcessedOrder()))
-                        .setSelectedShippingOptionId(selectedOptionId)
-                        .setCustomerPaidPrice(state.getArgs().getSelectedShipping().getPrice());
+                        .addAllItems(convertToShippingLineItems(request.getProcessedOrder()));
 
-        if (state.getArgs().getSelectedShipping().hasDeliveryDays()) {
-            shippingRequestBuilder.setDeliveryDaysSla(state.getArgs().getSelectedShipping().getDeliveryDays());
+        if (hasSelectedShipmentData(selectedShipment)) {
+            shippingRequestBuilder.setSelectedShipment(selectedShipment);
         }
 
         var shippingResponse = shippingAgent.calculateShippingOptions(shippingRequestBuilder.build());
@@ -247,8 +243,8 @@ public class OrderImpl implements Order {
         }
 
         if (shippingResponse.getRecommendation().getOutcome() == RecommendationOutcome.SLA_BREACH
-                && state.getArgs().getSelectedShipping().hasDeliveryDays()) {
-            int promisedDays = state.getArgs().getSelectedShipping().getDeliveryDays();
+                && hasSelectedDeliveryDays(selectedShipment)) {
+            int promisedDays = (int) selectedShipment.getEasypost().getSelectedRate().getDeliveryDays();
             int actualDays   = findOption(shippingResponse, selection.getOptionId()).getEstimatedDays();
             long breachDays  = Math.max(0L, (long)(actualDays - promisedDays));
             Workflow.upsertTypedSearchAttributes(SLA_BREACH_DAYS.valueSet(breachDays));
@@ -350,6 +346,25 @@ public class OrderImpl implements Order {
             builder.setFallbackReason(rec.getOutcome().name() + ": " + rec.getReasoning());
         }
         return builder.build();
+    }
+
+    private Shipment resolveSelectedShipment(FulfillOrderRequest request) {
+        if (request.hasSelectedShipment()) {
+            return request.getSelectedShipment();
+        }
+        return state.getArgs().getSelectedShipment();
+    }
+
+    private boolean hasSelectedDeliveryDays(Shipment selectedShipment) {
+        return selectedShipment.hasEasypost()
+                && selectedShipment.getEasypost().hasSelectedRate()
+                && selectedShipment.getEasypost().getSelectedRate().hasDeliveryDays();
+    }
+
+    private boolean hasSelectedShipmentData(Shipment selectedShipment) {
+        return selectedShipment.hasPaidPrice()
+                || selectedShipment.hasEasypost()
+                || selectedShipment.hasDeliveryDate();
     }
 
     private List<ShippingLineItem> convertToShippingLineItems(ProcessedOrder processedOrder) {

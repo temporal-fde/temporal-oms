@@ -5,6 +5,7 @@
 from ....common.v1.values_p2p import Address
 from ....common.v1.values_p2p import Coordinate
 from ....common.v1.values_p2p import Money
+from ....common.v1.values_p2p import Shipment
 from .values_p2p import LocationEvent
 from .values_p2p import LocationRiskSummary
 from .values_p2p import RiskLevel
@@ -39,12 +40,10 @@ class GetLocationEventsRequest(BaseModel):
 # Value is in kilometers (e.g. 2.0).
     within_km: float = Field(default=0.0)
 # Delivery window: events active at any point between ship and delivery dates.
-
     active_from: datetime = Field(default_factory=datetime.now)# ship date
     active_to: datetime = Field(default_factory=datetime.now)# expected delivery date
 # IANA TZ Database identifier for the destination (e.g. "America/New_York").
 # From EasyPost verifications.delivery.details.time_zone.
-
     timezone: str = Field(default="")
 
 class GetLocationEventsResponse(BaseModel):
@@ -117,9 +116,7 @@ class CalculateShippingOptionsRequest(BaseModel):
 # to_address: easypost_address pre-populated by fulfillment.Order validateOrder.
     to_address: Address = Field(default_factory=Address)
     items: typing.List[ShippingLineItem] = Field(default_factory=list)
-    selected_shipping_option_id: typing.Optional[str] = Field(default="")
-    customer_paid_price: typing.Optional[Money] = Field(default_factory=Money)
-    delivery_days_sla: typing.Optional[int] = Field(default=0)
+    selected_shipment: Shipment = Field(default_factory=Shipment)
 
 class CalculateShippingOptionsResponse(BaseModel):
     """
@@ -157,6 +154,7 @@ class GetShippingRatesRequest(BaseModel):
     from_easypost_id: str = Field(default="")
     to_easypost_id: str = Field(default="")
     items: typing.List[ShippingLineItem] = Field(default_factory=list)
+    selected_shipment: Shipment = Field(default_factory=Shipment)
 
 class GetShippingRatesResponse(BaseModel):
     shipment_id: str = Field(default="")

@@ -41,7 +41,6 @@ private static final long serialVersionUID = 0L;
     orderId_ = "";
     customerId_ = "";
     items_ = java.util.Collections.emptyList();
-    selectedShippingOptionId_ = "";
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
@@ -76,7 +75,7 @@ private static final long serialVersionUID = 0L;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
-      com.google.protobuf.ByteString bs = 
+      com.google.protobuf.ByteString bs =
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
       orderId_ = s;
@@ -92,7 +91,7 @@ private static final long serialVersionUID = 0L;
       getOrderIdBytes() {
     java.lang.Object ref = orderId_;
     if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
+      com.google.protobuf.ByteString b =
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
       orderId_ = b;
@@ -115,7 +114,7 @@ private static final long serialVersionUID = 0L;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
-      com.google.protobuf.ByteString bs = 
+      com.google.protobuf.ByteString bs =
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
       customerId_ = s;
@@ -131,7 +130,7 @@ private static final long serialVersionUID = 0L;
       getCustomerIdBytes() {
     java.lang.Object ref = customerId_;
     if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
+      com.google.protobuf.ByteString b =
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
       customerId_ = b;
@@ -193,7 +192,7 @@ private static final long serialVersionUID = 0L;
    * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingLineItem items = 4 [json_name = "items"];</code>
    */
   @java.lang.Override
-  public java.util.List<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItemOrBuilder> 
+  public java.util.List<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItemOrBuilder>
       getItemsOrBuilderList() {
     return items_;
   }
@@ -220,96 +219,30 @@ private static final long serialVersionUID = 0L;
     return items_.get(index);
   }
 
-  public static final int SELECTED_SHIPPING_OPTION_ID_FIELD_NUMBER = 5;
-  @SuppressWarnings("serial")
-  private volatile java.lang.Object selectedShippingOptionId_ = "";
+  public static final int SELECTED_SHIPMENT_FIELD_NUMBER = 5;
+  private com.acme.proto.acme.common.v1.Shipment selectedShipment_;
   /**
-   * <code>optional string selected_shipping_option_id = 5 [json_name = "selectedShippingOptionId"];</code>
-   * @return Whether the selectedShippingOptionId field is set.
+   * <code>.acme.common.v1.Shipment selected_shipment = 5 [json_name = "selectedShipment"];</code>
+   * @return Whether the selectedShipment field is set.
    */
   @java.lang.Override
-  public boolean hasSelectedShippingOptionId() {
+  public boolean hasSelectedShipment() {
     return ((bitField0_ & 0x00000002) != 0);
   }
   /**
-   * <code>optional string selected_shipping_option_id = 5 [json_name = "selectedShippingOptionId"];</code>
-   * @return The selectedShippingOptionId.
+   * <code>.acme.common.v1.Shipment selected_shipment = 5 [json_name = "selectedShipment"];</code>
+   * @return The selectedShipment.
    */
   @java.lang.Override
-  public java.lang.String getSelectedShippingOptionId() {
-    java.lang.Object ref = selectedShippingOptionId_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      selectedShippingOptionId_ = s;
-      return s;
-    }
+  public com.acme.proto.acme.common.v1.Shipment getSelectedShipment() {
+    return selectedShipment_ == null ? com.acme.proto.acme.common.v1.Shipment.getDefaultInstance() : selectedShipment_;
   }
   /**
-   * <code>optional string selected_shipping_option_id = 5 [json_name = "selectedShippingOptionId"];</code>
-   * @return The bytes for selectedShippingOptionId.
+   * <code>.acme.common.v1.Shipment selected_shipment = 5 [json_name = "selectedShipment"];</code>
    */
   @java.lang.Override
-  public com.google.protobuf.ByteString
-      getSelectedShippingOptionIdBytes() {
-    java.lang.Object ref = selectedShippingOptionId_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      selectedShippingOptionId_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
-  }
-
-  public static final int CUSTOMER_PAID_PRICE_FIELD_NUMBER = 6;
-  private com.acme.proto.acme.common.v1.Money customerPaidPrice_;
-  /**
-   * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
-   * @return Whether the customerPaidPrice field is set.
-   */
-  @java.lang.Override
-  public boolean hasCustomerPaidPrice() {
-    return ((bitField0_ & 0x00000004) != 0);
-  }
-  /**
-   * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
-   * @return The customerPaidPrice.
-   */
-  @java.lang.Override
-  public com.acme.proto.acme.common.v1.Money getCustomerPaidPrice() {
-    return customerPaidPrice_ == null ? com.acme.proto.acme.common.v1.Money.getDefaultInstance() : customerPaidPrice_;
-  }
-  /**
-   * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
-   */
-  @java.lang.Override
-  public com.acme.proto.acme.common.v1.MoneyOrBuilder getCustomerPaidPriceOrBuilder() {
-    return customerPaidPrice_ == null ? com.acme.proto.acme.common.v1.Money.getDefaultInstance() : customerPaidPrice_;
-  }
-
-  public static final int DELIVERY_DAYS_SLA_FIELD_NUMBER = 7;
-  private int deliveryDaysSla_ = 0;
-  /**
-   * <code>optional int32 delivery_days_sla = 7 [json_name = "deliveryDaysSla"];</code>
-   * @return Whether the deliveryDaysSla field is set.
-   */
-  @java.lang.Override
-  public boolean hasDeliveryDaysSla() {
-    return ((bitField0_ & 0x00000008) != 0);
-  }
-  /**
-   * <code>optional int32 delivery_days_sla = 7 [json_name = "deliveryDaysSla"];</code>
-   * @return The deliveryDaysSla.
-   */
-  @java.lang.Override
-  public int getDeliveryDaysSla() {
-    return deliveryDaysSla_;
+  public com.acme.proto.acme.common.v1.ShipmentOrBuilder getSelectedShipmentOrBuilder() {
+    return selectedShipment_ == null ? com.acme.proto.acme.common.v1.Shipment.getDefaultInstance() : selectedShipment_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -339,13 +272,7 @@ private static final long serialVersionUID = 0L;
       output.writeMessage(4, items_.get(i));
     }
     if (((bitField0_ & 0x00000002) != 0)) {
-      com.google.protobuf.GeneratedMessage.writeString(output, 5, selectedShippingOptionId_);
-    }
-    if (((bitField0_ & 0x00000004) != 0)) {
-      output.writeMessage(6, getCustomerPaidPrice());
-    }
-    if (((bitField0_ & 0x00000008) != 0)) {
-      output.writeInt32(7, deliveryDaysSla_);
+      output.writeMessage(5, getSelectedShipment());
     }
     getUnknownFields().writeTo(output);
   }
@@ -376,15 +303,8 @@ private static final long serialVersionUID = 0L;
           size += 1 * count;
         }
     if (((bitField0_ & 0x00000002) != 0)) {
-      size += com.google.protobuf.GeneratedMessage.computeStringSize(5, selectedShippingOptionId_);
-    }
-    if (((bitField0_ & 0x00000004) != 0)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(6, getCustomerPaidPrice());
-    }
-    if (((bitField0_ & 0x00000008) != 0)) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeInt32Size(7, deliveryDaysSla_);
+        .computeMessageSize(5, getSelectedShipment());
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -412,20 +332,10 @@ private static final long serialVersionUID = 0L;
     }
     if (!getItemsList()
         .equals(other.getItemsList())) return false;
-    if (hasSelectedShippingOptionId() != other.hasSelectedShippingOptionId()) return false;
-    if (hasSelectedShippingOptionId()) {
-      if (!getSelectedShippingOptionId()
-          .equals(other.getSelectedShippingOptionId())) return false;
-    }
-    if (hasCustomerPaidPrice() != other.hasCustomerPaidPrice()) return false;
-    if (hasCustomerPaidPrice()) {
-      if (!getCustomerPaidPrice()
-          .equals(other.getCustomerPaidPrice())) return false;
-    }
-    if (hasDeliveryDaysSla() != other.hasDeliveryDaysSla()) return false;
-    if (hasDeliveryDaysSla()) {
-      if (getDeliveryDaysSla()
-          != other.getDeliveryDaysSla()) return false;
+    if (hasSelectedShipment() != other.hasSelectedShipment()) return false;
+    if (hasSelectedShipment()) {
+      if (!getSelectedShipment()
+          .equals(other.getSelectedShipment())) return false;
     }
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
@@ -450,17 +360,9 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + ITEMS_FIELD_NUMBER;
       hash = (53 * hash) + getItemsList().hashCode();
     }
-    if (hasSelectedShippingOptionId()) {
-      hash = (37 * hash) + SELECTED_SHIPPING_OPTION_ID_FIELD_NUMBER;
-      hash = (53 * hash) + getSelectedShippingOptionId().hashCode();
-    }
-    if (hasCustomerPaidPrice()) {
-      hash = (37 * hash) + CUSTOMER_PAID_PRICE_FIELD_NUMBER;
-      hash = (53 * hash) + getCustomerPaidPrice().hashCode();
-    }
-    if (hasDeliveryDaysSla()) {
-      hash = (37 * hash) + DELIVERY_DAYS_SLA_FIELD_NUMBER;
-      hash = (53 * hash) + getDeliveryDaysSla();
+    if (hasSelectedShipment()) {
+      hash = (37 * hash) + SELECTED_SHIPMENT_FIELD_NUMBER;
+      hash = (53 * hash) + getSelectedShipment().hashCode();
     }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
@@ -604,7 +506,7 @@ private static final long serialVersionUID = 0L;
               .alwaysUseFieldBuilders) {
         internalGetToAddressFieldBuilder();
         internalGetItemsFieldBuilder();
-        internalGetCustomerPaidPriceFieldBuilder();
+        internalGetSelectedShipmentFieldBuilder();
       }
     }
     @java.lang.Override
@@ -625,13 +527,11 @@ private static final long serialVersionUID = 0L;
         itemsBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000008);
-      selectedShippingOptionId_ = "";
-      customerPaidPrice_ = null;
-      if (customerPaidPriceBuilder_ != null) {
-        customerPaidPriceBuilder_.dispose();
-        customerPaidPriceBuilder_ = null;
+      selectedShipment_ = null;
+      if (selectedShipmentBuilder_ != null) {
+        selectedShipmentBuilder_.dispose();
+        selectedShipmentBuilder_ = null;
       }
-      deliveryDaysSla_ = 0;
       return this;
     }
 
@@ -692,18 +592,10 @@ private static final long serialVersionUID = 0L;
         to_bitField0_ |= 0x00000001;
       }
       if (((from_bitField0_ & 0x00000010) != 0)) {
-        result.selectedShippingOptionId_ = selectedShippingOptionId_;
+        result.selectedShipment_ = selectedShipmentBuilder_ == null
+            ? selectedShipment_
+            : selectedShipmentBuilder_.build();
         to_bitField0_ |= 0x00000002;
-      }
-      if (((from_bitField0_ & 0x00000020) != 0)) {
-        result.customerPaidPrice_ = customerPaidPriceBuilder_ == null
-            ? customerPaidPrice_
-            : customerPaidPriceBuilder_.build();
-        to_bitField0_ |= 0x00000004;
-      }
-      if (((from_bitField0_ & 0x00000040) != 0)) {
-        result.deliveryDaysSla_ = deliveryDaysSla_;
-        to_bitField0_ |= 0x00000008;
       }
       result.bitField0_ |= to_bitField0_;
     }
@@ -751,7 +643,7 @@ private static final long serialVersionUID = 0L;
             itemsBuilder_ = null;
             items_ = other.items_;
             bitField0_ = (bitField0_ & ~0x00000008);
-            itemsBuilder_ = 
+            itemsBuilder_ =
               com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                  internalGetItemsFieldBuilder() : null;
           } else {
@@ -759,16 +651,8 @@ private static final long serialVersionUID = 0L;
           }
         }
       }
-      if (other.hasSelectedShippingOptionId()) {
-        selectedShippingOptionId_ = other.selectedShippingOptionId_;
-        bitField0_ |= 0x00000010;
-        onChanged();
-      }
-      if (other.hasCustomerPaidPrice()) {
-        mergeCustomerPaidPrice(other.getCustomerPaidPrice());
-      }
-      if (other.hasDeliveryDaysSla()) {
-        setDeliveryDaysSla(other.getDeliveryDaysSla());
+      if (other.hasSelectedShipment()) {
+        mergeSelectedShipment(other.getSelectedShipment());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -827,22 +711,12 @@ private static final long serialVersionUID = 0L;
               break;
             } // case 34
             case 42: {
-              selectedShippingOptionId_ = input.readStringRequireUtf8();
+              input.readMessage(
+                  internalGetSelectedShipmentFieldBuilder().getBuilder(),
+                  extensionRegistry);
               bitField0_ |= 0x00000010;
               break;
             } // case 42
-            case 50: {
-              input.readMessage(
-                  internalGetCustomerPaidPriceFieldBuilder().getBuilder(),
-                  extensionRegistry);
-              bitField0_ |= 0x00000020;
-              break;
-            } // case 50
-            case 56: {
-              deliveryDaysSla_ = input.readInt32();
-              bitField0_ |= 0x00000040;
-              break;
-            } // case 56
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -885,7 +759,7 @@ private static final long serialVersionUID = 0L;
         getOrderIdBytes() {
       java.lang.Object ref = orderId_;
       if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         orderId_ = b;
@@ -957,7 +831,7 @@ private static final long serialVersionUID = 0L;
         getCustomerIdBytes() {
       java.lang.Object ref = customerId_;
       if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         customerId_ = b;
@@ -1148,7 +1022,7 @@ private static final long serialVersionUID = 0L;
      * <code>.acme.common.v1.Address to_address = 3 [json_name = "toAddress"];</code>
      */
     private com.google.protobuf.SingleFieldBuilder<
-        com.acme.proto.acme.common.v1.Address, com.acme.proto.acme.common.v1.Address.Builder, com.acme.proto.acme.common.v1.AddressOrBuilder> 
+        com.acme.proto.acme.common.v1.Address, com.acme.proto.acme.common.v1.Address.Builder, com.acme.proto.acme.common.v1.AddressOrBuilder>
         internalGetToAddressFieldBuilder() {
       if (toAddressBuilder_ == null) {
         toAddressBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -1356,7 +1230,7 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingLineItem items = 4 [json_name = "items"];</code>
      */
-    public java.util.List<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItemOrBuilder> 
+    public java.util.List<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItemOrBuilder>
          getItemsOrBuilderList() {
       if (itemsBuilder_ != null) {
         return itemsBuilder_.getMessageOrBuilderList();
@@ -1382,12 +1256,12 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingLineItem items = 4 [json_name = "items"];</code>
      */
-    public java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItem.Builder> 
+    public java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItem.Builder>
          getItemsBuilderList() {
       return internalGetItemsFieldBuilder().getBuilderList();
     }
     private com.google.protobuf.RepeatedFieldBuilder<
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItem, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItem.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItemOrBuilder> 
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItem, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItem.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItemOrBuilder>
         internalGetItemsFieldBuilder() {
       if (itemsBuilder_ == null) {
         itemsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -1401,244 +1275,125 @@ private static final long serialVersionUID = 0L;
       return itemsBuilder_;
     }
 
-    private java.lang.Object selectedShippingOptionId_ = "";
+    private com.acme.proto.acme.common.v1.Shipment selectedShipment_;
+    private com.google.protobuf.SingleFieldBuilder<
+        com.acme.proto.acme.common.v1.Shipment, com.acme.proto.acme.common.v1.Shipment.Builder, com.acme.proto.acme.common.v1.ShipmentOrBuilder> selectedShipmentBuilder_;
     /**
-     * <code>optional string selected_shipping_option_id = 5 [json_name = "selectedShippingOptionId"];</code>
-     * @return Whether the selectedShippingOptionId field is set.
+     * <code>.acme.common.v1.Shipment selected_shipment = 5 [json_name = "selectedShipment"];</code>
+     * @return Whether the selectedShipment field is set.
      */
-    public boolean hasSelectedShippingOptionId() {
+    public boolean hasSelectedShipment() {
       return ((bitField0_ & 0x00000010) != 0);
     }
     /**
-     * <code>optional string selected_shipping_option_id = 5 [json_name = "selectedShippingOptionId"];</code>
-     * @return The selectedShippingOptionId.
+     * <code>.acme.common.v1.Shipment selected_shipment = 5 [json_name = "selectedShipment"];</code>
+     * @return The selectedShipment.
      */
-    public java.lang.String getSelectedShippingOptionId() {
-      java.lang.Object ref = selectedShippingOptionId_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        selectedShippingOptionId_ = s;
-        return s;
+    public com.acme.proto.acme.common.v1.Shipment getSelectedShipment() {
+      if (selectedShipmentBuilder_ == null) {
+        return selectedShipment_ == null ? com.acme.proto.acme.common.v1.Shipment.getDefaultInstance() : selectedShipment_;
       } else {
-        return (java.lang.String) ref;
+        return selectedShipmentBuilder_.getMessage();
       }
     }
     /**
-     * <code>optional string selected_shipping_option_id = 5 [json_name = "selectedShippingOptionId"];</code>
-     * @return The bytes for selectedShippingOptionId.
+     * <code>.acme.common.v1.Shipment selected_shipment = 5 [json_name = "selectedShipment"];</code>
      */
-    public com.google.protobuf.ByteString
-        getSelectedShippingOptionIdBytes() {
-      java.lang.Object ref = selectedShippingOptionId_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        selectedShippingOptionId_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-    /**
-     * <code>optional string selected_shipping_option_id = 5 [json_name = "selectedShippingOptionId"];</code>
-     * @param value The selectedShippingOptionId to set.
-     * @return This builder for chaining.
-     */
-    public Builder setSelectedShippingOptionId(
-        java.lang.String value) {
-      if (value == null) { throw new NullPointerException(); }
-      selectedShippingOptionId_ = value;
-      bitField0_ |= 0x00000010;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>optional string selected_shipping_option_id = 5 [json_name = "selectedShippingOptionId"];</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearSelectedShippingOptionId() {
-      selectedShippingOptionId_ = getDefaultInstance().getSelectedShippingOptionId();
-      bitField0_ = (bitField0_ & ~0x00000010);
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>optional string selected_shipping_option_id = 5 [json_name = "selectedShippingOptionId"];</code>
-     * @param value The bytes for selectedShippingOptionId to set.
-     * @return This builder for chaining.
-     */
-    public Builder setSelectedShippingOptionIdBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) { throw new NullPointerException(); }
-      checkByteStringIsUtf8(value);
-      selectedShippingOptionId_ = value;
-      bitField0_ |= 0x00000010;
-      onChanged();
-      return this;
-    }
-
-    private com.acme.proto.acme.common.v1.Money customerPaidPrice_;
-    private com.google.protobuf.SingleFieldBuilder<
-        com.acme.proto.acme.common.v1.Money, com.acme.proto.acme.common.v1.Money.Builder, com.acme.proto.acme.common.v1.MoneyOrBuilder> customerPaidPriceBuilder_;
-    /**
-     * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
-     * @return Whether the customerPaidPrice field is set.
-     */
-    public boolean hasCustomerPaidPrice() {
-      return ((bitField0_ & 0x00000020) != 0);
-    }
-    /**
-     * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
-     * @return The customerPaidPrice.
-     */
-    public com.acme.proto.acme.common.v1.Money getCustomerPaidPrice() {
-      if (customerPaidPriceBuilder_ == null) {
-        return customerPaidPrice_ == null ? com.acme.proto.acme.common.v1.Money.getDefaultInstance() : customerPaidPrice_;
-      } else {
-        return customerPaidPriceBuilder_.getMessage();
-      }
-    }
-    /**
-     * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
-     */
-    public Builder setCustomerPaidPrice(com.acme.proto.acme.common.v1.Money value) {
-      if (customerPaidPriceBuilder_ == null) {
+    public Builder setSelectedShipment(com.acme.proto.acme.common.v1.Shipment value) {
+      if (selectedShipmentBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        customerPaidPrice_ = value;
+        selectedShipment_ = value;
       } else {
-        customerPaidPriceBuilder_.setMessage(value);
+        selectedShipmentBuilder_.setMessage(value);
       }
-      bitField0_ |= 0x00000020;
+      bitField0_ |= 0x00000010;
       onChanged();
       return this;
     }
     /**
-     * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
+     * <code>.acme.common.v1.Shipment selected_shipment = 5 [json_name = "selectedShipment"];</code>
      */
-    public Builder setCustomerPaidPrice(
-        com.acme.proto.acme.common.v1.Money.Builder builderForValue) {
-      if (customerPaidPriceBuilder_ == null) {
-        customerPaidPrice_ = builderForValue.build();
+    public Builder setSelectedShipment(
+        com.acme.proto.acme.common.v1.Shipment.Builder builderForValue) {
+      if (selectedShipmentBuilder_ == null) {
+        selectedShipment_ = builderForValue.build();
       } else {
-        customerPaidPriceBuilder_.setMessage(builderForValue.build());
+        selectedShipmentBuilder_.setMessage(builderForValue.build());
       }
-      bitField0_ |= 0x00000020;
+      bitField0_ |= 0x00000010;
       onChanged();
       return this;
     }
     /**
-     * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
+     * <code>.acme.common.v1.Shipment selected_shipment = 5 [json_name = "selectedShipment"];</code>
      */
-    public Builder mergeCustomerPaidPrice(com.acme.proto.acme.common.v1.Money value) {
-      if (customerPaidPriceBuilder_ == null) {
-        if (((bitField0_ & 0x00000020) != 0) &&
-          customerPaidPrice_ != null &&
-          customerPaidPrice_ != com.acme.proto.acme.common.v1.Money.getDefaultInstance()) {
-          getCustomerPaidPriceBuilder().mergeFrom(value);
+    public Builder mergeSelectedShipment(com.acme.proto.acme.common.v1.Shipment value) {
+      if (selectedShipmentBuilder_ == null) {
+        if (((bitField0_ & 0x00000010) != 0) &&
+          selectedShipment_ != null &&
+          selectedShipment_ != com.acme.proto.acme.common.v1.Shipment.getDefaultInstance()) {
+          getSelectedShipmentBuilder().mergeFrom(value);
         } else {
-          customerPaidPrice_ = value;
+          selectedShipment_ = value;
         }
       } else {
-        customerPaidPriceBuilder_.mergeFrom(value);
+        selectedShipmentBuilder_.mergeFrom(value);
       }
-      if (customerPaidPrice_ != null) {
-        bitField0_ |= 0x00000020;
+      if (selectedShipment_ != null) {
+        bitField0_ |= 0x00000010;
         onChanged();
       }
       return this;
     }
     /**
-     * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
+     * <code>.acme.common.v1.Shipment selected_shipment = 5 [json_name = "selectedShipment"];</code>
      */
-    public Builder clearCustomerPaidPrice() {
-      bitField0_ = (bitField0_ & ~0x00000020);
-      customerPaidPrice_ = null;
-      if (customerPaidPriceBuilder_ != null) {
-        customerPaidPriceBuilder_.dispose();
-        customerPaidPriceBuilder_ = null;
+    public Builder clearSelectedShipment() {
+      bitField0_ = (bitField0_ & ~0x00000010);
+      selectedShipment_ = null;
+      if (selectedShipmentBuilder_ != null) {
+        selectedShipmentBuilder_.dispose();
+        selectedShipmentBuilder_ = null;
       }
       onChanged();
       return this;
     }
     /**
-     * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
+     * <code>.acme.common.v1.Shipment selected_shipment = 5 [json_name = "selectedShipment"];</code>
      */
-    public com.acme.proto.acme.common.v1.Money.Builder getCustomerPaidPriceBuilder() {
-      bitField0_ |= 0x00000020;
+    public com.acme.proto.acme.common.v1.Shipment.Builder getSelectedShipmentBuilder() {
+      bitField0_ |= 0x00000010;
       onChanged();
-      return internalGetCustomerPaidPriceFieldBuilder().getBuilder();
+      return internalGetSelectedShipmentFieldBuilder().getBuilder();
     }
     /**
-     * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
+     * <code>.acme.common.v1.Shipment selected_shipment = 5 [json_name = "selectedShipment"];</code>
      */
-    public com.acme.proto.acme.common.v1.MoneyOrBuilder getCustomerPaidPriceOrBuilder() {
-      if (customerPaidPriceBuilder_ != null) {
-        return customerPaidPriceBuilder_.getMessageOrBuilder();
+    public com.acme.proto.acme.common.v1.ShipmentOrBuilder getSelectedShipmentOrBuilder() {
+      if (selectedShipmentBuilder_ != null) {
+        return selectedShipmentBuilder_.getMessageOrBuilder();
       } else {
-        return customerPaidPrice_ == null ?
-            com.acme.proto.acme.common.v1.Money.getDefaultInstance() : customerPaidPrice_;
+        return selectedShipment_ == null ?
+            com.acme.proto.acme.common.v1.Shipment.getDefaultInstance() : selectedShipment_;
       }
     }
     /**
-     * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
+     * <code>.acme.common.v1.Shipment selected_shipment = 5 [json_name = "selectedShipment"];</code>
      */
     private com.google.protobuf.SingleFieldBuilder<
-        com.acme.proto.acme.common.v1.Money, com.acme.proto.acme.common.v1.Money.Builder, com.acme.proto.acme.common.v1.MoneyOrBuilder> 
-        internalGetCustomerPaidPriceFieldBuilder() {
-      if (customerPaidPriceBuilder_ == null) {
-        customerPaidPriceBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-            com.acme.proto.acme.common.v1.Money, com.acme.proto.acme.common.v1.Money.Builder, com.acme.proto.acme.common.v1.MoneyOrBuilder>(
-                getCustomerPaidPrice(),
+        com.acme.proto.acme.common.v1.Shipment, com.acme.proto.acme.common.v1.Shipment.Builder, com.acme.proto.acme.common.v1.ShipmentOrBuilder>
+        internalGetSelectedShipmentFieldBuilder() {
+      if (selectedShipmentBuilder_ == null) {
+        selectedShipmentBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+            com.acme.proto.acme.common.v1.Shipment, com.acme.proto.acme.common.v1.Shipment.Builder, com.acme.proto.acme.common.v1.ShipmentOrBuilder>(
+                getSelectedShipment(),
                 getParentForChildren(),
                 isClean());
-        customerPaidPrice_ = null;
+        selectedShipment_ = null;
       }
-      return customerPaidPriceBuilder_;
-    }
-
-    private int deliveryDaysSla_ ;
-    /**
-     * <code>optional int32 delivery_days_sla = 7 [json_name = "deliveryDaysSla"];</code>
-     * @return Whether the deliveryDaysSla field is set.
-     */
-    @java.lang.Override
-    public boolean hasDeliveryDaysSla() {
-      return ((bitField0_ & 0x00000040) != 0);
-    }
-    /**
-     * <code>optional int32 delivery_days_sla = 7 [json_name = "deliveryDaysSla"];</code>
-     * @return The deliveryDaysSla.
-     */
-    @java.lang.Override
-    public int getDeliveryDaysSla() {
-      return deliveryDaysSla_;
-    }
-    /**
-     * <code>optional int32 delivery_days_sla = 7 [json_name = "deliveryDaysSla"];</code>
-     * @param value The deliveryDaysSla to set.
-     * @return This builder for chaining.
-     */
-    public Builder setDeliveryDaysSla(int value) {
-
-      deliveryDaysSla_ = value;
-      bitField0_ |= 0x00000040;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>optional int32 delivery_days_sla = 7 [json_name = "deliveryDaysSla"];</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearDeliveryDaysSla() {
-      bitField0_ = (bitField0_ & ~0x00000040);
-      deliveryDaysSla_ = 0;
-      onChanged();
-      return this;
+      return selectedShipmentBuilder_;
     }
 
     // @@protoc_insertion_point(builder_scope:acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest)

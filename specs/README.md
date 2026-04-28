@@ -94,6 +94,13 @@ Provide feedback in PROGRESS.md → Feedback Items section.
 - **Spec:** `specs/workshop/augment-with-ai/`
 - **Next:** Tech lead review — confirm exercise list and Codespaces machine/key requirements
 
+### Workshop: Integration Stubs
+- **Status:** Draft
+- **Goal:** Document workflow-backed workshop stubs for commerce-app, PIMS, inventory, and location-events; align requirements for bringing the integration story behind one inspectable Temporal workflow
+- **Owner:** Temporal FDE Team
+- **Spec:** `specs/workshop/integrations/`
+- **Next:** Review requirements — decide whether `location-events` moves behind Nexus or remains an agent activity for the first workshop pass
+
 ### 🆕 fulfillment.Order (initiative)
 
 #### fulfillment.Order Workflow

@@ -31,7 +31,15 @@ from acme.common.v1.llm_p2p import (
     LlmToolResultBlock,
     LlmToolUseBlock,
 )
-from acme.common.v1.values_p2p import Address, Coordinate, EasyPostAddress, Money
+from acme.common.v1.values_p2p import (
+    Address,
+    Coordinate,
+    EasyPostAddress,
+    EasyPostRate,
+    EasyPostShipment,
+    Money,
+    Shipment,
+)
 from acme.fulfillment.domain.v1.shipping_agent_p2p import (
     BuildSystemPromptRequest,
     BuildSystemPromptResponse,
@@ -147,17 +155,27 @@ def _tool_use_response(calls: list[tuple[str, str, dict]]) -> LlmResponse:
 
 def _base_request(
     *,
-    customer_paid_price: Money | None = None,
-    delivery_days_sla: int = 0,
+    selected_paid_price: Money | None = None,
+    selected_delivery_days: int | None = None,
 ) -> CalculateShippingOptionsRequest:
-    return CalculateShippingOptionsRequest(
-        order_id=_ORDER_ID,
-        customer_id=_CUSTOMER_ID,
-        to_address=_TO_ADDRESS,
-        items=_ITEMS,
-        customer_paid_price=customer_paid_price,
-        delivery_days_sla=delivery_days_sla,
-    )
+    kwargs = {
+        "order_id": _ORDER_ID,
+        "customer_id": _CUSTOMER_ID,
+        "to_address": _TO_ADDRESS,
+        "items": _ITEMS,
+    }
+    if selected_paid_price is not None or selected_delivery_days is not None:
+        kwargs["selected_shipment"] = Shipment(
+            easypost=EasyPostShipment(
+                shipment_id="shp_selected",
+                selected_rate=EasyPostRate(
+                    rate_id="rate_selected",
+                    delivery_days=selected_delivery_days if selected_delivery_days is not None else 5,
+                ),
+            ),
+            paid_price=selected_paid_price or Money(currency="USD", units=0),
+        )
+    return CalculateShippingOptionsRequest(**kwargs)
 
 
 _START_REQUEST = StartShippingAgentRequest(
@@ -588,7 +606,7 @@ async def test_margin_spike_outcome() -> None:
         workers = _make_workers(env.client, margin_llm)
         async with workers[0], workers[1], workers[2]:
             handle = await _start_agent(env.client)
-            req = _base_request(customer_paid_price=Money(currency="USD", units=1))
+            req = _base_request(selected_paid_price=Money(currency="USD", units=1))
             resp = await handle.execute_update(ShippingAgent.calculate_shipping_options, req)
 
     assert resp.recommendation.outcome == RecommendationOutcome.MARGIN_SPIKE
@@ -615,7 +633,7 @@ async def test_sla_breach_outcome() -> None:
         workers = _make_workers(env.client, sla_llm)
         async with workers[0], workers[1], workers[2]:
             handle = await _start_agent(env.client)
-            req = _base_request(delivery_days_sla=2)
+            req = _base_request(selected_delivery_days=2)
             resp = await handle.execute_update(ShippingAgent.calculate_shipping_options, req)
 
     assert resp.recommendation.outcome == RecommendationOutcome.SLA_BREACH
@@ -674,7 +692,7 @@ async def test_margin_spike_enforces_alternate_warehouse() -> None:
             Worker(env.client, task_queue="agents", activities=common),
         ):
             handle = await _start_agent(env.client)
-            req = _base_request(customer_paid_price=Money(currency="USD", units=1))
+            req = _base_request(selected_paid_price=Money(currency="USD", units=1))
             resp = await handle.execute_update(ShippingAgent.calculate_shipping_options, req)
 
     assert resp.recommendation.outcome == RecommendationOutcome.MARGIN_SPIKE
@@ -731,7 +749,7 @@ async def test_sla_breach_enforces_alternate_warehouse() -> None:
             Worker(env.client, task_queue="agents", activities=common),
         ):
             handle = await _start_agent(env.client)
-            req = _base_request(delivery_days_sla=2)
+            req = _base_request(selected_delivery_days=2)
             resp = await handle.execute_update(ShippingAgent.calculate_shipping_options, req)
 
     assert resp.recommendation.outcome == RecommendationOutcome.SLA_BREACH

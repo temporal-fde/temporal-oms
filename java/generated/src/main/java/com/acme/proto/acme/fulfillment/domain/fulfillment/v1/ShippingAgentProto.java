@@ -154,20 +154,15 @@ public final class ShippingAgentProto extends com.google.protobuf.GeneratedFile 
       "mer_id\030\002 \001(\tR\ncustomerIdB\024\n\022_execution_o" +
       "ptions\"]\n\035ShippingAgentExecutionOptions\022" +
       ")\n\016cache_ttl_secs\030\001 \001(\003H\000R\014cacheTtlSecs\210" +
-      "\001\001B\021\n\017_cache_ttl_secs\"\364\003\n\037CalculateShipp" +
+      "\001\001B\021\n\017_cache_ttl_secs\"\254\002\n\037CalculateShipp" +
       "ingOptionsRequest\022\031\n\010order_id\030\001 \001(\tR\007ord" +
       "erId\022\037\n\013customer_id\030\002 \001(\tR\ncustomerId\0226\n" +
       "\nto_address\030\003 \001(\0132\027.acme.common.v1.Addre" +
       "ssR\ttoAddress\022N\n\005items\030\004 \003(\01328.acme.fulf" +
       "illment.domain.fulfillment.v1.ShippingLi" +
-      "neItemR\005items\022B\n\033selected_shipping_optio" +
-      "n_id\030\005 \001(\tH\000R\030selectedShippingOptionId\210\001" +
-      "\001\022J\n\023customer_paid_price\030\006 \001(\0132\025.acme.co" +
-      "mmon.v1.MoneyH\001R\021customerPaidPrice\210\001\001\022/\n" +
-      "\021delivery_days_sla\030\007 \001(\005H\002R\017deliveryDays" +
-      "Sla\210\001\001B\036\n\034_selected_shipping_option_idB\026" +
-      "\n\024_customer_paid_priceB\024\n\022_delivery_days" +
-      "_sla\"\371\001\n CalculateShippingOptionsRespons" +
+      "neItemR\005items\022E\n\021selected_shipment\030\005 \001(\013" +
+      "2\030.acme.common.v1.ShipmentR\020selectedShip" +
+      "ment\"\371\001\n CalculateShippingOptionsRespons" +
       "e\022f\n\016recommendation\030\001 \001(\0132>.acme.fulfill" +
       "ment.domain.fulfillment.v1.ShippingRecom" +
       "mendationR\016recommendation\022P\n\007options\030\002 \003" +
@@ -186,31 +181,33 @@ public final class ShippingAgentProto extends com.google.protobuf.GeneratedFile 
       "ryR\007results\032y\n\014ResultsEntry\022\020\n\003key\030\001 \001(\t" +
       "R\003key\022S\n\005value\030\002 \001(\0132=.acme.fulfillment." +
       "domain.fulfillment.v1.ShippingOptionsRes" +
-      "ultR\005value:\0028\001\"\271\001\n\027GetShippingRatesReque" +
+      "ultR\005value:\0028\001\"\200\002\n\027GetShippingRatesReque" +
       "st\022(\n\020from_easypost_id\030\001 \001(\tR\016fromEasypo" +
       "stId\022$\n\016to_easypost_id\030\002 \001(\tR\014toEasypost" +
       "Id\022N\n\005items\030\003 \003(\01328.acme.fulfillment.dom" +
       "ain.fulfillment.v1.ShippingLineItemR\005ite" +
-      "ms\"\215\001\n\030GetShippingRatesResponse\022\037\n\013shipm" +
-      "ent_id\030\001 \001(\tR\nshipmentId\022P\n\007options\030\002 \003(" +
-      "\01326.acme.fulfillment.domain.fulfillment." +
-      "v1.ShippingOptionR\007options\"}\n\030BuildSyste" +
-      "mPromptRequest\022a\n\007request\030\001 \001(\0132G.acme.f" +
-      "ulfillment.domain.fulfillment.v1.Calcula" +
-      "teShippingOptionsRequestR\007request\"@\n\031Bui" +
-      "ldSystemPromptResponse\022#\n\rsystem_prompt\030" +
-      "\001 \001(\tR\014systemPrompt*\233\001\n\025RecommendationOu" +
-      "tcome\022&\n\"RECOMMENDATION_OUTCOME_UNSPECIF" +
-      "IED\020\000\022\013\n\007PROCEED\020\001\022\025\n\021CHEAPER_AVAILABLE\020" +
-      "\002\022\024\n\020FASTER_AVAILABLE\020\003\022\020\n\014MARGIN_SPIKE\020" +
-      "\004\022\016\n\nSLA_BREACH\020\005B\210\002\n5com.acme.proto.acm" +
-      "e.fulfillment.domain.fulfillment.v1B\022Shi" +
-      "ppingAgentProtoP\001\242\002\004AFDF\252\002&Acme.Fulfillm" +
-      "ent.Domain.Fulfillment.V1\312\002&Acme\\Fulfill" +
-      "ment\\Domain\\Fulfillment\\V1\342\0022Acme\\Fulfil" +
-      "lment\\Domain\\Fulfillment\\V1\\GPBMetadata\352" +
-      "\002*Acme::Fulfillment::Domain::Fulfillment" +
-      "::V1b\006proto3"
+      "ms\022E\n\021selected_shipment\030\004 \001(\0132\030.acme.com" +
+      "mon.v1.ShipmentR\020selectedShipment\"\215\001\n\030Ge" +
+      "tShippingRatesResponse\022\037\n\013shipment_id\030\001 " +
+      "\001(\tR\nshipmentId\022P\n\007options\030\002 \003(\01326.acme." +
+      "fulfillment.domain.fulfillment.v1.Shippi" +
+      "ngOptionR\007options\"}\n\030BuildSystemPromptRe" +
+      "quest\022a\n\007request\030\001 \001(\0132G.acme.fulfillmen" +
+      "t.domain.fulfillment.v1.CalculateShippin" +
+      "gOptionsRequestR\007request\"@\n\031BuildSystemP" +
+      "romptResponse\022#\n\rsystem_prompt\030\001 \001(\tR\014sy" +
+      "stemPrompt*\233\001\n\025RecommendationOutcome\022&\n\"" +
+      "RECOMMENDATION_OUTCOME_UNSPECIFIED\020\000\022\013\n\007" +
+      "PROCEED\020\001\022\025\n\021CHEAPER_AVAILABLE\020\002\022\024\n\020FAST" +
+      "ER_AVAILABLE\020\003\022\020\n\014MARGIN_SPIKE\020\004\022\016\n\nSLA_" +
+      "BREACH\020\005B\210\002\n5com.acme.proto.acme.fulfill" +
+      "ment.domain.fulfillment.v1B\022ShippingAgen" +
+      "tProtoP\001\242\002\004AFDF\252\002&Acme.Fulfillment.Domai" +
+      "n.Fulfillment.V1\312\002&Acme\\Fulfillment\\Doma" +
+      "in\\Fulfillment\\V1\342\0022Acme\\Fulfillment\\Dom" +
+      "ain\\Fulfillment\\V1\\GPBMetadata\352\002*Acme::F" +
+      "ulfillment::Domain::Fulfillment::V1b\006pro" +
+      "to3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -260,7 +257,7 @@ public final class ShippingAgentProto extends com.google.protobuf.GeneratedFile 
     internal_static_acme_fulfillment_domain_fulfillment_v1_CalculateShippingOptionsRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_CalculateShippingOptionsRequest_descriptor,
-        new java.lang.String[] { "OrderId", "CustomerId", "ToAddress", "Items", "SelectedShippingOptionId", "CustomerPaidPrice", "DeliveryDaysSla", });
+        new java.lang.String[] { "OrderId", "CustomerId", "ToAddress", "Items", "SelectedShipment", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_CalculateShippingOptionsResponse_descriptor =
       getDescriptor().getMessageType(7);
     internal_static_acme_fulfillment_domain_fulfillment_v1_CalculateShippingOptionsResponse_fieldAccessorTable = new
@@ -290,7 +287,7 @@ public final class ShippingAgentProto extends com.google.protobuf.GeneratedFile 
     internal_static_acme_fulfillment_domain_fulfillment_v1_GetShippingRatesRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_fulfillment_domain_fulfillment_v1_GetShippingRatesRequest_descriptor,
-        new java.lang.String[] { "FromEasypostId", "ToEasypostId", "Items", });
+        new java.lang.String[] { "FromEasypostId", "ToEasypostId", "Items", "SelectedShipment", });
     internal_static_acme_fulfillment_domain_fulfillment_v1_GetShippingRatesResponse_descriptor =
       getDescriptor().getMessageType(11);
     internal_static_acme_fulfillment_domain_fulfillment_v1_GetShippingRatesResponse_fieldAccessorTable = new

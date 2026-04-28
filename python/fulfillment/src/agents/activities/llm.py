@@ -94,21 +94,40 @@ class LlmActivities:
     @activity.defn
     async def build_system_prompt(self, req: BuildSystemPromptRequest) -> BuildSystemPromptResponse:
         r = req.request
+        request_fields = getattr(r, "model_fields_set", set())
+        selected_shipment = r.selected_shipment
+        has_selected_shipment = "selected_shipment" in request_fields
+        paid_price = selected_shipment.paid_price if has_selected_shipment and selected_shipment else None
+        selected_rate = (
+            selected_shipment.easypost.selected_rate
+            if has_selected_shipment and selected_shipment and selected_shipment.easypost
+            else None
+        )
+        selected_rate_fields = getattr(selected_rate, "model_fields_set", set()) if selected_rate else set()
+        selected_delivery_days = (
+            selected_rate.delivery_days
+            if selected_rate and (
+                "delivery_days" in selected_rate_fields
+                or selected_rate.delivery_days not in (None, 0)
+            )
+            else None
+        )
+
         margin_rule = (
             f"MARGIN RULE: If all available rate costs exceed the customer paid price "
-            f"({r.customer_paid_price.units} {r.customer_paid_price.currency} "
+            f"({paid_price.units} {paid_price.currency} "
             f"in minor currency units), outcome MUST be MARGIN_SPIKE; "
             f"set margin_delta_cents to the overage of the cheapest available rate."
-            if (r.customer_paid_price and r.customer_paid_price.units > 0)
+            if (paid_price and paid_price.units > 0)
             else "MARGIN RULE: No customer paid price — skip margin spike logic."
         )
 
         sla_rule = (
             f"SLA RULE: If no rate that costs at or below the customer paid price "
-            f"delivers within {r.delivery_days_sla} days, outcome MUST be SLA_BREACH. "
+            f"delivers within {selected_delivery_days} days, outcome MUST be SLA_BREACH. "
             f"Set recommended_option_id to the rate ID of the fastest available option "
             f"(minimise delivery delay even if the SLA cannot be met)."
-            if r.delivery_days_sla is not None
+            if selected_delivery_days is not None
             else "SLA RULE: No delivery days SLA specified."
         )
 

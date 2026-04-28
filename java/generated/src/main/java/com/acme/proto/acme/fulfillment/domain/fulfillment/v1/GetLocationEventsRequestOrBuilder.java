@@ -51,7 +51,6 @@ public interface GetLocationEventsRequestOrBuilder extends
   /**
    * <pre>
    * Delivery window: events active at any point between ship and delivery dates.
-   * Maps to active.gte / active.lte on the PredictHQ Events API.
    * </pre>
    *
    * <code>.google.protobuf.Timestamp active_from = 3 [json_name = "activeFrom"];</code>
@@ -61,7 +60,6 @@ public interface GetLocationEventsRequestOrBuilder extends
   /**
    * <pre>
    * Delivery window: events active at any point between ship and delivery dates.
-   * Maps to active.gte / active.lte on the PredictHQ Events API.
    * </pre>
    *
    * <code>.google.protobuf.Timestamp active_from = 3 [json_name = "activeFrom"];</code>
@@ -71,7 +69,6 @@ public interface GetLocationEventsRequestOrBuilder extends
   /**
    * <pre>
    * Delivery window: events active at any point between ship and delivery dates.
-   * Maps to active.gte / active.lte on the PredictHQ Events API.
    * </pre>
    *
    * <code>.google.protobuf.Timestamp active_from = 3 [json_name = "activeFrom"];</code>
@@ -109,7 +106,6 @@ public interface GetLocationEventsRequestOrBuilder extends
    * <pre>
    * IANA TZ Database identifier for the destination (e.g. "America/New_York").
    * From EasyPost verifications.delivery.details.time_zone.
-   * Maps to active.tz on the PredictHQ Events API.
    * </pre>
    *
    * <code>string timezone = 5 [json_name = "timezone"];</code>
@@ -120,7 +116,6 @@ public interface GetLocationEventsRequestOrBuilder extends
    * <pre>
    * IANA TZ Database identifier for the destination (e.g. "America/New_York").
    * From EasyPost verifications.delivery.details.time_zone.
-   * Maps to active.tz on the PredictHQ Events API.
    * </pre>
    *
    * <code>string timezone = 5 [json_name = "timezone"];</code>

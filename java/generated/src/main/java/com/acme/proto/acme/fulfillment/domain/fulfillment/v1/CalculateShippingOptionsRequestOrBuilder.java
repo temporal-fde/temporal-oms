@@ -86,45 +86,17 @@ public interface CalculateShippingOptionsRequestOrBuilder extends
       int index);
 
   /**
-   * <code>optional string selected_shipping_option_id = 5 [json_name = "selectedShippingOptionId"];</code>
-   * @return Whether the selectedShippingOptionId field is set.
+   * <code>.acme.common.v1.Shipment selected_shipment = 5 [json_name = "selectedShipment"];</code>
+   * @return Whether the selectedShipment field is set.
    */
-  boolean hasSelectedShippingOptionId();
+  boolean hasSelectedShipment();
   /**
-   * <code>optional string selected_shipping_option_id = 5 [json_name = "selectedShippingOptionId"];</code>
-   * @return The selectedShippingOptionId.
+   * <code>.acme.common.v1.Shipment selected_shipment = 5 [json_name = "selectedShipment"];</code>
+   * @return The selectedShipment.
    */
-  java.lang.String getSelectedShippingOptionId();
+  com.acme.proto.acme.common.v1.Shipment getSelectedShipment();
   /**
-   * <code>optional string selected_shipping_option_id = 5 [json_name = "selectedShippingOptionId"];</code>
-   * @return The bytes for selectedShippingOptionId.
+   * <code>.acme.common.v1.Shipment selected_shipment = 5 [json_name = "selectedShipment"];</code>
    */
-  com.google.protobuf.ByteString
-      getSelectedShippingOptionIdBytes();
-
-  /**
-   * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
-   * @return Whether the customerPaidPrice field is set.
-   */
-  boolean hasCustomerPaidPrice();
-  /**
-   * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
-   * @return The customerPaidPrice.
-   */
-  com.acme.proto.acme.common.v1.Money getCustomerPaidPrice();
-  /**
-   * <code>optional .acme.common.v1.Money customer_paid_price = 6 [json_name = "customerPaidPrice"];</code>
-   */
-  com.acme.proto.acme.common.v1.MoneyOrBuilder getCustomerPaidPriceOrBuilder();
-
-  /**
-   * <code>optional int32 delivery_days_sla = 7 [json_name = "deliveryDaysSla"];</code>
-   * @return Whether the deliveryDaysSla field is set.
-   */
-  boolean hasDeliveryDaysSla();
-  /**
-   * <code>optional int32 delivery_days_sla = 7 [json_name = "deliveryDaysSla"];</code>
-   * @return The deliveryDaysSla.
-   */
-  int getDeliveryDaysSla();
+  com.acme.proto.acme.common.v1.ShipmentOrBuilder getSelectedShipmentOrBuilder();
 }
