@@ -2,20 +2,28 @@
 # Scenario: Margin Spike — ShippingAgent Alternate Warehouse Path
 # Step 1: Submit Order
 #
-# paid_price_cents=1 (1 cent) guarantees every real EasyPost rate exceeds the
+# paid_price_cents=1 (1 cent) guarantees every fixture-backed shipping rate exceeds the
 # customer paid price, triggering MARGIN_SPIKE in the ShippingAgent.
 # The agent must call find_alternate_warehouse before finalizing — watch for it
 # in the fulfillment namespace workflow history in Temporal UI.
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../_lib.sh"
+scenario_begin "$SCRIPT_DIR"
+
+ORDER_JSON="$(scenario_order_json "388 Townsend St" "San Francisco" "CA" "94107" "1")"
+
 echo "Submitting order with 1-cent paid price to trigger MARGIN_SPIKE..."
-echo "Workflow ID: margin-spike-123"
+echo "Workflow ID: ${ORDER_ID}"
+echo "Customer ID: ${CUSTOMER_ID}"
+echo "Run context: ${SCENARIO_CONTEXT_FILE}"
 echo ""
 
-xh PUT http://localhost:8080/api/v1/commerce-app/orders/margin-spike-123 \
-  customerId="cust-001" \
-  order:='{"orderId":"margin-spike-123","items":[{"itemId":"shirt-001","quantity":1}],"shippingAddress":{"street":"388 Townsend St","city":"San Francisco","state":"CA","postalCode":"94107","country":"US"},"selectedShipment":{"paidPriceCents":"1","currency":"USD"}}'
+xh PUT "http://localhost:8080/api/v1/commerce-app/orders/${ORDER_ID}" \
+  customerId="${CUSTOMER_ID}" \
+  order:="${ORDER_JSON}"
 
 echo ""
 echo "Order submitted"

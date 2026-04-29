@@ -1,0 +1,21 @@
+spring.config.import: classpath:acme.enablements.yaml
+spring.profiles.default: local
+spring.application.name: enablements-api
+spring.temporal.start-workers: false
+
+management.server.port: 9050
+
+server.port: 8050
+
+workshop:
+  integrations:
+    shipping:
+      fixture-path: classpath:/fixtures/shipping-fixtures.json
+      mode: fixture
+    location-events:
+      mode: fixture
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  show-actuator: false

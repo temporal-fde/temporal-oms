@@ -94,6 +94,13 @@ Provide feedback in PROGRESS.md → Feedback Items section.
 - **Spec:** `specs/workshop/augment-with-ai/`
 - **Next:** Tech lead review — confirm exercise list and Codespaces machine/key requirements
 
+### Workshop: Integration Stubs
+- **Status:** Runtime implementation complete; workshop material follow-up
+- **Goal:** Document `enablements-api` as the workshop-owned integration fixture boundary for commerce-app, PIMS, inventory, shipping, and location-events
+- **Owner:** Temporal FDE Team
+- **Spec:** `specs/workshop/integrations/`
+- **Next:** Complete Phase 8 workshop material and fixture inspection examples
+
 ### 🆕 fulfillment.Order (initiative)
 
 #### fulfillment.Order Workflow
@@ -104,11 +111,11 @@ Provide feedback in PROGRESS.md → Feedback Items section.
 - **Next:** Phase 1 (proto) is unblocked; 4 open questions to resolve before Phases 3/5/6 can complete (see PROGRESS.md)
 
 #### ShippingAgent
-- **Status:** Approved — Ready for Planning
-- **Goal:** LLM-driven shipping advisor (Claude + 4 activity tools) called by `fulfillment.Order` V2 via Nexus; long-running per-customer workflow with content-hashed rate caching
+- **Status:** Implemented for fixture-backed workshop path
+- **Goal:** LLM-driven shipping advisor (Claude + tool activities) called by `fulfillment.Order` via Nexus; shipping and first-pass location integrations are backed by `enablements-api`
 - **Owner:** Temporal FDE Team
 - **Spec:** `specs/fulfillment-order/shipping-agent/`
-- **Next:** Planning phase — break into detailed tasks; unblock Inventory Locations spec for `lookup_inventory_location`
+- **Next:** Add richer location-event enrichment behind `enablements-api`
 
 #### Deployment (k8s / Worker Versioning rollout)
 - **Status:** Not Started — follow-up spec

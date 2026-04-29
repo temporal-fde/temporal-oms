@@ -1,10 +1,10 @@
 # ShippingAgent — Progress Tracking
 
 **Feature:** `ShippingAgent` — AI-Powered Shipping Rate Selection
-**Status:** ✅ Phases 1–3, 6 Complete
+**Status:** ✅ Implemented for fixture-backed workshop path; live location-events enrichment deferred
 **Owner:** Temporal FDE Team
 **Created:** 2026-04-15
-**Updated:** 2026-04-17
+**Updated:** 2026-04-29
 
 ---
 
@@ -15,8 +15,8 @@
 | Phase 1 | Proto Schema | ✅ Complete | — |
 | Phase 2 | Activity Implementations | ✅ Complete | Phase 1 |
 | Phase 3 | ShippingAgent Workflow + Agentic Loop | ✅ Complete | Phase 2 |
-| Phase 4 | Nexus Handler + `fulfillment.Order` V2 Wiring | ⏳ Not started | Phase 3 + `fulfillment.Order` Phase 3–4 complete |
-| Phase 5 | Workshop Scenarios + Demo Scripts | ⏳ Not started | Phase 4 |
+| Phase 4 | Nexus Handler + `fulfillment.Order` V2 Wiring | ✅ Complete | `fulfillment.Order` calls ShippingAgent via Nexus |
+| Phase 5 | Workshop Scenarios + Demo Scripts | ✅ Complete for current scenarios | `valid-order`, `margin-spike`, and `sla-breach` scripts exercise current paths |
 | Phase 6 | Alternate Warehouse Path Hardening | ✅ Complete | — |
 
 ---
@@ -35,7 +35,8 @@
 
 - **Inventory Locations spec** — must exist before `lookup_inventory_location` has real data to query. V1 workaround: `python/fulfillment/config/warehouses.toml` static seed (see Q8).
 - **`fulfillment.Order` Phases 3–4 complete** — required before Phase 4 (Nexus wiring into `fulfillment.Order` V2)
-- **`fulfillment.Order` Phase 6 `AddressVerificationImpl`** — must populate `EasyPostAddress.coordinate` from EasyPost response after Phase 1 adds the field to proto; without it `to_address.easypost_address.coordinate` is null and destination `get_location_events` silently cannot run. Blocks ShippingAgent end-to-end integration testing (see Q7).
+- **Location-events enrichment** — current first pass returns `RISK_LEVEL_NONE` and empty events
+  through `enablements-api`; real enrichment remains a follow-up.
 
 ---
 
@@ -48,7 +49,7 @@ Identified during planning; all resolved.
 | Q1 | `src/worker.py` does not exist but `Dockerfile` runs `python -m src.worker`. Missing placeholder? | Phase 2 — Worker registration | ✅ Create it in Phase 2; it's a gap, not a choice |
 | Q2 | Worker process structure: 3 separate containers or one process with 3 `Worker` objects? | Phase 2 — Worker registration | ✅ One process, 3 `Worker` objects started concurrently; consistent with single `Dockerfile`; each `Worker` enforces its own `max_activities_per_second` independently |
 | Q3 | `call_llm` I/O types: Anthropic SDK types, custom Pydantic mirrors, or plain `dict`? | Phase 2 — `call_llm` | ✅ Use Anthropic SDK types directly — they are already Pydantic models; Temporal's data converter handles them without any wrapper |
-| Q4 | Margin threshold source for `MARGIN_SPIKE` condition? | Phase 1 — proto, Phase 3 — system prompt | ✅ Use `customer_paid_price` directly from `CalculateShippingOptionsRequest`; no new field or config lookup needed. System prompt rule: "if any available rate exceeds `customer_paid_price`, outcome is `MARGIN_SPIKE`" |
+| Q4 | Margin threshold source for `MARGIN_SPIKE` condition? | Phase 1 — proto, Phase 3 — system prompt | ✅ Use `selected_shipment.paid_price` from `CalculateShippingOptionsRequest`; prompt text calls this the customer paid price. |
 | Q5 | EasyPost parcel dimensions missing from `GetCarrierRatesRequest` — activity needs weight/dims | Phase 1 — proto, Phase 2 — `get_carrier_rates` | ✅ Hardcode default parcel for V1 (1 lb, 6×6×4 in); no proto field added; noted inline in activity |
 | Q6 | Define new `VerifyShippingAddressRequest/Response` in `shipping_agent.proto` or reuse Java `VerifyAddressRequest/Response` from `workflows.proto`? | Phase 1 — proto | ✅ Reuse existing Java types — `VerifyAddressRequest_p2p` / `VerifyAddressResponse_p2p` already generated from fulfillment-order Phase 1; removes two Phase 1 proto tasks |
 | Q7 | Must Java `AddressVerificationImpl` be updated to populate `EasyPostAddress.coordinate` after Phase 1? | Phase 2/3 integration | ✅ Yes — add explicit task to fulfillment-order Phase 6 breakdown; without it `to_address.easypost_address.coordinate` is null and destination SCRM silently fails; block ShippingAgent end-to-end integration testing on it |
@@ -91,7 +92,7 @@ Identified during planning; all resolved.
   - `ShippingRecommendation` fields: `outcome: RecommendationOutcome`, `recommended_option_id: string`, `reasoning: string`, `margin_delta_cents: int64`, `origin_risk_level: acme.fulfillment.domain.fulfillment.v1.RiskLevel`, `destination_risk_level: acme.fulfillment.domain.fulfillment.v1.RiskLevel`
 
 - [x] Replace `CalculateShippingOptionsRequest` stub in `shipping_agent.proto` with full definition
-  - Fields: `order_id: string`, `customer_id: string`, `to_address: acme.common.v1.Address` (easypost_address pre-populated by fulfillment.Order validateOrder), `items: repeated ShippingLineItem`, `from_address: optional acme.common.v1.Address`, `location_id: optional string`, `selected_shipping_option_id: optional string`, `customer_paid_price: optional acme.common.v1.Money`, `transit_days_sla: optional int32`
+  - Fields: `order_id: string`, `customer_id: string`, `to_address: acme.common.v1.Address` (easypost_address pre-populated by fulfillment.Order validateOrder), `items: repeated ShippingLineItem`, `selected_shipment: acme.common.v1.Shipment`
   - Remove the current `address` (field 1) and `coordinate` (field 2) stub fields; they are replaced by the fields above
 
 - [x] Replace `CalculateShippingOptionsResponse` stub in `shipping_agent.proto` with full definition
@@ -127,7 +128,8 @@ Identified during planning; all resolved.
 
 - [x] Add `anthropic` SDK to `python/pyproject.toml` — required by `call_llm`; resolve version constraint before adding
 
-- [x] Add EasyPost Python SDK (`easypost`) to `python/pyproject.toml` — required by `verify_address` and `get_carrier_rates`; resolve version constraint before adding
+- [x] Runtime shipping activities use the Python `enablements-api` HTTP client; no EasyPost key is
+  required for workshop execution
 
 - [x] `python/fulfillment/src/agents/activities/inventory.py`: `LookupInventoryActivities` class
   - `@activity.defn async def lookup_inventory_location(request: LookupInventoryLocationRequest_p2p) -> LookupInventoryLocationResponse_p2p`
@@ -142,19 +144,20 @@ Identified during planning; all resolved.
   - Initialize `anthropic.AsyncAnthropic` with `ANTHROPIC_API_KEY`; model `claude-sonnet-4-6`
   - Convert the Anthropic response back to `LlmResponse_p2p`: set `block.type` explicitly from `block_obj.type` for each content block; populate the appropriate nested message field (`text`, `tool_use`, or `tool_result`)
 
-#### 2b — `fulfillment-easypost` task queue activities (5 rps limit)
+#### 2b — `fulfillment-shipping` task queue activities
 
-- [x] `python/fulfillment/src/agents/activities/easypost.py`: `EasyPostActivities` class
+- [x] `python/fulfillment/src/agents/activities/shipping.py`: `ShippingActivities` class
   - `@activity.defn async def verify_address(request: VerifyAddressRequest_p2p) -> VerifyAddressResponse_p2p`
     - Uses `VerifyAddressRequest_p2p` / `VerifyAddressResponse_p2p` from `generated/pydantic/.../workflows_p2p.py` (already generated; no new proto needed)
-    - Call EasyPost `Address.create_and_verify()` with fields from `request.address`
-    - Populate `EasyPostAddress.id`, `.residential`, `.verified`, and `.coordinate` (lat/lng) from EasyPost verification response
+    - Call `enablements-api` shipping verification with fields from `request.address`
+    - Populate `EasyPostAddress.id`, `.residential`, `.verified`, and `.coordinate` from fixtures
     - Return `VerifyAddressResponse` with `address` carrying fully-populated `easypost_address`
   - `@activity.defn async def get_carrier_rates(request: GetShippingRatesRequest_p2p) -> GetShippingRatesResponse_p2p`
-    - Create EasyPost `Shipment` using `from_easypost_id` + `to_easypost_id` + hardcoded default parcel (1 lb, 6×6×4 in) — V1 simplification, noted in code comment
-    - Map EasyPost rates to `[ShippingOption]` (set `id = rate_id` for LLM cross-referencing)
+    - Call `enablements-api` shipping rates using `from_easypost_id` + `to_easypost_id` or
+      `selected_shipment.easypost.shipment_id`
+    - Map fixture rates to `[ShippingOption]` with stable `id`/`rate_id` for LLM cross-referencing
     - Return `GetShippingRatesResponse` with `shipment_id` and `options`
-  - EasyPost API key from env var `EASYPOST_API_KEY`
+  - No runtime EasyPost API key required
 
 #### 2c — `get_location_events` activity (stubbed)
 
@@ -167,11 +170,11 @@ Identified during planning; all resolved.
   - No `max_activities_per_second` constraint
   - Namespace: `fulfillment`; connect to `TEMPORAL_ADDRESS` env var
 
-- [x] `python/fulfillment/src/workers/easypost_worker.py`: Temporal worker for `fulfillment-easypost` task queue
-  - Register `EasyPostActivities`
-  - `max_activities_per_second=5.0`
+- [x] `python/fulfillment/src/workers/shipping_worker.py`: Temporal worker for `fulfillment-shipping` task queue
+  - Register `ShippingActivities`
+  - Applies a conservative worker-local activity rate guard
 
-- [x] `python/fulfillment/src/worker.py`: entry point (`python -m src.worker`) per Dockerfile — starts `agents` + `fulfillment-easypost` workers concurrently; no separate containers needed
+- [x] `python/fulfillment/src/worker.py`: entry point (`python -m src.worker`) per Dockerfile — starts `agents` + `fulfillment-shipping` workers concurrently; no separate containers needed
 
 ---
 
@@ -203,7 +206,9 @@ Identified during planning; all resolved.
   - Return `False` if `workflow.now() - _cache_meta[key] > timedelta(seconds=cache_ttl_secs)`
 
 - [x] System prompt builder `_build_system_prompt(request: CalculateShippingOptionsRequest_p2p) -> str` *(implemented as inline helper — see refactor task below)*
-  - Include: margin spike rule, SLA rule from `request.transit_days_sla`, path instruction, concurrency instruction, final JSON output format
+  - Include: margin spike rule from `request.selected_shipment.paid_price`, SLA rule from
+    `request.selected_shipment.easypost.selected_rate.delivery_days`, path instruction,
+    concurrency instruction, final tool output format
 
 - [ ] **Refactor**: move system prompt computation into a `build_system_prompt` LocalActivity
   - Replace the inline `_build_system_prompt(request)` call in `_run_react_loop` with `await workflow.execute_local_activity("build_system_prompt", args=[request], result_type=str, start_to_close_timeout=timedelta(seconds=5))`
@@ -227,14 +232,16 @@ Identified during planning; all resolved.
     2. If `response.stop_reason == LlmStopReason.LLM_STOP_REASON_TOOL_USE`:
        - Collect all blocks where `block.type == "tool_use"`
        - Dispatch all as concurrent activities using `asyncio.gather` over `workflow.execute_activity()` calls
-       - Route per `block.tool_use.name`: `verify_address` / `get_carrier_rates` → `task_queue="fulfillment-easypost"`; `get_location_events` + `lookup_inventory_location` → `task_queue="agents"`
+       - Route per `block.tool_use.name`: `verify_address` / `get_carrier_rates` → `task_queue="fulfillment-shipping"`; `get_location_events` + `lookup_inventory_location` → `task_queue="agents"`
        - Each activity uses `ActivityOptions` with appropriate `start_to_close_timeout`
        - Append all `tool_result` blocks to messages in the same order as `tool_use` blocks
        - If `lookup_inventory_location` was called in this turn: extract `location_id` from its result; compute cache key and check cache (cart path cache check — can only happen after location resolves)
     3. If `response.stop_reason == LlmStopReason.LLM_STOP_REASON_TOOL_USE` and block name is `finalize_recommendation`: extract `ShippingRecommendation` directly from `block.tool_use.input` dict; break loop — **do not dispatch this block as an activity**
     4. If `response.stop_reason == LlmStopReason.LLM_STOP_REASON_END_TURN` with no preceding `finalize_recommendation`: raise retryable `ApplicationError("LLM ended without calling finalize_recommendation")`
   - After loop: store `ShippingOptionsResult` in `_cache[key]`, store `workflow.now()` in `_cache_meta[key]`
-  - Return `CalculateShippingOptionsResponse(recommendation=..., options=..., cache_hit=False)`
+  - Return `CalculateShippingOptionsResponse(recommendation=..., options=..., cache_hit=False)`;
+    options include the de-duped union of rates returned by all primary and alternate
+    `get_carrier_rates` calls
 
 - [ ] **Revise**: Replace text-based `ShippingRecommendation` JSON parsing with `finalize_recommendation` tool extraction
   - Add `finalize_recommendation` to the tool list passed to `call_llm` (alongside the four real activity tools); schema: `outcome` enum, `recommended_option_id`, `reasoning`, `margin_delta_cents`, `origin_risk_level` enum, `destination_risk_level` enum — all required
@@ -306,7 +313,8 @@ All tests use Temporal Python test framework (`temporalio.testing.WorkflowEnviro
       immediately (`test_margin_spike_outcome` updated)
 - [x] `SLA_BREACH` with `find_alternate_warehouse` already called → finalize accepted
       immediately (`test_sla_breach_outcome` updated)
-- [x] `customer_paid_price.units=1` used in margin spike tests as the deterministic trigger
+- [x] `selected_shipment.paid_price.units=1` used in margin spike tests as the deterministic trigger
+- [x] Regression coverage ensures options accumulate across primary and alternate rate calls
 
 ---
 
@@ -322,4 +330,5 @@ All tests use Temporal Python test framework (`temporalio.testing.WorkflowEnviro
 | 2026-04-17 | Mike Nichols | Phases 1–3 implemented: proto schema + buf generate, 3 activity classes, 3 worker modules, worker entry point, ShippingAgent workflow with agentic loop, 9 passing unit tests. Notes: (1) temporalio pinned to >=1.26.0 for `@update.validator` API; (2) ShippingOptionLegacy rename in workflows.proto to resolve name conflict; (3) broken unqualified imports fixed in 3 generated _p2p files (codegen bug); (4) system prompt embedded in first user message since call_llm signature is locked to (messages, tools). |
 | 2026-04-20 | Mike Nichols | Spec updated: refactor `_build_system_prompt` from inline workflow function to `build_system_prompt` LocalActivity so prompt changes can be shipped without bumping the workflow build-id. Task added to Phase 3 task list. Design Decisions table updated with rationale. |
 | 2026-04-25 | Mike Nichols | Spec updated: replace raw JSON text parsing with `finalize_recommendation` forced tool use. Root cause: `claude-haiku-4-5` (and smaller models generally) adds prose/markdown before the JSON despite "output only raw JSON" instructions, causing non-retryable `json.loads()` failures in production. Fix: add a `finalize_recommendation` tool the model must call to submit its answer; tool inputs are SDK-serialized JSON so prose contamination is structurally impossible. Agentic Loop, Design Decisions, and Risks sections updated in spec.md; Phase 3 task revised in PROGRESS.md. |
-| 2026-04-27 | Mike Nichols | Phase 6 implemented (11/11 tests passing): Alternate Warehouse Path Hardening. Hardens `find_alternate_warehouse` from a prompt-level suggestion ("RECOMMENDED ACTIONS") into a workflow-layer guarantee via post-loop rejection. The loop tracks `alternate_warehouse_called`; a premature MARGIN_SPIKE/SLA_BREACH finalize is rejected with an explicit error tool_result and the LLM is forced to call the tool. Test trigger: `customer_paid_price.units=1` deterministically induces MARGIN_SPIKE without EasyPost stubbing. Overview, Recommendation Outcomes, Agentic Loop, Activities, Design Decisions, Acceptance Criteria, and Risks sections updated in spec.md. |
+| 2026-04-27 | Mike Nichols | Phase 6 implemented (11/11 tests passing): Alternate Warehouse Path Hardening. Hardens `find_alternate_warehouse` from a prompt-level suggestion ("RECOMMENDED ACTIONS") into a workflow-layer guarantee via post-loop rejection. The loop tracks `alternate_warehouse_called`; a premature MARGIN_SPIKE/SLA_BREACH finalize is rejected with an explicit error tool_result and the LLM is forced to call the tool. Test trigger: selected shipment paid price of 1 cent deterministically induces MARGIN_SPIKE. Overview, Recommendation Outcomes, Agentic Loop, Activities, Design Decisions, Acceptance Criteria, and Risks sections updated in spec.md. |
+| 2026-04-29 | Codex | Updated progress for fixture-backed runtime: shipping activities now call `enablements-api`, task queue/class names are `fulfillment-shipping` and `ShippingActivities`, scenario scripts cover valid/margin/SLA paths, and tests cover accumulated options across alternate warehouse rate calls. |

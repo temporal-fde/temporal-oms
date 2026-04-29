@@ -57,4 +57,19 @@ public interface GetShippingRatesRequestOrBuilder extends
    */
   com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItemOrBuilder getItemsOrBuilder(
       int index);
+
+  /**
+   * <code>.acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+   * @return Whether the selectedShipment field is set.
+   */
+  boolean hasSelectedShipment();
+  /**
+   * <code>.acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+   * @return The selectedShipment.
+   */
+  com.acme.proto.acme.common.v1.Shipment getSelectedShipment();
+  /**
+   * <code>.acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+   */
+  com.acme.proto.acme.common.v1.ShipmentOrBuilder getSelectedShipmentOrBuilder();
 }

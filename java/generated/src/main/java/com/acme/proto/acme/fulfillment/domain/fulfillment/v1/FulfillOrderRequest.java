@@ -32,7 +32,6 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private FulfillOrderRequest() {
-    selectedShippingOptionId_ = "";
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
@@ -106,66 +105,45 @@ private static final long serialVersionUID = 0L;
     return deliveryStatusRequest_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest.getDefaultInstance() : deliveryStatusRequest_;
   }
 
-  public static final int SELECTED_SHIPPING_OPTION_ID_FIELD_NUMBER = 3;
-  @SuppressWarnings("serial")
-  private volatile java.lang.Object selectedShippingOptionId_ = "";
+  public static final int SELECTED_SHIPMENT_FIELD_NUMBER = 3;
+  private com.acme.proto.acme.common.v1.Shipment selectedShipment_;
   /**
    * <pre>
-   * selected_shipping_option_id is the customer's original rate selection.
-   * If absent, fulfillment.Order falls back to state.args.selected_shipping.option_id.
+   * selected_shipment is the customer's original checkout shipment selection.
+   * If absent, fulfillment.Order falls back to state.args.selected_shipment.
    * </pre>
    *
-   * <code>optional string selected_shipping_option_id = 3 [json_name = "selectedShippingOptionId"];</code>
-   * @return Whether the selectedShippingOptionId field is set.
+   * <code>.acme.common.v1.Shipment selected_shipment = 3 [json_name = "selectedShipment"];</code>
+   * @return Whether the selectedShipment field is set.
    */
   @java.lang.Override
-  public boolean hasSelectedShippingOptionId() {
+  public boolean hasSelectedShipment() {
     return ((bitField0_ & 0x00000004) != 0);
   }
   /**
    * <pre>
-   * selected_shipping_option_id is the customer's original rate selection.
-   * If absent, fulfillment.Order falls back to state.args.selected_shipping.option_id.
+   * selected_shipment is the customer's original checkout shipment selection.
+   * If absent, fulfillment.Order falls back to state.args.selected_shipment.
    * </pre>
    *
-   * <code>optional string selected_shipping_option_id = 3 [json_name = "selectedShippingOptionId"];</code>
-   * @return The selectedShippingOptionId.
+   * <code>.acme.common.v1.Shipment selected_shipment = 3 [json_name = "selectedShipment"];</code>
+   * @return The selectedShipment.
    */
   @java.lang.Override
-  public java.lang.String getSelectedShippingOptionId() {
-    java.lang.Object ref = selectedShippingOptionId_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      selectedShippingOptionId_ = s;
-      return s;
-    }
+  public com.acme.proto.acme.common.v1.Shipment getSelectedShipment() {
+    return selectedShipment_ == null ? com.acme.proto.acme.common.v1.Shipment.getDefaultInstance() : selectedShipment_;
   }
   /**
    * <pre>
-   * selected_shipping_option_id is the customer's original rate selection.
-   * If absent, fulfillment.Order falls back to state.args.selected_shipping.option_id.
+   * selected_shipment is the customer's original checkout shipment selection.
+   * If absent, fulfillment.Order falls back to state.args.selected_shipment.
    * </pre>
    *
-   * <code>optional string selected_shipping_option_id = 3 [json_name = "selectedShippingOptionId"];</code>
-   * @return The bytes for selectedShippingOptionId.
+   * <code>.acme.common.v1.Shipment selected_shipment = 3 [json_name = "selectedShipment"];</code>
    */
   @java.lang.Override
-  public com.google.protobuf.ByteString
-      getSelectedShippingOptionIdBytes() {
-    java.lang.Object ref = selectedShippingOptionId_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      selectedShippingOptionId_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
+  public com.acme.proto.acme.common.v1.ShipmentOrBuilder getSelectedShipmentOrBuilder() {
+    return selectedShipment_ == null ? com.acme.proto.acme.common.v1.Shipment.getDefaultInstance() : selectedShipment_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -189,7 +167,7 @@ private static final long serialVersionUID = 0L;
       output.writeMessage(2, getDeliveryStatusRequest());
     }
     if (((bitField0_ & 0x00000004) != 0)) {
-      com.google.protobuf.GeneratedMessage.writeString(output, 3, selectedShippingOptionId_);
+      output.writeMessage(3, getSelectedShipment());
     }
     getUnknownFields().writeTo(output);
   }
@@ -209,7 +187,8 @@ private static final long serialVersionUID = 0L;
         .computeMessageSize(2, getDeliveryStatusRequest());
     }
     if (((bitField0_ & 0x00000004) != 0)) {
-      size += com.google.protobuf.GeneratedMessage.computeStringSize(3, selectedShippingOptionId_);
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(3, getSelectedShipment());
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -236,10 +215,10 @@ private static final long serialVersionUID = 0L;
       if (!getDeliveryStatusRequest()
           .equals(other.getDeliveryStatusRequest())) return false;
     }
-    if (hasSelectedShippingOptionId() != other.hasSelectedShippingOptionId()) return false;
-    if (hasSelectedShippingOptionId()) {
-      if (!getSelectedShippingOptionId()
-          .equals(other.getSelectedShippingOptionId())) return false;
+    if (hasSelectedShipment() != other.hasSelectedShipment()) return false;
+    if (hasSelectedShipment()) {
+      if (!getSelectedShipment()
+          .equals(other.getSelectedShipment())) return false;
     }
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
@@ -260,9 +239,9 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + DELIVERY_STATUS_REQUEST_FIELD_NUMBER;
       hash = (53 * hash) + getDeliveryStatusRequest().hashCode();
     }
-    if (hasSelectedShippingOptionId()) {
-      hash = (37 * hash) + SELECTED_SHIPPING_OPTION_ID_FIELD_NUMBER;
-      hash = (53 * hash) + getSelectedShippingOptionId().hashCode();
+    if (hasSelectedShipment()) {
+      hash = (37 * hash) + SELECTED_SHIPMENT_FIELD_NUMBER;
+      hash = (53 * hash) + getSelectedShipment().hashCode();
     }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
@@ -400,6 +379,7 @@ private static final long serialVersionUID = 0L;
               .alwaysUseFieldBuilders) {
         internalGetProcessedOrderFieldBuilder();
         internalGetDeliveryStatusRequestFieldBuilder();
+        internalGetSelectedShipmentFieldBuilder();
       }
     }
     @java.lang.Override
@@ -416,7 +396,11 @@ private static final long serialVersionUID = 0L;
         deliveryStatusRequestBuilder_.dispose();
         deliveryStatusRequestBuilder_ = null;
       }
-      selectedShippingOptionId_ = "";
+      selectedShipment_ = null;
+      if (selectedShipmentBuilder_ != null) {
+        selectedShipmentBuilder_.dispose();
+        selectedShipmentBuilder_ = null;
+      }
       return this;
     }
 
@@ -464,7 +448,9 @@ private static final long serialVersionUID = 0L;
         to_bitField0_ |= 0x00000002;
       }
       if (((from_bitField0_ & 0x00000004) != 0)) {
-        result.selectedShippingOptionId_ = selectedShippingOptionId_;
+        result.selectedShipment_ = selectedShipmentBuilder_ == null
+            ? selectedShipment_
+            : selectedShipmentBuilder_.build();
         to_bitField0_ |= 0x00000004;
       }
       result.bitField0_ |= to_bitField0_;
@@ -488,10 +474,8 @@ private static final long serialVersionUID = 0L;
       if (other.hasDeliveryStatusRequest()) {
         mergeDeliveryStatusRequest(other.getDeliveryStatusRequest());
       }
-      if (other.hasSelectedShippingOptionId()) {
-        selectedShippingOptionId_ = other.selectedShippingOptionId_;
-        bitField0_ |= 0x00000004;
-        onChanged();
+      if (other.hasSelectedShipment()) {
+        mergeSelectedShipment(other.getSelectedShipment());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -534,7 +518,9 @@ private static final long serialVersionUID = 0L;
               break;
             } // case 18
             case 26: {
-              selectedShippingOptionId_ = input.readStringRequireUtf8();
+              input.readMessage(
+                  internalGetSelectedShipmentFieldBuilder().getBuilder(),
+                  extensionRegistry);
               bitField0_ |= 0x00000004;
               break;
             } // case 26
@@ -663,7 +649,7 @@ private static final long serialVersionUID = 0L;
      * <code>.acme.fulfillment.domain.fulfillment.v1.ProcessedOrder processed_order = 1 [json_name = "processedOrder"];</code>
      */
     private com.google.protobuf.SingleFieldBuilder<
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ProcessedOrder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ProcessedOrder.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ProcessedOrderOrBuilder> 
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ProcessedOrder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ProcessedOrder.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ProcessedOrderOrBuilder>
         internalGetProcessedOrderFieldBuilder() {
       if (processedOrderBuilder_ == null) {
         processedOrderBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -784,7 +770,7 @@ private static final long serialVersionUID = 0L;
      * <code>optional .acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest delivery_status_request = 2 [json_name = "deliveryStatusRequest"];</code>
      */
     private com.google.protobuf.SingleFieldBuilder<
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequestOrBuilder> 
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequest.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.NotifyDeliveryStatusRequestOrBuilder>
         internalGetDeliveryStatusRequestFieldBuilder() {
       if (deliveryStatusRequestBuilder_ == null) {
         deliveryStatusRequestBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -797,113 +783,170 @@ private static final long serialVersionUID = 0L;
       return deliveryStatusRequestBuilder_;
     }
 
-    private java.lang.Object selectedShippingOptionId_ = "";
+    private com.acme.proto.acme.common.v1.Shipment selectedShipment_;
+    private com.google.protobuf.SingleFieldBuilder<
+        com.acme.proto.acme.common.v1.Shipment, com.acme.proto.acme.common.v1.Shipment.Builder, com.acme.proto.acme.common.v1.ShipmentOrBuilder> selectedShipmentBuilder_;
     /**
      * <pre>
-     * selected_shipping_option_id is the customer's original rate selection.
-     * If absent, fulfillment.Order falls back to state.args.selected_shipping.option_id.
+     * selected_shipment is the customer's original checkout shipment selection.
+     * If absent, fulfillment.Order falls back to state.args.selected_shipment.
      * </pre>
      *
-     * <code>optional string selected_shipping_option_id = 3 [json_name = "selectedShippingOptionId"];</code>
-     * @return Whether the selectedShippingOptionId field is set.
+     * <code>.acme.common.v1.Shipment selected_shipment = 3 [json_name = "selectedShipment"];</code>
+     * @return Whether the selectedShipment field is set.
      */
-    public boolean hasSelectedShippingOptionId() {
+    public boolean hasSelectedShipment() {
       return ((bitField0_ & 0x00000004) != 0);
     }
     /**
      * <pre>
-     * selected_shipping_option_id is the customer's original rate selection.
-     * If absent, fulfillment.Order falls back to state.args.selected_shipping.option_id.
+     * selected_shipment is the customer's original checkout shipment selection.
+     * If absent, fulfillment.Order falls back to state.args.selected_shipment.
      * </pre>
      *
-     * <code>optional string selected_shipping_option_id = 3 [json_name = "selectedShippingOptionId"];</code>
-     * @return The selectedShippingOptionId.
+     * <code>.acme.common.v1.Shipment selected_shipment = 3 [json_name = "selectedShipment"];</code>
+     * @return The selectedShipment.
      */
-    public java.lang.String getSelectedShippingOptionId() {
-      java.lang.Object ref = selectedShippingOptionId_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        selectedShippingOptionId_ = s;
-        return s;
+    public com.acme.proto.acme.common.v1.Shipment getSelectedShipment() {
+      if (selectedShipmentBuilder_ == null) {
+        return selectedShipment_ == null ? com.acme.proto.acme.common.v1.Shipment.getDefaultInstance() : selectedShipment_;
       } else {
-        return (java.lang.String) ref;
+        return selectedShipmentBuilder_.getMessage();
       }
     }
     /**
      * <pre>
-     * selected_shipping_option_id is the customer's original rate selection.
-     * If absent, fulfillment.Order falls back to state.args.selected_shipping.option_id.
+     * selected_shipment is the customer's original checkout shipment selection.
+     * If absent, fulfillment.Order falls back to state.args.selected_shipment.
      * </pre>
      *
-     * <code>optional string selected_shipping_option_id = 3 [json_name = "selectedShippingOptionId"];</code>
-     * @return The bytes for selectedShippingOptionId.
+     * <code>.acme.common.v1.Shipment selected_shipment = 3 [json_name = "selectedShipment"];</code>
      */
-    public com.google.protobuf.ByteString
-        getSelectedShippingOptionIdBytes() {
-      java.lang.Object ref = selectedShippingOptionId_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        selectedShippingOptionId_ = b;
-        return b;
+    public Builder setSelectedShipment(com.acme.proto.acme.common.v1.Shipment value) {
+      if (selectedShipmentBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        selectedShipment_ = value;
       } else {
-        return (com.google.protobuf.ByteString) ref;
+        selectedShipmentBuilder_.setMessage(value);
       }
-    }
-    /**
-     * <pre>
-     * selected_shipping_option_id is the customer's original rate selection.
-     * If absent, fulfillment.Order falls back to state.args.selected_shipping.option_id.
-     * </pre>
-     *
-     * <code>optional string selected_shipping_option_id = 3 [json_name = "selectedShippingOptionId"];</code>
-     * @param value The selectedShippingOptionId to set.
-     * @return This builder for chaining.
-     */
-    public Builder setSelectedShippingOptionId(
-        java.lang.String value) {
-      if (value == null) { throw new NullPointerException(); }
-      selectedShippingOptionId_ = value;
       bitField0_ |= 0x00000004;
       onChanged();
       return this;
     }
     /**
      * <pre>
-     * selected_shipping_option_id is the customer's original rate selection.
-     * If absent, fulfillment.Order falls back to state.args.selected_shipping.option_id.
+     * selected_shipment is the customer's original checkout shipment selection.
+     * If absent, fulfillment.Order falls back to state.args.selected_shipment.
      * </pre>
      *
-     * <code>optional string selected_shipping_option_id = 3 [json_name = "selectedShippingOptionId"];</code>
-     * @return This builder for chaining.
+     * <code>.acme.common.v1.Shipment selected_shipment = 3 [json_name = "selectedShipment"];</code>
      */
-    public Builder clearSelectedShippingOptionId() {
-      selectedShippingOptionId_ = getDefaultInstance().getSelectedShippingOptionId();
+    public Builder setSelectedShipment(
+        com.acme.proto.acme.common.v1.Shipment.Builder builderForValue) {
+      if (selectedShipmentBuilder_ == null) {
+        selectedShipment_ = builderForValue.build();
+      } else {
+        selectedShipmentBuilder_.setMessage(builderForValue.build());
+      }
+      bitField0_ |= 0x00000004;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * selected_shipment is the customer's original checkout shipment selection.
+     * If absent, fulfillment.Order falls back to state.args.selected_shipment.
+     * </pre>
+     *
+     * <code>.acme.common.v1.Shipment selected_shipment = 3 [json_name = "selectedShipment"];</code>
+     */
+    public Builder mergeSelectedShipment(com.acme.proto.acme.common.v1.Shipment value) {
+      if (selectedShipmentBuilder_ == null) {
+        if (((bitField0_ & 0x00000004) != 0) &&
+          selectedShipment_ != null &&
+          selectedShipment_ != com.acme.proto.acme.common.v1.Shipment.getDefaultInstance()) {
+          getSelectedShipmentBuilder().mergeFrom(value);
+        } else {
+          selectedShipment_ = value;
+        }
+      } else {
+        selectedShipmentBuilder_.mergeFrom(value);
+      }
+      if (selectedShipment_ != null) {
+        bitField0_ |= 0x00000004;
+        onChanged();
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * selected_shipment is the customer's original checkout shipment selection.
+     * If absent, fulfillment.Order falls back to state.args.selected_shipment.
+     * </pre>
+     *
+     * <code>.acme.common.v1.Shipment selected_shipment = 3 [json_name = "selectedShipment"];</code>
+     */
+    public Builder clearSelectedShipment() {
       bitField0_ = (bitField0_ & ~0x00000004);
+      selectedShipment_ = null;
+      if (selectedShipmentBuilder_ != null) {
+        selectedShipmentBuilder_.dispose();
+        selectedShipmentBuilder_ = null;
+      }
       onChanged();
       return this;
     }
     /**
      * <pre>
-     * selected_shipping_option_id is the customer's original rate selection.
-     * If absent, fulfillment.Order falls back to state.args.selected_shipping.option_id.
+     * selected_shipment is the customer's original checkout shipment selection.
+     * If absent, fulfillment.Order falls back to state.args.selected_shipment.
      * </pre>
      *
-     * <code>optional string selected_shipping_option_id = 3 [json_name = "selectedShippingOptionId"];</code>
-     * @param value The bytes for selectedShippingOptionId to set.
-     * @return This builder for chaining.
+     * <code>.acme.common.v1.Shipment selected_shipment = 3 [json_name = "selectedShipment"];</code>
      */
-    public Builder setSelectedShippingOptionIdBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) { throw new NullPointerException(); }
-      checkByteStringIsUtf8(value);
-      selectedShippingOptionId_ = value;
+    public com.acme.proto.acme.common.v1.Shipment.Builder getSelectedShipmentBuilder() {
       bitField0_ |= 0x00000004;
       onChanged();
-      return this;
+      return internalGetSelectedShipmentFieldBuilder().getBuilder();
+    }
+    /**
+     * <pre>
+     * selected_shipment is the customer's original checkout shipment selection.
+     * If absent, fulfillment.Order falls back to state.args.selected_shipment.
+     * </pre>
+     *
+     * <code>.acme.common.v1.Shipment selected_shipment = 3 [json_name = "selectedShipment"];</code>
+     */
+    public com.acme.proto.acme.common.v1.ShipmentOrBuilder getSelectedShipmentOrBuilder() {
+      if (selectedShipmentBuilder_ != null) {
+        return selectedShipmentBuilder_.getMessageOrBuilder();
+      } else {
+        return selectedShipment_ == null ?
+            com.acme.proto.acme.common.v1.Shipment.getDefaultInstance() : selectedShipment_;
+      }
+    }
+    /**
+     * <pre>
+     * selected_shipment is the customer's original checkout shipment selection.
+     * If absent, fulfillment.Order falls back to state.args.selected_shipment.
+     * </pre>
+     *
+     * <code>.acme.common.v1.Shipment selected_shipment = 3 [json_name = "selectedShipment"];</code>
+     */
+    private com.google.protobuf.SingleFieldBuilder<
+        com.acme.proto.acme.common.v1.Shipment, com.acme.proto.acme.common.v1.Shipment.Builder, com.acme.proto.acme.common.v1.ShipmentOrBuilder>
+        internalGetSelectedShipmentFieldBuilder() {
+      if (selectedShipmentBuilder_ == null) {
+        selectedShipmentBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+            com.acme.proto.acme.common.v1.Shipment, com.acme.proto.acme.common.v1.Shipment.Builder, com.acme.proto.acme.common.v1.ShipmentOrBuilder>(
+                getSelectedShipment(),
+                getParentForChildren(),
+                isClean());
+        selectedShipment_ = null;
+      }
+      return selectedShipmentBuilder_;
     }
 
     // @@protoc_insertion_point(builder_scope:acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest)

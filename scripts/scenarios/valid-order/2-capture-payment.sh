@@ -6,15 +6,22 @@
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../_lib.sh"
+scenario_resume "$SCRIPT_DIR"
+
+METADATA_JSON="$(scenario_metadata_json)"
+
 echo "💳 Capturing payment..."
-echo "Order ID: valid-order-123"
+echo "Order ID: ${ORDER_ID}"
+echo "Customer ID: ${CUSTOMER_ID}"
 echo ""
 
 xh POST http://localhost:8080/api/v1/payments-app/orders \
-  customerId="cust-001" \
-  rrn="payment-intent-789" \
-  amountCents=9999 \
-  metadata:='{"orderId":"valid-order-123"}'
+  customerId="${CUSTOMER_ID}" \
+  rrn="${PAYMENT_RRN}" \
+  amountCents="${PAYMENT_AMOUNT_CENTS}" \
+  metadata:="${METADATA_JSON}"
 
 echo ""
 echo "✅ Payment captured"

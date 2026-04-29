@@ -70,7 +70,7 @@ private static final long serialVersionUID = 0L;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
-      com.google.protobuf.ByteString bs = 
+      com.google.protobuf.ByteString bs =
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
       orderId_ = s;
@@ -86,7 +86,7 @@ private static final long serialVersionUID = 0L;
       getOrderIdBytes() {
     java.lang.Object ref = orderId_;
     if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
+      com.google.protobuf.ByteString b =
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
       orderId_ = b;
@@ -109,7 +109,7 @@ private static final long serialVersionUID = 0L;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
-      com.google.protobuf.ByteString bs = 
+      com.google.protobuf.ByteString bs =
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
       customerId_ = s;
@@ -125,7 +125,7 @@ private static final long serialVersionUID = 0L;
       getCustomerIdBytes() {
     java.lang.Object ref = customerId_;
     if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
+      com.google.protobuf.ByteString b =
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
       customerId_ = b;
@@ -161,30 +161,30 @@ private static final long serialVersionUID = 0L;
     return options_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.StartOrderFulfillmentOptions.getDefaultInstance() : options_;
   }
 
-  public static final int SELECTED_SHIPPING_FIELD_NUMBER = 4;
-  private com.acme.proto.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption selectedShipping_;
+  public static final int SELECTED_SHIPMENT_FIELD_NUMBER = 4;
+  private com.acme.proto.acme.common.v1.Shipment selectedShipment_;
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption selected_shipping = 4 [json_name = "selectedShipping"];</code>
-   * @return Whether the selectedShipping field is set.
+   * <code>.acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+   * @return Whether the selectedShipment field is set.
    */
   @java.lang.Override
-  public boolean hasSelectedShipping() {
+  public boolean hasSelectedShipment() {
     return ((bitField0_ & 0x00000002) != 0);
   }
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption selected_shipping = 4 [json_name = "selectedShipping"];</code>
-   * @return The selectedShipping.
+   * <code>.acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+   * @return The selectedShipment.
    */
   @java.lang.Override
-  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption getSelectedShipping() {
-    return selectedShipping_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption.getDefaultInstance() : selectedShipping_;
+  public com.acme.proto.acme.common.v1.Shipment getSelectedShipment() {
+    return selectedShipment_ == null ? com.acme.proto.acme.common.v1.Shipment.getDefaultInstance() : selectedShipment_;
   }
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption selected_shipping = 4 [json_name = "selectedShipping"];</code>
+   * <code>.acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
    */
   @java.lang.Override
-  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOptionOrBuilder getSelectedShippingOrBuilder() {
-    return selectedShipping_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption.getDefaultInstance() : selectedShipping_;
+  public com.acme.proto.acme.common.v1.ShipmentOrBuilder getSelectedShipmentOrBuilder() {
+    return selectedShipment_ == null ? com.acme.proto.acme.common.v1.Shipment.getDefaultInstance() : selectedShipment_;
   }
 
   public static final int PLACED_ORDER_FIELD_NUMBER = 5;
@@ -237,7 +237,7 @@ private static final long serialVersionUID = 0L;
       output.writeMessage(3, getOptions());
     }
     if (((bitField0_ & 0x00000002) != 0)) {
-      output.writeMessage(4, getSelectedShipping());
+      output.writeMessage(4, getSelectedShipment());
     }
     if (((bitField0_ & 0x00000004) != 0)) {
       output.writeMessage(5, getPlacedOrder());
@@ -263,7 +263,7 @@ private static final long serialVersionUID = 0L;
     }
     if (((bitField0_ & 0x00000002) != 0)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(4, getSelectedShipping());
+        .computeMessageSize(4, getSelectedShipment());
     }
     if (((bitField0_ & 0x00000004) != 0)) {
       size += com.google.protobuf.CodedOutputStream
@@ -293,10 +293,10 @@ private static final long serialVersionUID = 0L;
       if (!getOptions()
           .equals(other.getOptions())) return false;
     }
-    if (hasSelectedShipping() != other.hasSelectedShipping()) return false;
-    if (hasSelectedShipping()) {
-      if (!getSelectedShipping()
-          .equals(other.getSelectedShipping())) return false;
+    if (hasSelectedShipment() != other.hasSelectedShipment()) return false;
+    if (hasSelectedShipment()) {
+      if (!getSelectedShipment()
+          .equals(other.getSelectedShipment())) return false;
     }
     if (hasPlacedOrder() != other.hasPlacedOrder()) return false;
     if (hasPlacedOrder()) {
@@ -322,9 +322,9 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + OPTIONS_FIELD_NUMBER;
       hash = (53 * hash) + getOptions().hashCode();
     }
-    if (hasSelectedShipping()) {
-      hash = (37 * hash) + SELECTED_SHIPPING_FIELD_NUMBER;
-      hash = (53 * hash) + getSelectedShipping().hashCode();
+    if (hasSelectedShipment()) {
+      hash = (37 * hash) + SELECTED_SHIPMENT_FIELD_NUMBER;
+      hash = (53 * hash) + getSelectedShipment().hashCode();
     }
     if (hasPlacedOrder()) {
       hash = (37 * hash) + PLACED_ORDER_FIELD_NUMBER;
@@ -467,7 +467,7 @@ private static final long serialVersionUID = 0L;
       if (com.google.protobuf.GeneratedMessage
               .alwaysUseFieldBuilders) {
         internalGetOptionsFieldBuilder();
-        internalGetSelectedShippingFieldBuilder();
+        internalGetSelectedShipmentFieldBuilder();
         internalGetPlacedOrderFieldBuilder();
       }
     }
@@ -482,10 +482,10 @@ private static final long serialVersionUID = 0L;
         optionsBuilder_.dispose();
         optionsBuilder_ = null;
       }
-      selectedShipping_ = null;
-      if (selectedShippingBuilder_ != null) {
-        selectedShippingBuilder_.dispose();
-        selectedShippingBuilder_ = null;
+      selectedShipment_ = null;
+      if (selectedShipmentBuilder_ != null) {
+        selectedShipmentBuilder_.dispose();
+        selectedShipmentBuilder_ = null;
       }
       placedOrder_ = null;
       if (placedOrderBuilder_ != null) {
@@ -539,9 +539,9 @@ private static final long serialVersionUID = 0L;
         to_bitField0_ |= 0x00000001;
       }
       if (((from_bitField0_ & 0x00000008) != 0)) {
-        result.selectedShipping_ = selectedShippingBuilder_ == null
-            ? selectedShipping_
-            : selectedShippingBuilder_.build();
+        result.selectedShipment_ = selectedShipmentBuilder_ == null
+            ? selectedShipment_
+            : selectedShipmentBuilder_.build();
         to_bitField0_ |= 0x00000002;
       }
       if (((from_bitField0_ & 0x00000010) != 0)) {
@@ -578,8 +578,8 @@ private static final long serialVersionUID = 0L;
       if (other.hasOptions()) {
         mergeOptions(other.getOptions());
       }
-      if (other.hasSelectedShipping()) {
-        mergeSelectedShipping(other.getSelectedShipping());
+      if (other.hasSelectedShipment()) {
+        mergeSelectedShipment(other.getSelectedShipment());
       }
       if (other.hasPlacedOrder()) {
         mergePlacedOrder(other.getPlacedOrder());
@@ -629,7 +629,7 @@ private static final long serialVersionUID = 0L;
             } // case 26
             case 34: {
               input.readMessage(
-                  internalGetSelectedShippingFieldBuilder().getBuilder(),
+                  internalGetSelectedShipmentFieldBuilder().getBuilder(),
                   extensionRegistry);
               bitField0_ |= 0x00000008;
               break;
@@ -683,7 +683,7 @@ private static final long serialVersionUID = 0L;
         getOrderIdBytes() {
       java.lang.Object ref = orderId_;
       if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         orderId_ = b;
@@ -755,7 +755,7 @@ private static final long serialVersionUID = 0L;
         getCustomerIdBytes() {
       java.lang.Object ref = customerId_;
       if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         customerId_ = b;
@@ -910,7 +910,7 @@ private static final long serialVersionUID = 0L;
      * <code>optional .acme.fulfillment.domain.fulfillment.v1.StartOrderFulfillmentOptions options = 3 [json_name = "options"];</code>
      */
     private com.google.protobuf.SingleFieldBuilder<
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.StartOrderFulfillmentOptions, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.StartOrderFulfillmentOptions.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.StartOrderFulfillmentOptionsOrBuilder> 
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.StartOrderFulfillmentOptions, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.StartOrderFulfillmentOptions.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.StartOrderFulfillmentOptionsOrBuilder>
         internalGetOptionsFieldBuilder() {
       if (optionsBuilder_ == null) {
         optionsBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -923,125 +923,125 @@ private static final long serialVersionUID = 0L;
       return optionsBuilder_;
     }
 
-    private com.acme.proto.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption selectedShipping_;
+    private com.acme.proto.acme.common.v1.Shipment selectedShipment_;
     private com.google.protobuf.SingleFieldBuilder<
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOptionOrBuilder> selectedShippingBuilder_;
+        com.acme.proto.acme.common.v1.Shipment, com.acme.proto.acme.common.v1.Shipment.Builder, com.acme.proto.acme.common.v1.ShipmentOrBuilder> selectedShipmentBuilder_;
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption selected_shipping = 4 [json_name = "selectedShipping"];</code>
-     * @return Whether the selectedShipping field is set.
+     * <code>.acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+     * @return Whether the selectedShipment field is set.
      */
-    public boolean hasSelectedShipping() {
+    public boolean hasSelectedShipment() {
       return ((bitField0_ & 0x00000008) != 0);
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption selected_shipping = 4 [json_name = "selectedShipping"];</code>
-     * @return The selectedShipping.
+     * <code>.acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
+     * @return The selectedShipment.
      */
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption getSelectedShipping() {
-      if (selectedShippingBuilder_ == null) {
-        return selectedShipping_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption.getDefaultInstance() : selectedShipping_;
+    public com.acme.proto.acme.common.v1.Shipment getSelectedShipment() {
+      if (selectedShipmentBuilder_ == null) {
+        return selectedShipment_ == null ? com.acme.proto.acme.common.v1.Shipment.getDefaultInstance() : selectedShipment_;
       } else {
-        return selectedShippingBuilder_.getMessage();
+        return selectedShipmentBuilder_.getMessage();
       }
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption selected_shipping = 4 [json_name = "selectedShipping"];</code>
+     * <code>.acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
      */
-    public Builder setSelectedShipping(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption value) {
-      if (selectedShippingBuilder_ == null) {
+    public Builder setSelectedShipment(com.acme.proto.acme.common.v1.Shipment value) {
+      if (selectedShipmentBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        selectedShipping_ = value;
+        selectedShipment_ = value;
       } else {
-        selectedShippingBuilder_.setMessage(value);
+        selectedShipmentBuilder_.setMessage(value);
       }
       bitField0_ |= 0x00000008;
       onChanged();
       return this;
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption selected_shipping = 4 [json_name = "selectedShipping"];</code>
+     * <code>.acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
      */
-    public Builder setSelectedShipping(
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption.Builder builderForValue) {
-      if (selectedShippingBuilder_ == null) {
-        selectedShipping_ = builderForValue.build();
+    public Builder setSelectedShipment(
+        com.acme.proto.acme.common.v1.Shipment.Builder builderForValue) {
+      if (selectedShipmentBuilder_ == null) {
+        selectedShipment_ = builderForValue.build();
       } else {
-        selectedShippingBuilder_.setMessage(builderForValue.build());
+        selectedShipmentBuilder_.setMessage(builderForValue.build());
       }
       bitField0_ |= 0x00000008;
       onChanged();
       return this;
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption selected_shipping = 4 [json_name = "selectedShipping"];</code>
+     * <code>.acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
      */
-    public Builder mergeSelectedShipping(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption value) {
-      if (selectedShippingBuilder_ == null) {
+    public Builder mergeSelectedShipment(com.acme.proto.acme.common.v1.Shipment value) {
+      if (selectedShipmentBuilder_ == null) {
         if (((bitField0_ & 0x00000008) != 0) &&
-          selectedShipping_ != null &&
-          selectedShipping_ != com.acme.proto.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption.getDefaultInstance()) {
-          getSelectedShippingBuilder().mergeFrom(value);
+          selectedShipment_ != null &&
+          selectedShipment_ != com.acme.proto.acme.common.v1.Shipment.getDefaultInstance()) {
+          getSelectedShipmentBuilder().mergeFrom(value);
         } else {
-          selectedShipping_ = value;
+          selectedShipment_ = value;
         }
       } else {
-        selectedShippingBuilder_.mergeFrom(value);
+        selectedShipmentBuilder_.mergeFrom(value);
       }
-      if (selectedShipping_ != null) {
+      if (selectedShipment_ != null) {
         bitField0_ |= 0x00000008;
         onChanged();
       }
       return this;
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption selected_shipping = 4 [json_name = "selectedShipping"];</code>
+     * <code>.acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
      */
-    public Builder clearSelectedShipping() {
+    public Builder clearSelectedShipment() {
       bitField0_ = (bitField0_ & ~0x00000008);
-      selectedShipping_ = null;
-      if (selectedShippingBuilder_ != null) {
-        selectedShippingBuilder_.dispose();
-        selectedShippingBuilder_ = null;
+      selectedShipment_ = null;
+      if (selectedShipmentBuilder_ != null) {
+        selectedShipmentBuilder_.dispose();
+        selectedShipmentBuilder_ = null;
       }
       onChanged();
       return this;
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption selected_shipping = 4 [json_name = "selectedShipping"];</code>
+     * <code>.acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
      */
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption.Builder getSelectedShippingBuilder() {
+    public com.acme.proto.acme.common.v1.Shipment.Builder getSelectedShipmentBuilder() {
       bitField0_ |= 0x00000008;
       onChanged();
-      return internalGetSelectedShippingFieldBuilder().getBuilder();
+      return internalGetSelectedShipmentFieldBuilder().getBuilder();
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption selected_shipping = 4 [json_name = "selectedShipping"];</code>
+     * <code>.acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
      */
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOptionOrBuilder getSelectedShippingOrBuilder() {
-      if (selectedShippingBuilder_ != null) {
-        return selectedShippingBuilder_.getMessageOrBuilder();
+    public com.acme.proto.acme.common.v1.ShipmentOrBuilder getSelectedShipmentOrBuilder() {
+      if (selectedShipmentBuilder_ != null) {
+        return selectedShipmentBuilder_.getMessageOrBuilder();
       } else {
-        return selectedShipping_ == null ?
-            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption.getDefaultInstance() : selectedShipping_;
+        return selectedShipment_ == null ?
+            com.acme.proto.acme.common.v1.Shipment.getDefaultInstance() : selectedShipment_;
       }
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption selected_shipping = 4 [json_name = "selectedShipping"];</code>
+     * <code>.acme.common.v1.Shipment selected_shipment = 4 [json_name = "selectedShipment"];</code>
      */
     private com.google.protobuf.SingleFieldBuilder<
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOptionOrBuilder> 
-        internalGetSelectedShippingFieldBuilder() {
-      if (selectedShippingBuilder_ == null) {
-        selectedShippingBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOption.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.SelectedShippingOptionOrBuilder>(
-                getSelectedShipping(),
+        com.acme.proto.acme.common.v1.Shipment, com.acme.proto.acme.common.v1.Shipment.Builder, com.acme.proto.acme.common.v1.ShipmentOrBuilder>
+        internalGetSelectedShipmentFieldBuilder() {
+      if (selectedShipmentBuilder_ == null) {
+        selectedShipmentBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+            com.acme.proto.acme.common.v1.Shipment, com.acme.proto.acme.common.v1.Shipment.Builder, com.acme.proto.acme.common.v1.ShipmentOrBuilder>(
+                getSelectedShipment(),
                 getParentForChildren(),
                 isClean());
-        selectedShipping_ = null;
+        selectedShipment_ = null;
       }
-      return selectedShippingBuilder_;
+      return selectedShipmentBuilder_;
     }
 
     private com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrder placedOrder_;
@@ -1152,7 +1152,7 @@ private static final long serialVersionUID = 0L;
      * <code>.acme.fulfillment.domain.fulfillment.v1.PlacedOrder placed_order = 5 [json_name = "placedOrder"];</code>
      */
     private com.google.protobuf.SingleFieldBuilder<
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrder.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrderOrBuilder> 
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrder.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.PlacedOrderOrBuilder>
         internalGetPlacedOrderFieldBuilder() {
       if (placedOrderBuilder_ == null) {
         placedOrderBuilder_ = new com.google.protobuf.SingleFieldBuilder<

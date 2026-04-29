@@ -126,21 +126,12 @@ message StartOrderFulfillmentRequest {
   string order_id = 1;
   string customer_id = 2;
   optional StartOrderFulfillmentOptions options = 3;
-  SelectedShippingOption selected_shipping = 4;
+  acme.common.v1.Shipment selected_shipment = 4;
   PlacedOrder placed_order = 5;
 }
 
 message StartOrderFulfillmentOptions {
   optional int64 fulfillment_timeout_secs = 1;
-}
-
-// SelectedShippingOption is the shipping option chosen by the customer at order
-// placement time. Used as the baseline for margin comparison in fulfillOrder.
-message SelectedShippingOption {
-  string option_id = 1;
-  acme.common.v1.Money price = 2;
-  google.protobuf.Timestamp expected_ship_date = 3;
-  optional int32 delivery_days = 4;
 }
 
 // ── validateOrder Update / Nexus operation ────────────────────────────────────
@@ -194,9 +185,9 @@ message FulfillmentOptions {
 message FulfillOrderRequest {
   ProcessedOrder processed_order = 1;
   optional NotifyDeliveryStatusRequest delivery_status_request = 2;
-  // selected_shipping_option_id is the customer's original rate selection.
-  // If absent, fulfillment.Order falls back to state.args.selected_shipping.option_id.
-  optional string selected_shipping_option_id = 3;
+  // selected_shipment is the customer's original checkout shipment selection.
+  // If absent, fulfillment.Order falls back to state.args.selected_shipment.
+  acme.common.v1.Shipment selected_shipment = 3;
 }
 
 // ProcessedOrder carries fulfillment's own view of the processing result.

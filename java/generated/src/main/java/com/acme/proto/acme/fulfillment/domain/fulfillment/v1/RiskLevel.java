@@ -7,7 +7,7 @@ package com.acme.proto.acme.fulfillment.domain.fulfillment.v1;
 
 /**
  * <pre>
- * RiskLevel normalizes PredictHQ rank (0–100) into tiers the agent can reason about.
+ * RiskLevel represents supply chain risk tiers the agent can reason about.
  * </pre>
  *
  * Protobuf enum {@code acme.fulfillment.domain.fulfillment.v1.RiskLevel}
@@ -28,34 +28,18 @@ public enum RiskLevel
    */
   RISK_LEVEL_NONE(1),
   /**
-   * <pre>
-   * rank 1–30
-   * </pre>
-   *
    * <code>RISK_LEVEL_LOW = 2;</code>
    */
   RISK_LEVEL_LOW(2),
   /**
-   * <pre>
-   * rank 31–60
-   * </pre>
-   *
    * <code>RISK_LEVEL_MODERATE = 3;</code>
    */
   RISK_LEVEL_MODERATE(3),
   /**
-   * <pre>
-   * rank 61–80
-   * </pre>
-   *
    * <code>RISK_LEVEL_HIGH = 4;</code>
    */
   RISK_LEVEL_HIGH(4),
   /**
-   * <pre>
-   * rank 81–100
-   * </pre>
-   *
    * <code>RISK_LEVEL_CRITICAL = 5;</code>
    */
   RISK_LEVEL_CRITICAL(5),
@@ -84,34 +68,18 @@ public enum RiskLevel
    */
   public static final int RISK_LEVEL_NONE_VALUE = 1;
   /**
-   * <pre>
-   * rank 1–30
-   * </pre>
-   *
    * <code>RISK_LEVEL_LOW = 2;</code>
    */
   public static final int RISK_LEVEL_LOW_VALUE = 2;
   /**
-   * <pre>
-   * rank 31–60
-   * </pre>
-   *
    * <code>RISK_LEVEL_MODERATE = 3;</code>
    */
   public static final int RISK_LEVEL_MODERATE_VALUE = 3;
   /**
-   * <pre>
-   * rank 61–80
-   * </pre>
-   *
    * <code>RISK_LEVEL_HIGH = 4;</code>
    */
   public static final int RISK_LEVEL_HIGH_VALUE = 4;
   /**
-   * <pre>
-   * rank 81–100
-   * </pre>
-   *
    * <code>RISK_LEVEL_CRITICAL = 5;</code>
    */
   public static final int RISK_LEVEL_CRITICAL_VALUE = 5;

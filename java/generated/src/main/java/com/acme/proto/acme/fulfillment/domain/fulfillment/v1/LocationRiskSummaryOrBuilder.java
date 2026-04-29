@@ -45,7 +45,7 @@ public interface LocationRiskSummaryOrBuilder extends
 
   /**
    * <pre>
-   * Count of events per PredictHQ category string
+   * Count of events per category string
    * (e.g. {"severe-weather": 2, "airport-delays": 1}).
    * </pre>
    *
@@ -54,7 +54,7 @@ public interface LocationRiskSummaryOrBuilder extends
   int getEventsByCategoryCount();
   /**
    * <pre>
-   * Count of events per PredictHQ category string
+   * Count of events per category string
    * (e.g. {"severe-weather": 2, "airport-delays": 1}).
    * </pre>
    *
@@ -70,7 +70,7 @@ public interface LocationRiskSummaryOrBuilder extends
   getEventsByCategory();
   /**
    * <pre>
-   * Count of events per PredictHQ category string
+   * Count of events per category string
    * (e.g. {"severe-weather": 2, "airport-delays": 1}).
    * </pre>
    *
@@ -80,7 +80,7 @@ public interface LocationRiskSummaryOrBuilder extends
   getEventsByCategoryMap();
   /**
    * <pre>
-   * Count of events per PredictHQ category string
+   * Count of events per category string
    * (e.g. {"severe-weather": 2, "airport-delays": 1}).
    * </pre>
    *
@@ -91,7 +91,7 @@ public interface LocationRiskSummaryOrBuilder extends
       int defaultValue);
   /**
    * <pre>
-   * Count of events per PredictHQ category string
+   * Count of events per category string
    * (e.g. {"severe-weather": 2, "airport-delays": 1}).
    * </pre>
    *

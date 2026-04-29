@@ -43,9 +43,9 @@ with workflow.unsafe.imports_passed_through():
         LookupInventoryAddressResponse,
     )
     from acme.fulfillment.domain.v1.workflows_p2p import VerifyAddressRequest, VerifyAddressResponse
-    from src.agents.activities.easypost import EasyPostActivities
     from src.agents.activities.llm import LlmActivities
     from src.agents.activities.location_events import LocationEventsActivities
+    from src.agents.activities.shipping import ShippingActivities
     from src.agents.dispatch import activity_name, activity_tool, nexus_tool, ToolSpecs
     from src.config import settings
     from src.services.inventory_service import InventoryService
@@ -69,12 +69,12 @@ _TOOLS = ToolSpecs(
         schedule_to_close_timeout=_ACTIVITY_TIMEOUT,
     ),
     activity_tool(
-        activity_name(EasyPostActivities.get_carrier_rates),
-        "Create an EasyPost shipment and retrieve available carrier rates.",
-        EasyPostActivities.get_carrier_rates,
+        activity_name(ShippingActivities.get_carrier_rates),
+        "Retrieve fixture-backed shipment rates from the shipping integration.",
+        ShippingActivities.get_carrier_rates,
         GetShippingRatesRequest,
         GetShippingRatesResponse,
-        task_queue="fulfillment-easypost",
+        task_queue="fulfillment-shipping",
         start_to_close_timeout=_ACTIVITY_TIMEOUT,
         retry_policy=_ACTIVITY_RETRY,
     ),
@@ -171,18 +171,27 @@ def _build_recommendation(data: dict) -> ShippingRecommendation:
 
 
 
-_NAME_RATES = activity_name(EasyPostActivities.get_carrier_rates)
+_NAME_RATES = activity_name(ShippingActivities.get_carrier_rates)
 _NAME_ALTERNATE_WAREHOUSE = "find_alternate_warehouse"
 _NEGATIVE_OUTCOMES = frozenset({"MARGIN_SPIKE", "SLA_BREACH"})
 
 _DEFAULT_CACHE_TTL_SECS = 1800
 
 
-def _cache_key(from_ep_id: str, to_ep: object, items: list) -> str:
+def _cache_key(from_ep_id: str, to_ep: object, items: list, selected_shipment: object | None) -> str:
     postal = getattr(to_ep, "zip", "") if to_ep else ""
     country = getattr(to_ep, "country", "") if to_ep else ""
     sorted_items = sorted((getattr(i, "sku_id", ""), getattr(i, "quantity", 0)) for i in items)
-    raw = f"{from_ep_id}:{postal}:{country}:{sorted_items}"
+    selected_ep = getattr(selected_shipment, "easypost", None) if selected_shipment else None
+    selected_rate = getattr(selected_ep, "selected_rate", None) if selected_ep else None
+    paid_price = getattr(selected_shipment, "paid_price", None) if selected_shipment else None
+    selected_context = (
+        getattr(selected_rate, "rate_id", "") if selected_rate else "",
+        getattr(selected_rate, "delivery_days", None) if selected_rate else None,
+        getattr(paid_price, "currency", "") if paid_price else "",
+        getattr(paid_price, "units", 0) if paid_price else 0,
+    )
+    raw = f"{from_ep_id}:{postal}:{country}:{sorted_items}:{selected_context}"
     return hashlib.sha256(raw.encode()).hexdigest()[:16]
 
 
@@ -236,7 +245,7 @@ class ShippingAgent:
                     "verify_address",
                     args=[VerifyAddressRequest(address=request.to_address)],
                     result_type=VerifyAddressResponse,
-                    task_queue="fulfillment-easypost",
+                    task_queue="fulfillment-shipping",
                     start_to_close_timeout=_ACTIVITY_TIMEOUT,
                     retry_policy=_ACTIVITY_RETRY,
                 ),
@@ -255,7 +264,11 @@ class ShippingAgent:
 
         # Cache check — key derived from resolved origin + destination + items.
         from_ep_id = origin_ep.id if (origin_ep and origin_ep.id) else ""
-        key = _cache_key(from_ep_id, dest_ep, request.items)
+        request_fields = getattr(request, "model_fields_set", set())
+        selected_shipment = (
+            request.selected_shipment if "selected_shipment" in request_fields else None
+        )
+        key = _cache_key(from_ep_id, dest_ep, request.items, selected_shipment)
         cached = self._cache.get(key)
         if cached is not None:
             now = workflow.now()
@@ -300,11 +313,39 @@ class ShippingAgent:
             return f"{ep.street1}, {ep.city}, {ep.state} {ep.zip}  easypost_id={ep_id}{coord}{tz}"
 
         items_desc = ", ".join(f"{i.sku_id}×{i.quantity}" for i in request.items)
+        selected_ep = selected_shipment.easypost if selected_shipment else None
+        selected_rate = selected_ep.selected_rate if selected_ep else None
+        paid_price = selected_shipment.paid_price if selected_shipment else None
+        selected_rate_fields = getattr(selected_rate, "model_fields_set", set()) if selected_rate else set()
+        has_delivery_days = (
+            selected_rate
+            and (
+                "delivery_days" in selected_rate_fields
+                or selected_rate.delivery_days not in (None, 0)
+            )
+        )
+        has_selected_context = bool(
+            (paid_price and paid_price.units > 0)
+            or (selected_rate and selected_rate.rate_id)
+            or has_delivery_days
+        )
+        selected_rate_id = selected_rate.rate_id if selected_rate else ""
+        selected_delivery_days = selected_rate.delivery_days if selected_rate else None
+        selected_paid_units = paid_price.units if paid_price else 0
+        selected_paid_currency = paid_price.currency if paid_price else ""
+        selected_desc = (
+            f"selected_shipment: paid_price={selected_paid_units} {selected_paid_currency}; "
+            f"selected_rate_id={selected_rate_id}; "
+            f"delivery_days={selected_delivery_days}\n"
+            if has_selected_context
+            else ""
+        )
         task_text = (
             f"Calculate shipping options for order {request.order_id}.\n"
             f"destination: {_addr_line(dest_ep)}\n"
             f"origin (resolved from inventory): {_addr_line(origin_ep)}\n"
             f"items: {items_desc}\n"
+            f"{selected_desc}"
         )
 
         # System instructions are embedded in the first user message (call_llm has no system param)
@@ -319,6 +360,7 @@ class ShippingAgent:
 
         recommendation: ShippingRecommendation | None = None
         all_options: list[ShippingOption] = []
+        options_by_id: dict[str, ShippingOption] = {}
         alternate_warehouse_called = False
 
         while True:
@@ -369,9 +411,21 @@ class ShippingAgent:
                     recommendation = _build_recommendation(finalize_block.tool_use.input)
                     break
 
-                # ReAct: Act — dispatch real activity tools concurrently, block until all resolve
+                # ReAct: Act — dispatch real activity tools concurrently, block until all resolve.
+                # The selected shipment is workflow context, not LLM-authored tool input, so attach
+                # it at dispatch time while keeping the public tool call shape stable.
+                dispatch_blocks = []
+                for block in tool_blocks:
+                    dispatch_block = block
+                    if block.tool_use.name == _NAME_RATES and selected_shipment:
+                        dispatch_block = block.model_copy(deep=True)
+                        dispatch_block.tool_use.input["selected_shipment"] = (
+                            selected_shipment.model_dump(mode="json")
+                        )
+                    dispatch_blocks.append(dispatch_block)
+
                 tool_results: list[str] = list(await asyncio.gather(
-                    *[_TOOLS.dispatch(b) for b in tool_blocks]
+                    *[_TOOLS.dispatch(b) for b in dispatch_blocks]
                 ))
 
                 for block in tool_blocks:
@@ -382,7 +436,12 @@ class ShippingAgent:
                     if block.tool_use.name == _NAME_RATES:
                         try:
                             data = json.loads(result_json)
-                            all_options = [ShippingOption(**o) for o in data.get("options", [])]
+                            for option_json in data.get("options", []):
+                                option = ShippingOption(**option_json)
+                                option_id = option.id or option.rate_id
+                                if option_id not in options_by_id:
+                                    options_by_id[option_id] = option
+                                    all_options.append(option)
                         except Exception:
                             pass
 

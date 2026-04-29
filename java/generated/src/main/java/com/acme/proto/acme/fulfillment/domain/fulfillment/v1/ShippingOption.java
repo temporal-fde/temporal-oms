@@ -9,7 +9,7 @@ package com.acme.proto.acme.fulfillment.domain.fulfillment.v1;
  * <pre>
  * ShippingOption is a single carrier rate returned by get_carrier_rates.
  * id is set to rate_id so the LLM can cross-reference recommended_option_id back to the rate.
- * shipment_id is the EasyPost Shipment ID — needed by fulfillment.Order to call printShippingLabel.
+ * shipment_id is the fixture shipment ID needed by fulfillment.Order to call printShippingLabel.
  * </pre>
  *
  * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.ShippingOption}
@@ -519,7 +519,7 @@ private static final long serialVersionUID = 0L;
    * <pre>
    * ShippingOption is a single carrier rate returned by get_carrier_rates.
    * id is set to rate_id so the LLM can cross-reference recommended_option_id back to the rate.
-   * shipment_id is the EasyPost Shipment ID — needed by fulfillment.Order to call printShippingLabel.
+   * shipment_id is the fixture shipment ID needed by fulfillment.Order to call printShippingLabel.
    * </pre>
    *
    * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.ShippingOption}

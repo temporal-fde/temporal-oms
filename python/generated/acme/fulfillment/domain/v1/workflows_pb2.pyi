@@ -211,32 +211,20 @@ class StartOrderFulfillmentRequest(_message.Message):
     ORDER_ID_FIELD_NUMBER: _ClassVar[int]
     CUSTOMER_ID_FIELD_NUMBER: _ClassVar[int]
     OPTIONS_FIELD_NUMBER: _ClassVar[int]
-    SELECTED_SHIPPING_FIELD_NUMBER: _ClassVar[int]
+    SELECTED_SHIPMENT_FIELD_NUMBER: _ClassVar[int]
     PLACED_ORDER_FIELD_NUMBER: _ClassVar[int]
     order_id: str
     customer_id: str
     options: StartOrderFulfillmentOptions
-    selected_shipping: SelectedShippingOption
+    selected_shipment: _values_pb2.Shipment
     placed_order: PlacedOrder
-    def __init__(self, order_id: _Optional[str] = ..., customer_id: _Optional[str] = ..., options: _Optional[_Union[StartOrderFulfillmentOptions, _Mapping]] = ..., selected_shipping: _Optional[_Union[SelectedShippingOption, _Mapping]] = ..., placed_order: _Optional[_Union[PlacedOrder, _Mapping]] = ...) -> None: ...
+    def __init__(self, order_id: _Optional[str] = ..., customer_id: _Optional[str] = ..., options: _Optional[_Union[StartOrderFulfillmentOptions, _Mapping]] = ..., selected_shipment: _Optional[_Union[_values_pb2.Shipment, _Mapping]] = ..., placed_order: _Optional[_Union[PlacedOrder, _Mapping]] = ...) -> None: ...
 
 class StartOrderFulfillmentOptions(_message.Message):
     __slots__ = ()
     FULFILLMENT_TIMEOUT_SECS_FIELD_NUMBER: _ClassVar[int]
     fulfillment_timeout_secs: int
     def __init__(self, fulfillment_timeout_secs: _Optional[int] = ...) -> None: ...
-
-class SelectedShippingOption(_message.Message):
-    __slots__ = ()
-    OPTION_ID_FIELD_NUMBER: _ClassVar[int]
-    PRICE_FIELD_NUMBER: _ClassVar[int]
-    EXPECTED_SHIP_DATE_FIELD_NUMBER: _ClassVar[int]
-    DELIVERY_DAYS_FIELD_NUMBER: _ClassVar[int]
-    option_id: str
-    price: _values_pb2.Money
-    expected_ship_date: _timestamp_pb2.Timestamp
-    delivery_days: int
-    def __init__(self, option_id: _Optional[str] = ..., price: _Optional[_Union[_values_pb2.Money, _Mapping]] = ..., expected_ship_date: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., delivery_days: _Optional[int] = ...) -> None: ...
 
 class ValidateOrderRequest(_message.Message):
     __slots__ = ()
@@ -286,11 +274,11 @@ class FulfillOrderRequest(_message.Message):
     __slots__ = ()
     PROCESSED_ORDER_FIELD_NUMBER: _ClassVar[int]
     DELIVERY_STATUS_REQUEST_FIELD_NUMBER: _ClassVar[int]
-    SELECTED_SHIPPING_OPTION_ID_FIELD_NUMBER: _ClassVar[int]
+    SELECTED_SHIPMENT_FIELD_NUMBER: _ClassVar[int]
     processed_order: ProcessedOrder
     delivery_status_request: NotifyDeliveryStatusRequest
-    selected_shipping_option_id: str
-    def __init__(self, processed_order: _Optional[_Union[ProcessedOrder, _Mapping]] = ..., delivery_status_request: _Optional[_Union[NotifyDeliveryStatusRequest, _Mapping]] = ..., selected_shipping_option_id: _Optional[str] = ...) -> None: ...
+    selected_shipment: _values_pb2.Shipment
+    def __init__(self, processed_order: _Optional[_Union[ProcessedOrder, _Mapping]] = ..., delivery_status_request: _Optional[_Union[NotifyDeliveryStatusRequest, _Mapping]] = ..., selected_shipment: _Optional[_Union[_values_pb2.Shipment, _Mapping]] = ...) -> None: ...
 
 class ProcessedOrder(_message.Message):
     __slots__ = ()

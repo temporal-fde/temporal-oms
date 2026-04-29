@@ -4,6 +4,7 @@
 # Pydantic Version: 2.13.0 
 from ....common.v1.values_p2p import Address
 from ....common.v1.values_p2p import Money
+from ....common.v1.values_p2p import Shipment
 from datetime import datetime
 from enum import IntEnum
 from google.protobuf.message import Message  # type: ignore
@@ -140,17 +141,6 @@ class FulfilledOrderEvent(BaseModel):
 class StartOrderFulfillmentOptions(BaseModel):
     fulfillment_timeout_secs: typing.Optional[int] = Field(default=0)
 
-class SelectedShippingOption(BaseModel):
-    """
-     SelectedShippingOption is the shipping option chosen by the customer at order
- placement time. Used as the baseline for margin comparison in fulfillOrder.
-    """
-
-    option_id: str = Field(default="")
-    price: Money = Field(default_factory=Money)
-    expected_ship_date: datetime = Field(default_factory=datetime.now)
-    delivery_days: typing.Optional[int] = Field(default=0)
-
 class FulfillmentItem(BaseModel):
     """
      FulfillmentItem is the line-item type for fulfillment activities.
@@ -186,7 +176,7 @@ class StartOrderFulfillmentRequest(BaseModel):
     order_id: str = Field(default="")
     customer_id: str = Field(default="")
     options: typing.Optional[StartOrderFulfillmentOptions] = Field(default_factory=StartOrderFulfillmentOptions)
-    selected_shipping: SelectedShippingOption = Field(default_factory=SelectedShippingOption)
+    selected_shipment: Shipment = Field(default_factory=Shipment)
     placed_order: PlacedOrder = Field(default_factory=PlacedOrder)
 
 class ValidateOrderRequest(BaseModel):
@@ -255,9 +245,9 @@ class FulfillOrderRequest(BaseModel):
 
     processed_order: ProcessedOrder = Field(default_factory=ProcessedOrder)
     delivery_status_request: typing.Optional[NotifyDeliveryStatusRequest] = Field(default_factory=NotifyDeliveryStatusRequest)
-# selected_shipping_option_id is the customer's original rate selection.
-# If absent, fulfillment.Order falls back to state.args.selected_shipping.option_id.
-    selected_shipping_option_id: typing.Optional[str] = Field(default="")
+# selected_shipment is the customer's original checkout shipment selection.
+# If absent, fulfillment.Order falls back to state.args.selected_shipment.
+    selected_shipment: Shipment = Field(default_factory=Shipment)
 
 class ShippingSelection(BaseModel):
     """

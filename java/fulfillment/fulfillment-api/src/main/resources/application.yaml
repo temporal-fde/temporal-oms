@@ -7,10 +7,9 @@ management.server.port: 9071
 
 server.port: 8060
 
-easypost:
-  api-key: ${EASYPOST_API_KEY}
-  warehouse:
-    from-address-id: ${EASYPOST_WAREHOUSE_FROM_ADDRESS_ID:}
+enablements:
+  api:
+    base-url: ${ENABLEMENTS_API_BASE_URL:http://localhost:8050}
 
 springdoc:
   api-docs:

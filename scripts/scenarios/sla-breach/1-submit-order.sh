@@ -3,7 +3,7 @@
 # Step 1: Submit Order
 #
 # delivery_days=0 sets a same-day SLA — impossible for any carrier to meet.
-# paid_price_cents=3000 ($30) caps what the agent may spend.
+# paid_price_cents=995 ($9.95) matches the normal route's workshop margin.
 # No carrier delivers in 0 days, so SLA_BREACH is always triggered.
 #
 # The SLA rule in the system prompt reads:
@@ -15,13 +15,21 @@
 
 set -e
 
-echo "Submitting order with 1-day SLA and \$30 cap to trigger SLA_BREACH..."
-echo "Workflow ID: sla-breach-123"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../_lib.sh"
+scenario_begin "$SCRIPT_DIR"
+
+ORDER_JSON="$(scenario_order_json "11 Wall St" "New York" "NY" "10005" "995" "0")"
+
+echo "Submitting order with same-day SLA to trigger SLA_BREACH..."
+echo "Workflow ID: ${ORDER_ID}"
+echo "Customer ID: ${CUSTOMER_ID}"
+echo "Run context: ${SCENARIO_CONTEXT_FILE}"
 echo ""
 
-xh PUT http://localhost:8080/api/v1/commerce-app/orders/sla-breach-123 \
-  customerId="cust-002" \
-  order:='{"orderId":"sla-breach-123","items":[{"itemId":"shirt-001","quantity":1}],"shippingAddress":{"street":"388 Townsend St","city":"San Francisco","state":"CA","postalCode":"94107","country":"US"},"selectedShipment":{"paidPriceCents":"3000","currency":"USD","deliveryDays":0}}'
+xh PUT "http://localhost:8080/api/v1/commerce-app/orders/${ORDER_ID}" \
+  customerId="${CUSTOMER_ID}" \
+  order:="${ORDER_JSON}"
 
 echo ""
 echo "Order submitted"

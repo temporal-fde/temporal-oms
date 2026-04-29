@@ -6,14 +6,22 @@
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../_lib.sh"
+scenario_begin "$SCRIPT_DIR"
+
+ORDER_JSON="$(scenario_order_json "11 Wall St" "New York" "NY" "10005" "995" "5")"
+
 echo "📋 Submitting VALID order for processing..."
-echo "Workflow ID: valid-order-123"
+echo "Workflow ID: ${ORDER_ID}"
+echo "Customer ID: ${CUSTOMER_ID}"
 echo "Note: This order will pass validation and proceed automatically"
+echo "Run context: ${SCENARIO_CONTEXT_FILE}"
 echo ""
 
-xh PUT http://localhost:8080/api/v1/commerce-app/orders/valid-order-123 \
-  customerId="cust-001" \
-  order:='{"orderId":"valid-order-123","items":[{"itemId":"shirt-001","quantity":1}],"shippingAddress":{"street":"388 Townsend St","city":"San Francisco","state":"CA","postalCode":"94107","country":"US"},"selectedShipment":{"paidPriceCents":"5000","currency":"USD","deliveryDays":5}}'
+xh PUT "http://localhost:8080/api/v1/commerce-app/orders/${ORDER_ID}" \
+  customerId="${CUSTOMER_ID}" \
+  order:="${ORDER_JSON}"
 
 echo ""
 echo "✅ Order submitted"

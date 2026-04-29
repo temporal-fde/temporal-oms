@@ -34,7 +34,7 @@ def _fix_timestamps(obj: Any) -> Any:
 
 
 def _to_pb2(value: BaseModel, pb2_cls: type) -> Any:
-    return ParseDict(_fix_timestamps(value.model_dump(mode="json")), pb2_cls())
+    return ParseDict(_fix_timestamps(value.model_dump(mode="json", exclude_unset=True)), pb2_cls())
 
 
 class PydanticJsonProtoPayloadConverter(JSONProtoPayloadConverter):

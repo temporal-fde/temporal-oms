@@ -42,33 +42,31 @@ public interface FulfillOrderRequestOrBuilder extends
 
   /**
    * <pre>
-   * selected_shipping_option_id is the customer's original rate selection.
-   * If absent, fulfillment.Order falls back to state.args.selected_shipping.option_id.
+   * selected_shipment is the customer's original checkout shipment selection.
+   * If absent, fulfillment.Order falls back to state.args.selected_shipment.
    * </pre>
    *
-   * <code>optional string selected_shipping_option_id = 3 [json_name = "selectedShippingOptionId"];</code>
-   * @return Whether the selectedShippingOptionId field is set.
+   * <code>.acme.common.v1.Shipment selected_shipment = 3 [json_name = "selectedShipment"];</code>
+   * @return Whether the selectedShipment field is set.
    */
-  boolean hasSelectedShippingOptionId();
+  boolean hasSelectedShipment();
   /**
    * <pre>
-   * selected_shipping_option_id is the customer's original rate selection.
-   * If absent, fulfillment.Order falls back to state.args.selected_shipping.option_id.
+   * selected_shipment is the customer's original checkout shipment selection.
+   * If absent, fulfillment.Order falls back to state.args.selected_shipment.
    * </pre>
    *
-   * <code>optional string selected_shipping_option_id = 3 [json_name = "selectedShippingOptionId"];</code>
-   * @return The selectedShippingOptionId.
+   * <code>.acme.common.v1.Shipment selected_shipment = 3 [json_name = "selectedShipment"];</code>
+   * @return The selectedShipment.
    */
-  java.lang.String getSelectedShippingOptionId();
+  com.acme.proto.acme.common.v1.Shipment getSelectedShipment();
   /**
    * <pre>
-   * selected_shipping_option_id is the customer's original rate selection.
-   * If absent, fulfillment.Order falls back to state.args.selected_shipping.option_id.
+   * selected_shipment is the customer's original checkout shipment selection.
+   * If absent, fulfillment.Order falls back to state.args.selected_shipment.
    * </pre>
    *
-   * <code>optional string selected_shipping_option_id = 3 [json_name = "selectedShippingOptionId"];</code>
-   * @return The bytes for selectedShippingOptionId.
+   * <code>.acme.common.v1.Shipment selected_shipment = 3 [json_name = "selectedShipment"];</code>
    */
-  com.google.protobuf.ByteString
-      getSelectedShippingOptionIdBytes();
+  com.acme.proto.acme.common.v1.ShipmentOrBuilder getSelectedShipmentOrBuilder();
 }

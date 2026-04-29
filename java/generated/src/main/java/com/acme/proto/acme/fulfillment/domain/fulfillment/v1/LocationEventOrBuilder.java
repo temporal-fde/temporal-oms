@@ -53,7 +53,7 @@ public interface LocationEventOrBuilder extends
 
   /**
    * <pre>
-   * PredictHQ category string (e.g. "severe-weather", "airport-delays", "disasters").
+   * Event category string (e.g. "severe-weather", "airport-delays", "disasters").
    * </pre>
    *
    * <code>string category = 4 [json_name = "category"];</code>
@@ -62,7 +62,7 @@ public interface LocationEventOrBuilder extends
   java.lang.String getCategory();
   /**
    * <pre>
-   * PredictHQ category string (e.g. "severe-weather", "airport-delays", "disasters").
+   * Event category string (e.g. "severe-weather", "airport-delays", "disasters").
    * </pre>
    *
    * <code>string category = 4 [json_name = "category"];</code>
@@ -73,7 +73,7 @@ public interface LocationEventOrBuilder extends
 
   /**
    * <pre>
-   * PredictHQ Rank (0–100): overall significance of the event.
+   * Rank (0–100): overall significance of the event.
    * </pre>
    *
    * <code>int32 rank = 5 [json_name = "rank"];</code>

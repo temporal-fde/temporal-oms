@@ -17,16 +17,16 @@ rates, origin_risk, dest_risk = await gather(
 cheapest = min(rates.options, key=lambda r: r.cost)
 fastest  = min(rates.options, key=lambda r: r.transit_days)
 
-if all(r.cost > request.customer_paid_price.units for r in rates.options):
+if all(r.cost > request.selected_shipment.paid_price.units for r in rates.options):
     alt = await find_alternate_warehouse(items, exclude=[lookup.address])
     if alt:
         rates = await get_carrier_rates(alt.easypost.id, verify.address.easypost.id)
-        if all(r.cost > request.customer_paid_price.units for r in rates.options):
+        if all(r.cost > request.selected_shipment.paid_price.units for r in rates.options):
             return MARGIN_SPIKE  # still too expensive from alternate
     else:
         return MARGIN_SPIKE
 
-if fastest.transit_days > request.transit_days_sla:
+if fastest.transit_days > request.selected_shipment.easypost.selected_rate.delivery_days:
     return SLA_BREACH
 
 if dest_risk.summary.overall_risk_level >= RISK_LEVEL_HIGH:

@@ -57,6 +57,15 @@ OVERLAY=cloud ./scripts/app-deploy.sh
 ./scripts/status.sh
 ```
 
+### Run Demo Scenarios
+```bash
+# Select from all scenarios discovered under scripts/scenarios
+./scripts/runscenario.sh
+
+# Run a specific scenario without step prompts
+./scripts/runscenario.sh valid-order --yes
+```
+
 ## What Each Script Does
 
 | Script | Purpose |
@@ -67,6 +76,7 @@ OVERLAY=cloud ./scripts/app-deploy.sh
 | `infra-down.sh` | Delete KinD cluster and all infrastructure |
 | `demo-up.sh` | Full setup: runs infra-up + app-deploy |
 | `demo-down.sh` | Full teardown: runs app-down + infra-down |
+| `runscenario.sh` | Dynamic selector for scenario subdirectories under `scripts/scenarios` |
 | `tunnel.sh` | Port-forward Traefik to localhost:8080 (run in another terminal) |
 | `status.sh` | Show current deployment status (pods, KinD cluster, Temporal server)
 

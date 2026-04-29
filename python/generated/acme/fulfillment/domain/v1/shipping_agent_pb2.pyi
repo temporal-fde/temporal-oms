@@ -109,17 +109,13 @@ class CalculateShippingOptionsRequest(_message.Message):
     CUSTOMER_ID_FIELD_NUMBER: _ClassVar[int]
     TO_ADDRESS_FIELD_NUMBER: _ClassVar[int]
     ITEMS_FIELD_NUMBER: _ClassVar[int]
-    SELECTED_SHIPPING_OPTION_ID_FIELD_NUMBER: _ClassVar[int]
-    CUSTOMER_PAID_PRICE_FIELD_NUMBER: _ClassVar[int]
-    DELIVERY_DAYS_SLA_FIELD_NUMBER: _ClassVar[int]
+    SELECTED_SHIPMENT_FIELD_NUMBER: _ClassVar[int]
     order_id: str
     customer_id: str
     to_address: _values_pb2_1.Address
     items: _containers.RepeatedCompositeFieldContainer[_values_pb2.ShippingLineItem]
-    selected_shipping_option_id: str
-    customer_paid_price: _values_pb2_1.Money
-    delivery_days_sla: int
-    def __init__(self, order_id: _Optional[str] = ..., customer_id: _Optional[str] = ..., to_address: _Optional[_Union[_values_pb2_1.Address, _Mapping]] = ..., items: _Optional[_Iterable[_Union[_values_pb2.ShippingLineItem, _Mapping]]] = ..., selected_shipping_option_id: _Optional[str] = ..., customer_paid_price: _Optional[_Union[_values_pb2_1.Money, _Mapping]] = ..., delivery_days_sla: _Optional[int] = ...) -> None: ...
+    selected_shipment: _values_pb2_1.Shipment
+    def __init__(self, order_id: _Optional[str] = ..., customer_id: _Optional[str] = ..., to_address: _Optional[_Union[_values_pb2_1.Address, _Mapping]] = ..., items: _Optional[_Iterable[_Union[_values_pb2.ShippingLineItem, _Mapping]]] = ..., selected_shipment: _Optional[_Union[_values_pb2_1.Shipment, _Mapping]] = ...) -> None: ...
 
 class CalculateShippingOptionsResponse(_message.Message):
     __slots__ = ()
@@ -159,10 +155,12 @@ class GetShippingRatesRequest(_message.Message):
     FROM_EASYPOST_ID_FIELD_NUMBER: _ClassVar[int]
     TO_EASYPOST_ID_FIELD_NUMBER: _ClassVar[int]
     ITEMS_FIELD_NUMBER: _ClassVar[int]
+    SELECTED_SHIPMENT_FIELD_NUMBER: _ClassVar[int]
     from_easypost_id: str
     to_easypost_id: str
     items: _containers.RepeatedCompositeFieldContainer[_values_pb2.ShippingLineItem]
-    def __init__(self, from_easypost_id: _Optional[str] = ..., to_easypost_id: _Optional[str] = ..., items: _Optional[_Iterable[_Union[_values_pb2.ShippingLineItem, _Mapping]]] = ...) -> None: ...
+    selected_shipment: _values_pb2_1.Shipment
+    def __init__(self, from_easypost_id: _Optional[str] = ..., to_easypost_id: _Optional[str] = ..., items: _Optional[_Iterable[_Union[_values_pb2.ShippingLineItem, _Mapping]]] = ..., selected_shipment: _Optional[_Union[_values_pb2_1.Shipment, _Mapping]] = ...) -> None: ...
 
 class GetShippingRatesResponse(_message.Message):
     __slots__ = ()

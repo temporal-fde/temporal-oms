@@ -7,9 +7,6 @@ management.server.port: 9091
 
 server.port: 8080
 
-easypost:
-  api-key: ${EASYPOST_API_KEY}
-
 # Swagger/OpenAPI Configuration (MANDATORY per stack-api-rest)
 springdoc:
   api-docs:
@@ -19,4 +16,3 @@ springdoc:
 #    operationsSorter: method
 #    tagsSorter: alpha
   show-actuator: false
-

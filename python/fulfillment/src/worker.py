@@ -2,7 +2,7 @@
 
 Starts two Temporal workers in a single process concurrently:
   - agents               (ShippingAgent workflow + LLM + location events activities + ShippingAgent Nexus service)
-  - fulfillment-easypost  (EasyPost activities, 5 rps)
+  - fulfillment-shipping  (fixture-backed shipping activities)
 """
 from __future__ import annotations
 
@@ -17,8 +17,8 @@ logging.basicConfig(
 )
 
 from src.config import settings
-from src.workers.easypost_worker import build_easypost_worker
 from src.workers.fulfillment_worker import build_fulfillment_worker
+from src.workers.shipping_worker import build_shipping_worker
 
 _log = logging.getLogger(__name__)
 
@@ -26,9 +26,9 @@ _log = logging.getLogger(__name__)
 async def main() -> None:
     _log.info("Connecting to Temporal at %s (namespace: %s)", settings.temporal_fulfillment_address, settings.temporal_fulfillment_namespace)
 
-    fulfillment, easypost = await asyncio.gather(
+    fulfillment, shipping = await asyncio.gather(
         build_fulfillment_worker(),
-        build_easypost_worker(),
+        build_shipping_worker(),
     )
 
     loop = asyncio.get_running_loop()
@@ -40,7 +40,7 @@ async def main() -> None:
     loop.add_signal_handler(signal.SIGTERM, _handle_sigterm)
     loop.add_signal_handler(signal.SIGINT, _handle_sigterm)
 
-    async with fulfillment, easypost:
+    async with fulfillment, shipping:
         _log.info("All workers polling — press Ctrl+C to stop")
         await shutdown_event.wait()
 
