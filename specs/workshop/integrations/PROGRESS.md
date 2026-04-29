@@ -2,7 +2,7 @@
 
 **Spec:** [spec.md](./spec.md)
 **Last Updated:** 2026-04-29
-**Current Status:** Implementation complete for runtime integration work; workshop exercise material remains open.
+**Current Status:** Runtime integration work and Nexus compatibility reroute are complete; workshop exercise material remains open.
 
 ---
 
@@ -16,7 +16,8 @@
 | Phase 4 | Location-Events Integration Service | ✅ Complete | `enablements-api` endpoint and service return `RISK_LEVEL_NONE`, empty events, and echoed request window/timezone. |
 | Phase 5 | ShippingAgent Dispatch Migration | ✅ Complete | Python enablements HTTP client/adapters are in place; existing LLM-facing tool names remain stable. |
 | Phase 6 | Fulfillment Carrier Migration | ✅ Complete | Java `CarriersImpl` now delegates address verification and label printing to `enablements-api`; runtime EasyPost calls are removed from the fulfillment carrier path. |
-| Phase 7 | Workshop Exercise Material | 🟡 Partial | Scenario runner and margin/SLA walkthrough scripts exist; exercise notes and fixture-state query examples still need to be added. |
+| Phase 7 | Nexus Integration Reroute | ✅ Complete | `oms-integrations-v1` now targets enablements workers; commerce-app, PIMS, and inventory Nexus handlers are stateless HTTP adapters over `enablements-api`. |
+| Phase 8 | Workshop Exercise Material | 🟡 Partial | Scenario runner and margin/SLA walkthrough scripts exist; exercise notes and fixture-state query examples still need to be added. |
 
 ---
 
@@ -78,7 +79,18 @@
 - [x] Removed EasyPost as a runtime dependency for fulfillment carrier operations
 - [x] Preserved deterministic non-retryable failures for invalid address/rate requests
 
-### Phase 7 - Workshop Exercise Material
+### Phase 7 - Nexus Integration Reroute
+
+- [x] Added a protobuf-aware Java HTTP caller in `enablements-core`
+- [x] Added enablements-owned Nexus adapters for commerce-app, PIMS, and inventory
+- [x] Kept OMS Nexus service contracts stable
+- [x] Omitted payments from worker registration per the workshop integration decision
+- [x] Registered an `integrations` task queue in `enablements-workers`
+- [x] Removed apps-worker integration Nexus service registration
+- [x] Updated `scripts/setup-temporal-namespaces.sh` so `oms-integrations-v1` is retargeted to the configured enablements namespace and `integrations` task queue
+- [x] Added focused adapter, HTTP route, and worker routing tests
+
+### Phase 8 - Workshop Exercise Material
 
 - [ ] Add exercise notes explaining why integrations are owned by `enablements-api`
 - [ ] Add a query/check script for the `enablements-api` fixture state endpoint
@@ -96,9 +108,10 @@
 - `enablements-api` exists as a sibling module under `java/enablements`.
 - REST endpoints use generated protobuf messages directly where practical, with query-encoded protobuf JSON for complex `GET` inputs.
 - The copied protobuf JSON converter includes default values, which keeps explicit zero values observable.
-- `apps.Integrations` remains prior art/current compatibility infrastructure. Nexus handlers for
-  commerce-app, PIMS, and inventory still use it today; rerouting those handlers to
-  `enablements-api` is a planned follow-up.
+- `apps.Integrations` remains prior art, but apps workers no longer register the integrations task
+  queue or integration Nexus services.
+- Enablements-owned Nexus adapters for commerce-app, PIMS, and inventory delegate to
+  `enablements-api` over HTTP.
 - Python shipping activity class and task queue names are now `ShippingActivities` and
   `fulfillment-shipping`; LLM-facing tool names remain stable.
 - The offline EasyPost capture script was reviewed but not executed during this progress update because it requires EasyPost credentials and network access.
@@ -108,19 +121,27 @@
 ## Validation
 
 - [x] `env -u JAVA_HOME mvn -pl enablements/enablements-api,fulfillment/fulfillment-core -am test`
-  - `IntegrationServicesTest`: 11 passed
+  - `IntegrationServicesTest`: 13 passed
   - `CarriersImplTest`: 3 passed
 - [x] `python/.venv/bin/python -m pytest python/fulfillment/tests/test_enablements_integrations_client.py`
   - 2 passed
 - [x] `mvn -pl enablements/enablements-api,fulfillment/fulfillment-core -am -DskipTests compile`
   - Build success
 - [x] Focused ShippingAgent Temporal tests pass with fixture-backed shipping and location-events paths.
+- [x] `JAVA_HOME=/Users/mnichols/.asdf/installs/java/openjdk-21.0.2 mvn -pl enablements/enablements-core,enablements/enablements-workers,apps/apps-core -am test`
+  - `AppsWorkerRoutingConfigTest`: 1 passed
+  - `HttpEnablementsIntegrationsClientTest`: 3 passed
+  - `EnablementsWorkerRoutingConfigTest`: 1 passed
+  - `NexusIntegrationAdaptersTest`: 3 passed
+- [x] `JAVA_HOME=/Users/mnichols/.asdf/installs/java/openjdk-21.0.2 mvn -pl enablements/enablements-api -am test`
+  - `IntegrationServicesTest`: 13 passed
+- [x] `JAVA_HOME=/Users/mnichols/.asdf/installs/java/openjdk-21.0.2 mvn -pl apps/apps-workers -am test`
+  - Apps worker module builds with the integrations task queue removed
 
 ---
 
 ## Open Items
 
-- Complete Phase 7 workshop material.
-- Reroute the existing Nexus integration handlers to use `enablements-api` as their backend.
+- Complete Phase 8 workshop material.
 - Decide later whether `apps.Integrations` should be deprecated or retained as compatibility/prior-art infrastructure.
 - If Java tests are run from this shell, unset or update `JAVA_HOME`; it currently points Maven at Java 17 while this project compiles Java 21 classfiles.

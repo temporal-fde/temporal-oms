@@ -15,20 +15,3 @@ spring.temporal:
         default-versioning-behavior: PINNED
         deployment-name: ${TEMPORAL_DEPLOYMENT_NAME:apps}
         build-id: ${TEMPORAL_WORKER_BUILD_ID:local}
-    - task-queue: integrations
-      workflow-classes:
-        - com.acme.apps.workflows.IntegrationsImpl
-      activity-beans:
-        - integrations-setup-activities
-      nexus-service-beans:
-        - commerce-app-service
-        - pims-service
-        - payments-service
-        - inventory-service
-      deployment-properties:
-        use-versioning: true
-        default-versioning-behavior: PINNED
-        deployment-name: ${TEMPORAL_DEPLOYMENT_NAME:apps}
-        build-id: ${TEMPORAL_WORKER_BUILD_ID:local}
-      rate-limits:
-        max-task-queue-activities-per-second: 1
