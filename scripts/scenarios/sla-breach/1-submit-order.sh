@@ -3,7 +3,7 @@
 # Step 1: Submit Order
 #
 # delivery_days=0 sets a same-day SLA — impossible for any carrier to meet.
-# paid_price_cents=3000 ($30) caps what the agent may spend.
+# paid_price_cents=995 ($9.95) matches the normal route's workshop margin.
 # No carrier delivers in 0 days, so SLA_BREACH is always triggered.
 #
 # The SLA rule in the system prompt reads:
@@ -21,7 +21,7 @@ echo ""
 
 xh PUT http://localhost:8080/api/v1/commerce-app/orders/sla-breach-123 \
   customerId="cust-002" \
-  order:='{"orderId":"sla-breach-123","items":[{"itemId":"shirt-001","quantity":1}],"shippingAddress":{"street":"388 Townsend St","city":"San Francisco","state":"CA","postalCode":"94107","country":"US"},"selectedShipment":{"paidPriceCents":"3000","currency":"USD","deliveryDays":0}}'
+  order:='{"orderId":"sla-breach-123","items":[{"itemId":"shirt-001","quantity":1}],"shippingAddress":{"street":"11 Wall St","city":"New York","state":"NY","postalCode":"10005","country":"US"},"selectedShipment":{"paidPriceCents":"995","currency":"USD","deliveryDays":0}}'
 
 echo ""
 echo "Order submitted"

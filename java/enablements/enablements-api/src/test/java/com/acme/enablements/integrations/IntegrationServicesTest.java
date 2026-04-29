@@ -122,6 +122,8 @@ class IntegrationServicesTest {
         assertThat(rates.getOptionsList())
                 .extracting(option -> option.getRateId())
                 .containsExactly("rate_wh_east_01_nyc_ground", "rate_wh_east_01_nyc_2day", "rate_wh_east_01_nyc_priority");
+        assertThat(rates.getOptionsList())
+                .allSatisfy(option -> assertThat(option.getCost().getUnits()).isLessThanOrEqualTo(1000));
     }
 
     @Test
@@ -139,6 +141,28 @@ class IntegrationServicesTest {
                         "rate_wh_east_01_wh_west_01_2day",
                         "rate_wh_east_01_wh_west_01_priority",
                         "rate_wh_east_01_wh_west_01_ground");
+    }
+
+    @Test
+    void shippingRatesIncludeAlternateWarehouseScenarioRoutes() {
+        var nycRates = shipping.getShippingRates(GetShippingRatesRequest.newBuilder()
+                .setFromEasypostId("adr_wh_east_02")
+                .setToEasypostId("adr_dest_nyc_01")
+                .addItems(ShippingLineItem.newBuilder().setSkuId("ELEC-SKU-001").setQuantity(1).build())
+                .build());
+
+        assertThat(nycRates.getOptionsList())
+                .allSatisfy(option -> assertThat(option.getCost().getUnits()).isLessThanOrEqualTo(1000));
+
+        var westRates = shipping.getShippingRates(GetShippingRatesRequest.newBuilder()
+                .setFromEasypostId("adr_wh_east_02")
+                .setToEasypostId("adr_wh_west_01")
+                .addItems(ShippingLineItem.newBuilder().setSkuId("ELEC-SKU-001").setQuantity(1).build())
+                .build());
+
+        assertThat(westRates.getShipmentId()).isEqualTo("shp_adr_wh_east_02_to_adr_wh_west_01");
+        assertThat(westRates.getOptionsList())
+                .allSatisfy(option -> assertThat(option.getCost().getUnits()).isGreaterThan(1000));
     }
 
     @Test
