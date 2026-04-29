@@ -132,7 +132,7 @@ Phase 5 cannot start until Phases 3 and 4 are both complete and the deployment s
 - [x] `CarriersImpl.printShippingLabel` — delegates to `enablements-api` synthetic label lookup
 - [x] `FulfillmentOptionsLoaderImpl` — returns fixed workshop shipping margin and Nexus endpoint names
 - [x] Inventory lifecycle operations are wired through existing Nexus integration handlers
-- [ ] Follow-up: reroute inventory Nexus backend from `apps.Integrations` to `enablements-api`
+- [x] Inventory Nexus backend delegates through enablements-owned handlers to `enablements-api`
 
 ### Phase 7 — V2 ShippingAgent Nexus Integration
 

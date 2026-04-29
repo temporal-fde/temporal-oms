@@ -89,6 +89,7 @@
 - [x] Removed apps-worker integration Nexus service registration
 - [x] Updated `scripts/setup-temporal-namespaces.sh` so `oms-integrations-v1` is retargeted to the configured enablements namespace and `integrations` task queue
 - [x] Added focused adapter, HTTP route, and worker routing tests
+- [x] Removed obsolete apps-owned integration workflow code after the reroute was verified
 
 ### Phase 8 - Workshop Exercise Material
 
@@ -108,8 +109,7 @@
 - `enablements-api` exists as a sibling module under `java/enablements`.
 - REST endpoints use generated protobuf messages directly where practical, with query-encoded protobuf JSON for complex `GET` inputs.
 - The copied protobuf JSON converter includes default values, which keeps explicit zero values observable.
-- `apps.Integrations` remains prior art, but apps workers no longer register the integrations task
-  queue or integration Nexus services.
+- Apps workers no longer register the integrations task queue or integration Nexus services.
 - Enablements-owned Nexus adapters for commerce-app, PIMS, and inventory delegate to
   `enablements-api` over HTTP.
 - Python shipping activity class and task queue names are now `ShippingActivities` and
@@ -143,5 +143,4 @@
 ## Open Items
 
 - Complete Phase 8 workshop material.
-- Decide later whether `apps.Integrations` should be deprecated or retained as compatibility/prior-art infrastructure.
 - If Java tests are run from this shell, unset or update `JAVA_HOME`; it currently points Maven at Java 17 while this project compiles Java 21 classfiles.

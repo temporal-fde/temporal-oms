@@ -95,11 +95,11 @@ Provide feedback in PROGRESS.md → Feedback Items section.
 - **Next:** Tech lead review — confirm exercise list and Codespaces machine/key requirements
 
 ### Workshop: Integration Stubs
-- **Status:** Runtime implementation mostly complete; Nexus backend reroute follow-up
+- **Status:** Runtime implementation complete; workshop material follow-up
 - **Goal:** Document `enablements-api` as the workshop-owned integration fixture boundary for commerce-app, PIMS, inventory, shipping, and location-events
 - **Owner:** Temporal FDE Team
 - **Spec:** `specs/workshop/integrations/`
-- **Next:** Reroute existing Nexus integration handlers to use `enablements-api` as their backend; decide later whether `apps.Integrations` should be deprecated
+- **Next:** Complete Phase 8 workshop material and fixture inspection examples
 
 ### 🆕 fulfillment.Order (initiative)
 

@@ -97,7 +97,7 @@ public class OrderActivitiesImpl implements OrderActivities {
     }
 
     private void callOrderEndpoint(String orderId, String customerId) {
-        // see com/acme/apps/workflows/activities/IntegrationsSetupImpl.java:40
+        // Keep this address aligned with the workshop fixture warehouse set.
         var shippingAddress = ShippingAddress.newBuilder()
                 .setStreet("388 Townsend St")
                 .setCity("San Francisco")

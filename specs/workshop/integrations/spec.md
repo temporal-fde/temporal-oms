@@ -13,9 +13,8 @@
 ### Executive Summary
 
 The workshop needs credible external systems without requiring every participant to provision
-commerce, PIMS, inventory, carrier, and supply-chain-risk services. The existing
-`apps.Integrations` workflow proves the value of a central simulator, but the target implementation
-should now move the workshop integration surface into a new `enablements-api` module.
+commerce, PIMS, inventory, carrier, and supply-chain-risk services. The workshop integration
+surface now lives in `enablements-api`.
 
 `enablements-api` becomes the one place to manage integration fixture state, REST operations,
 scenario mutation, and fixture inspection. Nexus remains a compatibility ingress for existing OMS
@@ -55,8 +54,7 @@ decide to include payment validation in the exercise narrative.
 ### Acceptance Criteria
 
 - [x] The workshop spec lists every in-scope service operation and its request/response type
-- [x] The spec explains the current `apps.Integrations` singleton workflow pattern as prior art
-      and identifies `enablements-api` as the target owner
+- [x] The spec identifies `enablements-api` as the target owner for workshop integrations
 - [x] The spec identifies which behavior is already implemented vs planned
 - [x] `location-events` has a proposed service contract and a clear migration path from the
       current Python activity stub
@@ -101,38 +99,14 @@ location-events all contribute facts to one recommendation path.
 
 ## Current State (As-Is)
 
-### What Exists Today
+### Enablements-Owned Integrations
 
-`java/apps/apps-core/src/main/java/com/acme/apps/workflows/IntegrationsImpl.java` is a singleton
-workflow used as an in-memory integration stub.
+`enablements-api` owns the workshop integration simulator state and fixture-backed behavior.
+The `oms-integrations-v1` Nexus endpoint remains a compatibility ingress for workflow callers, but
+it targets enablements workers and delegates to `enablements-api` over HTTP.
 
-- Workflow type: `apps.Integrations`
-- Workflow ID: `integrations`
-- Task queue: `integrations`
-- Namespace: `apps`
-- Startup activity: `IntegrationsSetup.preloadWarehouseAddresses()`
-- Query: `getState() -> GetIntegrationsStateResponse`
-
-Nexus service handlers in `java/apps/apps-core/src/main/java/com/acme/apps/services/` expose
-service-shaped operations and route calls into the singleton workflow:
-
-```
-caller workflow
-  -> Nexus operation on integrations endpoint
-  -> executeUpdateWithStart(workflowId="integrations")
-  -> apps.Integrations update handler
-  -> deterministic stubbed response
-```
-
-The `integrations` worker currently registers these Nexus service beans:
-
-- `commerce-app-service`
-- `pims-service`
-- `payments-service`
-- `inventory-service`
-
-`location-events` does not use the `apps.Integrations` pattern. Today the LLM-facing Python
-activity remains registered on the `agents` task queue, but it delegates to `enablements-api`:
+`location-events` follows the same model. Today the LLM-facing Python activity remains registered
+on the `agents` task queue, but it delegates to `enablements-api`:
 
 ```python
 async def get_location_events(
@@ -142,10 +116,9 @@ async def get_location_events(
 
 The current first pass returns `RISK_LEVEL_NONE` with no events through the enablements API path.
 
-This current state remains useful context, but it is not the target shape for new integration work.
-New workshop integration APIs, fixture state, inspection endpoints, and compatibility Nexus
-handlers should live in the enablements bounded context. The `apps` bounded context should keep
-order/payment webhook orchestration, but it should not own integration simulator behavior.
+Workshop integration APIs, fixture state, inspection endpoints, and compatibility Nexus handlers
+live in the enablements bounded context. The `apps` bounded context keeps order/payment webhook
+orchestration, but it does not own integration simulator behavior.
 
 ### Existing Stub Behavior
 
@@ -308,9 +281,9 @@ message ReleaseHoldResponse {
 }
 ```
 
-Current stub rules:
+Current enablements-owned stub rules:
 
-- Warehouse addresses are pre-verified through EasyPost at `apps.Integrations` startup
+- Warehouse addresses are served from packaged `enablements-api` fixture data
 - Collection A warehouses are primary; Collection B warehouses are alternates
 - `lookupInventoryAddress` returns a direct warehouse when `address_id` is present
 - Otherwise it picks the first warehouse whose SKU prefixes match the first line item's `sku_id`
@@ -635,8 +608,7 @@ GET /api/v1/integrations/fixtures
 
 - Response: `GetEnablementIntegrationsFixturesResponse` or equivalent JSON DTO
 
-No endpoint in this surface should require callers to know about Nexus, `apps.Integrations`, or the
-old apps worker. Those remain implementation history and migration context only.
+No endpoint in this surface should require callers to know about Nexus or worker internals.
 
 ### Nexus Compatibility Surface
 
@@ -699,8 +671,8 @@ Key rules:
 
 The fixture capture script should:
 
-- Start from the hardcoded warehouse addresses currently used by `OrderActivitiesImpl` and
-  `IntegrationsSetup`
+- Start from the hardcoded warehouse addresses currently used by `OrderActivitiesImpl` and the
+  enablements shipping fixtures
 - Add roughly 10 additional legitimate destination addresses for richer rate coverage
 - Verify every address and persist the resulting `EasyPostAddress` fields, including coordinates
   and timezone when available
@@ -811,10 +783,9 @@ dispatch implementation can call `enablements-api` over HTTP.
   expose demo/reference state, and own all integration simulator state. Nexus adapters must call
   this API over HTTP when fixture behavior or state matters.
 - **Current migration state:** Shipping and location-event activity paths use `enablements-api`.
-  Existing Nexus integrations for commerce-app, PIMS, inventory, and the currently registered
-  payments service still delegate to `apps.Integrations`; rerouting those handlers to enablements
-  is an explicit follow-up. `apps.Integrations` remains prior art and current compatibility
-  infrastructure, not a deprecated component yet.
+  The `oms-integrations-v1` Nexus compatibility endpoint now targets enablements workers, where
+  commerce-app, PIMS, and inventory service handlers are stateless HTTP adapters over
+  `enablements-api`. Payments is intentionally not registered for this workshop slice.
 - **Interfaces:**
   - REST endpoints under `/api/v1/integrations/**`
   - shared Java services for commerce-app, PIMS, inventory, shipping, and location-events
@@ -879,7 +850,7 @@ Potential additive change:
 
 ```protobuf
 message GetEnablementIntegrationsFixturesResponse {
-  repeated WarehouseEntry warehouses = 1;
+  repeated WarehouseFixture warehouses = 1;
   repeated LocationEventSeed location_event_seeds = 2;
   repeated ShippingAddressFixture shipping_addresses = 3;
   repeated ShippingShipmentFixture shipping_shipments = 4;
@@ -1079,22 +1050,20 @@ this spec is intended to remove.
 
 Deliverables:
 
-- [ ] Add or expose a thin Java HTTP caller in `enablements-core` for
+- [x] Add or expose a thin Java HTTP caller in `enablements-core` for
       `/api/v1/integrations/**`
-- [ ] Move commerce-app, PIMS, inventory, and any intentionally retained payments Nexus service
+- [x] Move commerce-app, PIMS, inventory, and any intentionally retained payments Nexus service
       implementations from `apps-core` to enablements-owned code
-- [ ] Register an `integrations` task queue in `enablements-workers` with the enablements-owned
+- [x] Register an `integrations` task queue in `enablements-workers` with the enablements-owned
       Nexus service beans
-- [ ] Retarget `oms-integrations-v1` from `apps / integrations` to the configured enablements
+- [x] Retarget `oms-integrations-v1` from `apps / integrations` to the configured enablements
       worker namespace and `integrations` task queue
-- [ ] Remove the `integrations` task queue and integration Nexus service registration from
+- [x] Remove the `integrations` task queue and integration Nexus service registration from
       `apps-workers` after compatibility is verified
-- [ ] Decide whether `payments-service` is intentionally retained under enablements or removed
+- [x] Decide whether `payments-service` is intentionally retained under enablements or removed
       from the workshop integration endpoint
-- [ ] If `payments-service` is retained, add a matching `enablements-api` payment-validation
-      endpoint so the Nexus adapter still delegates over HTTP
-- [ ] Keep `apps.Integrations` only as prior-art/compatibility context until the reroute has been
-      reviewed
+- [x] Confirm `payments-service` is not retained, so no payment-validation endpoint is needed
+- [x] Remove obsolete apps-owned integration workflow code after the reroute was verified
 
 ### Phase 8: Workshop Exercise Material
 
@@ -1300,9 +1269,9 @@ Follow-up integration tests should cover the Nexus reroute after it is implement
 
 ### Implementation Notes
 
-- The current `IntegrationsImpl` item map uses uppercase item IDs such as `ITEM-ELEC-001`.
-  The commerce REST product endpoint still returns lowercase `item-{n}` values; workshop scripts
-  should use known item IDs when deterministic SKU/warehouse behavior matters.
+- PIMS fixtures use uppercase item IDs such as `ITEM-ELEC-001`. The commerce REST product endpoint
+  still returns lowercase `item-{n}` values; workshop scripts should use known item IDs when
+  deterministic SKU/warehouse behavior matters.
 - `lookupInventoryAddress` currently matches only the first item SKU. If multi-item orders are
   important for the workshop, this needs a requirement: split by warehouse, reject mixed prefixes,
   or choose a primary warehouse deterministically.
@@ -1326,10 +1295,6 @@ Follow-up integration tests should cover the Nexus reroute after it is implement
 - `java/enablements/enablements-workers`
 - `java/enablements/enablements-api/src/main/java/com/acme/enablements/controllers/IntegrationsController.java`
 - `java/enablements/enablements-api/src/main/java/com/acme/enablements/integrations/**`
-- `java/apps/apps-core/src/main/java/com/acme/apps/workflows/IntegrationsImpl.java` (prior art)
-- `java/apps/apps-core/src/main/java/com/acme/apps/services/InventoryServiceImpl.java` (prior art)
-- `java/apps/apps-core/src/main/java/com/acme/apps/services/ProductInformationManagementServiceImpl.java` (prior art)
-- `java/apps/apps-core/src/main/java/com/acme/apps/services/CommerceAppServiceImpl.java` (prior art)
 - `scripts/setup-temporal-namespaces.sh`
 - `python/fulfillment/src/agents/activities/location_events.py`
 - `python/fulfillment/src/agents/activities/shipping.py`

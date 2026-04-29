@@ -474,7 +474,7 @@ Deliverables:
 | Detached scope for inventory compensation is easy to break in refactors | High | Medium | Dedicated unit tests for both cancel and timeout compensation paths; CI must run these |
 | Proto naming conflict: existing Python-era `FulfillOrderRequest` in same package | Low | High | New Java messages use distinct names (`StartOrderFulfillmentRequest`, not `FulfillOrderRequest`); long-term, split into separate `.proto` files |
 | `Workflow.getVersion()` branch in `processing.Order` — wrong placement causes non-determinism on replay | High | Low | Follow existing `VersioningBehavior.PINNED` pattern in `processing.OrderImpl`; write replay test before deploying new build-id |
-| Nexus integration backend still points some operations at `apps.Integrations` | Medium | Medium | Reroute commerce-app, PIMS, and inventory Nexus handlers to `enablements-api` in a follow-up |
+| Nexus integration backend depends on enablements availability | Medium | Medium | Keep `enablements-api` and enablements workers in the local/workshop startup path |
 
 ---
 

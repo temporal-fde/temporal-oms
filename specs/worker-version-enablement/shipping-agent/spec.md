@@ -28,9 +28,8 @@ That gap is now closed for the current scripts:
 - ShippingAgent receives that context as `CalculateShippingOptionsRequest.selected_shipment`.
 - Runtime shipping and location-event tool calls go through `enablements-api`, not EasyPost.
 
-The remaining follow-up is to reroute existing Nexus integration handlers for commerce-app, PIMS,
-and inventory so their backend is `enablements-api` instead of `apps.Integrations`.
-`apps.Integrations` is not declared deprecated yet.
+The Nexus integration handlers for commerce-app, PIMS, and inventory now use `enablements-api` as
+their backend.
 
 ---
 
@@ -62,10 +61,6 @@ the echoed request window/timezone. Real weather/event enrichment is a separate 
 
 ## Follow-Up Scope
 
-- Reroute the existing Nexus integration service handlers to use `enablements-api` as their
-  backend for commerce-app, PIMS, and inventory.
-- Decide later whether `apps.Integrations` should be deprecated or retained as compatibility and
-  prior-art infrastructure.
 - Add richer location-event enrichment behind `enablements-api`.
 - Add fixture-state query examples or scripts for workshop operators.
 
