@@ -1,10 +1,10 @@
 # Location Events Activity Specification
 
 **Feature Name:** `get_location_events` — Supply Chain Risk via Weather + Major Events
-**Status:** Draft
+**Status:** Deferred enrichment; first-pass fixture endpoint implemented
 **Owner:** Temporal FDE Team
 **Created:** 2026-04-28
-**Updated:** 2026-04-28
+**Updated:** 2026-04-29
 
 ---
 
@@ -16,7 +16,13 @@ The `get_location_events` activity provides supply chain risk data for a geograp
 consumed by `ShippingAgent` to inform shipping recommendation outcomes (`MARGIN_SPIKE`,
 `SLA_BREACH`, etc.). It was originally designed to call PredictHQ, which is no longer available.
 
-This spec replaces PredictHQ with two free, simple public APIs: **Open-Meteo** for weather
+Current workshop runtime does not call external location-event APIs. `get_location_events` now
+delegates to `enablements-api`, which returns `RISK_LEVEL_NONE`, no events, and echoes the request
+window/timezone. That first pass keeps the ShippingAgent path deterministic while preserving the
+existing protobuf contract.
+
+This deferred enrichment spec replaces PredictHQ with two free, simple public APIs:
+**Open-Meteo** for weather
 disruption signals and **Ticketmaster Discovery** for major local events (traffic congestion risk).
 Both APIs are lat/lng-native, require no credit card, and return data that workshop participants
 can immediately reason about. The activity merges results from both sources into the same
@@ -70,9 +76,10 @@ what weather or events happen to be occurring on the day.
   `proto/acme/fulfillment/domain/v1/shipping_agent.proto`
 - `LocationEvent`, `LocationRiskSummary`, `RiskLevel` defined in
   `proto/acme/common/v1/values.proto`
-- Activity stub at `python/fulfillment/src/agents/activities/location_events.py` — the
-  function signature and Temporal decorator exist but the body calls PredictHQ
-- Activity is registered on the fulfillment worker and `ShippingAgent` calls it via tool dispatch
+- Activity at `python/fulfillment/src/agents/activities/location_events.py` calls
+  `enablements-api` through the Python HTTP client
+- `enablements-api` implements the first-pass endpoint with empty events and `RISK_LEVEL_NONE`
+- Activity is registered on the `agents` worker and `ShippingAgent` calls it via tool dispatch
 
 ### Pain Points / Gaps
 

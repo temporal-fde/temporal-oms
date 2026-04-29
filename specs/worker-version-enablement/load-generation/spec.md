@@ -92,7 +92,7 @@ Enablements Application (new bounded context)
 │       • v1 build-id: enablements-worker:v1
 │       • v2 build-id: enablements-worker:v2
 │
-└── enablements-api endpoints (in apps-api, separate controller)
+└── enablements-api endpoints (dedicated java/enablements/enablements-api module)
     └─ EnablementsController: Query workflow state + control signals
        • GET /api/v1/enablements/worker-version/{enablement_id} - Get workflow state
        • POST /api/v1/enablements/worker-version/{enablement_id}/start - Trigger workflow
@@ -235,7 +235,7 @@ enablements:
 
   # OMS API integration
   apps-api-endpoint: ${APPS_API_ENDPOINT:http://localhost:8080}
-  processing-api-endpoint: ${PROCESSING_API_ENDPOINT:http://localhost:8081}
+  processing-api-endpoint: ${PROCESSING_API_ENDPOINT:http://localhost:8070}
   api-timeout: 10000             # ms per API call
 
   # Temporal integration
@@ -309,7 +309,7 @@ curl -X POST http://localhost:8080/api/v1/enablements/worker-version/demo-sessio
 
 **Configuration:**
 - OMS APIs: `APPS_API_ENDPOINT` (default: http://localhost:8080 or tunneled Traefik)
-- Processing API: `PROCESSING_API_ENDPOINT` (default: http://localhost:8081 or tunneled)
+- Processing API: `PROCESSING_API_ENDPOINT` (default: http://localhost:8070 or tunneled)
 - Temporal: `TEMPORAL_TARGET` (default: localhost:7233 for local, or cloud Temporal)
 
 ---

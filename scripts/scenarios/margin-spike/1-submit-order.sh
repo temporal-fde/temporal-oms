@@ -2,7 +2,7 @@
 # Scenario: Margin Spike — ShippingAgent Alternate Warehouse Path
 # Step 1: Submit Order
 #
-# paid_price_cents=1 (1 cent) guarantees every real EasyPost rate exceeds the
+# paid_price_cents=1 (1 cent) guarantees every fixture-backed shipping rate exceeds the
 # customer paid price, triggering MARGIN_SPIKE in the ShippingAgent.
 # The agent must call find_alternate_warehouse before finalizing — watch for it
 # in the fulfillment namespace workflow history in Temporal UI.

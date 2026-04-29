@@ -95,11 +95,11 @@ Provide feedback in PROGRESS.md → Feedback Items section.
 - **Next:** Tech lead review — confirm exercise list and Codespaces machine/key requirements
 
 ### Workshop: Integration Stubs
-- **Status:** Draft
-- **Goal:** Document workflow-backed workshop stubs for commerce-app, PIMS, inventory, and location-events; align requirements for bringing the integration story behind one inspectable Temporal workflow
+- **Status:** Runtime implementation mostly complete; Nexus backend reroute follow-up
+- **Goal:** Document `enablements-api` as the workshop-owned integration fixture boundary for commerce-app, PIMS, inventory, shipping, and location-events
 - **Owner:** Temporal FDE Team
 - **Spec:** `specs/workshop/integrations/`
-- **Next:** Review requirements — decide whether `location-events` moves behind Nexus or remains an agent activity for the first workshop pass
+- **Next:** Reroute existing Nexus integration handlers to use `enablements-api` as their backend; decide later whether `apps.Integrations` should be deprecated
 
 ### 🆕 fulfillment.Order (initiative)
 
@@ -111,11 +111,11 @@ Provide feedback in PROGRESS.md → Feedback Items section.
 - **Next:** Phase 1 (proto) is unblocked; 4 open questions to resolve before Phases 3/5/6 can complete (see PROGRESS.md)
 
 #### ShippingAgent
-- **Status:** Approved — Ready for Planning
-- **Goal:** LLM-driven shipping advisor (Claude + 4 activity tools) called by `fulfillment.Order` V2 via Nexus; long-running per-customer workflow with content-hashed rate caching
+- **Status:** Implemented for fixture-backed workshop path
+- **Goal:** LLM-driven shipping advisor (Claude + tool activities) called by `fulfillment.Order` via Nexus; shipping and first-pass location integrations are backed by `enablements-api`
 - **Owner:** Temporal FDE Team
 - **Spec:** `specs/fulfillment-order/shipping-agent/`
-- **Next:** Planning phase — break into detailed tasks; unblock Inventory Locations spec for `lookup_inventory_location`
+- **Next:** Add richer location-event enrichment behind `enablements-api`
 
 #### Deployment (k8s / Worker Versioning rollout)
 - **Status:** Not Started — follow-up spec

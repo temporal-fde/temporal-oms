@@ -23,13 +23,23 @@ temporal workflow update execute \
     "customer_id": "cust-123",
     "to_address": {
       "easypost": {
-        "street1": "540 Broad St",
-        "city": "Newark",
-        "state": "NJ",
-        "zip": "07102",
+        "id": "adr_dest_nyc_01",
+        "street1": "11 Wall St",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10005",
         "country": "US"
       }
     },
     "items": [{"sku_id": "ELEC-001", "quantity": 1}],
-    "transit_days_sla": 3
+    "selected_shipment": {
+      "paid_price": {"currency": "USD", "units": 995},
+      "easypost": {
+        "shipment_id": "shp_adr_wh_east_01_to_adr_dest_nyc_01",
+        "selected_rate": {
+          "id": "rate_wh_east_01_nyc_ground",
+          "delivery_days": 3
+        }
+      }
+    }
   }'

@@ -12,7 +12,7 @@ public interface GetLocationEventsRequestOrBuilder extends
 
   /**
    * <pre>
-   * Destination coordinates from EasyPost address verification.
+   * Destination coordinates from verified address data.
    * </pre>
    *
    * <code>.acme.common.v1.Coordinate coordinate = 1 [json_name = "coordinate"];</code>
@@ -21,7 +21,7 @@ public interface GetLocationEventsRequestOrBuilder extends
   boolean hasCoordinate();
   /**
    * <pre>
-   * Destination coordinates from EasyPost address verification.
+   * Destination coordinates from verified address data.
    * </pre>
    *
    * <code>.acme.common.v1.Coordinate coordinate = 1 [json_name = "coordinate"];</code>
@@ -30,7 +30,7 @@ public interface GetLocationEventsRequestOrBuilder extends
   com.acme.proto.acme.common.v1.Coordinate getCoordinate();
   /**
    * <pre>
-   * Destination coordinates from EasyPost address verification.
+   * Destination coordinates from verified address data.
    * </pre>
    *
    * <code>.acme.common.v1.Coordinate coordinate = 1 [json_name = "coordinate"];</code>
@@ -105,7 +105,7 @@ public interface GetLocationEventsRequestOrBuilder extends
   /**
    * <pre>
    * IANA TZ Database identifier for the destination (e.g. "America/New_York").
-   * From EasyPost verifications.delivery.details.time_zone.
+   * IANA timezone associated with the verified address.
    * </pre>
    *
    * <code>string timezone = 5 [json_name = "timezone"];</code>
@@ -115,7 +115,7 @@ public interface GetLocationEventsRequestOrBuilder extends
   /**
    * <pre>
    * IANA TZ Database identifier for the destination (e.g. "America/New_York").
-   * From EasyPost verifications.delivery.details.time_zone.
+   * IANA timezone associated with the verified address.
    * </pre>
    *
    * <code>string timezone = 5 [json_name = "timezone"];</code>

@@ -116,8 +116,8 @@ ShippingAgent (consumer — worked example)
 │         name=activity_name(LookupInventoryActivities.lookup_inventory_location),
 │         description=..., method=..., req_type=..., result_type=...,
 │         task_queue="fulfillment", ...),
-│     activity_tool(..., task_queue="fulfillment-easypost", ...),   # verify_address
-│     activity_tool(..., task_queue="fulfillment-easypost", ...),   # get_carrier_rates
+│     activity_tool(..., task_queue="fulfillment-shipping", ...),   # verify_address
+│     activity_tool(..., task_queue="fulfillment-shipping", ...),   # get_carrier_rates
 │     activity_tool(..., task_queue="agents", ...),                  # get_location_events
 │   )
 │

@@ -43,9 +43,9 @@ with workflow.unsafe.imports_passed_through():
         LookupInventoryAddressResponse,
     )
     from acme.fulfillment.domain.v1.workflows_p2p import VerifyAddressRequest, VerifyAddressResponse
-    from src.agents.activities.easypost import EasyPostActivities
     from src.agents.activities.llm import LlmActivities
     from src.agents.activities.location_events import LocationEventsActivities
+    from src.agents.activities.shipping import ShippingActivities
     from src.agents.dispatch import activity_name, activity_tool, nexus_tool, ToolSpecs
     from src.config import settings
     from src.services.inventory_service import InventoryService
@@ -69,12 +69,12 @@ _TOOLS = ToolSpecs(
         schedule_to_close_timeout=_ACTIVITY_TIMEOUT,
     ),
     activity_tool(
-        activity_name(EasyPostActivities.get_carrier_rates),
-        "Create an EasyPost shipment and retrieve available carrier rates.",
-        EasyPostActivities.get_carrier_rates,
+        activity_name(ShippingActivities.get_carrier_rates),
+        "Retrieve fixture-backed shipment rates from the shipping integration.",
+        ShippingActivities.get_carrier_rates,
         GetShippingRatesRequest,
         GetShippingRatesResponse,
-        task_queue="fulfillment-easypost",
+        task_queue="fulfillment-shipping",
         start_to_close_timeout=_ACTIVITY_TIMEOUT,
         retry_policy=_ACTIVITY_RETRY,
     ),
@@ -171,7 +171,7 @@ def _build_recommendation(data: dict) -> ShippingRecommendation:
 
 
 
-_NAME_RATES = activity_name(EasyPostActivities.get_carrier_rates)
+_NAME_RATES = activity_name(ShippingActivities.get_carrier_rates)
 _NAME_ALTERNATE_WAREHOUSE = "find_alternate_warehouse"
 _NEGATIVE_OUTCOMES = frozenset({"MARGIN_SPIKE", "SLA_BREACH"})
 
@@ -245,7 +245,7 @@ class ShippingAgent:
                     "verify_address",
                     args=[VerifyAddressRequest(address=request.to_address)],
                     result_type=VerifyAddressResponse,
-                    task_queue="fulfillment-easypost",
+                    task_queue="fulfillment-shipping",
                     start_to_close_timeout=_ACTIVITY_TIMEOUT,
                     retry_policy=_ACTIVITY_RETRY,
                 ),

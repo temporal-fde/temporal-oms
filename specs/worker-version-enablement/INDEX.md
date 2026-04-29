@@ -89,20 +89,18 @@ Run an **enablement session** to teach the team how to safely deploy workflow co
 
 ### 4. ShippingAgent Integration
 **Spec:** [shipping-agent/spec.md](./shipping-agent/spec.md)
-**Status:** 📋 Spec Complete — Awaiting Implementation Session
+**Status:** ✅ Implemented for current scenarios
 **Owner:** Temporal FDE Team
-**Purpose:** Fix the enablements load-generator so orders reach ShippingAgent with a real
-`customer_paid_price`, triggering the MARGIN_SPIKE → `find_alternate_warehouse` path and making
-the full agentic loop visible in Temporal UI during live sessions.
+**Purpose:** Ensure scenario orders reach ShippingAgent with selected-shipment context, triggering
+explicit margin and SLA paths when requested and making the full agentic loop visible in Temporal UI.
 
 **Key Deliverables:**
-- `apps.OrderImpl`: set `selected_shipping.price = Money{units=1}` on every order before
-  dispatching to fulfillment (Option A — hardcoded, workshop-appropriate)
-- Verified end-to-end: `find_alternate_warehouse` visible in ShippingAgent workflow history
+- Scenario scripts set selected shipment paid price and delivery days explicitly
+- ShippingAgent receives `selected_shipment` and uses fixture-backed `enablements-api` rates
+- Verified paths include `find_alternate_warehouse`, `MARGIN_SPIKE`, and `SLA_BREACH`
 
-**Why it matters:** Without this fix, ShippingAgent silently skips its margin rule and the
-most interesting branch (`find_alternate_warehouse`) is structurally unreachable from the
-demo load-generator
+**Why it matters:** The workshop can now demonstrate normal fulfillment separately from explicit
+margin and SLA failures without relying on live carrier data.
 
 ---
 

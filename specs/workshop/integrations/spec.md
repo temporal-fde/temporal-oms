@@ -4,7 +4,7 @@
 **Status:** Draft
 **Owner:** Temporal FDE Team
 **Created:** 2026-04-28
-**Updated:** 2026-04-28
+**Updated:** 2026-04-29
 
 ---
 
@@ -18,9 +18,9 @@ commerce, PIMS, inventory, carrier, and supply-chain-risk services. The existing
 should now move the workshop integration surface into a new `enablements-api` module.
 
 `enablements-api` becomes the one place to manage integration fixture state, REST operations,
-scenario mutation, and fixture inspection. Nexus is not part of the primary design for this spec.
-If a future exercise wants Nexus, it can be invoked inside an `enablements-api` operation, but it
-must not own the contracts, fixture state, scenario rules, or inspection surface.
+scenario mutation, and fixture inspection. Nexus remains a compatibility ingress for existing OMS
+workflows, but it is not the source of truth for integration behavior. The target Nexus handlers
+live with enablements, are stateless adapters, and delegate to `enablements-api` over HTTP.
 
 The services in scope are:
 
@@ -54,17 +54,19 @@ decide to include payment validation in the exercise narrative.
 
 ### Acceptance Criteria
 
-- [ ] The workshop spec lists every in-scope service operation and its request/response type
-- [ ] The spec explains the current `apps.Integrations` singleton workflow pattern as prior art
+- [x] The workshop spec lists every in-scope service operation and its request/response type
+- [x] The spec explains the current `apps.Integrations` singleton workflow pattern as prior art
       and identifies `enablements-api` as the target owner
-- [ ] The spec identifies which behavior is already implemented vs planned
-- [ ] `location-events` has a proposed service contract and a clear migration path from the
+- [x] The spec identifies which behavior is already implemented vs planned
+- [x] `location-events` has a proposed service contract and a clear migration path from the
       current Python activity stub
-- [ ] EasyPost replacement APIs are listed for address verification, carrier rates, shipments,
+- [x] EasyPost replacement APIs are listed for address verification, carrier rates, shipments,
       and label printing
-- [ ] The spec defines how `selected_shipment` flows end-to-end as `acme.common.v1.Shipment`
-- [ ] The spec defines the fixture hierarchy and deterministic ID strategy for shipping data
-- [ ] Open requirements are explicit enough to review before implementation starts
+- [x] The spec defines how `selected_shipment` flows end-to-end as `acme.common.v1.Shipment`
+- [x] The spec defines the fixture hierarchy and deterministic ID strategy for shipping data
+- [x] The spec defines the Nexus compatibility reroute from apps-owned handlers to
+      enablements-owned HTTP adapters
+- [x] Open requirements are explicit enough to review before implementation starts
 
 ### Requirements and Motivation
 
@@ -75,8 +77,9 @@ The integration layer should satisfy these workshop requirements:
 - **Observable behavior:** fixture state and demo reference data should be queryable through
   `enablements-api` inspection endpoints
 - **Service boundary fidelity:** callers should interact with HTTP APIs hosted by
-  `enablements-api` that look like external systems. Nexus is not required at the boundary and
-  should only appear later as an internal adapter if a specific exercise needs it
+  `enablements-api` that look like external systems. Existing workflow callers may continue to use
+  the `oms-integrations-v1` Nexus endpoint, but that endpoint should be backed by enablements-owned
+  handlers that call `enablements-api` over HTTP
 - **Deterministic scenarios:** facilitators need stable ways to produce invalid orders, SKU
   enrichment, primary vs alternate warehouse selection, and location-risk outcomes
 - **No runtime EasyPost dependency:** EasyPost may be used by a capture script to build fixtures,
@@ -128,8 +131,8 @@ The `integrations` worker currently registers these Nexus service beans:
 - `payments-service`
 - `inventory-service`
 
-`location-events` does not use this pattern yet. Today it is a Python activity registered on the
-`agents` task queue:
+`location-events` does not use the `apps.Integrations` pattern. Today the LLM-facing Python
+activity remains registered on the `agents` task queue, but it delegates to `enablements-api`:
 
 ```python
 async def get_location_events(
@@ -137,11 +140,12 @@ async def get_location_events(
 ) -> GetLocationEventsResponse
 ```
 
-The activity is stubbed and returns `RISK_LEVEL_NONE` with no events.
+The current first pass returns `RISK_LEVEL_NONE` with no events through the enablements API path.
 
 This current state remains useful context, but it is not the target shape for new integration work.
-New workshop integration APIs, fixture state, and inspection endpoints should live in
-`enablements-api`.
+New workshop integration APIs, fixture state, inspection endpoints, and compatibility Nexus
+handlers should live in the enablements bounded context. The `apps` bounded context should keep
+order/payment webhook orchestration, but it should not own integration simulator behavior.
 
 ### Existing Stub Behavior
 
@@ -355,18 +359,20 @@ Current stub rule:
 - Return no events
 - Echo `active_from`, `active_to`, and `timezone`
 
-#### EasyPost-Dependent Shipping APIs
+#### Former EasyPost-Dependent Shipping APIs
 
-Today shipping data is split across Java and Python EasyPost call sites:
+Shipping runtime behavior has moved to fixture-backed `enablements-api` calls. The logical
+operations are still split across Java and Python callers, but they no longer call EasyPost during
+local/workshop execution:
 
 - Java `Carriers.verifyAddress(VerifyAddressRequest)` verifies the destination address before
-  fulfillment continues
-- Python `EasyPostActivities.verify_address(VerifyAddressRequest)` is the same logical operation
-  for the ShippingAgent/cart path
-- Python `EasyPostActivities.get_carrier_rates(GetShippingRatesRequest)` creates an EasyPost
-  shipment and returns all available rates to the ShippingAgent
-- Java `Carriers.printShippingLabel(PrintShippingLabelRequest)` retrieves the shipment, validates
-  the selected rate, buys the label, and returns tracking data
+  fulfillment continues through `enablements-api`
+- Python `ShippingActivities.verify_address(VerifyAddressRequest)` is the same logical operation
+  for the ShippingAgent/cart path through `enablements-api`
+- Python `ShippingActivities.get_carrier_rates(GetShippingRatesRequest)` retrieves fixture-backed
+  shipment rates from `enablements-api`
+- Java `Carriers.printShippingLabel(PrintShippingLabelRequest)` validates the fixture shipment/rate
+  pair and returns deterministic synthetic tracking data through `enablements-api`
 
 Current request/response contracts that need fixture-backed support:
 
@@ -495,9 +501,24 @@ callers
 
 All new integration fixture state should be managed inside `enablements-api`. The API owns the
 fixture loader/cache, scenario mutation, REST contracts, and inspection endpoints. Other workers
-call it over HTTP. If we later want Nexus for a specific demonstration, the `enablements-api`
-operation can call Nexus internally, but fixture ownership and external contracts remain in
-enablements.
+call it over HTTP.
+
+Existing workflow callers that already use Nexus should keep the same service contracts and endpoint
+name, but the backing worker moves from apps to enablements:
+
+```text
+processing.Order / fulfillment.Order
+  -> Nexus operation on oms-integrations-v1
+  -> configured enablements worker namespace, integrations task queue
+  -> enablements-owned Nexus service handler
+  -> enablements-api REST operation
+  -> enablements integration service
+  -> fixture store / in-memory cache
+```
+
+Nexus handlers must not directly access fixture state or inject the fixture services. Their job is
+only request/response transport adaptation. This keeps `enablements-api` as the inspectable owner
+and avoids split-brain fixture state between an API process and a worker process.
 
 ### Key Capabilities
 
@@ -509,8 +530,9 @@ enablements.
   can drive predictable outcomes
 - **Fixture-backed shipping:** address verification, rate lookup, shipment selection, and label
   printing are served from local fixtures instead of EasyPost
-- **Single owner, optional internal adapter:** `enablements-api` owns the implementation. Optional
-  Nexus usage, if added later, must be hidden inside an operation and delegate to the same services
+- **Single owner, Nexus compatibility adapter:** `enablements-api` owns the implementation. Nexus
+  usage is a compatibility adapter hosted by enablements workers and must delegate to
+  `enablements-api` over HTTP
 - **Location-events on the same foundation:** `location-events` should use the same
   `enablements-api` fixture store/cache pattern. The first pass returns an empty event list;
   later enrichment can use request inputs to hint at risk scenarios.
@@ -559,6 +581,15 @@ GET /api/v1/integrations/pims/enrich-order
 - Request: `EnrichOrderRequest`
 - Response: `EnrichOrderResponse`
 
+Payments, only if payment validation remains registered:
+
+```http
+POST /api/v1/integrations/payments/validate-payment
+```
+
+- Request: `ValidatePaymentRequest`
+- Response: `ValidatePaymentResponse`
+
 Inventory:
 
 ```http
@@ -606,6 +637,30 @@ GET /api/v1/integrations/fixtures
 
 No endpoint in this surface should require callers to know about Nexus, `apps.Integrations`, or the
 old apps worker. Those remain implementation history and migration context only.
+
+### Nexus Compatibility Surface
+
+The existing Nexus service contracts in `java/oms/src/main/java/com/acme/oms/services/` stay
+stable:
+
+- `CommerceAppService`
+- `ProductInformationManagementService`
+- `InventoryService`
+- `PaymentsService`, only if payment validation remains registered for a future exercise
+
+The target implementation should move the corresponding Nexus service implementations out of
+`apps-core` and into enablements. The worker process that registers them should be
+`enablements-workers`, on an `integrations` task queue. The existing Nexus endpoint name
+`oms-integrations-v1` should be retargeted from `apps / integrations` to the configured
+enablements worker namespace and `integrations` task queue so processing and fulfillment callers do
+not need contract changes.
+
+Each Nexus handler should delegate to `enablements-api` over HTTP and return the same protobuf
+response type. If a simple Java helper is useful, expose it from `enablements-core` as a thin
+protobuf-aware HTTP caller. It should not own fixture state, and it should not make
+`enablements-api` depend on worker-only Nexus registration. Register any Nexus service beans only in
+the worker process, either by package placement, explicit Spring configuration, or conditional
+configuration.
 
 ### EasyPost Replacement / Shipping
 
@@ -734,7 +789,8 @@ dispatch implementation can call `enablements-api` over HTTP.
 |----------|-----------|------------------------|
 | Put all new integration fixture ownership in `enablements-api` | Enablements is the workshop/demo bounded context; one API owns fixtures, scenario mutation, inspection, and any optional internal adapters | Spread state across apps, fulfillment, Python activities, and Nexus handlers - harder to reason about and reset |
 | Add an `enablements-api` module following the Java bounded-context convention | Apps, processing, and fulfillment already use `*-api` modules for REST deployment; enablements should follow the same shape | Put controllers into `enablements-core` or `apps-api` - violates local module conventions and blurs ownership |
-| Use REST as the integration boundary | REST is simple to call from Java workflows, Python activities, scripts, and Kubernetes; Nexus can be introduced inside an operation later | Make Nexus the primary boundary - useful for Temporal demos, but unnecessary for owning fixture state |
+| Use REST as the integration behavior boundary | REST is simple to call from Java workflows, Python activities, Nexus adapters, scripts, and Kubernetes | Make Nexus the source of truth - useful for Temporal demos, but the wrong owner for fixture state |
+| Host integration Nexus compatibility in enablements workers | Existing workflow callers keep stable Nexus contracts while the implementation moves out of apps and delegates to `enablements-api` | Leave Nexus handlers in `apps-core` - pragmatic historically, but keeps integration simulator ownership in the wrong bounded context |
 | Treat `location-events` as an enablements integration service | Risk data is external-domain context like inventory and PIMS; bringing it together clarifies the workshop architecture and avoids Python-only fixture logic | Keep it as a Python activity - simpler short-term but splits the integration story |
 | Preserve the existing `get_location_events` tool name | Avoids retraining the LLM prompt and keeps ShippingAgent history readable | Rename to Java-style `getLocationEvents` - leaks service implementation style into agent tools |
 | Remove payments from the workshop integration path | The order workflow path does not depend on payments; keeping it registered adds noise without workshop value | Keep payments registered but undocumented - low effort, but leaves an unused service in the story |
@@ -752,13 +808,39 @@ dispatch implementation can call `enablements-api` over HTTP.
 
 - **Purpose:** Workshop-owned integration simulator API
 - **Responsibilities:** Load fixture data, serve REST operations, mutate scenario responses,
-  expose demo/reference state, and own all integration simulator state. If a future exercise needs
-  Nexus, `enablements-api` may call it internally, but Nexus must delegate to this same service
-  layer.
+  expose demo/reference state, and own all integration simulator state. Nexus adapters must call
+  this API over HTTP when fixture behavior or state matters.
+- **Current migration state:** Shipping and location-event activity paths use `enablements-api`.
+  Existing Nexus integrations for commerce-app, PIMS, inventory, and the currently registered
+  payments service still delegate to `apps.Integrations`; rerouting those handlers to enablements
+  is an explicit follow-up. `apps.Integrations` remains prior art and current compatibility
+  infrastructure, not a deprecated component yet.
 - **Interfaces:**
   - REST endpoints under `/api/v1/integrations/**`
   - shared Java services for commerce-app, PIMS, inventory, shipping, and location-events
   - fixture state endpoint
+
+#### `enablements-core`
+
+- **Purpose:** Shared enablements workflow/activity code plus reusable integration transport
+  helpers.
+- **Responsibilities:** Optionally expose a thin protobuf-aware HTTP caller for
+  `enablements-api` integration endpoints and host enablements-owned Nexus service adapter classes
+  if that keeps the module layout simple.
+- **Constraints:** The HTTP caller and Nexus adapters are stateless transport code. They must not
+  load fixtures, mutate scenario state, or inject `enablements-api` fixture services directly.
+
+#### `enablements-workers`
+
+- **Purpose:** Worker deployment for enablements workflows and compatibility Nexus handlers.
+- **Responsibilities:** Register the existing `enablements` task queue for
+  `WorkerVersionEnablement` and an `integrations` task queue for Nexus service compatibility.
+- **Interfaces:**
+  - `integrations` task queue with Nexus service beans for commerce-app, PIMS, inventory, and any
+    intentionally retained payments service
+  - handlers delegate to `enablements-api` over HTTP
+  - `oms-integrations-v1` Nexus endpoint targets the configured enablements worker namespace and
+    `integrations` task queue
 
 #### Shipping Service
 
@@ -871,6 +953,29 @@ the `apps`, `processing`, and `fulfillment` bounded-context convention:
 `enablements-api` owns the integration REST surface and fixture resources. Payments is
 intentionally omitted unless a future exercise introduces payment validation.
 
+`enablements-workers` should also own the integration Nexus compatibility worker:
+
+```yaml
+spring.temporal:
+  namespace: ${TEMPORAL_ENABLEMENTS_NAMESPACE:default}
+  workers:
+    - task-queue: enablements
+      workflow-classes:
+        - com.acme.enablements.workflows.WorkerVersionEnablementImpl
+      activity-beans:
+        - order-activities
+        - deployment-activities
+    - task-queue: integrations
+      nexus-service-beans:
+        - commerce-app-service
+        - pims-service
+        - inventory-service
+```
+
+The `oms-integrations-v1` Nexus endpoint should target the configured enablements worker namespace
+and the `integrations` task queue. `apps-workers` should stop registering integration Nexus service
+beans after the enablements worker is in place.
+
 Shipping configuration:
 
 ```yaml
@@ -894,28 +999,28 @@ capture script or a deliberate developer task.
 
 Deliverables:
 
-- [ ] Review this spec and confirm the in-scope services
-- [ ] Add `enablements-api` module to `java/enablements/pom.xml`
-- [ ] Remove payments from the workshop integration narrative and registration unless a future
+- [x] Review this spec and confirm the in-scope services
+- [x] Add `enablements-api` module to `java/enablements/pom.xml`
+- [x] Remove payments from the workshop integration narrative and registration unless a future
       exercise needs it
-- [ ] Copy `ProtobufJsonHttpMessageConverter` and `WebMvcConfig` pattern from apps into
+- [x] Copy `ProtobufJsonHttpMessageConverter` and `WebMvcConfig` pattern from apps into
       `enablements-api`
-- [ ] Document the `enablements-api` service/cache shape for all integration runtime lookups
-- [ ] Document the REST endpoint names under `enablements-api`
-- [ ] Define the minimum seeded scenarios needed for the workshop
+- [x] Document the `enablements-api` service/cache shape for all integration runtime lookups
+- [x] Document the REST endpoint names under `enablements-api`
+- [x] Define the minimum seeded scenarios needed for the workshop
 
 ### Phase 2: EasyPost Fixture Capture
 
 Deliverables:
 
-- [ ] Inventory the warehouse and destination addresses that must exist in the shipping fixtures
-- [ ] Add roughly 10 legitimate destination addresses for richer route/rate coverage
-- [ ] Write a capture script that verifies addresses through EasyPost and persists address
+- [x] Inventory the warehouse and destination addresses that must exist in the shipping fixtures
+- [x] Add roughly 10 legitimate destination addresses for richer route/rate coverage
+- [x] Write a capture script that verifies addresses through EasyPost and persists address
       payloads, coordinates, and timezones
-- [ ] For each configured origin/destination pair, capture shipment and all returned rates
-- [ ] For every captured rate, generate a deterministic synthetic label/tracking payload from
+- [x] For each configured origin/destination pair, capture shipment and all returned rates
+- [x] For every captured rate, generate a deterministic synthetic label/tracking payload from
       `shipment_id + rate_id`
-- [ ] Write `shipping-fixtures.json` with stable IDs and enough raw payload detail to debug fixture
+- [x] Write `shipping-fixtures.json` with stable IDs and enough raw payload detail to debug fixture
       mismatches
 - [ ] Document how to refresh fixtures intentionally without changing runtime behavior
 
@@ -923,54 +1028,75 @@ Deliverables:
 
 Deliverables:
 
-- [ ] Create an `enablements-api` fixture loader/cache for shipping data
-- [ ] Implement `verifyAddress(VerifyAddressRequest)` from fixtures
-- [ ] Implement `getShippingRates(GetShippingRatesRequest)` from fixtures
-- [ ] Implement `printShippingLabel(PrintShippingLabelRequest)` from fixtures
-- [ ] Optionally implement `getCarrierRates(GetCarrierRatesRequest)` as a compatibility wrapper
-- [ ] Add deterministic scenario mutation for `paid_price.units=1` and explicit
+- [x] Create an `enablements-api` fixture loader/cache for shipping data
+- [x] Implement `verifyAddress(VerifyAddressRequest)` from fixtures
+- [x] Implement `getShippingRates(GetShippingRatesRequest)` from fixtures
+- [x] Implement `printShippingLabel(PrintShippingLabelRequest)` from fixtures
+- [x] Optionally implement `getCarrierRates(GetCarrierRatesRequest)` as a compatibility wrapper
+- [x] Add deterministic scenario mutation for `paid_price.units=1` and explicit
       `delivery_days=0`
-- [ ] Expose the implementation through `enablements-api` REST endpoints
-- [ ] Add fixture state REST endpoints for manual use and workshop scripts
+- [x] Expose the implementation through `enablements-api` REST endpoints
+- [x] Add fixture state REST endpoints for manual use and workshop scripts
 
 ### Phase 4: Location-Events Integration Service
 
 Deliverables:
 
-- [ ] Create `LocationEventsService` inside `enablements-api`
-- [ ] Return empty events and `RISK_LEVEL_NONE` in the first pass
-- [ ] Leave room for future input-derived risk hints without adding scenario fields now
-- [ ] Expose `GET /api/v1/integrations/location-events`
+- [x] Create `LocationEventsService` inside `enablements-api`
+- [x] Return empty events and `RISK_LEVEL_NONE` in the first pass
+- [x] Leave room for future input-derived risk hints without adding scenario fields now
+- [x] Expose `GET /api/v1/integrations/location-events`
 
 ### Phase 5: ShippingAgent Dispatch Migration
 
 Deliverables:
 
-- [ ] Add Python HTTP client/adapters for `enablements-api`
-- [ ] Keep the ShippingAgent LLM-facing tool definitions stable
-- [ ] Keep LLM tool name as `get_location_events`
-- [ ] Keep request/response protos unchanged
-- [ ] Remove or replace the local Python EasyPost/location activities only after the
+- [x] Add Python HTTP client/adapters for `enablements-api`
+- [x] Keep the ShippingAgent LLM-facing tool definitions stable
+- [x] Keep LLM tool name as `get_location_events`
+- [x] Keep request/response protos unchanged
+- [x] Replace the local Python shipping/location activity implementations after the
       `enablements-api` path is verified
-- [ ] Move `get_carrier_rates` to fixture-backed shipping without changing the
+- [x] Move `get_carrier_rates` to fixture-backed shipping without changing the
       LLM-facing tool name
-- [ ] Ensure `selected_shipment` is attached by workflow context and not invented by the LLM
+- [x] Ensure `selected_shipment` is attached by workflow context and not invented by the LLM
 
 ### Phase 6: Fulfillment Carrier Migration
 
 Deliverables:
 
-- [ ] Replace Java `CarriersImpl.verifyAddress` EasyPost calls with fixture-backed verification
-- [ ] Replace Java `CarriersImpl.printShippingLabel` EasyPost calls with fixture-backed label
+- [x] Replace Java `CarriersImpl.verifyAddress` EasyPost calls with fixture-backed verification
+- [x] Replace Java `CarriersImpl.printShippingLabel` EasyPost calls with fixture-backed label
       lookup
-- [ ] Remove EasyPost key as a runtime requirement for local/workshop fulfillment workers
-- [ ] Keep failure behavior for invalid address/rate IDs deterministic and non-retryable
+- [x] Remove EasyPost key as a runtime requirement for local/workshop fulfillment workers
+- [x] Keep failure behavior for invalid address/rate IDs deterministic and non-retryable
 
 Initial implementation should deliver Phases 2-6 together. Splitting `location-events` from
 EasyPost replacement would leave the workshop dependent on the same scattered integration paths
 this spec is intended to remove.
 
-### Phase 7: Workshop Exercise Material
+### Phase 7: Nexus Integration Reroute
+
+Deliverables:
+
+- [ ] Add or expose a thin Java HTTP caller in `enablements-core` for
+      `/api/v1/integrations/**`
+- [ ] Move commerce-app, PIMS, inventory, and any intentionally retained payments Nexus service
+      implementations from `apps-core` to enablements-owned code
+- [ ] Register an `integrations` task queue in `enablements-workers` with the enablements-owned
+      Nexus service beans
+- [ ] Retarget `oms-integrations-v1` from `apps / integrations` to the configured enablements
+      worker namespace and `integrations` task queue
+- [ ] Remove the `integrations` task queue and integration Nexus service registration from
+      `apps-workers` after compatibility is verified
+- [ ] Decide whether `payments-service` is intentionally retained under enablements or removed
+      from the workshop integration endpoint
+- [ ] If `payments-service` is retained, add a matching `enablements-api` payment-validation
+      endpoint so the Nexus adapter still delegates over HTTP
+- [ ] Keep `apps.Integrations` only as prior-art/compatibility context until the reroute has been
+      reviewed
+
+### Phase 8: Workshop Exercise Material
 
 Deliverables:
 
@@ -978,8 +1104,9 @@ Deliverables:
 - [ ] Add a query/check script for the `enablements-api` fixture state endpoint
 - [ ] Add a scenario that demonstrates inventory lookup, alternate warehouse lookup, and
       location risk in one ShippingAgent run
-- [ ] Add a scenario that demonstrates `paid_price.units=1` margin leak/spike
-- [ ] Add a scenario that demonstrates `delivery_days=0` SLA breach
+- [x] Add a scenario that demonstrates `paid_price.units=1` margin leak/spike
+- [x] Add a scenario that demonstrates `delivery_days=0` SLA breach
+- [x] Add a dynamic scenario selector that discovers scenario subdirectories
 - [ ] Add a script or REST example that lists fixture addresses, rates, shipments, and labels
 
 ### Critical Files / Modules
@@ -998,6 +1125,11 @@ To Create:
     state
 - `java/enablements/enablements-api/src/main/java/com/acme/enablements/integrations/**` -
   fixture loader/cache, services, DTO helpers, and scenario mutation
+- `java/enablements/enablements-core/src/main/java/com/acme/enablements/integrations/**` -
+  optional stateless HTTP client/helper for calling `enablements-api`
+- `java/enablements/enablements-core/src/main/java/com/acme/enablements/services/**` -
+  Nexus service adapters that preserve the `oms` service contracts and delegate to
+  `enablements-api`
 - `java/enablements/enablements-api/src/main/resources/fixtures/shipping-fixtures.json` - captured
   fixture database
 - `scripts/capture-easypost-fixtures.*` - offline fixture capture script
@@ -1007,17 +1139,29 @@ To Create:
 To Modify:
 
 - `java/enablements/pom.xml` - add `enablements-api`
+- `java/enablements/enablements-core/src/main/resources/acme.enablements.yaml` - add the
+  `integrations` task queue and Nexus service bean registration for enablements workers
+- `scripts/setup-temporal-namespaces.sh` or equivalent environment setup - retarget
+  `oms-integrations-v1` to the configured enablements worker namespace and `integrations` task
+  queue
+- `java/apps/apps-core/src/main/resources/acme.apps.yaml` - remove the `integrations` task queue
+  after the enablements worker is verified
+- `java/apps/apps-core/src/main/java/com/acme/apps/services/**` - move or remove integration
+  Nexus service implementations once enablements-owned adapters are registered
+- `java/apps/apps-core/src/main/java/com/acme/apps/workflows/Integrations*.java` - retain only as
+  prior-art context until compatibility is verified, then remove in a follow-up if no callers
+  depend on it
 - existing callers/config - point workshop/demo integration URLs at `enablements-api`
 - `java/fulfillment/fulfillment-core/src/main/java/com/acme/fulfillment/workflows/activities/CarriersImpl.java` -
   replace EasyPost address and label calls with `enablements-api` calls
 - `python/fulfillment/src/agents/workflows/shipping_agent.py` - keep tool names but route
   dispatch/adapters to `enablements-api`
-- `python/fulfillment/src/agents/activities/easypost.py` - remove or convert to fixture-backed
-  adapter after the `enablements-api` path is verified
-- `python/fulfillment/src/workers/fulfillment_worker.py` - remove activity registration after
-  migration
-- `python/fulfillment/src/workers/easypost_worker.py` - remove runtime EasyPost worker once no
-  activities depend on it
+- `python/fulfillment/src/agents/activities/shipping.py` - fixture-backed adapter for
+  `verify_address` and `get_carrier_rates`
+- `python/fulfillment/src/workers/fulfillment_worker.py` - main `agents` worker for
+  ShippingAgent, LLM, inventory, and location-event activities
+- `python/fulfillment/src/workers/shipping_worker.py` - `fulfillment-shipping` worker for shipping
+  activities
 
 ---
 
@@ -1053,8 +1197,6 @@ To Modify:
 
 ### Integration Tests
 
-- `processing.Order` calls commerce-app and PIMS through `enablements-api`
-- `fulfillment.Order` calls inventory lifecycle operations through `enablements-api`
 - `fulfillment.Order` validates addresses and prints labels without a runtime EasyPost key
 - `ShippingAgent` calls inventory lookup, carrier rates, location events, and alternate warehouse
   lookup without changing the public tool names
@@ -1064,17 +1206,27 @@ To Modify:
 - `enablements-api` location-events endpoint returns empty-risk payloads in the first pass
 - `enablements-api` fixture state endpoint exposes demo/reference data
 
+Follow-up integration tests should cover the Nexus reroute after it is implemented:
+
+- `processing.Order` calls commerce-app and PIMS through Nexus handlers backed by `enablements-api`
+- `fulfillment.Order` calls inventory lifecycle operations through Nexus handlers backed by
+  `enablements-api`
+- `oms-integrations-v1` targets the configured enablements worker namespace and `integrations`
+  task queue
+- Nexus service adapters do not directly instantiate or inject fixture services; observable state
+  comes from `enablements-api`
+
 ### Validation Checklist
 
 - [ ] Existing processing and fulfillment workflow tests pass
-- [ ] ShippingAgent tests pass with `get_location_events` backed by `enablements-api`
-- [ ] ShippingAgent tests pass with fixture-backed `get_carrier_rates`
+- [x] ShippingAgent tests pass with `get_location_events` backed by `enablements-api`
+- [x] ShippingAgent tests pass with fixture-backed `get_carrier_rates`
 - [ ] Fulfillment label-printing tests pass without EasyPost
 - [ ] `enablements-api` exposes inspectable fixture state
 - [ ] Workshop can inspect location-event fixture configuration even though first pass returns no
       events
-- [ ] Workshop scenario can demonstrate margin leak/spike with `paid_price.units=1`
-- [ ] Workshop scenario can demonstrate SLA breach with explicit `delivery_days=0`
+- [x] Workshop scenario can demonstrate margin leak/spike with `paid_price.units=1`
+- [x] Workshop scenario can demonstrate SLA breach with explicit `delivery_days=0`
 - [ ] Local startup succeeds without `EASYPOST_API_KEY` in fixture mode
 
 ---
@@ -1089,7 +1241,8 @@ To Modify:
 | EasyPost warehouse verification slows or blocks workshop startup | High | Medium | Remove runtime verification; load precomputed address fixtures |
 | Fixture capture script accidentally changes stable IDs | Medium | Medium | Generate deterministic IDs from address/route/rate keys and review fixture diffs |
 | Captured rates do not naturally match a desired SLA scenario | Medium | Medium | Mutate copied rate payloads on demand based on scenario inputs |
-| REST and optional future Nexus behavior drift | Medium | Medium | Keep fixture ownership in `enablements-api`; any future Nexus hook should delegate into the same service |
+| REST and Nexus compatibility behavior drift | Medium | Medium | Make Nexus handlers stateless HTTP adapters and keep fixture ownership in `enablements-api` |
+| Integration Nexus endpoint remains backed by apps workers | Medium | Medium | Retarget `oms-integrations-v1` to the configured enablements worker namespace and `integrations` task queue, then remove the apps registration after verification |
 | Removing EasyPost hides real integration errors | Low | Medium | Keep capture mode documented and make fixture failures explicit/non-retryable |
 | Payments remains registered but undocumented in the exercise | Low | High | Remove payments from workshop registration unless the workshop narrative needs it |
 
@@ -1110,6 +1263,8 @@ To Modify:
 - `fulfillment.Order` depends on address verification and label printing
 - `ShippingAgent` depends on `inventory`, fixture-backed carrier rates, and `location-events`
 - Workshop scripts and docs should treat `enablements-api` as part of the local platform
+- Existing workflow callers depend on the `oms-integrations-v1` Nexus endpoint name remaining
+  stable even though the endpoint target moves to enablements
 
 ### Rollout Blockers
 
@@ -1137,6 +1292,11 @@ To Modify:
 - [x] canonical fixture JSON lives under `enablements-api/src/main/resources/fixtures` so it is
       packaged for local and Kubernetes runs
 - [x] EasyPost replacement and `location-events` migration should be delivered together
+- [x] Nexus service handlers are compatibility adapters, not fixture owners
+- [x] Integration Nexus handlers should move from apps to enablements and delegate to
+      `enablements-api` over HTTP
+- [x] The `oms-integrations-v1` endpoint name should stay stable for callers while its target moves
+      to the configured enablements worker namespace and `integrations` task queue
 
 ### Implementation Notes
 
@@ -1148,6 +1308,8 @@ To Modify:
   or choose a primary warehouse deterministically.
 - The ShippingAgent tool names should remain stable; only the dispatch/adapters need to change to
   call `enablements-api`.
+- Enablements-owned Nexus service adapters should not access fixture state directly. If they need a
+  helper, use a stateless HTTP caller in `enablements-core` that talks to `enablements-api`.
 - The Python converter must preserve explicit zero values for `delivery_days`; `delivery_days=0`
   is meaningful scenario input, not an absent value.
 - `selected_shipment` should be supplied by workflow/request context. The LLM should not be
@@ -1162,12 +1324,15 @@ To Modify:
 - `java/enablements/pom.xml`
 - `java/enablements/enablements-core`
 - `java/enablements/enablements-workers`
+- `java/enablements/enablements-api/src/main/java/com/acme/enablements/controllers/IntegrationsController.java`
+- `java/enablements/enablements-api/src/main/java/com/acme/enablements/integrations/**`
 - `java/apps/apps-core/src/main/java/com/acme/apps/workflows/IntegrationsImpl.java` (prior art)
-- `java/apps/apps-core/src/main/java/com/acme/apps/services/InventoryServiceImpl.java`
-- `java/apps/apps-core/src/main/java/com/acme/apps/services/ProductInformationManagementServiceImpl.java`
-- `java/apps/apps-core/src/main/java/com/acme/apps/services/CommerceAppServiceImpl.java`
+- `java/apps/apps-core/src/main/java/com/acme/apps/services/InventoryServiceImpl.java` (prior art)
+- `java/apps/apps-core/src/main/java/com/acme/apps/services/ProductInformationManagementServiceImpl.java` (prior art)
+- `java/apps/apps-core/src/main/java/com/acme/apps/services/CommerceAppServiceImpl.java` (prior art)
+- `scripts/setup-temporal-namespaces.sh`
 - `python/fulfillment/src/agents/activities/location_events.py`
-- `python/fulfillment/src/agents/activities/easypost.py`
+- `python/fulfillment/src/agents/activities/shipping.py`
 - `python/fulfillment/src/agents/workflows/shipping_agent.py`
 - `java/fulfillment/fulfillment-core/src/main/java/com/acme/fulfillment/workflows/activities/CarriersImpl.java`
 - `proto/acme/fulfillment/domain/v1/shipping_agent.proto`

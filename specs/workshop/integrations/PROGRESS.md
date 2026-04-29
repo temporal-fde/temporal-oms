@@ -1,7 +1,7 @@
 # Workshop Integrations - Progress Tracking
 
 **Spec:** [spec.md](./spec.md)
-**Last Updated:** 2026-04-28
+**Last Updated:** 2026-04-29
 **Current Status:** Implementation complete for runtime integration work; workshop exercise material remains open.
 
 ---
@@ -16,7 +16,7 @@
 | Phase 4 | Location-Events Integration Service | ✅ Complete | `enablements-api` endpoint and service return `RISK_LEVEL_NONE`, empty events, and echoed request window/timezone. |
 | Phase 5 | ShippingAgent Dispatch Migration | ✅ Complete | Python enablements HTTP client/adapters are in place; existing LLM-facing tool names remain stable. |
 | Phase 6 | Fulfillment Carrier Migration | ✅ Complete | Java `CarriersImpl` now delegates address verification and label printing to `enablements-api`; runtime EasyPost calls are removed from the fulfillment carrier path. |
-| Phase 7 | Workshop Exercise Material | ⏳ Not started | Exercise notes, fixture-state query script, and scenario walkthroughs still need to be added. |
+| Phase 7 | Workshop Exercise Material | 🟡 Partial | Scenario runner and margin/SLA walkthrough scripts exist; exercise notes and fixture-state query examples still need to be added. |
 
 ---
 
@@ -83,8 +83,10 @@
 - [ ] Add exercise notes explaining why integrations are owned by `enablements-api`
 - [ ] Add a query/check script for the `enablements-api` fixture state endpoint
 - [ ] Add a scenario that demonstrates inventory lookup, alternate warehouse lookup, and location risk in one ShippingAgent run
-- [ ] Add a scenario that demonstrates `paid_price.units=1` margin leak/spike
-- [ ] Add a scenario that demonstrates `delivery_days=0` SLA breach
+- [x] Add a scenario that demonstrates `paid_price.units=1` margin leak/spike
+- [x] Add a scenario that demonstrates `delivery_days=0` SLA breach
+- [x] Add a dynamic scenario selector that discovers `scripts/scenarios/*/run.sh`
+- [x] Generate unique order/workflow IDs and unique customer IDs for scenario runs
 - [ ] Add a script or REST example that lists fixture addresses, rates, shipments, and labels
 
 ---
@@ -94,8 +96,11 @@
 - `enablements-api` exists as a sibling module under `java/enablements`.
 - REST endpoints use generated protobuf messages directly where practical, with query-encoded protobuf JSON for complex `GET` inputs.
 - The copied protobuf JSON converter includes default values, which keeps explicit zero values observable.
-- `apps.Integrations` remains prior art/current-state context only; new fixture ownership is in `enablements-api`.
-- Python classes and task queue names still contain `EasyPost` for workflow-history/tool-name stability, but the implementation delegates to `enablements-api`.
+- `apps.Integrations` remains prior art/current compatibility infrastructure. Nexus handlers for
+  commerce-app, PIMS, and inventory still use it today; rerouting those handlers to
+  `enablements-api` is a planned follow-up.
+- Python shipping activity class and task queue names are now `ShippingActivities` and
+  `fulfillment-shipping`; LLM-facing tool names remain stable.
 - The offline EasyPost capture script was reviewed but not executed during this progress update because it requires EasyPost credentials and network access.
 
 ---
@@ -109,12 +114,13 @@
   - 2 passed
 - [x] `mvn -pl enablements/enablements-api,fulfillment/fulfillment-core -am -DskipTests compile`
   - Build success
-- [ ] Full ShippingAgent Temporal tests were not run in this review pass.
+- [x] Focused ShippingAgent Temporal tests pass with fixture-backed shipping and location-events paths.
 
 ---
 
 ## Open Items
 
 - Complete Phase 7 workshop material.
-- Decide whether to rename the Python `EasyPostActivities` class and `fulfillment-easypost` task queue in a future non-history-preserving cleanup.
+- Reroute the existing Nexus integration handlers to use `enablements-api` as their backend.
+- Decide later whether `apps.Integrations` should be deprecated or retained as compatibility/prior-art infrastructure.
 - If Java tests are run from this shell, unset or update `JAVA_HOME`; it currently points Maven at Java 17 while this project compiles Java 21 classfiles.

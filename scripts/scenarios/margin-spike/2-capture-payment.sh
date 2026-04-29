@@ -5,7 +5,7 @@
 # Payment triggers order processing. Once enriched, fulfillment.Order calls
 # ShippingAgent via Nexus. Watch the fulfillment namespace in Temporal UI:
 #
-#   get_carrier_rates       — fetches real EasyPost rates (all > 1 cent)
+#   get_carrier_rates       — fetches fixture-backed rates (all > 1 cent)
 #   get_location_events     — origin + destination SCRM (concurrent)
 #   finalize_recommendation — REJECTED (find_alternate_warehouse not called yet)
 #   find_alternate_warehouse — returns empty (no alternate in seed data)

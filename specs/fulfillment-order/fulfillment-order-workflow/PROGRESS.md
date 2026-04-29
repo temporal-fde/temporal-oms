@@ -1,10 +1,10 @@
 # fulfillment.Order Workflow — Progress Tracking
 
 **Feature:** `fulfillment.Order` — Durable Fulfillment Orchestration
-**Status:** 🚧 Implementing — Phases 1–5 complete (unit tests + deployment pending)
+**Status:** ✅ Current V2 path implemented; Nexus integration backend reroute follow-up
 **Owner:** Temporal FDE Team
 **Created:** 2026-04-15
-**Updated:** 2026-04-15
+**Updated:** 2026-04-29
 
 ---
 
@@ -17,8 +17,8 @@
 | Phase 3 | `fulfillment.Order` Implementation (V1) | ✅ Complete | Phase 2 |
 | Phase 4 | Nexus Handler for `validateOrder` | ✅ Complete | Phase 2 |
 | Phase 5 | Worker Versioning — `apps.Order` + `processing.Order` | ✅ Complete (deploy + validate pending) | — |
-| Phase 6 | Activity Implementations | ⏳ Not started | stubs in place; real integration deferred |
-| Phase 7 | V2 — `ShippingAgent` Nexus Integration | ⏳ Deferred | `ShippingAgent` spec |
+| Phase 6 | Activity Implementations | ✅ Complete for fixture-backed workshop path | Inventory Nexus backend reroute remains follow-up |
+| Phase 7 | V2 — `ShippingAgent` Nexus Integration | ✅ Complete | ShippingAgent called through Nexus |
 
 Phases 3 and 4 can be worked in parallel once Phase 2 is complete.
 Phase 6 can be worked in parallel with Phases 3–4 once Phase 2 is complete.
@@ -73,9 +73,9 @@ Phase 5 cannot start until Phases 3 and 4 are both complete and the deployment s
 - [x] `validateOrder` Update handler: `AddressVerification.verifyAddress()` → store verified `Address` in state → return `ValidateOrderResponse`
 - [x] `fulfillOrder` Update handler:
   - `reserveItems`
-  - `DeliveryService.getCarrierRates(easypost_address_id, ProcessedOrder)` (creates EasyPost Shipment)
-  - Margin check; set `margin_leak` SearchAttribute if actual > `shipping_margin`
-  - Fallback option selection (silent — no customer notification)
+  - `ShippingAgent.calculateShippingOptions(...)` through Nexus
+  - Apply recommendation; set `margin_leak` / `sla_breach_days` SearchAttributes when applicable
+  - Fallback selection for `MARGIN_SPIKE` / `SLA_BREACH`
   - Concurrent: `Carriers.printShippingLabel()` + `Allocations.deductInventory()` via `Promise.allOf`
   - `Workflow.await()` for `notifyDeliveryStatus` Signal
 - [x] `cancelOrder` Signal handler: set cancellation flag
@@ -127,18 +127,18 @@ Phase 5 cannot start until Phases 3 and 4 are both complete and the deployment s
 - [ ] New `processing.Order` workflows do not emit Kafka messages
 
 ### Phase 6 — Activity Implementations
-> Blocked on: Phase 2. Resolve inventory service contract question first.
-> Can run in parallel with Phases 3 and 4.
 
-- [ ] `AddressVerificationImpl` — `EasyPostClient.addresses().createAndVerify(Map)` → populate `Address.easypost_address`
-- [ ] `AllocationsImpl` — hold, reserve, deduct, release (contract TBD per open question)
-- [ ] `DeliveryServiceImpl` — EasyPost Shipment creation + carrier rate query using `easypost_address.id`
-- [ ] `CarriersImpl` — `printShippingLabel` using the rate selected from `getCarrierRates`
-- [ ] `FulfillmentOptionsLoaderImpl` — load `shipping_margin` from config / config service
-- [ ] Replace stub beans in `acme.fulfillment.yaml` with real implementations
+- [x] `CarriersImpl.verifyAddress` — delegates to `enablements-api` shipping verification
+- [x] `CarriersImpl.printShippingLabel` — delegates to `enablements-api` synthetic label lookup
+- [x] `FulfillmentOptionsLoaderImpl` — returns fixed workshop shipping margin and Nexus endpoint names
+- [x] Inventory lifecycle operations are wired through existing Nexus integration handlers
+- [ ] Follow-up: reroute inventory Nexus backend from `apps.Integrations` to `enablements-api`
 
-### Phase 7 — V2 ShippingAgent Nexus Integration (Deferred)
-> Blocked on: `ShippingAgent` spec approved and Nexus endpoint available.
+### Phase 7 — V2 ShippingAgent Nexus Integration
+
+- [x] `fulfillment.Order` calls `ShippingAgent.calculateShippingOptions` through Nexus
+- [x] `fulfillment.Order` applies the returned recommendation and selected shipping option
+- [x] `fulfillment.Order` prints labels through fixture-backed `CarriersImpl`
 
 ---
 
@@ -153,7 +153,7 @@ Phase 5 cannot start until Phases 3 and 4 are both complete and the deployment s
 **Status:** Accepted
 
 ### Decision: `EasyPostAddress` on `common.Address`, no separate `ValidatedAddress` type (2026-04-15)
-**Rationale:** Avoids a redundant abstraction layer; EasyPost is a known dependency and the field name should be explicit. Keeps `Address` self-contained.
+**Rationale:** Avoids a redundant abstraction layer and preserves the existing external-address contract. Runtime values now come from fixtures rather than live EasyPost calls.
 **Status:** Accepted
 
 ### Decision: `validateOrder` fires in `apps.Order` `execute()` right before `processOrder` (2026-04-15)
@@ -162,7 +162,7 @@ Phase 5 cannot start until Phases 3 and 4 are both complete and the deployment s
 
 ### Decision: `ShippingAgent` called via Nexus operation (V2 path) (2026-04-15)
 **Rationale:** `ShippingAgent` design is a separate spec; `fulfillment.Order` V2 path calls it via Nexus.
-**Status:** Accepted; V2 deferred to Phase 7
+**Status:** Accepted; implemented
 
 ### Decision: K8s / Worker Versioning deployment in separate spec (2026-04-15)
 **Rationale:** Deployment topology changes are a distinct concern from workflow implementation; separating keeps this spec focused.

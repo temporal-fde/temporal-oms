@@ -7,9 +7,8 @@ package com.acme.proto.acme.fulfillment.domain.fulfillment.v1;
 
 /**
  * <pre>
- * GetShippingRatesRequest creates an EasyPost Shipment and retrieves available carrier rates.
- * Distinct from Java's GetCarrierRatesRequest — no parcel fields (V1 hardcodes default parcel
- * in the activity: 1 lb, 6×6×4 in).
+ * GetShippingRatesRequest retrieves fixture-backed shipment rates.
+ * Distinct from Java's GetCarrierRatesRequest; parcel details are owned by the fixture data.
  * </pre>
  *
  * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.GetShippingRatesRequest}
@@ -405,9 +404,8 @@ private static final long serialVersionUID = 0L;
   }
   /**
    * <pre>
-   * GetShippingRatesRequest creates an EasyPost Shipment and retrieves available carrier rates.
-   * Distinct from Java's GetCarrierRatesRequest — no parcel fields (V1 hardcodes default parcel
-   * in the activity: 1 lb, 6×6×4 in).
+   * GetShippingRatesRequest retrieves fixture-backed shipment rates.
+   * Distinct from Java's GetCarrierRatesRequest; parcel details are owned by the fixture data.
    * </pre>
    *
    * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.GetShippingRatesRequest}

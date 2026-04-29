@@ -8,7 +8,7 @@ import "acme/common/v1/values.proto";
 
 // tool for agent to augment shipping rate comps
 message GetLocationEventsRequest {
-  // Destination coordinates from EasyPost address verification.
+  // Destination coordinates from verified address data.
   acme.common.v1.Coordinate coordinate = 1;
 
   // Radius around the destination to search for events.
@@ -20,7 +20,7 @@ message GetLocationEventsRequest {
   google.protobuf.Timestamp active_to   = 4; // expected delivery date
 
   // IANA TZ Database identifier for the destination (e.g. "America/New_York").
-  // From EasyPost verifications.delivery.details.time_zone.
+  // IANA timezone associated with the verified address.
   string timezone = 5;
 }
 
@@ -39,7 +39,7 @@ message GetLocationEventsResponse {
 
 // ShippingOption is a single carrier rate returned by get_carrier_rates.
 // id is set to rate_id so the LLM can cross-reference recommended_option_id back to the rate.
-// shipment_id is the EasyPost Shipment ID — needed by fulfillment.Order to call printShippingLabel.
+// shipment_id is the fixture shipment ID needed by fulfillment.Order to call printShippingLabel.
 message ShippingOption {
   string              id             = 1;
   string              carrier        = 2;
@@ -119,11 +119,10 @@ message ShippingOptionsCache {
 }
 
 
-// ── Activity: get_carrier_rates (fulfillment-easypost task queue) ─────────────
+// ── Activity: get_carrier_rates (fulfillment-shipping task queue) ─────────────
 
-// GetShippingRatesRequest creates an EasyPost Shipment and retrieves available carrier rates.
-// Distinct from Java's GetCarrierRatesRequest — no parcel fields (V1 hardcodes default parcel
-// in the activity: 1 lb, 6×6×4 in).
+// GetShippingRatesRequest retrieves fixture-backed shipment rates.
+// Distinct from Java's GetCarrierRatesRequest; parcel details are owned by the fixture data.
 message GetShippingRatesRequest {
   string from_easypost_id             = 1;
   string to_easypost_id               = 2;

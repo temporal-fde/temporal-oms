@@ -34,7 +34,7 @@ class GetLocationEventsRequest(BaseModel):
      tool for agent to augment shipping rate comps
     """
 
-# Destination coordinates from EasyPost address verification.
+# Destination coordinates from verified address data.
     coordinate: Coordinate = Field(default_factory=Coordinate)
 # Radius around the destination to search for events.
 # Value is in kilometers (e.g. 2.0).
@@ -43,7 +43,7 @@ class GetLocationEventsRequest(BaseModel):
     active_from: datetime = Field(default_factory=datetime.now)# ship date
     active_to: datetime = Field(default_factory=datetime.now)# expected delivery date
 # IANA TZ Database identifier for the destination (e.g. "America/New_York").
-# From EasyPost verifications.delivery.details.time_zone.
+# IANA timezone associated with the verified address.
     timezone: str = Field(default="")
 
 class GetLocationEventsResponse(BaseModel):
@@ -63,7 +63,7 @@ class ShippingOption(BaseModel):
     """
      ShippingOption is a single carrier rate returned by get_carrier_rates.
  id is set to rate_id so the LLM can cross-reference recommended_option_id back to the rate.
- shipment_id is the EasyPost Shipment ID — needed by fulfillment.Order to call printShippingLabel.
+ shipment_id is the fixture shipment ID needed by fulfillment.Order to call printShippingLabel.
     """
 
     id: str = Field(default="")
@@ -146,9 +146,8 @@ class ShippingOptionsCache(BaseModel):
 
 class GetShippingRatesRequest(BaseModel):
     """
-     GetShippingRatesRequest creates an EasyPost Shipment and retrieves available carrier rates.
- Distinct from Java's GetCarrierRatesRequest — no parcel fields (V1 hardcodes default parcel
- in the activity: 1 lb, 6×6×4 in).
+     GetShippingRatesRequest retrieves fixture-backed shipment rates.
+ Distinct from Java's GetCarrierRatesRequest; parcel details are owned by the fixture data.
     """
 
     from_easypost_id: str = Field(default="")

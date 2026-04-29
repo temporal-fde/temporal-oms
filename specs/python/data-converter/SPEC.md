@@ -306,7 +306,7 @@ No environment variables or configuration changes required. The converter is pur
 - Assemble `ProtoPydanticPayloadConverter` and `proto_pydantic_data_converter`
 
 **Phase 3: Wire Up Workers**
-- Update `fulfillment_worker.py`, `easypost_worker.py`: replace `pydantic_data_converter` with `proto_pydantic_data_converter`
+- Update `fulfillment_worker.py`, `shipping_worker.py`: replace `pydantic_data_converter` with `proto_pydantic_data_converter`
 - Verify no application code changed
 
 **Phase 4: Tests**
@@ -324,7 +324,7 @@ To Create:
 
 To Modify:
 - `python/fulfillment/src/workers/fulfillment_worker.py` — replace `pydantic_data_converter` with `proto_pydantic_data_converter`
-- `python/fulfillment/src/workers/easypost_worker.py` — same
+- `python/fulfillment/src/workers/shipping_worker.py` — same
 - `Makefile` (or `buf.gen.yaml` post-hook) — add `gen_converter_registry.py` to the proto generation step
 
 ---
@@ -385,7 +385,7 @@ All tests in `python/fulfillment/tests/test_converter.py`.
 
 ### Cross-Cutting Concerns
 
-- Both Python workers (`fulfillment_worker`, `easypost_worker`) use `pydantic_data_converter` today and must be updated in the same commit to maintain a consistent wire format across task queues.
+- Both Python workers (`fulfillment_worker`, `shipping_worker`) use `pydantic_data_converter` today and must be updated in the same commit to maintain a consistent wire format across task queues.
 - The converter applies to **all** payloads on a worker, not just Nexus payloads. Python-internal activity inputs/outputs that are currently `json/plain` Pydantic models will become `json/protobuf`. This is the desired end state but requires the round-trip test to confirm no regressions.
 
 ### Rollout Blockers
@@ -398,7 +398,7 @@ All tests in `python/fulfillment/tests/test_converter.py`.
 
 ### Questions for Tech Lead / Product
 
-- [x] Should `easypost_worker` receive the same converter in this PR, or in a follow-up? **Same PR** — consistent wire format is a system-wide invariant, not a per-worker choice.
+- [x] Should `shipping_worker` receive the same converter in this PR, or in a follow-up? **Same PR** — consistent wire format is a system-wide invariant, not a per-worker choice.
 
 ### Implementation Notes
 

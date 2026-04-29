@@ -17,11 +17,8 @@ from src.services.enablements_integrations import (
 )
 
 
-class EasyPostActivities:
-    """Temporal activities that call fixture-backed shipping endpoints.
-
-    The class name is retained so existing workflow history and activity references stay stable.
-    """
+class ShippingActivities:
+    """Temporal activities that call fixture-backed shipping endpoints."""
 
     def __init__(self, client: EnablementsIntegrationsClient | None = None) -> None:
         self._client = client or EnablementsIntegrationsClient()

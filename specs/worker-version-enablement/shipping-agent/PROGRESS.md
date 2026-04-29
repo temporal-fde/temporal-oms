@@ -1,25 +1,30 @@
-# ShippingAgent Integration (Enablements Path) — Progress Tracking
+# ShippingAgent Integration (Enablements Path) - Progress Tracking
 
-**Feature:** ShippingAgent integration for the enablements load-generation path
-**Status:** 📋 Spec Complete — Awaiting Implementation Session
+**Feature:** ShippingAgent integration for the enablements/scenario path
+**Status:** ✅ Implemented for current workshop scenarios
 **Owner:** Temporal FDE Team
 **Created:** 2026-04-27
-**Updated:** 2026-04-27
+**Updated:** 2026-04-29
 
 ---
 
 ## Phase Status
 
-| Phase | Description | Status | Blocking On |
-|-------|-------------|--------|-------------|
-| Phase 1 | Load-generation changes — thread `selected_shipment` from enablements through to ShippingAgent | ✅ Complete | — |
+| Phase | Description | Status | Notes |
+|-------|-------------|--------|-------|
+| Phase 1 | Thread selected shipment context through to ShippingAgent | ✅ Complete | `selected_shipment` carries paid price and selected delivery days |
+| Phase 2 | Fixture-backed shipping and location activities | ✅ Complete | Activities call `enablements-api`; no runtime EasyPost key required |
+| Phase 3 | Scenario scripts | ✅ Complete | Dynamic runner, unique order IDs, unique customer IDs, margin-spike, and SLA-breach scenarios exist |
+| Phase 4 | Nexus integration backend reroute | ⏳ Follow-up | Existing Nexus handlers still use `apps.Integrations` for commerce-app, PIMS, and inventory |
 
 ---
 
 ## Dependencies
 
-- **ShippingAgent Phase 6** (prompt hardening + post-loop `find_alternate_warehouse` enforcement) — ✅ Complete
-- **Session pre-flight**: integrations Nexus endpoint registered in local k8s cluster; EasyPost test key active
+- **ShippingAgent alternate warehouse enforcement** - complete.
+- **`enablements-api` runtime fixtures** - complete for shipping and first-pass location-events.
+- **Nexus backend reroute** - follow-up; do not mark `apps.Integrations` deprecated until that decision is made.
+- **Location-events enrichment** - follow-up; current first pass returns empty events and `RISK_LEVEL_NONE`.
 
 ---
 
@@ -27,5 +32,6 @@
 
 | Date | Author | Change |
 |------|--------|--------|
-| 2026-04-27 | Mike Nichols | Initial spec written. Traced full enablements → apps → fulfillment → ShippingAgent call chain. Identified that `customer_paid_price` and `transit_days_sla` are never populated, silently disabling both margin and SLA rules in ShippingAgent. `find_alternate_warehouse` structurally unreachable from enablements path. Recommended fix: hardcode `selected_shipping.price = Money{units=1}` in `apps.OrderImpl` (Option A). Implementation deferred to separate Claude session. |
-| 2026-04-27 | Claude | Implemented Phase 1 (Option B — thread through, not hardcode). Added `SelectedShipment` to REST API proto (`apps/api/v1/message.proto`). Added `delivery_days` to `SelectedShippingOption` (fulfillment domain proto). Renamed `transit_days_sla` → `delivery_days_sla` on `CalculateShippingOptionsRequest`; removed `transit_days_sla` from `acme.common.v1.Shipment` (was redundant — SLA derives from `EasyPostRate.delivery_days`). Wired: enablements sets `paid_price_cents=1` → controller maps to `Shipment.paid_price` → `apps.OrderImpl` maps to `SelectedShippingOption.price` → `fulfillment.OrderImpl` passes as `customer_paid_price` → ShippingAgent MARGIN_SPIKE triggers deterministically. `delivery_days_sla` path also wired end-to-end; enablements does not set it (SLA_BREACH not required for workshop demo). |
+| 2026-04-27 | Mike Nichols | Initial spec written. Traced full enablements -> apps -> fulfillment -> ShippingAgent call chain and identified missing selected-shipment context. |
+| 2026-04-27 | Claude | Implemented selected-shipment threading for paid price and selected delivery days. |
+| 2026-04-29 | Codex | Updated progress to current state: scripts now generate unique order/customer IDs, margin/SLA scenarios are explicit, runtime shipping uses `enablements-api`, and Nexus backend reroute remains a follow-up. |
