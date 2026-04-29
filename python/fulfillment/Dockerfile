@@ -1,35 +1,21 @@
-# Python Worker Dockerfile for Fulfillments Service (AI Agent)
+# Python worker Dockerfile for the fulfillment agents and shipping task queues.
 FROM python:3.12-slim
 
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    gcc \
-    && rm -rf /var/lib/apt/lists/*
+COPY pyproject.toml uv.lock ./
 
-# Copy Poetry files
-COPY pyproject.toml poetry.lock ./
+RUN pip install --no-cache-dir uv && \
+    uv sync --frozen --no-dev
 
-# Install Poetry
-RUN pip install --no-cache-dir poetry==1.8.3
+COPY generated ./generated
+COPY fulfillment/src ./fulfillment/src
 
-# Install dependencies
-RUN poetry config virtualenvs.create false && \
-    poetry install --no-dev --no-interaction --no-ansi
+ENV PATH="/app/.venv/bin:${PATH}" \
+    PYTHONPATH="/app/generated:/app/generated/pydantic:/app/fulfillment" \
+    PYTHONUNBUFFERED=1
 
-# Copy application code
-COPY src/ ./src/
-
-# Create non-root user
 RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
 USER appuser
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
-  CMD python -c "import requests; requests.get('http://localhost:9090/health')" || exit 1
-
-EXPOSE 9090
-
-# Run the worker
 CMD ["python", "-m", "src.worker"]

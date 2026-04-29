@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fulfillment-python-worker
+  namespace: temporal-oms-fulfillment
+  labels:
+    app: fulfillment-python-worker
+    component: worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fulfillment-python-worker
+  template:
+    metadata:
+      labels:
+        app: fulfillment-python-worker
+        component: worker
+        task-queues: agents-fulfillment-shipping
+    spec:
+      containers:
+      - name: worker
+        image: temporal-oms/fulfillment-python-worker:latest
+        imagePullPolicy: Never
+        envFrom:
+        - configMapRef:
+            name: temporal-oms-config
+        - secretRef:
+            name: temporal-oms-secrets
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"

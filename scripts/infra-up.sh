@@ -22,6 +22,8 @@ export KUBECONFIG=/tmp/kind-config.yaml
 echo "→ Creating Kubernetes namespaces..."
 kubectl create namespace temporal-oms-apps --dry-run=client -o yaml | kubectl apply -f - >/dev/null
 kubectl create namespace temporal-oms-processing --dry-run=client -o yaml | kubectl apply -f - >/dev/null
+kubectl create namespace temporal-oms-fulfillment --dry-run=client -o yaml | kubectl apply -f - >/dev/null
+kubectl create namespace temporal-oms-enablements --dry-run=client -o yaml | kubectl apply -f - >/dev/null
 
 # Install cert-manager (required by Temporal Worker Controller)
 echo "→ Installing cert-manager..."
@@ -75,6 +77,12 @@ if [ "${OVERLAY:-local}" = "cloud" ]; then
     AUTOMATIONS_KEY=$(yq '.temporal.connection.api-key' "$PROJECT_DIR/config/acme.automations.secret.yaml")
     PROCESSING_KEY=$(yq '.temporal.connection.api-key' "$PROJECT_DIR/config/acme.processing.secret.yaml")
     APPS_KEY=$(yq '.temporal.connection.api-key' "$PROJECT_DIR/config/acme.apps.secret.yaml")
+    FULFILLMENT_KEY=$(yq '.temporal.connection.api-key' "$PROJECT_DIR/config/acme.fulfillment.secret.yaml")
+    if [ -f "$PROJECT_DIR/config/acme.enablements.secret.yaml" ]; then
+        ENABLEMENTS_KEY=$(yq '.temporal.connection.api-key' "$PROJECT_DIR/config/acme.enablements.secret.yaml")
+    else
+        ENABLEMENTS_KEY="$AUTOMATIONS_KEY"
+    fi
 
     # temporal-processing-api-key:
     #   TEMPORAL_API_KEY  → acme.automations key (used by Temporal Worker Controller's TemporalConnection)
@@ -90,6 +98,16 @@ if [ "${OVERLAY:-local}" = "cloud" ]; then
     kubectl create secret generic temporal-apps-api-key \
         -n temporal-oms-apps \
         --from-literal="temporal-secret.yaml=spring.temporal.connection.api-key: \"$APPS_KEY\"" \
+        --dry-run=client -o yaml | kubectl apply -f - >/dev/null
+
+    kubectl create secret generic temporal-fulfillment-api-key \
+        -n temporal-oms-fulfillment \
+        --from-literal="temporal-secret.yaml=spring.temporal.connection.api-key: \"$FULFILLMENT_KEY\"" \
+        --dry-run=client -o yaml | kubectl apply -f - >/dev/null
+
+    kubectl create secret generic temporal-enablements-api-key \
+        -n temporal-oms-enablements \
+        --from-literal="temporal-secret.yaml=spring.temporal.connection.api-key: \"$ENABLEMENTS_KEY\"" \
         --dry-run=client -o yaml | kubectl apply -f - >/dev/null
 fi
 

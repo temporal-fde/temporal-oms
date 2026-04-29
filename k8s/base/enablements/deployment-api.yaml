@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: enablements-api
+  namespace: temporal-oms-enablements
+  labels:
+    app: enablements-api
+    component: api
+    namespace: enablements
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: enablements-api
+  template:
+    metadata:
+      labels:
+        app: enablements-api
+        component: api
+        namespace: enablements
+      annotations:
+        instrumentation.opentelemetry.io/inject-sdk: "true"
+    spec:
+      containers:
+      - name: api
+        image: temporal-oms/enablements-api:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8050
+          name: http
+          protocol: TCP
+        - containerPort: 9050
+          name: management
+          protocol: TCP
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: k8s
+        envFrom:
+        - configMapRef:
+            name: temporal-oms-config
+        - secretRef:
+            name: temporal-oms-secrets
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 9050
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 9050
+          initialDelaySeconds: 20
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - name: temporal-config
+          mountPath: /etc/config/temporal
+          readOnly: true
+        - name: temporal-secret
+          mountPath: /etc/config/temporal-secret
+          readOnly: true
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+      volumes:
+      - name: temporal-config
+        configMap:
+          name: temporal-enablements-config
+          defaultMode: 0444
+      - name: temporal-secret
+        secret:
+          secretName: temporal-enablements-api-key
+          defaultMode: 0444
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: enablements-api
+  namespace: temporal-oms-enablements
+  labels:
+    app: enablements-api
+spec:
+  type: ClusterIP
+  selector:
+    app: enablements-api
+  ports:
+  - port: 8050
+    targetPort: 8050
+    protocol: TCP
+    name: http
+  - port: 9050
+    targetPort: 9050
+    protocol: TCP
+    name: management

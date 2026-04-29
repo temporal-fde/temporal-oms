@@ -4,3 +4,61 @@ kind: Kustomization
 resources:
   - ../../base
   - configmap
+
+patches:
+  - target:
+      kind: ConfigMap
+      name: temporal-oms-config
+      namespace: temporal-oms-apps
+    patch: |-
+      - op: replace
+        path: /data/TEMPORAL_TLS_ENABLED
+        value: "true"
+      - op: replace
+        path: /data/TEMPORAL_APPS_NAMESPACE
+        value: fde-oms-apps.sdvdw
+      - op: replace
+        path: /data/TEMPORAL_APPS_ADDRESS
+        value: us-east-1.aws.api.temporal.io:7233
+  - target:
+      kind: ConfigMap
+      name: temporal-oms-config
+      namespace: temporal-oms-processing
+    patch: |-
+      - op: replace
+        path: /data/TEMPORAL_TLS_ENABLED
+        value: "true"
+      - op: replace
+        path: /data/TEMPORAL_PROCESSING_NAMESPACE
+        value: fde-oms-processing.sdvdw
+      - op: replace
+        path: /data/TEMPORAL_PROCESSING_ADDRESS
+        value: us-east-1.aws.api.temporal.io:7233
+  - target:
+      kind: ConfigMap
+      name: temporal-oms-config
+      namespace: temporal-oms-fulfillment
+    patch: |-
+      - op: replace
+        path: /data/TEMPORAL_TLS_ENABLED
+        value: "true"
+      - op: replace
+        path: /data/TEMPORAL_FULFILLMENT_NAMESPACE
+        value: fde-oms-fulfillment.sdvdw
+      - op: replace
+        path: /data/TEMPORAL_FULFILLMENT_ADDRESS
+        value: us-east-1.aws.api.temporal.io:7233
+  - target:
+      kind: ConfigMap
+      name: temporal-oms-config
+      namespace: temporal-oms-enablements
+    patch: |-
+      - op: replace
+        path: /data/TEMPORAL_TLS_ENABLED
+        value: "true"
+      - op: replace
+        path: /data/TEMPORAL_ENABLEMENTS_NAMESPACE
+        value: default
+      - op: replace
+        path: /data/TEMPORAL_ENABLEMENTS_ADDRESS
+        value: us-east-1.aws.api.temporal.io:7233

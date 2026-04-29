@@ -12,6 +12,14 @@ echo "Processing Namespace:"
 kubectl get pods -n temporal-oms-processing --no-headers 2>/dev/null | awk '{printf "  %-40s %s\n", $1, $3}' || echo "  (namespace not found)"
 
 echo ""
+echo "Fulfillment Namespace:"
+kubectl get pods -n temporal-oms-fulfillment --no-headers 2>/dev/null | awk '{printf "  %-40s %s\n", $1, $3}' || echo "  (namespace not found)"
+
+echo ""
+echo "Enablements Namespace:"
+kubectl get pods -n temporal-oms-enablements --no-headers 2>/dev/null | awk '{printf "  %-40s %s\n", $1, $3}' || echo "  (namespace not found)"
+
+echo ""
 echo "Temporal Server:"
 if pgrep -f "temporal server start-dev" >/dev/null 2>&1; then
     echo "  ✓ Running on localhost:7233"

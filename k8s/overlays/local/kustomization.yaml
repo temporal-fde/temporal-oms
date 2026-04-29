@@ -31,3 +31,35 @@ patches:
         path: /spec/template/spec/volumes/1
       - op: remove
         path: /spec/template/spec/containers/0/volumeMounts/1
+  - target:
+      kind: Deployment
+      name: processing-workers
+    patch: |-
+      - op: remove
+        path: /spec/template/spec/volumes/1
+      - op: remove
+        path: /spec/template/spec/containers/0/volumeMounts/1
+  - target:
+      kind: Deployment
+      name: enablements-api
+    patch: |-
+      - op: remove
+        path: /spec/template/spec/volumes/1
+      - op: remove
+        path: /spec/template/spec/containers/0/volumeMounts/1
+  - target:
+      kind: Deployment
+      name: enablements-workers
+    patch: |-
+      - op: remove
+        path: /spec/template/spec/volumes/1
+      - op: remove
+        path: /spec/template/spec/containers/0/volumeMounts/1
+  - target:
+      kind: Deployment
+      name: fulfillment-workers
+    patch: |-
+      - op: remove
+        path: /spec/template/spec/volumes/1
+      - op: remove
+        path: /spec/template/spec/containers/0/volumeMounts/1
