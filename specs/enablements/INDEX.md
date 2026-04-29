@@ -54,7 +54,7 @@ Run an **enablement session** to teach the team how to safely deploy workflow co
 ---
 
 ### 2. Version Deployment Setup
-**Spec:** [version-deployment/spec.md](./version-deployment/spec.md)
+**Spec:** [version-deployment/spec.md](worker-versioning/spec.md)
 **Status:** 📋 Draft
 **Owner:** TBD
 **Purpose:** Configure workers with build-id versioning, deploy V1 + V2 side-by-side
@@ -203,6 +203,6 @@ Timeline:
 
 - [Temporal Worker Versioning Docs](https://temporal.io/blog/worker-versioning)
 - [Load Generation Spec](./load-generation/spec.md)
-- [Version Deployment Spec](./version-deployment/spec.md)
+- [Version Deployment Spec](worker-versioning/spec.md)
 - [Validation Framework Spec](./validation-framework/spec.md)
 - [Initiative PROGRESS.md](./PROGRESS.md)

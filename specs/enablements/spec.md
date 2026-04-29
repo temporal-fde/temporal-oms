@@ -1,6 +1,6 @@
-# Worker Version Enablement Specification
+# Enablements Specification
 
-**Feature Name:** Worker Version Enablement with Load Generation & Validation
+**Feature Name:** Enablements with Load Generation & Validation
 **Status:** Draft - Ready for Tech Lead Review
 **Owner:** [Your Name]
 **Created:** 2026-03-18

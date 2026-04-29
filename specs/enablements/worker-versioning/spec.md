@@ -1,4 +1,4 @@
-# Worker Version Deployment Specification
+# Worker Versioning Enablements Specification
 
 **Feature Name:** Worker Version Deployment with Build-ID Routing
 **Status:** Draft - Ready for Tech Lead Review

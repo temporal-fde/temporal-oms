@@ -24,7 +24,7 @@ See [INDEX.md](./INDEX.md) for architecture overview and dependency diagram.
 | Sub-Spec | Status | Owner | Review Date | Approval |
 |----------|--------|-------|-------------|----------|
 | [Worker Version Enablement Workflow](./load-generation/) | 📋 Draft | [Your Name] | TBD | ⏳ Pending |
-| [Version Deployment](./version-deployment/) | 📋 Draft | [Your Name] | TBD | ⏳ Pending |
+| [Version Deployment](worker-versioning/) | 📋 Draft | [Your Name] | TBD | ⏳ Pending |
 | [Validation Framework](./validation-framework/) | 📋 Draft | [Your Name] | TBD | ⏳ Pending |
 
 **Overall Status:** ⏳ **Awaiting Tech Lead Review of All Specs**

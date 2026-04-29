@@ -4,7 +4,7 @@
 **Status:** 📋 Draft - Ready for Tech Lead Review
 **Owner:** [Your Name]
 **Initiative:** [Worker Version Enablement](../INDEX.md)
-**Depends on:** [Load Generation](../load-generation/PROGRESS.md), [Version Deployment](../version-deployment/PROGRESS.md)
+**Depends on:** [Load Generation](../load-generation/PROGRESS.md), [Version Deployment](../worker-versioning/PROGRESS.md)
 
 ---
 

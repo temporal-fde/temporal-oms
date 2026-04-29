@@ -7,7 +7,7 @@
 **Updated:** 2026-03-18
 
 **Part of:** [Worker Version Enablement Initiative](../INDEX.md)
-**Depends on:** [Worker Version Enablement Workflow](../load-generation/spec.md), [Version Deployment](../version-deployment/spec.md)
+**Depends on:** [Worker Version Enablement Workflow](../load-generation/spec.md), [Version Deployment](../worker-versioning/spec.md)
 
 ---
 
@@ -436,6 +436,6 @@ Deliverables:
 
 - [Worker Version Enablement Initiative](../INDEX.md)
 - [Worker Version Enablement Workflow](../load-generation/spec.md)
-- [Version Deployment Setup](../version-deployment/spec.md)
+- [Version Deployment Setup](../worker-versioning/spec.md)
 - [Temporal Workflow Queries](https://docs.temporal.io/concepts/what-is-a-query)
 - [Temporal Workflow History](https://docs.temporal.io/concepts/what-is-a-workflow-history)

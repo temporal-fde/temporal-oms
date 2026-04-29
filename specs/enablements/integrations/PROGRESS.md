@@ -1,6 +1,6 @@
 # Workshop Integrations - Progress Tracking
 
-**Spec:** [spec.md](./spec.md)
+**Spec:** [spec.md](spec.md)
 **Last Updated:** 2026-04-29
 **Current Status:** Runtime integration work and Nexus compatibility reroute are complete; workshop exercise material remains open.
 

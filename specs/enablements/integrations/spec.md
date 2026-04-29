@@ -1,6 +1,6 @@
-# Workshop Specification: Integration Stubs
+# Enablements Specification: Integration Stubs
 
-**Feature Name:** Integration Stubs - Enablements API External Services for Workshop
+**Feature Name:** Integration Stubs - Enablements API External Services
 **Status:** Draft
 **Owner:** Temporal FDE Team
 **Created:** 2026-04-28
@@ -39,22 +39,21 @@ decide to include payment validation in the exercise narrative.
 
 ### Primary Goals
 
-- Goal 1: Give workshop participants one integration mental model: external APIs backed by
+- Goal 1: Give enablement participants one integration mental model: external APIs backed by
   `enablements-api`, not ad hoc mocks scattered across workers
 - Goal 2: Document the current stubbed APIs and exact request/response signatures before adding
-  more workshop behavior
+  more enablements behavior
 - Goal 3: Bring `location-events` into the same integration discussion so supply-chain risk data is
   seeded and inspectable like inventory, PIMS, and commerce-app data
 - Goal 4: Keep the stubs realistic enough to drive the OMS workflow and ShippingAgent scenarios
   without introducing real vendor setup
 - Goal 5: Support `scenarios` input to alter the response behavior of various stubbed services so that dependents can demonstrate alternate behavior.
-- Goal 6: Remove EasyPost from workshop/runtime execution by serving captured, deterministic
-  shipping fixtures through the existing message contracts
+- Goal 6: Serve captured, deterministic shipping fixtures through the existing message contracts
 
 ### Acceptance Criteria
 
-- [x] The workshop spec lists every in-scope service operation and its request/response type
-- [x] The spec identifies `enablements-api` as the target owner for workshop integrations
+- [x] The enablements spec lists every in-scope service operation and its request/response type
+- [x] The spec identifies `enablements-api` as the target owner for enablements integrations
 - [x] The spec identifies which behavior is already implemented vs planned
 - [x] `location-events` has a proposed service contract and a clear migration path from the
       current Python activity stub
@@ -68,10 +67,10 @@ decide to include payment validation in the exercise narrative.
 
 ### Requirements and Motivation
 
-The integration layer should satisfy these workshop requirements:
+The integration layer should satisfy these enablements requirements:
 
 - **No vendor setup for core exercises:** participants should not need commerce, PIMS, inventory,
-  or risk-event accounts to complete the workshop
+  or risk-event accounts to complete the enablement.
 - **Observable behavior:** fixture state and demo reference data should be queryable through
   `enablements-api` inspection endpoints
 - **Service boundary fidelity:** callers should interact with HTTP APIs hosted by
@@ -81,15 +80,15 @@ The integration layer should satisfy these workshop requirements:
 - **Deterministic scenarios:** facilitators need stable ways to produce invalid orders, SKU
   enrichment, primary vs alternate warehouse selection, and location-risk outcomes
 - **No runtime EasyPost dependency:** EasyPost may be used by a capture script to build fixtures,
-  but normal local/workshop execution should not need an EasyPost key or network access
+  but normal local/enablements execution should not need an EasyPost key or network access
 - **Contract compatibility:** Java workflows, Python activities, and REST endpoints should keep the
   current request/response contracts where practical
-- **Low reset cost:** workshop data should be resettable by restarting `enablements-api` or
+- **Low reset cost:** enablements data should be resettable by restarting `enablements-api` or
   reloading its packaged fixtures
 - **Clear promotion path:** any stubbed service should have an obvious replacement path to a real
   service later
 
-The motivation for bringing these together is not just code reuse. It gives the workshop a single
+The motivation for bringing these together is not just code reuse. It gives the enablements a single
 story for external dependencies: the OMS stays composed of bounded contexts, while enablements owns
 the deterministic simulator for the systems we do not want participants to provision. This also
 makes the ShippingAgent exercise easier to explain because PIMS, inventory, carrier data, and
@@ -101,7 +100,7 @@ location-events all contribute facts to one recommendation path.
 
 ### Enablements-Owned Integrations
 
-`enablements-api` owns the workshop integration simulator state and fixture-backed behavior.
+`enablements-api` owns the enablements integration simulator state and fixture-backed behavior.
 The `oms-integrations-v1` Nexus endpoint remains a compatibility ingress for workflow callers, but
 it targets enablements workers and delegates to `enablements-api` over HTTP.
 
@@ -445,12 +444,12 @@ date.
 - Inventory, PIMS, and location risk are connected in the ShippingAgent scenario, but that
   motivation is not captured in one place
 - Runtime EasyPost calls require an API key, network access, and rate-limit management for a
-  workshop path that should be deterministic
+  enablements path that should be deterministic
 - Warehouse startup currently verifies addresses through EasyPost; this couples inventory seed
   loading to a vendor call even though the relevant IDs, coordinates, and timezones are stable
-- `get_carrier_rates` creates a new shipment on every call; repeated workshop runs can produce
+- `get_carrier_rates` creates a new shipment on every call; repeated enablements runs can produce
   different IDs and rate ordering unless responses are captured
-- `printShippingLabel` currently buys through EasyPost; even with test keys, the workshop only
+- `printShippingLabel` currently buys through EasyPost; even with test keys, the enablements only
   needs a realistic tracking number and label URL response
 - SLA and margin scenarios are now driven by `selected_shipment` fields, but the spec needs to
   describe those triggers so fixture behavior and prompts stay aligned
@@ -459,7 +458,7 @@ date.
 
 ### Architecture Overview
 
-The integration layer becomes the workshop's shared external-system simulator. Each service keeps a
+The integration layer becomes the enablement's shared external-system simulator. Each service keeps a
 domain-shaped API, but responses come from deterministic seeded data rather than real vendors.
 
 The converged target is:
@@ -497,7 +496,7 @@ and avoids split-brain fixture state between an API process and a worker process
 
 - **Single inspectable source of stub truth:** participants can query `enablements-api` and see
   warehouse, address, shipment, rate, label, and location-event fixture state
-- **Service-shaped APIs:** callers use explicit REST endpoints, so the workshop boundary looks
+- **Service-shaped APIs:** callers use explicit REST endpoints, so the integrations boundary looks
   like an external service rather than a direct test double
 - **Deterministic scenario hooks:** order ID, item ID, SKU prefix, warehouse, and coordinate inputs
   can drive predictable outcomes
@@ -512,7 +511,7 @@ and avoids split-brain fixture state between an API process and a worker process
 
 ### `enablements-api` REST Surface
 
-All in-scope workshop integrations should be exposed by `enablements-api` and backed by services in
+All in-scope enablements integrations should be exposed by `enablements-api` and backed by services in
 that module. Endpoints should accept and return the existing protobuf message types directly where
 practical so Java workflows, Python activities, scripts, and tests use the same contracts.
 

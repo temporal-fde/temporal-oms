@@ -68,7 +68,7 @@ the echoed request window/timezone. Real weather/event enrichment is a separate 
 
 ## References
 
-- [Workshop integrations spec](../../workshop/integrations/spec.md)
+- [Workshop integrations spec](../integrations/spec.md)
 - [ShippingAgent spec](../../fulfillment-order/shipping-agent/spec.md)
 - [Scenario scripts](../../../scripts/scenarios/README.md)
 - [`ShippingActivities`](../../../python/fulfillment/src/agents/activities/shipping.py)
