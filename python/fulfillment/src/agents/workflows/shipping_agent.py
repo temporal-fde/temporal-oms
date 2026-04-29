@@ -360,6 +360,7 @@ class ShippingAgent:
 
         recommendation: ShippingRecommendation | None = None
         all_options: list[ShippingOption] = []
+        options_by_id: dict[str, ShippingOption] = {}
         alternate_warehouse_called = False
 
         while True:
@@ -435,7 +436,12 @@ class ShippingAgent:
                     if block.tool_use.name == _NAME_RATES:
                         try:
                             data = json.loads(result_json)
-                            all_options = [ShippingOption(**o) for o in data.get("options", [])]
+                            for option_json in data.get("options", []):
+                                option = ShippingOption(**option_json)
+                                option_id = option.id or option.rate_id
+                                if option_id not in options_by_id:
+                                    options_by_id[option_id] = option
+                                    all_options.append(option)
                         except Exception:
                             pass
 

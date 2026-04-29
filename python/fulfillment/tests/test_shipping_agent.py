@@ -641,6 +641,105 @@ async def test_sla_breach_outcome() -> None:
 
 
 @pytest.mark.asyncio
+async def test_options_accumulate_across_primary_and_alternate_rate_calls() -> None:
+    """The final response must include whichever rate the LLM recommends, even after alternate lookup."""
+    turn = 0
+    primary_rate_id = "rate_wh_east_01_nyc_ground"
+    alternate_rate_id = "rate_wh_east_02_nyc_2day"
+
+    @activity.defn(name="get_carrier_rates")
+    async def route_rates(req: GetShippingRatesRequest) -> GetShippingRatesResponse:
+        if req.from_easypost_id == "adr_wh_east_02":
+            return GetShippingRatesResponse(
+                shipment_id="shp_adr_wh_east_02_to_adr_dest_nyc_01",
+                options=[
+                    ShippingOption(
+                        id=alternate_rate_id,
+                        carrier="FedEx",
+                        service_level="2Day",
+                        cost=Money(currency="USD", units=990),
+                        estimated_days=2,
+                        rate_id=alternate_rate_id,
+                    ),
+                ],
+            )
+        return GetShippingRatesResponse(
+            shipment_id="shp_adr_wh_east_01_to_adr_dest_nyc_01",
+            options=[
+                ShippingOption(
+                    id=primary_rate_id,
+                    carrier="UPS",
+                    service_level="Ground",
+                    cost=Money(currency="USD", units=780),
+                    estimated_days=2,
+                    rate_id=primary_rate_id,
+                ),
+            ],
+        )
+
+    @service_handler(service=InventoryService)
+    class AlternateInventory:
+        @sync_operation
+        async def lookupInventoryAddress(
+            self, ctx: StartOperationContext, req: LookupInventoryAddressRequest
+        ) -> LookupInventoryAddressResponse:
+            return _LOOKUP_RESULT
+
+        @sync_operation
+        async def findAlternateWarehouse(
+            self, ctx: StartOperationContext, req: FindAlternateWarehouseRequest
+        ) -> FindAlternateWarehouseResponse:
+            return FindAlternateWarehouseResponse(
+                address=Address(easypost=EasyPostAddress(id="adr_wh_east_02"))
+            )
+
+    @activity.defn(name="call_llm")
+    async def sla_llm(messages: list, tools: list) -> LlmResponse:
+        nonlocal turn
+        turn += 1
+        if turn == 1:
+            return _tool_use_response([
+                ("tu_primary", "get_carrier_rates",
+                 {"from_easypost_id": "adr_wh_east_01", "to_easypost_id": "adr_dest", "items": []}),
+            ])
+        if turn == 2:
+            return _tool_use_response([
+                ("tu_alt", "find_alternate_warehouse",
+                 {"items": [{"sku_id": "ELEC-001", "quantity": 2}], "current_address_id": "adr_wh_east_01"}),
+            ])
+        if turn == 3:
+            return _tool_use_response([
+                ("tu_alt_rates", "get_carrier_rates",
+                 {"from_easypost_id": "adr_wh_east_02", "to_easypost_id": "adr_dest", "items": []}),
+            ])
+        return _finalize_response({
+            "outcome": "SLA_BREACH",
+            "recommended_option_id": primary_rate_id,
+            "reasoning": "No rate can satisfy same-day delivery.",
+            "margin_delta_cents": 0,
+            "origin_risk_level": "RISK_LEVEL_NONE",
+            "destination_risk_level": "RISK_LEVEL_NONE",
+        })
+
+    async with _test_env() as env:
+        common = [mock_build_system_prompt, mock_verify_address, route_rates,
+                  mock_get_location_events, sla_llm]
+        async with (
+            Worker(env.client, task_queue="fulfillment", workflows=[ShippingAgent],
+                   activities=common, nexus_service_handlers=[AlternateInventory()],
+                   workflow_failure_exception_types=[Exception]),
+            Worker(env.client, task_queue="fulfillment-easypost", activities=common),
+            Worker(env.client, task_queue="agents", activities=common),
+        ):
+            handle = await _start_agent(env.client)
+            req = _base_request(selected_delivery_days=0)
+            resp = await handle.execute_update(ShippingAgent.calculate_shipping_options, req)
+
+    assert resp.recommendation.recommended_option_id == primary_rate_id
+    assert [option.id for option in resp.options] == [primary_rate_id, alternate_rate_id]
+
+
+@pytest.mark.asyncio
 async def test_margin_spike_enforces_alternate_warehouse() -> None:
     """MARGIN_SPIKE finalize without find_alternate_warehouse is rejected; second attempt accepted."""
     finalize_attempts = 0
