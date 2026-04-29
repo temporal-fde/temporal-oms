@@ -21,6 +21,17 @@ with `ORDER_ID=...` and/or `CUSTOMER_ID=...`.
 
 ## Scenarios
 
+Run any scenario from the repository root with the dynamic selector:
+
+```bash
+./scripts/runscenario.sh
+./scripts/runscenario.sh --yes
+./scripts/runscenario.sh valid-order --yes
+```
+
+The selector discovers every `scripts/scenarios/*/run.sh`, so adding a new
+scenario only requires adding a subdirectory with its own `run.sh`.
+
 ### 1. Valid Order (Happy Path) ✓
 **Directory**: `valid-order/`
 
