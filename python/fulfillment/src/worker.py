@@ -2,7 +2,7 @@
 
 Starts two Temporal workers in a single process concurrently:
   - agents               (ShippingAgent workflow + LLM + location events activities + ShippingAgent Nexus service)
-  - fulfillment-easypost  (EasyPost activities, 5 rps)
+  - fulfillment-easypost  (fixture-backed shipping activities)
 """
 from __future__ import annotations
 

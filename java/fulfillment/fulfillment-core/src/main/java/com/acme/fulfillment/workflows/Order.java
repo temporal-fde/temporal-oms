@@ -25,7 +25,7 @@ public interface Order {
     void execute(StartOrderFulfillmentRequest request);
 
     /**
-     * Update: Verify the shipping address via EasyPost.
+     * Update: Verify the shipping address via the fixture-backed shipping integration.
      * Called by apps.Order via the validateOrder Nexus operation (UpdateWithStart).
      * Stores the verified Address (with easypost_address) in workflow state for
      * downstream use in ShippingAgent.calculateShippingOptions.

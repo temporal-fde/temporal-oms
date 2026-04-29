@@ -1,0 +1,8 @@
+spring.temporal:
+  connection:
+    target: ${TEMPORAL_ENABLEMENTS_ADDRESS:temporal-frontend.temporal.svc.cluster.local:7233}
+    api-key: ${TEMPORAL_ENABLEMENTS_API_KEY:}
+  namespace: ${TEMPORAL_ENABLEMENTS_NAMESPACE:default}
+
+server:
+  port: 8080

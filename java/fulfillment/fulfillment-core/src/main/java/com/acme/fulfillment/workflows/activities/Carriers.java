@@ -8,11 +8,11 @@ import io.temporal.activity.ActivityInterface;
 import io.temporal.activity.ActivityMethod;
 
 /**
- * Carriers activity — EasyPost address verification and label printing.
+ * Carriers activity — fixture-backed address verification and label printing.
  *
  * verifyAddress: called in validateOrder Update handler; populates easypost_address.id.
  * printShippingLabel: called concurrently with InventoryService.deductInventory in fulfillOrder.
- *   Carrier rate selection is handled by the Python ShippingAgent (fulfillment-easypost task queue).
+ *   Carrier rate selection is handled by the Python ShippingAgent.
  */
 @ActivityInterface
 public interface Carriers {
