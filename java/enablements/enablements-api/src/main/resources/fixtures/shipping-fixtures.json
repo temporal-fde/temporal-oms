@@ -192,6 +192,18 @@
       "labels": []
     },
     {
+      "shipment_id": "shp_adr_wh_east_01_to_adr_wh_west_01",
+      "from_address_id": "adr_wh_east_01",
+      "to_address_id": "adr_wh_west_01",
+      "parcel": {"weight_oz": 16, "length_in": 6, "width_in": 6, "height_in": 4},
+      "rates": [
+        {"rate_id": "rate_wh_east_01_wh_west_01_ground", "carrier": "UPS", "service_level": "Ground", "cost": {"currency": "USD", "units": 1895}, "estimated_days": 5, "delivery_days": 5},
+        {"rate_id": "rate_wh_east_01_wh_west_01_2day", "carrier": "FedEx", "service_level": "2Day", "cost": {"currency": "USD", "units": 2495}, "estimated_days": 2, "delivery_days": 2},
+        {"rate_id": "rate_wh_east_01_wh_west_01_priority", "carrier": "USPS", "service_level": "Priority", "cost": {"currency": "USD", "units": 1815}, "estimated_days": 4, "delivery_days": 4}
+      ],
+      "labels": []
+    },
+    {
       "shipment_id": "shp_adr_wh_east_02_to_adr_dest_nyc_01",
       "from_address_id": "adr_wh_east_02",
       "to_address_id": "adr_dest_nyc_01",

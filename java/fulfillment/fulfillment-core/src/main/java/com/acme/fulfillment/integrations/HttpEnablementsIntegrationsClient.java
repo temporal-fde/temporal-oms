@@ -53,8 +53,8 @@ public class HttpEnablementsIntegrationsClient implements EnablementsIntegration
             String responseJson = restClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path(path)
-                            .queryParam("request", requestJson)
-                            .build())
+                            .queryParam("request", "{request}")
+                            .build(requestJson))
                     .retrieve()
                     .body(String.class);
             return fromJson(responseJson == null ? "{}" : responseJson, responseType);

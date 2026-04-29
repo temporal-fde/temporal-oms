@@ -125,6 +125,23 @@ class IntegrationServicesTest {
     }
 
     @Test
+    void shippingRatesIncludeWarehouseToWarehouseScenarioRoute() {
+        var rates = shipping.getShippingRates(GetShippingRatesRequest.newBuilder()
+                .setFromEasypostId("adr_wh_east_01")
+                .setToEasypostId("adr_wh_west_01")
+                .addItems(ShippingLineItem.newBuilder().setSkuId("ELEC-SKU-001").setQuantity(1).build())
+                .build());
+
+        assertThat(rates.getShipmentId()).isEqualTo("shp_adr_wh_east_01_to_adr_wh_west_01");
+        assertThat(rates.getOptionsList())
+                .extracting(option -> option.getRateId())
+                .containsExactly(
+                        "rate_wh_east_01_wh_west_01_2day",
+                        "rate_wh_east_01_wh_west_01_priority",
+                        "rate_wh_east_01_wh_west_01_ground");
+    }
+
+    @Test
     void shippingScenariosMutateCopiedRatesDeterministically() {
         var marginSpike = shipping.getShippingRates(baseRatesRequest()
                 .setSelectedShipment(Shipment.newBuilder()
