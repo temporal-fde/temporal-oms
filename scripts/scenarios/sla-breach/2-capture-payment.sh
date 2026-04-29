@@ -15,20 +15,27 @@
 
 set -e
 
-echo "Capturing payment for sla-breach-123..."
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../_lib.sh"
+scenario_resume "$SCRIPT_DIR"
+
+METADATA_JSON="$(scenario_metadata_json)"
+
+echo "Capturing payment for ${ORDER_ID}..."
+echo "Customer ID: ${CUSTOMER_ID}"
 echo ""
 
 xh POST http://localhost:8080/api/v1/payments-app/orders \
-  customerId="cust-002" \
-  rrn="payment-sla-breach" \
-  amountCents=9999 \
-  metadata:='{"orderId":"sla-breach-123"}'
+  customerId="${CUSTOMER_ID}" \
+  rrn="${PAYMENT_RRN}" \
+  amountCents="${PAYMENT_AMOUNT_CENTS}" \
+  metadata:="${METADATA_JSON}"
 
 echo ""
 echo "Payment captured — order is now processing"
 echo ""
 echo "Watch Temporal UI (fulfillment namespace) for:"
-echo "  ShippingAgent workflow ID: cust-002"
+echo "  ShippingAgent workflow ID: ${CUSTOMER_ID}"
 echo "  Outcome: SLA_BREACH after find_alternate_warehouse returns empty"
 echo ""
 echo "Note: delivery_days=0 with paid_price_cents=995 — fixture rates stay under"

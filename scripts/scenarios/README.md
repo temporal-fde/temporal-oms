@@ -4,10 +4,17 @@ Executable demo scripts for showcasing the Temporal Order Management System to c
 
 Each scenario is a standalone workflow that demonstrates different order processing paths.
 
+Every scenario run uses a unique generated order/workflow ID and a matching
+unique customer ID. Step 1 stores the current run context under
+`${TMPDIR:-/tmp}/fde-temporal-oms-scenarios`, and later steps in the same
+scenario read that context automatically. To force specific IDs, run a script
+with `ORDER_ID=...` and/or `CUSTOMER_ID=...`.
+
 ## Prerequisites
 
 - ✅ Temporal Server running (localhost:7233)
 - ✅ Apps API server running (localhost:8080)
+- ✅ Processing API server running (localhost:8070)
 - ✅ Processing Workers running
 - ✅ `xh` (HTTP client) installed
 - ✅ `temporal` CLI installed
@@ -21,8 +28,10 @@ Demonstrates an order that passes all validation and proceeds through the comple
 
 ```bash
 cd valid-order
-./1-submit-order.sh        # Submit valid order
-./2-capture-payment.sh     # Capture payment → auto-validates → enriches → fulfills
+./run.sh                   # Prompts before each step
+./run.sh --yes             # Runs all steps with short pauses
+./1-submit-order.sh        # Submit valid order with a fresh generated ID
+./2-capture-payment.sh     # Uses the ID from the latest submit step
 ```
 
 **What happens:**
@@ -41,9 +50,11 @@ Demonstrates an order that fails validation and requires manual support team int
 
 ```bash
 cd invalid-order
-./1-submit-order.sh           # Submit invalid order
-./2-capture-payment.sh        # Capture payment → triggers validation
-./3-complete-validation.sh    # Support team corrects and resumes
+./run.sh                      # Prompts before each step
+./run.sh --yes                # Runs all steps with short pauses
+./1-submit-order.sh           # Submit invalid order with a fresh generated ID
+./2-capture-payment.sh        # Uses the ID from the latest submit step
+./3-complete-validation.sh    # Uses the same ID and resumes processing
 ```
 
 **What happens:**
@@ -54,7 +65,7 @@ cd invalid-order
 5. Support team reviews and provides corrections
 6. Workflow resumes with corrected data
 
-**Note**: The order ID "invalid-order-123" contains "invalid" which triggers validation failure. This demonstrates the support workflow.
+**Note**: Generated IDs for this scenario start with `invalid-order`, which contains `invalid` and triggers validation failure. This demonstrates the support workflow.
 
 ---
 
@@ -65,8 +76,10 @@ Demonstrates canceling an order before it completes processing.
 
 ```bash
 cd cancel-order
-./1-submit-order.sh      # Submit order
-./2-cancel-order.sh      # Cancel the order mid-flight
+./run.sh                 # Prompts before each step
+./run.sh --yes           # Runs all steps with short pauses
+./1-submit-order.sh      # Submit order with a fresh generated ID
+./2-cancel-order.sh      # Uses the same ID and cancels mid-flight
 ```
 
 **What happens:**
@@ -74,6 +87,50 @@ cd cancel-order
 2. Cancellation request sent via workflow update
 3. Order processing is aborted
 4. Workflow completes in canceled state
+
+---
+
+### 4. Margin Spike
+**Directory**: `margin-spike/`
+
+Demonstrates the ShippingAgent alternate-warehouse path when customer paid price is intentionally too low.
+
+```bash
+cd margin-spike
+./run.sh                 # Prompts before each step
+./run.sh --yes           # Runs all steps with short pauses
+./1-submit-order.sh      # Submit order with a fresh generated ID
+./2-capture-payment.sh   # Uses the same ID and triggers processing
+```
+
+**What happens:**
+1. Order submitted with `paidPriceCents=1`
+2. Payment captured
+3. ShippingAgent fetches fixture-backed rates
+4. ShippingAgent calls `find_alternate_warehouse`
+5. Recommendation finalizes with `MARGIN_SPIKE`
+
+---
+
+### 5. SLA Breach
+**Directory**: `sla-breach/`
+
+Demonstrates the ShippingAgent SLA breach path using an explicit same-day delivery requirement.
+
+```bash
+cd sla-breach
+./run.sh                 # Prompts before each step
+./run.sh --yes           # Runs all steps with short pauses
+./1-submit-order.sh      # Submit order with a fresh generated ID
+./2-capture-payment.sh   # Uses the same ID and triggers processing
+```
+
+**What happens:**
+1. Order submitted with `deliveryDays=0`
+2. Payment captured
+3. ShippingAgent fetches fixture-backed rates
+4. ShippingAgent calls `find_alternate_warehouse`
+5. Recommendation finalizes with `SLA_BREACH`
 
 ---
 
@@ -164,10 +221,27 @@ While demos are running, open [Temporal UI](http://localhost:8233) to show:
 ## Customizing Scenarios
 
 Edit the scripts to change:
-- **Order ID**: Replace `cancel-order-123` with your own ID
-- **Customer ID**: Change `cust-001` to any customer
+- **Order ID**: Set `ORDER_ID=your-id` when invoking a script or `run.sh`
+- **Customer ID**: Generated uniquely by default; set `CUSTOMER_ID=your-customer` to override
 - **Items**: Modify the JSON to include different products
-- **Payment Amount**: Change `amountCents=9999` (in cents, so 9999 = $99.99)
+- **Payment Amount**: Set `PAYMENT_AMOUNT_CENTS=9999` when invoking a script or `run.sh`
+
+### Run Context
+
+The generated values are saved outside the repository so scenario runs do not
+dirty the worktree:
+
+```bash
+${TMPDIR:-/tmp}/fde-temporal-oms-scenarios/<scenario>.env
+```
+
+If a later step says no saved run context exists, run that scenario's
+`1-submit-order.sh` first, use the scenario `run.sh`, or provide `ORDER_ID`
+manually.
+
+For invalid-order validation completion, the REST step retries HTTP 409 while
+the support workflow is still registering the validation request. Tune this with
+`VALIDATION_COMPLETE_MAX_ATTEMPTS` and `VALIDATION_COMPLETE_RETRY_SECONDS`.
 
 ---
 
@@ -188,6 +262,11 @@ Edit the scripts to change:
 ### Support team workflow not found
 - Ensure Processing Workers are running
 - The SupportTeam workflow must be registered in the worker
+
+### Validation completion returns 404
+- Ensure `processing-api` is running on localhost:8070
+- Check: `curl http://localhost:9081/actuator/health`
+- If using a tunnel or Kubernetes ingress, set `PROCESSING_API_ENDPOINT`
 
 ---
 
