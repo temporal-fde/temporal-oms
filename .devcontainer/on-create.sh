@@ -4,8 +4,10 @@ set -euo pipefail
 
 cp -n .env.codespaces .env.local
 
-echo "Prebuilding Java artifacts..."
-(cd java && mvn -DskipTests install)
+JAVAC_EXECUTABLE="$(command -v javac)"
+
+echo "Prebuilding Java artifacts with ${JAVAC_EXECUTABLE}..."
+(cd java && mvn -DskipTests -Djavac.executable="${JAVAC_EXECUTABLE}" install)
 
 echo "Syncing Python dependencies..."
 (cd python && uv sync)
