@@ -3,6 +3,7 @@ set -e
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$PROJECT_DIR"
+. "$PROJECT_DIR/scripts/_lib/java-tools.sh"
 
 export KUBECONFIG=/tmp/k3d-config.yaml
 
@@ -12,9 +13,8 @@ PROCESSING_WORKER_MODE="${PROCESSING_WORKER_MODE:-versioned}"
 echo "📦 Building and deploying applications to k3d (${OVERLAY} Temporal)..."
 
 echo "→ Building Java projects..."
-cd java
-mvn clean install -DskipTests -q
-cd "$PROJECT_DIR"
+JAVAC_EXECUTABLE="$(resolve_javac_executable)"
+(cd java && mvn -Djavac.executable="$JAVAC_EXECUTABLE" clean install -DskipTests -q)
 
 echo "→ Building Docker images..."
 docker build -q -t temporal-oms/apps-api:latest \

@@ -27,7 +27,7 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.plugin.version>3.14.1</maven.compiler.plugin.version>
-        <javac.executable>${user.home}/.asdf/shims/javac</javac.executable>
+        <javac.executable>javac</javac.executable>
 
         <!-- Temporal -->
         <temporal.version>1.33.0</temporal.version>

@@ -10,7 +10,9 @@ if [[ -d .devcontainer/k9s ]]; then
   cp -R .devcontainer/k9s/. "$HOME/.config/k9s/"
 fi
 
-JAVAC_EXECUTABLE="$(command -v javac)"
+. scripts/_lib/java-tools.sh
+
+JAVAC_EXECUTABLE="$(resolve_javac_executable)"
 
 echo "Prebuilding Java artifacts with ${JAVAC_EXECUTABLE}..."
 (cd java && mvn -DskipTests -Djavac.executable="${JAVAC_EXECUTABLE}" install)

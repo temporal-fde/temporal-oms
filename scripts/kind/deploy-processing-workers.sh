@@ -11,12 +11,14 @@ IMAGE="temporal-oms/processing-workers:${VERSION}"
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$PROJECT_DIR"
+. "$PROJECT_DIR/scripts/_lib/java-tools.sh"
 export KUBECONFIG=/tmp/kind-config.yaml
 
 echo "🚀 Deploying processing workers ${VERSION} to KinD..."
 
 echo "→ Building Java..."
-cd java && mvn clean install -DskipTests -q && cd "$PROJECT_DIR"
+JAVAC_EXECUTABLE="$(resolve_javac_executable)"
+(cd java && mvn -Djavac.executable="$JAVAC_EXECUTABLE" clean install -DskipTests -q)
 
 echo "→ Building image ${IMAGE}..."
 docker build -q -t "${IMAGE}" \
