@@ -13,11 +13,13 @@ Use this repo's devcontainer. It installs the workshop toolchain for you:
 - Temporal CLI `1.7.0`
 - Docker-in-Docker
 - `kubectl`, Helm, `kind`, `k3d`, and `k9s`
-- `caddy` and `cloudflared` for instructor key distribution helpers
 - `jq`, `yq`, `curl`, and process utilities
 
 Create a Codespace from the workshop branch. The devcontainer also creates `.env.local` from the
 committed non-secret `.env.codespaces` file and prebuilds Java/Python dependencies.
+
+Instructor-only key distribution helpers (`caddy` and `cloudflared`) run from the instructor's
+local machine, not from attendee Codespaces.
 
 ### 🎯 Want to Deploy to Kubernetes?
 
