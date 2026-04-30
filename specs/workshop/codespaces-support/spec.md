@@ -201,7 +201,7 @@ Recommended attendee devcontainer:
 
 - Java 21 and Maven 3.9.x, matching `.tool-versions`.
 - Python via `uv`; use the repo's `python/uv.lock`.
-- Temporal CLI pinned to a version that supports Worker Deployment commands used by the lab.
+- Temporal CLI pinned to `1.7.0`, which supports the Worker Deployment commands used by the lab.
 - `jq`, `curl` or `xh`, `git`, `procps`, and shell utilities.
 - No Docker requirement for the default attendee path.
 - `forwardPorts` for `8233`, `8080`, `8050`, `8070`, and `8071`; optionally `7233` for CLI access

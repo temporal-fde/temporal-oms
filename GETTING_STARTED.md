@@ -4,6 +4,21 @@ A Java-based Order Management System powered by Temporal workflows.
 
 ## Choose Your Setup Path
 
+### ☁️ Running in GitHub Codespaces for the Workshop?
+
+Use this repo's devcontainer. It installs the workshop toolchain for you:
+
+- Java 21 and Maven 3.9.9
+- Python 3.13 and `uv`
+- Temporal CLI `1.7.0`
+- Docker-in-Docker
+- `kubectl`, Helm, `kind`, `k3d`, and `k9s`
+- `caddy` and `cloudflared` for instructor key distribution helpers
+- `jq`, `yq`, `curl`, and process utilities
+
+Create a Codespace from the workshop branch. The devcontainer also creates `.env.local` from the
+committed non-secret `.env.codespaces` file and prebuilds Java/Python dependencies.
+
 ### 🎯 Want to Deploy to Kubernetes?
 
 If you want to run the full application stack in Kubernetes (locally via KinD/k3d or with Temporal Cloud), see **[DEPLOYMENT.md](DEPLOYMENT.md)** for:

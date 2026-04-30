@@ -153,7 +153,7 @@ See [Dependencies](#dependencies) for full detail. The exercises assume:
 ### Phase 1: Devcontainer (blocking dependency)
 
 Deliverables:
-- [ ] `.devcontainer/devcontainer.json` — base image, features (Java 21, Python 3.11, Temporal CLI), port forwards
+- [x] `.devcontainer/devcontainer.json` — base image, features (Java 21, Python 3.13, Temporal CLI), port forwards
 - [ ] `scripts/workshop-start.sh` — starts Temporal dev server + runs `setup-temporal-namespaces.sh` + starts all 5 worker processes
 - [ ] Verify clean Codespaces cold start takes < 5 min to ready state
 
