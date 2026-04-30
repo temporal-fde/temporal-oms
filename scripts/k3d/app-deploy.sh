@@ -9,6 +9,10 @@ export KUBECONFIG=/tmp/k3d-config.yaml
 
 OVERLAY="${OVERLAY:-local}"
 PROCESSING_WORKER_MODE="${PROCESSING_WORKER_MODE:-versioned}"
+KUSTOMIZE_OVERLAY="$OVERLAY"
+if [ "$OVERLAY" = "local" ]; then
+  KUSTOMIZE_OVERLAY="k3d-local"
+fi
 
 echo "📦 Building and deploying applications to k3d (${OVERLAY} Temporal)..."
 
@@ -55,10 +59,12 @@ k3d image import \
   --cluster temporal-oms
 
 echo "→ Deploying to k3d..."
-kubectl apply -k "k8s/overlays/${OVERLAY}" >/dev/null
+echo "  using kustomize overlay: ${KUSTOMIZE_OVERLAY}"
+kubectl apply -k "k8s/overlays/${KUSTOMIZE_OVERLAY}" >/dev/null
 if [ "$PROCESSING_WORKER_MODE" = "versioned" ]; then
+  echo "  using TemporalWorkerDeployment for processing-workers"
   kubectl delete deployment processing-workers -n temporal-oms-processing --ignore-not-found >/dev/null
-  kubectl apply -k "k8s/processing-versioned/overlays/${OVERLAY}" >/dev/null
+  kubectl apply -k "k8s/processing-versioned/overlays/${KUSTOMIZE_OVERLAY}" >/dev/null
 else
   kubectl delete temporalworkerdeployment processing-workers -n temporal-oms-processing --ignore-not-found >/dev/null
 fi
@@ -71,6 +77,19 @@ for ns in temporal-oms-apps temporal-oms-processing temporal-oms-enablements tem
 done
 
 sleep 8
+
+if [ "$PROCESSING_WORKER_MODE" = "versioned" ]; then
+  echo "→ Waiting for processing TemporalWorkerDeployment..."
+  if ! kubectl wait \
+    --for=condition=Ready \
+    temporalworkerdeployment/processing-workers \
+    -n temporal-oms-processing \
+    --timeout=180s; then
+    echo "ERROR: processing TemporalWorkerDeployment did not become Ready." >&2
+    kubectl describe temporalworkerdeployment processing-workers -n temporal-oms-processing >&2 || true
+    exit 1
+  fi
+fi
 
 echo "✅ Applications deployed to k3d!"
 echo ""
