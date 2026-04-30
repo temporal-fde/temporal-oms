@@ -1,6 +1,7 @@
 # Kubernetes Deployment with Kustomize
 
-This directory contains the KinD/Kubernetes manifests for the current OMS runtime topology.
+This directory contains the Kubernetes manifests for the current OMS runtime topology. The demo
+scripts can apply them to either KinD or k3d.
 
 ## Topology
 
@@ -42,25 +43,32 @@ http://enablements-api.temporal-oms-enablements.svc.cluster.local:8050
 Java fulfillment workers and the Python fulfillment worker receive this as `ENABLEMENTS_API_BASE_URL`.
 The Python worker also receives `TEMPORAL_FULFILLMENT_ADDRESS`, `TEMPORAL_FULFILLMENT_NAMESPACE`, and `ANTHROPIC_API_KEY`.
 
-## Local KinD
+## Local KinD or k3d
 
 Start local Temporal and create the namespaces/endpoints/search attributes:
 
 ```bash
-temporal server start-dev
+temporal server start-dev --ip 0.0.0.0 --ui-ip 0.0.0.0
 ./scripts/setup-temporal-namespaces.sh
 ```
 
-Deploy the full local stack:
+Deploy the full local stack to KinD:
 
 ```bash
-OVERLAY=local ./scripts/demo-up.sh
+OVERLAY=local ./scripts/kind/demo-up.sh
+```
+
+Deploy the full local stack to k3d:
+
+```bash
+OVERLAY=local ./scripts/k3d/demo-up.sh
 ```
 
 Port-forward APIs:
 
 ```bash
-./scripts/tunnel.sh
+./scripts/kind/tunnel.sh
+./scripts/k3d/tunnel.sh
 ```
 
 Endpoints:
@@ -69,10 +77,13 @@ Endpoints:
 - Processing API: `http://localhost:8070/actuator/health`
 - Enablements API: `http://localhost:8050/actuator/health`
 
-`scripts/app-deploy.sh` defaults to `PROCESSING_WORKER_MODE=versioned`, preserving the Temporal Worker Controller path for the processing worker. To deploy processing as a plain Kubernetes `Deployment` from `k8s/base`, run:
+`scripts/kind/app-deploy.sh` and `scripts/k3d/app-deploy.sh` default to
+`PROCESSING_WORKER_MODE=versioned`, preserving the Temporal Worker Controller path for the
+processing worker. To deploy processing as a plain Kubernetes `Deployment` from `k8s/base`, run:
 
 ```bash
-PROCESSING_WORKER_MODE=deployment OVERLAY=local ./scripts/app-deploy.sh
+PROCESSING_WORKER_MODE=deployment OVERLAY=local ./scripts/kind/app-deploy.sh
+PROCESSING_WORKER_MODE=deployment OVERLAY=local ./scripts/k3d/app-deploy.sh
 ```
 
 ## Temporal Cloud
@@ -80,7 +91,8 @@ PROCESSING_WORKER_MODE=deployment OVERLAY=local ./scripts/app-deploy.sh
 Populate the secret files under `config/` from their templates, then deploy with:
 
 ```bash
-OVERLAY=cloud ./scripts/demo-up.sh
+OVERLAY=cloud ./scripts/kind/demo-up.sh
+OVERLAY=cloud ./scripts/k3d/demo-up.sh
 ```
 
 Cloud overlay defaults currently use:

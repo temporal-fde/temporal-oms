@@ -1,6 +1,13 @@
 # Temporal OMS - Deployment Guide
 
-This guide covers deploying the Temporal OMS application to **KinD (Kubernetes in Docker)** or **running locally** without Kubernetes.
+This guide covers deploying the Temporal OMS application to **KinD (Kubernetes in Docker)**,
+**k3d**, or **running locally** without Kubernetes.
+
+The Kubernetes scripts are split by cluster runtime:
+
+- `scripts/kind/*` - KinD implementation.
+- `scripts/k3d/*` - k3d implementation.
+- `scripts/*.sh` - backwards-compatible KinD aliases.
 
 ## Quick Start
 
@@ -8,41 +15,76 @@ This guide covers deploying the Temporal OMS application to **KinD (Kubernetes i
 
 ```bash
 # Ensure Temporal Cloud credentials are set up (see below)
-OVERLAY=cloud ./scripts/demo-up.sh
+OVERLAY=cloud ./scripts/kind/demo-up.sh
 
 # Check status
-./scripts/status.sh
+./scripts/kind/status.sh
 
 # Port-forward API access (in another terminal)
-./scripts/tunnel.sh
+./scripts/kind/tunnel.sh
 
 # Test the API
 curl http://localhost:8080/api/v1/commerce-app/clothing
 
 # Tear down
-./scripts/demo-down.sh
+./scripts/kind/demo-down.sh
 ```
 
-### Option 2: Deploy to KinD with Local Temporal
+### Option 2: Deploy to k3d with Cloud Temporal
+
+```bash
+# Ensure Temporal Cloud credentials are set up (see below)
+OVERLAY=cloud ./scripts/k3d/demo-up.sh
+
+# Check status
+./scripts/k3d/status.sh
+
+# Port-forward API access
+./scripts/k3d/tunnel.sh
+
+# Tear down
+./scripts/k3d/demo-down.sh
+```
+
+### Option 3: Deploy to k3d with Local Temporal
+
+```bash
+# Start your local Temporal server first and bind it to all interfaces for k3d pods
+temporal server start-dev --ip 0.0.0.0 --ui-ip 0.0.0.0
+
+# Deploy with local overlay
+OVERLAY=local ./scripts/k3d/demo-up.sh
+
+# Check status
+./scripts/k3d/status.sh
+
+# Port-forward API access
+./scripts/k3d/tunnel.sh
+
+# Tear down
+./scripts/k3d/demo-down.sh
+```
+
+### Option 4: Deploy to KinD with Local Temporal
 
 ```bash
 # Start your local Temporal server first (on port 7233)
 temporal server start-dev &
 
 # Deploy with local overlay
-OVERLAY=local ./scripts/demo-up.sh
+OVERLAY=local ./scripts/kind/demo-up.sh
 
 # Check status
-./scripts/status.sh
+./scripts/kind/status.sh
 
 # Port-forward API access
-./scripts/tunnel.sh
+./scripts/kind/tunnel.sh
 
 # Tear down
-./scripts/demo-down.sh
+./scripts/kind/demo-down.sh
 ```
 
-### Option 3: Run Everything Locally (No Kubernetes)
+### Option 5: Run Everything Locally (No Kubernetes)
 
 ```bash
 # Start Temporal server
@@ -70,17 +112,18 @@ asdf plugin add java https://github.com/halcyon/asdf-java.git
 asdf plugin add maven https://github.com/asdf-community/asdf-maven.git
 asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git
 asdf plugin add kind https://github.com/johnlayton/asdf-kind.git
+asdf plugin add k3d https://github.com/spencergilbert/asdf-k3d.git
 
 # Install versions from .tool-versions
 asdf install
 
 # Or install manually
-brew install java maven nodejs kind kubectl
+brew install java maven nodejs kind k3d kubectl
 ```
 
 ### System Resources
 
-- **Minikube alternative**: Using KinD requires Docker
+- **Minikube alternative**: Using KinD or k3d requires Docker
 - **Memory**: 4GB minimum (8GB recommended)
 - **Disk**: 5GB free space
 
@@ -102,7 +145,8 @@ cp config/acme.processing.secret.template.yaml  config/acme.processing.secret.ya
 cp config/acme.automations.secret.template.yaml config/acme.automations.secret.yaml
 ```
 
-`infra-up.sh` reads these files at deploy time and creates the Kubernetes secrets imperatively — nothing with a real key ever touches a committed file.
+`scripts/kind/infra-up.sh` and `scripts/k3d/infra-up.sh` read these files at deploy time and create
+the Kubernetes secrets imperatively. Nothing with a real key ever touches a committed file.
 
 See **[CLOUD.md](CLOUD.md)** for the full secret-to-Kubernetes mapping and troubleshooting.
 
@@ -112,12 +156,13 @@ See **[CLOUD.md](CLOUD.md)** for the full secret-to-Kubernetes mapping and troub
 # Install Temporal CLI (if not already installed)
 brew install temporal
 
-# Start local Temporal server (in background or separate terminal)
-temporal server start-dev
+# Start local Temporal server (in background or separate terminal).
+# Binding to 0.0.0.0 lets KinD/k3d pods reach it through host.docker.internal.
+temporal server start-dev --ip 0.0.0.0 --ui-ip 0.0.0.0
 
 # Verify it's running
 temporal workflow list
-# Note: Runs on localhost:7233 by default
+# Note: Listens on port 7233 by default
 ```
 
 > **Worker Versioning and `set-current-version`**
@@ -128,22 +173,24 @@ temporal workflow list
 >
 > If workers are running **without the Temporal Worker Controller in the environment** (e.g. Level 1, running directly on your machine), you must call `set-current-version` yourself. This is what `scripts/setup-temporal-namespaces.sh` does. If you skip it, workers will connect and poll but the server will dispatch no tasks — workflows stall silently. See [GETTING_STARTED.md](GETTING_STARTED.md) for details.
 
-### 3. Build and Deploy to KinD
+### 3. Build and Deploy to Kubernetes
 
 #### Step 3a: Deploy Complete Environment
 
 ```bash
 # For Temporal Cloud deployment
-OVERLAY=cloud ./scripts/demo-up.sh
+OVERLAY=cloud ./scripts/kind/demo-up.sh
+OVERLAY=cloud ./scripts/k3d/demo-up.sh
 
 # OR for Local Temporal deployment
-OVERLAY=local ./scripts/demo-up.sh
+OVERLAY=local ./scripts/kind/demo-up.sh
+OVERLAY=local ./scripts/k3d/demo-up.sh
 ```
 
 This script:
-1. Creates KinD cluster (if not exists)
+1. Creates the selected cluster (if not exists)
 2. Builds Docker images
-3. Loads images into KinD
+3. Loads or imports images into the selected cluster
 4. Creates namespaces
 5. Installs Traefik ingress
 6. Deploys applications with ConfigMaps and Secrets
@@ -152,20 +199,24 @@ This script:
 
 ```bash
 # Check all pods are running
-./scripts/status.sh
+./scripts/kind/status.sh
+# or
+./scripts/k3d/status.sh
 
 # Should show:
 # - apps-api: Running (2 replicas)
 # - apps-worker: Running (2 replicas)
 # - processing-worker: Running (2 replicas)
-# - KinD cluster: temporal-oms (running)
+# - selected cluster: temporal-oms (running)
 ```
 
 #### Step 3c: Access the API
 
 ```bash
 # In one terminal, port-forward
-./scripts/tunnel.sh
+./scripts/kind/tunnel.sh
+# or
+./scripts/k3d/tunnel.sh
 
 # In another terminal, test the API
 curl http://localhost:8080/api/v1/commerce-app/clothing
@@ -205,7 +256,8 @@ open http://localhost:8080/api/docs
 - `config/acme.processing.secret.yaml` — Processing worker API key (gitignored, created from template)
 - `config/acme.automations.secret.yaml` — Temporal Worker Controller API key (gitignored, created from template)
 
-Kubernetes secrets are created imperatively by `infra-up.sh` from those files. No secrets are committed.
+Kubernetes secrets are created imperatively by `scripts/kind/infra-up.sh` or
+`scripts/k3d/infra-up.sh` from those files. No secrets are committed.
 
 ### Spring Boot Configuration
 
@@ -234,10 +286,14 @@ This ensures configuration files are only imported when running in Kubernetes, n
 vim java/apps/src/main/java/com/acme/apps/...
 
 # 2. Redeploy (rebuilds images and restarts pods)
-OVERLAY=cloud ./scripts/app-deploy.sh
+OVERLAY=cloud ./scripts/kind/app-deploy.sh
+# or
+OVERLAY=local ./scripts/k3d/app-deploy.sh
 
 # 3. Check status
-./scripts/status.sh
+./scripts/kind/status.sh
+# or
+./scripts/k3d/status.sh
 
 # 4. View logs
 export KUBECONFIG=/tmp/kind-config.yaml
@@ -247,7 +303,7 @@ kubectl logs -n temporal-oms-apps -l app=apps-worker --tail=50
 ### Debugging
 
 ```bash
-# Enable KUBECONFIG for all commands
+# Enable KUBECONFIG for all commands. Use /tmp/k3d-config.yaml for k3d.
 export KUBECONFIG=/tmp/kind-config.yaml
 
 # Check all pods and their status
@@ -305,27 +361,35 @@ curl http://localhost:8080/api/v1/commerce-app/clothing
 ### Check Cluster Status
 
 ```bash
-./scripts/status.sh
+./scripts/kind/status.sh
+./scripts/k3d/status.sh
 ```
 
 ### Redeploy Applications (keep cluster running)
 
 ```bash
-OVERLAY=cloud ./scripts/app-deploy.sh
+OVERLAY=cloud ./scripts/kind/app-deploy.sh
+OVERLAY=local ./scripts/k3d/app-deploy.sh
 ```
 
 ### Full Teardown and Restart
 
 ```bash
-./scripts/demo-down.sh
+./scripts/kind/demo-down.sh
 sleep 5
-OVERLAY=cloud ./scripts/demo-up.sh
+OVERLAY=cloud ./scripts/kind/demo-up.sh
+
+./scripts/k3d/demo-down.sh
+sleep 5
+OVERLAY=local ./scripts/k3d/demo-up.sh
 ```
 
 ### View Logs
 
 ```bash
 export KUBECONFIG=/tmp/kind-config.yaml
+# or
+export KUBECONFIG=/tmp/k3d-config.yaml
 
 # Apps API
 kubectl logs -n temporal-oms-apps -l app=apps-api --tail=50
@@ -338,7 +402,8 @@ kubectl logs -n temporal-oms-processing -l app=processing-worker --tail=50
 ### Port Forward (for API access)
 
 ```bash
-./scripts/tunnel.sh
+./scripts/kind/tunnel.sh
+./scripts/k3d/tunnel.sh
 # Then access: http://localhost:8080/api/
 ```
 
@@ -372,17 +437,21 @@ kubectl describe pod -n temporal-oms-apps <pod-name>
 # - Network connectivity (check target host/port)
 ```
 
-### Images not loading
+### Images not loading or importing
 
 ```bash
-# Ensure KUBECONFIG is set for your shell
+# Ensure KUBECONFIG is set for your shell. Use /tmp/k3d-config.yaml for k3d.
 export KUBECONFIG=/tmp/kind-config.yaml
 
 # Check images in KinD
 kind load docker-image temporal-oms/apps-api:latest --name temporal-oms
 
+# Check images in k3d
+k3d image import temporal-oms/apps-api:latest --cluster temporal-oms
+
 # Or just redeploy
-OVERLAY=cloud ./scripts/app-deploy.sh
+OVERLAY=cloud ./scripts/kind/app-deploy.sh
+OVERLAY=local ./scripts/k3d/app-deploy.sh
 ```
 
 ### Docker context issues
@@ -395,7 +464,8 @@ docker context use default
 docker ps
 
 # Then deploy
-OVERLAY=cloud ./scripts/demo-up.sh
+OVERLAY=cloud ./scripts/kind/demo-up.sh
+OVERLAY=local ./scripts/k3d/demo-up.sh
 ```
 
 ---
@@ -405,7 +475,7 @@ OVERLAY=cloud ./scripts/demo-up.sh
 ### Deployment Structure
 
 ```
-KinD Cluster (temporal-oms)
+KinD or k3d Cluster (temporal-oms)
 ├── temporal-oms-apps namespace
 │   ├── apps-api (2 replicas) - REST API
 │   └── apps-worker (2+ replicas) - Workflow workers
@@ -436,20 +506,20 @@ Application → Spring Boot Profile (k8s)
 
 | Script | Purpose | Example |
 |--------|---------|---------|
-| `demo-up.sh` | Full environment setup | `OVERLAY=cloud ./scripts/demo-up.sh` |
-| `demo-down.sh` | Complete teardown | `./scripts/demo-down.sh` |
-| `app-deploy.sh` | Rebuild and redeploy apps only | `OVERLAY=cloud ./scripts/app-deploy.sh` |
-| `status.sh` | Check deployment status | `./scripts/status.sh` |
-| `tunnel.sh` | Port-forward API access | `./scripts/tunnel.sh` |
-| `infra-up.sh` | Create KinD cluster only | `./scripts/infra-up.sh` |
-| `infra-down.sh` | Delete KinD cluster | `./scripts/infra-down.sh` |
+| `scripts/kind/demo-up.sh` | Full KinD environment setup | `OVERLAY=cloud ./scripts/kind/demo-up.sh` |
+| `scripts/k3d/demo-up.sh` | Full k3d environment setup | `OVERLAY=local ./scripts/k3d/demo-up.sh` |
+| `scripts/kind/app-deploy.sh` | Rebuild and redeploy apps to KinD | `OVERLAY=cloud ./scripts/kind/app-deploy.sh` |
+| `scripts/k3d/app-deploy.sh` | Rebuild and redeploy apps to k3d | `OVERLAY=local ./scripts/k3d/app-deploy.sh` |
+| `scripts/kind/status.sh` | Check KinD deployment status | `./scripts/kind/status.sh` |
+| `scripts/k3d/status.sh` | Check k3d deployment status | `./scripts/k3d/status.sh` |
+| `scripts/*.sh` | Backwards-compatible KinD aliases | `OVERLAY=cloud ./scripts/demo-up.sh` |
 
 ---
 
 ## Next Steps
 
 1. **First time setup**: Follow the "Quick Start" section above
-2. **Make changes**: Edit Java code and run `./scripts/app-deploy.sh`
+2. **Make changes**: Edit Java code and run `./scripts/kind/app-deploy.sh` or `./scripts/k3d/app-deploy.sh`
 3. **Test workflows**: Submit orders via API or scenarios
 4. **Monitor**: Check logs with `kubectl logs` commands
 5. **Deploy to production**: Adapt the deployment for your cloud provider (GKE, EKS, AKS, etc.)
@@ -459,6 +529,7 @@ Application → Spring Boot Profile (k8s)
 ## References
 
 - [KinD Documentation](https://kind.sigs.k8s.io/)
+- [k3d Documentation](https://k3d.io/)
 - [Temporal Cloud API Keys](https://docs.temporal.io/cloud/api-keys)
 - [Spring Boot Configuration](https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.external-config)
 - [Kubectl Documentation](https://kubernetes.io/docs/reference/kubectl/)

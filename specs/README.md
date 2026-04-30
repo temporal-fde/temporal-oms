@@ -94,6 +94,13 @@ Provide feedback in PROGRESS.md → Feedback Items section.
 - **Spec:** `specs/workshop/augment-with-ai/`
 - **Next:** Tech lead review — confirm exercise list and Codespaces machine/key requirements
 
+### Workshop: Codespaces Support
+- **Status:** Planning
+- **Goal:** Define the Codespaces architecture, sizing, startup model, caching, risks, and validation plan for the Replay 2026 Temporal OMS workshop
+- **Owner:** Temporal FDE Team
+- **Spec:** `specs/workshop/codespaces-support/`
+- **Next:** Decide v1/v2 artifact strategy and validate local-process startup in a fresh Codespace
+
 ### Workshop: Integration Stubs
 - **Status:** Runtime implementation complete; workshop material follow-up
 - **Goal:** Document `enablements-api` as the workshop-owned integration fixture boundary for commerce-app, PIMS, inventory, shipping, and location-events
