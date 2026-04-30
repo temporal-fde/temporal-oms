@@ -13,6 +13,10 @@ Temporal Worker Controller demo, but that demo should be instructor-controlled u
 validated in Codespaces. A local k3d spike has validated the basic Kubernetes feasibility on a
 developer machine; Codespaces validation is still pending.
 
+For the concrete remote k3d validation procedure, use
+[`k3d-remote-runbook.md`](./k3d-remote-runbook.md). The runbook is intentionally scoped to
+instructor/maintainer validation and should not be treated as attendee workshop setup.
+
 External facts checked while preparing this spec:
 
 - GitHub Codespaces supports setting minimum machine requirements with `hostRequirements` in
@@ -600,7 +604,8 @@ TWC validation:
   - host Temporal connectivity from pods
   - `TemporalWorkerDeployment` rollout
   - k9s observation flow
-- Repeat the k3d validation inside a fresh Codespace on the proposed instructor machine size.
+- Repeat the k3d validation inside a fresh Codespace on the proposed instructor machine size using
+  [`k3d-remote-runbook.md`](./k3d-remote-runbook.md).
 - Do not include k3d in attendee Exercise 01 instructions until this passes twice from a fresh
   Codespace.
 
