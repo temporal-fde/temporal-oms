@@ -34,5 +34,8 @@
 
 ## Notes
 
-- Exercise 01 is fully specified. Exercises 02 and 03 are intentionally TBD until tech lead confirms the arc.
+- The safe fulfillment handoff foundation exercise now has a planning spec at
+  `specs/workshop/exercises/01-safe-fulfillment-handoff/spec.md`.
+  Hands-on mechanics are intentionally TBD until the rollout/lab implementation is planned.
+- Exercises 02 and 03 are intentionally TBD until tech lead confirms the arc.
 - Phase 1 (devcontainer) is the hard dependency for all exercise scripts.

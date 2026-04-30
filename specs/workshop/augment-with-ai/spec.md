@@ -91,87 +91,29 @@ exercises/
   devcontainer.json                       # Codespaces config — see Dependencies
 ```
 
-### Exercise 01 — Route Traffic Safely: Kafka → Nexus
+### Related Foundation Exercise — Safely Move Fulfillment Ownership
 
-**The question this exercise answers:** "We have new behavior. How do we route traffic there without disrupting in-flight orders?"
+The first workshop lab is not AI-specific. It establishes the safe-extensibility foundation that the
+AI labs build on.
 
-#### Context
+**The question this exercise answers:** "How do we move fulfillment orchestration from
+`processing.Order` to `apps.Order` without disrupting in-flight orders or hiding rollout policy in
+workflow code?"
 
-The `processing.Order` workflow previously handed off to fulfillment by publishing to a Kafka topic (`order-fulfillment`). The embedded Kafka broker and `AdminController` at `GET /admin/order-fulfillment/{orderId}` (port 8071) expose this: if an order went through the old path, a message exists at that endpoint.
+The current planning spec for this foundation exercise lives in the top-level workshop exercises
+directory:
+[`../exercises/01-safe-fulfillment-handoff/spec.md`](../exercises/01-safe-fulfillment-handoff/spec.md).
 
-The new path bypasses the Kafka activity entirely. `apps.Order` calls `Fulfillment.fulfillOrder` via Nexus directly, which dispatches an Update to the already-running `fulfillment.Order` workflow.
+The chosen approach is a combination of:
 
-The version gate controlling which path a `processing.Order` execution uses:
+- a routing slip in `ProcessOrderRequestExecutionOptions` (`send_fulfillment=false` from `apps v2`)
+- manual Worker Deployment commands (`processing v2` first, then ramp `apps v2`), with TWC
+  introduced later as the Kubernetes automation layer
 
-```java
-// java/processing/processing-core/.../workflows/OrderImpl.java
-int removeKafkaFulfillmentVersion = Workflow.getVersion(
-    "remove-kafka-fulfillment", Workflow.DEFAULT_VERSION, 1);
-if (removeKafkaFulfillmentVersion == Workflow.DEFAULT_VERSION) {
-    this.fulfillments.fulfillOrder(...);  // Kafka activity — old path
-}
-// else: apps.Order has already called fulfillment via Nexus — nothing to do here
-```
-
-When `processing` workers run with `TEMPORAL_WORKER_BUILD_ID=v2`, new workflow executions pick up version 1 of the gate (skip Kafka). Old executions already pinned to v1 workers replay with `DEFAULT_VERSION` (Kafka path) until they complete. This is determinism-safe by design.
-
-#### Design Decision: Where the Ramp Lives
-
-The exercise explicitly presents two options and requires participants to choose:
-
-| Option | Mechanism | Problem |
-|--------|-----------|---------|
-| A — Application flag | % check inside the workflow or activity config | Not replay-safe. A workflow that started on the new path and later replays on old code diverges. Couples traffic policy to business logic. |
-| B — Worker Deployment ramp | Temporal Worker Deployment API; `rampPercentage` in TWC at k8s level | New executions are pinned to a version at start time. In-flight executions stay on their pinned version. Traffic policy is in the platform, not the code. |
-
-The exercise must lead participants to Option B before showing the mechanism.
-
-#### The Three Acts
-
-**Act 1 — Observe the old path (5 min)**
-- Submit 3 orders using `submit-orders.sh`
-- For each order ID: check `GET http://localhost:8071/admin/order-fulfillment/{orderId}` → Kafka message present
-- Also check `fulfillment.Order` workflow exists in Temporal UI (`http://localhost:8233/namespaces/fulfillment/workflows/{orderId}`)
-- Establish: old path delivers the same fulfillment result — just via Kafka as the handoff
-
-**Act 2 — Ramp new workers (10 min)**
-- Start a second processing worker process with `TEMPORAL_WORKER_BUILD_ID=v2` (v1 workers keep running)
-- Use Temporal CLI to set a ramping version at 50%:
-  ```bash
-  temporal worker deployment set-ramping-version \
-    --deployment-name processing \
-    --build-id v2 \
-    --percentage 50 \
-    --namespace processing
-  ```
-- Submit 6 more orders via `submit-orders.sh`
-- Run `check-parity.sh`: some orders have Kafka messages (v1 path), some don't (v2 path)
-- Verify `fulfillment.Order` completed for ALL orders regardless of path
-
-**Act 3 — Cut over and sunset (5 min)**
-- Promote v2 to current (100%):
-  ```bash
-  temporal worker deployment set-current-version \
-    --deployment-name processing \
-    --build-id v2 \
-    --namespace processing
-  ```
-- Submit 3 more orders → zero Kafka messages, all Nexus
-- Stop the v1 worker process (simulates `scaledownDelay` sunset)
-- Point to `k8s/processing-versioned/base/temporal-worker-deployment.yaml` — this is the production equivalent, with Progressive rollout (50% → 90% → 100%) automated by TWC
-
-#### Parity Verification
-
-Both paths produce a completed `fulfillment.Order` workflow — this is the invariant. The Kafka message proves which route was taken; absence proves the Nexus route. The final order state (via `temporal workflow query --type getState --namespace fulfillment`) must be equivalent regardless of path.
-
-#### Scripts
-
-**`submit-orders.sh`** — takes an optional count (default 3), POSTs orders to `http://localhost:8080`, prints order IDs for use in parity check.
-
-**`check-parity.sh`** — takes a list of order IDs, for each:
-1. `GET http://localhost:8071/admin/order-fulfillment/{id}` → prints "KAFKA (old path)" or "NO KAFKA (nexus path)"
-2. `temporal workflow describe --workflow-id {id} --namespace fulfillment` → prints status
-3. Compares statuses — both should be "Completed"
+The hands-on lab steps, scripts, and exact startup mechanics are intentionally deferred to the
+top-level workshop exercise implementation plan. This section replaces the earlier
+processing-only ramp proposal, which did not account for the coordinated ApplicationService →
+DomainService ownership change.
 
 ### Exercises 02 and 03
 

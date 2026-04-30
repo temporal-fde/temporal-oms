@@ -39,6 +39,10 @@ Equip your team to deliver real-world solutions that require a reliable bridge b
 
 ### Safe Extensibility
 
+* Exercise 01 spec: [Safely Move Fulfillment Ownership](./exercises/01-safe-fulfillment-handoff/spec.md)
+
+* Demo spec: [Temporal Worker Controller Rollout](./demos/temporal-worker-controller/spec.md)
+
 * Python: Augmenting plain ShippingAPI with agent ReAct via Nexus
 
 * Provide all the Temporal primitives (Nexus Ops, Activities, etc), just code the ReAct loop
