@@ -78,12 +78,21 @@ cp .env.example .env.local
 
 All Java services and Python workers load `.env.local` automatically — no extra steps needed once it exists. The defaults in `.env.example` are already correct for local Temporal (no API keys required for Temporal itself).
 
+For Codespaces/workshop runs, use the committed non-secret defaults instead:
+
+```bash
+cp .env.codespaces .env.local
+```
+
+Keep `ANTHROPIC_API_KEY` and `OPENAI_API_KEY` out of `.env.local` in Codespaces. Provide them as GitHub Codespaces secrets so they are exposed as runtime environment variables.
+
 API keys are only needed for integration features. Workers start and connect without them — activities that call external APIs will fail with a clear error message if the key is missing when that feature is exercised.
 
 | Variable | Where to get it | Needed for |
 |----------|----------------|------------|
 | `EASYPOST_API_KEY` | [easypost.com](https://www.easypost.com) → Dashboard → API Keys | Address verification, carrier rate quotes |
-| `ANTHROPIC_API_KEY` | [console.anthropic.com](https://console.anthropic.com) | AI shipping agent (shipping route selection) |
+| `ANTHROPIC_API_KEY` | [console.anthropic.com](https://console.anthropic.com) | AI shipping agent live Claude calls |
+| `OPENAI_API_KEY` | [platform.openai.com](https://platform.openai.com) | AI exercises or tooling that calls OpenAI APIs |
 | `PREDICTHQ_API_KEY` | [predicthq.com](https://www.predicthq.com) | Location risk events (weather/event disruption data) |
 
 ### Step 1: Start Local Temporal
@@ -184,7 +193,7 @@ cd python/fulfillment
 uv run --project .. python -m src.worker
 ```
 
-> Uses `ANTHROPIC_API_KEY`, `EASYPOST_API_KEY`, and `PREDICTHQ_API_KEY` from `.env.local`. Workers connect and poll without them — activities that call these APIs surface a clear error when invoked without the key.
+> Uses `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `EASYPOST_API_KEY`, and `PREDICTHQ_API_KEY` from the environment or `.env.local`. Workers connect and poll without them — activities that call these APIs surface a clear error when invoked without the key.
 
 All services are now ready:
 - ✅ Apps API running on `http://localhost:8080`

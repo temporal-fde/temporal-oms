@@ -222,7 +222,8 @@ Recommended instructor or optional k8s machine:
 Recommended startup sequence:
 
 1. Verify machine resources, tool versions, and free ports.
-2. Create `.env.local` from `.env.example` if missing, without requiring API keys.
+2. In Codespaces, create `.env.local` from `.env.codespaces` if missing. For non-Codespaces local
+   development, `.env.example` remains the general template.
 3. Start `temporal server start-dev` on `127.0.0.1:7233` with UI on `8233`.
 4. Wait for Temporal frontend and default namespace readiness.
 5. Run `scripts/setup-temporal-namespaces.sh`.
@@ -431,6 +432,12 @@ Recommended secret policy:
 - `ANTHROPIC_API_KEY`:
   - Required only for later AI exercises if those exercises call Claude for real.
   - Provide through Codespaces user, repository, or organization secrets.
+  - Do not write it to `.env.codespaces` or commit it anywhere.
+- `OPENAI_API_KEY`:
+  - Required only for later AI exercises or tooling if those paths call OpenAI APIs for real.
+  - Provide through Codespaces user, repository, or organization secrets.
+  - Do not write it to `.env.codespaces` or commit it anywhere.
+- AI exercises:
   - `workshop-start.sh` should warn if absent and mark AI exercises unavailable, but still start
     Exercise 01.
 - Temporal Cloud credentials:
@@ -504,6 +511,7 @@ Hard checks:
 Warnings:
 
 - Missing `ANTHROPIC_API_KEY` means later AI exercises using live Claude calls are unavailable.
+- Missing `OPENAI_API_KEY` means later AI exercises or tooling using live OpenAI calls are unavailable.
 - Docker/kubectl/k3d/kind absent is acceptable for attendee exercises but not for instructor TWC
   demo validation.
 
@@ -545,10 +553,10 @@ Useful status output:
 - Which Temporal CLI and Temporal dev server versions should be pinned?
 - Should the enablements namespace remain `default`, or should the workshop use an explicit
   `enablements` namespace to reduce attendee confusion?
-- Do later AI exercises require live Anthropic calls, or can they run with fixtures/mocks for all
-  attendees?
-- Can the organization provide `ANTHROPIC_API_KEY` as a Codespaces repository or organization
-  secret, or must attendees bring their own?
+- Do later AI exercises require live Anthropic/OpenAI calls, or can they run with fixtures/mocks for
+  all attendees?
+- Can the organization provide `ANTHROPIC_API_KEY` and `OPENAI_API_KEY` as Codespaces repository or
+  organization secrets, or must attendees bring their own?
 - Should the instructor Codespace demo prefer KinD or k3d after fresh Codespaces validation?
 - For the k3d Codespaces path, should Temporal run on the devcontainer host, in the k3d cluster, or
   in Temporal Cloud?

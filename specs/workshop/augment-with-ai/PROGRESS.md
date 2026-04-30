@@ -16,7 +16,7 @@
 ## Open Items (blocking)
 
 - [ ] Confirm full exercise list — spec has 3 exercises, arc TBD
-- [ ] Confirm Codespaces machine type and whether API keys are pre-configured
+- [ ] Confirm Codespaces machine type and whether Anthropic/OpenAI API keys are pre-configured
 - [ ] Verify `temporal worker deployment set-ramping-version` is available in pinned CLI version
 - [ ] Confirm Kafka admin port 8071 is available in full-stack local run
 

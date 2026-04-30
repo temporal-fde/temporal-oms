@@ -249,7 +249,7 @@ Minimum devcontainer config:
 - [ ] What is the full exercise list? Is the arc (migration → observe AI → extend AI) the right one, or are there other exercises planned?
 - [ ] Does Exercise 03 ask participants to write new Python code, or is it a configuration/integration exercise?
 - [ ] Should `workshop-start.sh` start the Python worker automatically, or is starting the Python worker part of an exercise?
-- [ ] Are Anthropic API keys expected to be pre-configured in the Codespaces environment (repo secrets), or do participants bring their own? EasyPost is only needed for offline fixture capture, not normal workshop runtime.
+- [ ] Are Anthropic and OpenAI API keys expected to be pre-configured in the Codespaces environment (repo secrets), or do participants bring their own? EasyPost is only needed for offline fixture capture, not normal workshop runtime.
 - [ ] Is the Kafka admin endpoint (port 8071) currently available when running with all workers, or does it only appear in a specific startup mode?
 
 ### Implementation Notes

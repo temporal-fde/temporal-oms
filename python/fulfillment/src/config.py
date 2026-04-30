@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     temporal_fulfillment_api_key: str = ""
     temporal_fulfillment_namespace: str = "fulfillment"
     anthropic_api_key: str = ""
+    openai_api_key: str = ""
     enablements_api_base_url: str = "http://localhost:8050"
     integrations_endpoint: str = "oms-integrations-v1"
 
