@@ -4,6 +4,12 @@ set -euo pipefail
 
 cp -n .env.codespaces .env.local
 
+if [[ -d .devcontainer/k9s ]]; then
+  echo "Installing k9s config..."
+  mkdir -p "$HOME/.config/k9s"
+  cp -R .devcontainer/k9s/. "$HOME/.config/k9s/"
+fi
+
 JAVAC_EXECUTABLE="$(command -v javac)"
 
 echo "Prebuilding Java artifacts with ${JAVAC_EXECUTABLE}..."
