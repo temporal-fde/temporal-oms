@@ -1,0 +1,37 @@
+flowchart TB
+  subgraph Phase1["Phase 1: make processing backward-compatible first"]
+    Ops1["Ops: set processing v2 current"]
+    AppsV1["apps.Order v1"]
+    ProcV2Compat["processing.Order v2<br/>legacy-compatible default"]
+    KafkaLegacy["Kafka fulfillment handoff"]
+
+    Ops1 --> ProcV2Compat
+    AppsV1 -->|"processOrder<br/>send_fulfillment absent"| ProcV2Compat
+    ProcV2Compat -->|"default true"| KafkaLegacy
+  end
+
+  subgraph Phase2["Phase 2: ramp apps v2 after processing is ready"]
+    Ops2["Ops: ramp apps v2"]
+    AppsV2["apps.Order v2"]
+    Fulfillment["fulfillment.Order"]
+    ProcV2Skip["processing.Order v2"]
+    NoKafka["no Kafka record"]
+
+    Ops2 --> AppsV2
+    AppsV2 -->|"validateOrder Nexus<br/>UpdateWithStart"| Fulfillment
+    AppsV2 -->|"processOrder<br/>send_fulfillment=false"| ProcV2Skip
+    ProcV2Skip -->|"skip legacy handoff"| NoKafka
+    AppsV2 -->|"fulfillOrder Update<br/>after processing"| Fulfillment
+  end
+
+  Phase1 --> Phase2
+
+  classDef control fill:#e8f3ff,stroke:#2f6fbd,color:#222;
+  classDef legacy fill:#eeeeee,stroke:#777,color:#222;
+  classDef target fill:#e9f7ef,stroke:#218838,color:#222;
+  classDef note fill:#fff0e5,stroke:#d46b08,color:#222;
+  class Ops1,Ops2 control;
+  class AppsV1,KafkaLegacy legacy;
+  class AppsV2,Fulfillment,ProcV2Compat,ProcV2Skip target;
+  class NoKafka note;
+

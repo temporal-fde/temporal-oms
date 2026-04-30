@@ -433,13 +433,6 @@ Recommended secret policy:
   - Provide through Codespaces user, repository, or organization secrets.
   - `workshop-start.sh` should warn if absent and mark AI exercises unavailable, but still start
     Exercise 01.
-- `EASYPOST_API_KEY`:
-  - Not required for the workshop runtime if fixture-backed shipping remains through
-    `enablements-api`.
-  - Do not ask attendees for it.
-- `PREDICTHQ_API_KEY`:
-  - Not required for the fixture-backed workshop path unless a later location-events exercise
-    explicitly changes that.
 - Temporal Cloud credentials:
   - Not required for attendee Codespaces.
   - Required only if the instructor TWC demo uses Temporal Cloud.

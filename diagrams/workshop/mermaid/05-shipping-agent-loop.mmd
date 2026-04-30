@@ -1,0 +1,37 @@
+flowchart TB
+  Fulfillment["fulfillment.Order<br/>deterministic business workflow"]
+  Nexus["Nexus operation<br/>calculateShippingOptions"]
+  Agent["ShippingAgent workflow<br/>WorkflowID: customer_id"]
+  Cache{"cache hit?"}
+  Prompt["build_system_prompt<br/>LocalActivity"]
+  Claude["call_llm<br/>Claude"]
+  Finalize["finalize_recommendation<br/>structured tool output"]
+  Decision["fulfillment.Order applies policy<br/>margin_leak / SLA / fallback"]
+
+  Fulfillment --> Nexus --> Agent
+  Agent --> Cache
+  Cache -->|"yes"| Decision
+  Cache -->|"no"| Prompt --> Claude
+
+  subgraph Tools["Temporal activity tools"]
+    Inventory["lookup_inventory_address"]
+    Verify["verify_address"]
+    Rates["get_carrier_rates"]
+    Events["get_location_events"]
+    Alternate["find_alternate_warehouse"]
+  end
+
+  Claude -->|"tool_use blocks"| Tools
+  Tools -->|"tool_result blocks"| Claude
+  Claude --> Finalize
+  Finalize --> Decision
+
+  classDef workflow fill:#e8f3ff,stroke:#2f6fbd,color:#222;
+  classDef agent fill:#eee8ff,stroke:#6f42c1,color:#222;
+  classDef tool fill:#e9f7ef,stroke:#218838,color:#222;
+  classDef decision fill:#fff0e5,stroke:#d46b08,color:#222;
+  class Fulfillment,Agent workflow;
+  class Claude,Prompt,Finalize agent;
+  class Inventory,Verify,Rates,Events,Alternate,Nexus tool;
+  class Decision decision;
+

@@ -1,0 +1,40 @@
+flowchart LR
+  subgraph Gaps["V1 Gaps"]
+    StateLoss["State loss on restart"]
+    NoCancel["No cancellation or compensation"]
+    LateAddress["Address validation too late"]
+    StaleRates["Checkout rates go stale"]
+    NoRisk["No origin/destination risk context"]
+    NoVisibility["No margin or SLA observability"]
+  end
+
+  subgraph Needs["Architectural Needs"]
+    DurableWorkflow["Durable fulfillment lifecycle"]
+    Signals["Signals and detached compensation"]
+    EarlyValidation["Early validateOrder"]
+    RateRequery["Fulfillment-time rate requery"]
+    AgentReasoning["Agentic shipping advisor"]
+    SearchAttrs["Search Attributes and workflow history"]
+  end
+
+  StateLoss --> DurableWorkflow
+  NoCancel --> Signals
+  LateAddress --> EarlyValidation
+  StaleRates --> RateRequery
+  NoRisk --> AgentReasoning
+  NoVisibility --> SearchAttrs
+
+  DurableWorkflow --> FulfillmentOrder["fulfillment.Order"]
+  Signals --> FulfillmentOrder
+  EarlyValidation --> FulfillmentOrder
+  RateRequery --> ShippingAgent["ShippingAgent"]
+  AgentReasoning --> ShippingAgent
+  SearchAttrs --> TemporalUI["Temporal UI / analytics"]
+
+  classDef gap fill:#fff0e5,stroke:#d46b08,color:#222;
+  classDef need fill:#e8f3ff,stroke:#2f6fbd,color:#222;
+  classDef target fill:#eee8ff,stroke:#6f42c1,color:#222;
+  class StateLoss,NoCancel,LateAddress,StaleRates,NoRisk,NoVisibility gap;
+  class DurableWorkflow,Signals,EarlyValidation,RateRequery,AgentReasoning,SearchAttrs need;
+  class FulfillmentOrder,ShippingAgent,TemporalUI target;
+

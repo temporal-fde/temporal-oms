@@ -1,0 +1,25 @@
+flowchart LR
+  subgraph Apps["apps namespace"]
+    AppsOrder["apps.Order"]
+  end
+
+  subgraph Processing["processing namespace"]
+    ProcessingOrder["processing.Order"]
+    Fulfillments["Fulfillments.fulfillOrder()<br/>activity"]
+    KafkaProducer["serialize FulfillOrderRequest<br/>to JSON"]
+    KafkaConsumer["in-process KafkaConsumer"]
+    Memory["HashMap<br/>fulfillment records"]
+  end
+
+  AppsOrder -->|"processOrder Nexus operation"| ProcessingOrder
+  ProcessingOrder -->|"after enrichment"| Fulfillments
+  Fulfillments --> KafkaProducer
+  KafkaProducer -->|"embedded Kafka topic"| KafkaConsumer
+  KafkaConsumer --> Memory
+
+  ProcessingOrder -. "no fulfillment result returned" .-> AppsOrder
+
+  classDef legacy fill:#eeeeee,stroke:#777,color:#222;
+  classDef risk fill:#fff0e5,stroke:#d46b08,color:#222;
+  class AppsOrder,ProcessingOrder,Fulfillments,KafkaProducer,KafkaConsumer,Memory legacy;
+
