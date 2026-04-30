@@ -265,8 +265,8 @@ Deliverables:
 - `java/pom.xml` - Add load-generator module
 - `java/processing/processing-workers/src/main/resources/application.yaml` - Add BUILD_ID env var
 - `k8s/base/kustomization.yaml` - Add load-generator deployment
-- `scripts/app-deploy.sh` - Build load-generator Docker image
-- `scripts/demo-up.sh` - Deploy load-generator on startup
+- `scripts/kind/app-deploy.sh` and `scripts/k3d/app-deploy.sh` - Build load-generator Docker image
+- `scripts/kind/demo-up.sh` and `scripts/k3d/demo-up.sh` - Deploy load-generator on startup
 
 ---
 

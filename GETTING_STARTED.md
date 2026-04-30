@@ -6,8 +6,8 @@ A Java-based Order Management System powered by Temporal workflows.
 
 ### 🎯 Want to Deploy to Kubernetes?
 
-If you want to run the full application stack in Kubernetes (either locally via KinD or with Temporal Cloud), see **[DEPLOYMENT.md](DEPLOYMENT.md)** for:
-- One-liner deployment with `./scripts/demo-up.sh`
+If you want to run the full application stack in Kubernetes (locally via KinD/k3d or with Temporal Cloud), see **[DEPLOYMENT.md](DEPLOYMENT.md)** for:
+- Parallel Kubernetes runners under `scripts/kind/*` and `scripts/k3d/*`
 - Support for both local Temporal and Temporal Cloud
 - Production-like Kubernetes environment
 - Traefik ingress for API access

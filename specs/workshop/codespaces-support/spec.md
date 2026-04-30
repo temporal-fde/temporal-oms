@@ -158,7 +158,6 @@ Use a hybrid workshop architecture:
 7. Keep Kubernetes demo scripts split by runtime:
    - `scripts/kind/*` for KinD
    - `scripts/k3d/*` for k3d
-   - top-level `scripts/*.sh` as backwards-compatible KinD aliases
 
 This keeps Exercise 01 focused on Temporal primitives:
 

@@ -91,16 +91,20 @@ Goal: establish that the demo is starting from a known state.
 
 Goal: get the full stack running with processing workers at `v1`.
 
-1. Deploy the demo environment:
+1. Deploy the demo environment with one Kubernetes runner:
 
    ```bash
-   OVERLAY=local ./scripts/demo-up.sh
+   OVERLAY=local ./scripts/kind/demo-up.sh
+   # or
+   OVERLAY=local ./scripts/k3d/demo-up.sh
    ```
 
    Or, for the cloud-backed version:
 
    ```bash
-   OVERLAY=cloud ./scripts/demo-up.sh
+   OVERLAY=cloud ./scripts/kind/demo-up.sh
+   # or
+   OVERLAY=cloud ./scripts/k3d/demo-up.sh
    ```
 
 2. Open `k9s` and point out that processing worker pods are on the `v1` deployment version.
@@ -145,10 +149,12 @@ Goal: get the full stack running with processing workers at `v1`.
 
 Goal: keep workflows actively starting while processing workers roll from `v1` to `v2`.
 
-1. Tunnel from the host to the KinD cluster:
+1. Tunnel from the host to the selected Kubernetes cluster:
 
    ```bash
-   ./scripts/tunnel.sh
+   ./scripts/kind/tunnel.sh
+   # or
+   ./scripts/k3d/tunnel.sh
    ```
 
 2. Start the `WorkerVersionEnablement` workflow:
@@ -181,13 +187,15 @@ Goal: trigger the TWC rollout and observe progressive promotion under load.
 1. Deploy `v2` processing workers:
 
    ```bash
-   VERSION=v2 ./scripts/deploy-processing-workers.sh
+   VERSION=v2 ./scripts/kind/deploy-processing-workers.sh
+   # or
+   VERSION=v2 ./scripts/k3d/deploy-processing-workers.sh
    ```
 
-2. Walk through the important lines inside `scripts/deploy-processing-workers.sh`:
+2. Walk through the important lines inside the selected `deploy-processing-workers.sh`:
    - Java build
    - Docker image tag `temporal-oms/processing-workers:v2`
-   - `kind load docker-image`
+   - `kind load docker-image` for KinD, or `k3d image import` for k3d
    - `kubectl patch temporalworkerdeployment processing-workers ...`
 
 3. In k9s, stay in `temporal-oms-processing` and watch `:pods`.
@@ -302,7 +310,9 @@ kubectl patch temporalworkerdeployment <name> \
 If an existing helper script is preferred, the demo can use that instead of a raw patch:
 
 ```bash
-VERSION=v2 OVERLAY=local ./scripts/deploy-processing-workers.sh
+VERSION=v2 OVERLAY=local ./scripts/kind/deploy-processing-workers.sh
+# or
+VERSION=v2 OVERLAY=local ./scripts/k3d/deploy-processing-workers.sh
 ```
 
 The final demo script should avoid requiring attendees to type these commands. This is

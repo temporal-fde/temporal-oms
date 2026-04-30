@@ -13,8 +13,8 @@ Start at Level 1 and work up. Each level builds on the previous.
 | Level | Description | What you need |
 |-------|-------------|---------------|
 | **1** | Run locally — no Kubernetes | Java, Maven, Docker, Temporal CLI |
-| **2** | KinD cluster with local Temporal | Level 1 + KinD, Helm, kubectl, k9s |
-| **3** | KinD cluster connected to Temporal Cloud | Level 2 + Temporal Cloud account, namespaces, service accounts, API keys |
+| **2** | KinD or k3d cluster with local Temporal | Level 1 + KinD or k3d, Helm, kubectl, k9s |
+| **3** | KinD or k3d cluster connected to Temporal Cloud | Level 2 + Temporal Cloud account, namespaces, service accounts, API keys |
 | **4** | Worker Versioning Enablement (live demo) | Level 3 running + load generation |
 
 ---
@@ -33,6 +33,7 @@ asdf install
 | `maven` 3.9+ | Java build tool |
 | `nodejs` | Web tooling |
 | `kind` | Local Kubernetes cluster |
+| `k3d` | Lightweight local Kubernetes cluster |
 | `k9s` | Kubernetes cluster UI |
 | `temporal` CLI | Namespace, workflow, and Nexus management |
 | `kubectl` | Kubernetes control plane |
@@ -55,20 +56,24 @@ Fastest path to a working system. All services run as local JVM processes agains
 
 ---
 
-## Level 2 — KinD Deployment with Local Temporal
+## Level 2 — Kubernetes Deployment with Local Temporal
 
-Full stack in a local Kubernetes cluster. Temporal server runs inside KinD.
+Full stack in a local Kubernetes cluster. Choose one runner and use that directory consistently.
 
 ```bash
-./scripts/infra-up.sh
-./scripts/app-deploy.sh
+./scripts/kind/infra-up.sh
+./scripts/kind/app-deploy.sh
+
+# or
+./scripts/k3d/infra-up.sh
+./scripts/k3d/app-deploy.sh
 ```
 
 → **[DEPLOYMENT.md](DEPLOYMENT.md)** for full prerequisites, verification, and troubleshooting.
 
 ---
 
-## Level 3 — KinD + Temporal Cloud
+## Level 3 — Kubernetes + Temporal Cloud
 
 ### Step 1: Set Up Temporal Cloud (Manual, One-Time)
 
@@ -140,8 +145,12 @@ In `k8s/overlays/cloud/configmap/`, update the Temporal namespace and endpoint v
 ### Step 4: Deploy
 
 ```bash
-OVERLAY=cloud ./scripts/infra-up.sh    # Creates cluster, installs controller, applies secrets
-OVERLAY=cloud ./scripts/app-deploy.sh  # Builds images, deploys apps
+OVERLAY=cloud ./scripts/kind/infra-up.sh    # Creates KinD cluster, installs controller, applies secrets
+OVERLAY=cloud ./scripts/kind/app-deploy.sh  # Builds images, deploys apps
+
+# or
+OVERLAY=cloud ./scripts/k3d/infra-up.sh
+OVERLAY=cloud ./scripts/k3d/app-deploy.sh
 ```
 
 → **[CLOUD.md](CLOUD.md)** for verification steps and troubleshooting.
@@ -162,13 +171,20 @@ Demonstrates zero-downtime worker version rollouts against a live order stream. 
 
 | Script | Purpose |
 |--------|---------|
-| `scripts/infra-up.sh` | Create KinD cluster, install Temporal Worker Controller, apply cloud secrets |
-| `scripts/app-deploy.sh` | Build Docker images, load into KinD, deploy all applications |
-| `scripts/deploy-processing-workers.sh` | Bump processing workers to a new version (`VERSION=v2`) |
-| `scripts/demo-up.sh` | Run infra-up + app-deploy in one step |
-| `scripts/infra-down.sh` | Tear down the KinD cluster |
-| `scripts/status.sh` | Show pod status across namespaces |
+| `scripts/kind/infra-up.sh` | Create KinD cluster, install Temporal Worker Controller, apply cloud secrets |
+| `scripts/k3d/infra-up.sh` | Create k3d cluster, install Temporal Worker Controller, apply cloud secrets |
+| `scripts/kind/app-deploy.sh` | Build Docker images, load into KinD, deploy all applications |
+| `scripts/k3d/app-deploy.sh` | Build Docker images, import into k3d, deploy all applications |
+| `scripts/kind/deploy-processing-workers.sh` | Bump processing workers in KinD to a new version (`VERSION=v2`) |
+| `scripts/k3d/deploy-processing-workers.sh` | Bump processing workers in k3d to a new version (`VERSION=v2`) |
+| `scripts/kind/demo-up.sh` | Run KinD infra-up + app-deploy in one step |
+| `scripts/k3d/demo-up.sh` | Run k3d infra-up + app-deploy in one step |
+| `scripts/kind/infra-down.sh` | Tear down the KinD cluster |
+| `scripts/k3d/infra-down.sh` | Tear down the k3d cluster |
+| `scripts/kind/status.sh` | Show pod status across namespaces in KinD |
+| `scripts/k3d/status.sh` | Show pod status across namespaces in k3d |
 | `scripts/setup-temporal-namespaces.sh` | Create Temporal namespaces and Nexus endpoints |
-| `scripts/tunnel.sh` | Port-forward APIs for local access |
+| `scripts/kind/tunnel.sh` | Port-forward APIs for local access through KinD |
+| `scripts/k3d/tunnel.sh` | Port-forward APIs for local access through k3d |
 
 → **[scripts/README.md](scripts/README.md)** for detailed usage.

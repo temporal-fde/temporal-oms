@@ -7,7 +7,6 @@ The Kubernetes scripts are split by cluster runtime:
 
 - `scripts/kind/*` - KinD implementation.
 - `scripts/k3d/*` - k3d implementation.
-- `scripts/*.sh` - backwards-compatible KinD aliases.
 
 ## Quick Start
 
@@ -512,7 +511,6 @@ Application → Spring Boot Profile (k8s)
 | `scripts/k3d/app-deploy.sh` | Rebuild and redeploy apps to k3d | `OVERLAY=local ./scripts/k3d/app-deploy.sh` |
 | `scripts/kind/status.sh` | Check KinD deployment status | `./scripts/kind/status.sh` |
 | `scripts/k3d/status.sh` | Check k3d deployment status | `./scripts/k3d/status.sh` |
-| `scripts/*.sh` | Backwards-compatible KinD aliases | `OVERLAY=cloud ./scripts/demo-up.sh` |
 
 ---
 

@@ -316,7 +316,7 @@ Deliverables:
 - `java/processing/processing-workers/src/main/resources/application.yaml` - Add BUILD_ID env binding
 - `k8s/base/processing/deployment-workers.yaml` - Rename to deployment-workers-v1.yaml, add BUILD_ID env
 - `k8s/base/kustomization.yaml` - Add deployment-workers-v2.yaml
-- `scripts/app-deploy.sh` - Update to deploy both v1 and v2
+- `scripts/kind/app-deploy.sh` and `scripts/k3d/app-deploy.sh` - Update to deploy both v1 and v2
 
 ---
 

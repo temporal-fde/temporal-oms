@@ -10,7 +10,6 @@ Modular scripts for managing the Temporal OMS Kubernetes deployment with either 
 |---|---|
 | `scripts/kind/*` | KinD implementation |
 | `scripts/k3d/*` | k3d implementation |
-| `scripts/*.sh` | Backwards-compatible KinD aliases |
 
 The two cluster-specific directories intentionally duplicate the small driver scripts. This keeps
 the operational paths easy to read and avoids cluster-driver conditionals inside every shell script.
