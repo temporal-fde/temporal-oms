@@ -111,6 +111,10 @@ It prints a random HTTPS URL, Basic Auth credentials, and the attendee command t
 to each attendee's gitignored `.env.local`. Stop the script after setup and revoke the provider keys
 after the workshop.
 
+For k3d/KinD runs, `scripts/k3d/app-deploy.sh` and `scripts/kind/app-deploy.sh` read `.env.local`
+and patch `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` into the in-cluster `temporal-oms-secrets`
+Secrets after Kustomize applies its placeholder values.
+
 Defaults:
 
 ```text

@@ -4,6 +4,7 @@ set -e
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$PROJECT_DIR"
 . "$PROJECT_DIR/scripts/_lib/java-tools.sh"
+. "$PROJECT_DIR/scripts/_lib/k8s-runtime-secrets.sh"
 
 export KUBECONFIG=/tmp/k3d-config.yaml
 
@@ -70,6 +71,7 @@ else
 fi
 kubectl apply -f k8s/ingress/apps-api-ingress.yaml >/dev/null
 kubectl apply -f k8s/ingress/processing-api-ingress.yaml >/dev/null
+apply_runtime_api_key_secrets "$PROJECT_DIR"
 
 echo "→ Restarting pods..."
 for ns in temporal-oms-apps temporal-oms-processing temporal-oms-enablements temporal-oms-fulfillment; do
