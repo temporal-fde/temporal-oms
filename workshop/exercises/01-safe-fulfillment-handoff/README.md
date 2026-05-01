@@ -271,10 +271,11 @@ temporal worker deployment set-ramping-version \
   --deployment-name apps \
   --build-id v2 \
   --percentage 50 \
-  --namespace apps
+  --namespace apps \
+  --yes
 ```
 
-If you want a direct cutover instead:
+OR, If you want a direct cutover instead:
 
 ```bash
 temporal worker deployment set-current-version \
