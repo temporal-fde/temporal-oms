@@ -160,7 +160,10 @@ records.
 
 ## 4. Implement `processing v2`
 
-Apply the processing changes from [SOLUTION.md](SOLUTION.md#processing-v2-code):
+> Only make the following changes to the **processing** OrderImplV1 Java file. 
+> The apps context will change shortly.
+
+Apply the **processing** changes from [SOLUTION.md](SOLUTION.md#processing-v2-code):
 
 - Add `send_fulfillment` to the
   [processing proto contract](../../../proto/acme/processing/domain/v1/workflows.proto).
@@ -214,7 +217,7 @@ absent field as `true`, so old app traffic still publishes the legacy Kafka hand
 
 ## 7. Implement `apps v2`
 
-Apply the apps changes from [SOLUTION.md](SOLUTION.md#apps-v2-code) in
+Apply the **apps** changes from [SOLUTION.md](SOLUTION.md#apps-v2-code) in
 [apps OrderImplV1.java](../../../java/apps/apps-core/src/main/java/com/acme/apps/workflows/OrderImplV1.java):
 
 - Start `fulfillment.Order` through the `Fulfillment` Nexus service.
