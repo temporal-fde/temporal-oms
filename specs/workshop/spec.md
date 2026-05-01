@@ -39,6 +39,8 @@ Equip your team to deliver real-world solutions that require a reliable bridge b
 
 ### Safe Extensibility
 
+* Exercise 01 guide: [Safely Move Fulfillment Ownership](../../workshop/exercises/01-safe-fulfillment-handoff/README.md)
+
 * Exercise 01 spec: [Safely Move Fulfillment Ownership](./exercises/01-safe-fulfillment-handoff/spec.md)
 
 * Demo spec: [Temporal Worker Controller Rollout](./demos/temporal-worker-controller/spec.md)

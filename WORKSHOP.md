@@ -1,3 +1,6 @@
+Implemented exercises live in [workshop/README.md](workshop/README.md). Specs live under
+[specs/workshop/](specs/workshop/).
+
 1. Visit here to get access to keys: https://codeshare.io/2jEVPM
 2. Check the `.env.local` is in your codespace and has API keys.
 3. Start Temporal server

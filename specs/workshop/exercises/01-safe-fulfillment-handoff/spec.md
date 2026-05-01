@@ -71,40 +71,28 @@ Both `apps.Order` and `processing.Order` use pinned Worker Versioning for this e
 Auto-upgrade is not useful here because this exercise is about preserving each order's chosen
 fulfillment path until that order finishes.
 
-Add an optional field to `ProcessOrderRequestExecutionOptions`:
+Add `send_fulfillment` to `ProcessOrderRequestExecutionOptions`.
 
-```proto
-message ProcessOrderRequestExecutionOptions {
-  optional int64 processing_timeout_secs = 1;
-  optional acme.oms.v1.OmsProperties oms_properties = 2;
-  optional bool send_fulfillment = 3;
-}
-```
-
-`processing v2` interprets the option with a legacy-compatible default:
-
-```java
-boolean sendFulfillment =
-    !opts.hasSendFulfillment() || opts.getSendFulfillment();
-
-if (sendFulfillment) {
-    fulfillments.fulfillOrder(...); // legacy Kafka handoff
-}
-```
-
-`apps v1` does not set the field, so `processing v2` preserves legacy behavior.
-
-`apps v2` starts and completes `fulfillment.Order` directly, and sends:
-
-```java
-ProcessOrderRequestExecutionOptions.newBuilder()
-    .setProcessingTimeoutSecs(...)
-    .setSendFulfillment(false)
-    .build()
-```
+`processing v2` interprets the option with a legacy-compatible default: absent means `true`.
+`apps v1` does not set the field, so `processing v2` preserves legacy behavior. `apps v2` starts
+and completes `fulfillment.Order` directly, and sends `send_fulfillment=false` when it calls
+processing.
 
 This creates a visible routing slip in the workflow input: the caller explicitly tells processing
 whether processing should send the fulfillment handoff for this order.
+
+## Implemented Exercise Materials
+
+The spec stays focused on the architecture, constraints, and rollout model. The implemented lab
+material lives under the root `workshop/` directory:
+
+- Participant guide: `workshop/exercises/01-safe-fulfillment-handoff/README.md`
+- Solution and code snippets: `workshop/exercises/01-safe-fulfillment-handoff/SOLUTION.md`
+
+Exercise 01 is a live code-and-rollout exercise. Participants may apply the `processing v2` and
+`apps v2` code changes during the lab, then start new worker processes with build ID `v2` while
+the original `v1` workers keep running. `SOLUTION.md` records the code snippets and build/run
+commands.
 
 ## Rollout Model
 
@@ -112,10 +100,10 @@ The exercise uses manual Worker Deployment commands so attendees see what TWC au
 
 The safe rollout sequence is:
 
-1. Deploy `processing v2` with support for `send_fulfillment`.
+1. Implement, build, and start `processing v2` with support for `send_fulfillment`.
 2. Use Worker Versioning to make `processing v2` current.
 3. Keep `processing v1` available only for already-pinned in-flight processing workflows.
-4. Deploy `apps v2`.
+4. Implement, build, and start `apps v2`.
 5. Use Worker Versioning to ramp `apps v2`.
 6. New `apps v2` executions start `fulfillment.Order` and set `send_fulfillment=false`.
 7. Old `apps v1` executions continue to call processing without the option and still get the
@@ -132,50 +120,10 @@ order gives us the operational control to avoid that mixed state.
 
 ### Manual Commands Used In The Lab
 
-The final scripts may wrap these commands, but the exercise should expose the underlying Temporal
-operations explicitly.
+The exercise should expose the underlying Temporal operations explicitly. The exact participant
+commands live in the implemented guide:
 
-Initial state:
-
-```bash
-temporal worker deployment set-current-version \
-  --deployment-name processing \
-  --build-id v1 \
-  --namespace processing
-
-temporal worker deployment set-current-version \
-  --deployment-name apps \
-  --build-id v1 \
-  --namespace apps
-```
-
-Promote backward-compatible processing first:
-
-```bash
-temporal worker deployment set-current-version \
-  --deployment-name processing \
-  --build-id v2 \
-  --namespace processing
-```
-
-Ramp the application service after processing is compatible:
-
-```bash
-temporal worker deployment set-ramping-version \
-  --deployment-name apps \
-  --build-id v2 \
-  --percentage 50 \
-  --namespace apps
-```
-
-Complete the application service cutover:
-
-```bash
-temporal worker deployment set-current-version \
-  --deployment-name apps \
-  --build-id v2 \
-  --namespace apps
-```
+`workshop/exercises/01-safe-fulfillment-handoff/README.md`
 
 The later TWC/Kubernetes segment should show that the controller performs this same lifecycle from
 WorkerDeployment rollout state: register new build IDs, wait for pollers, ramp traffic, gate the
@@ -183,36 +131,37 @@ rollout, and sunset drained versions.
 
 ## What Participants Will Do
 
-The script details are intentionally deferred to the exercise implementation plan. The participant
-experience should still center on running and understanding the Temporal Worker Deployment
-commands above.
+The participant experience is implemented in
+`workshop/exercises/01-safe-fulfillment-handoff/README.md`.
 
 Participants will:
 
-1. Observe the old path: `apps v1 -> processing -> Kafka fulfillment`.
-2. Start or select `processing v2`, which supports the routing slip while preserving legacy
-   behavior for old callers, then promote it to current.
-3. Start or select `apps v2`, which now starts `fulfillment.Order` and sets
+1. Start the enablements order generator so traffic is flowing continuously.
+2. Observe the old path under load: `apps v1 -> processing -> Kafka fulfillment`.
+3. Implement, build, and start `processing v2`, which supports the routing slip while preserving
+   legacy behavior for old callers, then promote it to current.
+4. Implement, build, and start `apps v2`, which now starts `fulfillment.Order` and sets
    `send_fulfillment=false`, then ramp it to 50%.
-4. Submit orders during the ramp and verify that old and new orders both complete, but only the old
-   path creates Kafka fulfillment records.
-5. Promote `apps v2` to current.
-6. Inspect Temporal UI to confirm each execution kept its chosen behavior through workflow history.
+5. Let the generator continue during the ramp and verify that old and new orders both complete, but
+   only the old path creates Kafka fulfillment records.
+6. Promote `apps v2` to current.
+7. Inspect Temporal UI to confirm each execution kept its chosen behavior through workflow history.
 
 ## Proposed Timing
 
 | Segment | Time | Purpose |
 |---|---:|---|
 | Decision frame | 5 min | Explain the options and why routing slip + Worker Versioning is selected |
-| Observe legacy path | 5 min | Submit old-path orders and confirm Kafka fulfillment |
-| Promote processing v2 | 7 min | Show backward-compatible domain-service rollout |
-| Ramp apps v2 | 10 min | Submit mixed traffic and observe old/new behavior |
+| Start load + observe legacy path | 5 min | Run the enablements order generator and confirm Kafka fulfillment |
+| Implement/promote processing v2 | 7 min | Show backward-compatible domain-service rollout |
+| Implement/ramp apps v2 | 10 min | Keep generated traffic running and observe old/new behavior |
 | Inspect proof | 8 min | Check Kafka records, `fulfillment.Order`, and `send_fulfillment=false` |
 | Promote apps v2 | 5 min | Complete the cutover |
 | Debrief/TWC bridge | 5 min | Explain how TWC automates the commands later |
 
-Total target: 45 minutes. This assumes workers are prebuilt and version startup is scripted.
-Manual file copying, Java rebuilds, or environment debugging will push the exercise past an hour.
+Total target: 45 minutes if participants apply the provided solution snippets directly and Java
+builds are already warm. Environment debugging or broad manual refactoring will push the exercise
+past an hour.
 
 ## Success Criteria
 

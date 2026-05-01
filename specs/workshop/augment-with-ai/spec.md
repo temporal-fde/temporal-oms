@@ -52,10 +52,12 @@ Each exercise is ~20-30 minutes. The full workshop is designed to run in a 2-3 h
 ### What exists today
 
 - `GETTING_STARTED.md` describes a 5-terminal manual startup for local dev — not workshop-friendly
-- The Nexus migration is complete in code (`Workflow.getVersion("remove-kafka-fulfillment", ...)` gate exists in `processing.OrderImpl`), but there is no guided exercise showing how to deploy through it
+- The fulfillment handoff migration is moving to an explicit `send_fulfillment` routing slip in `ProcessOrderRequest.options`; there is no guided exercise yet showing how to deploy the coordinated `processing` and `apps` worker versions
 - ShippingAgent (Python, Claude-based) is implemented but no exercise material exists
-- `scripts/scenarios/` has demo scripts but these are linear, not pedagogical
-- No `exercises/` directory, no `.devcontainer/`
+- `scripts/scenarios/` has demo scripts, but Exercise 01 should use the sustained
+  `WorkerVersionEnablement` traffic generator instead
+- Root `workshop/exercises/` now contains Exercise 01 material; later exercises and the final
+  devcontainer workflow still need to be implemented
 
 ### Gaps
 
@@ -71,21 +73,19 @@ Each exercise is ~20-30 minutes. The full workshop is designed to run in a 2-3 h
 ### Workshop Structure
 
 ```
-exercises/
+workshop/
   README.md                               # Workshop arc, how exercises relate
-  01-nexus-migration/
-    README.md                             # Exercise narrative + guided questions (3 acts)
-    SOLUTION.md                           # Step-by-step CLI + expected output + the "why"
-    scripts/
-      submit-orders.sh                    # POST N orders, print IDs
-      check-parity.sh                     # Hits admin endpoint + describes fulfillment.Order
-  02-shipping-agent/                      # [TBD — see Open Questions]
-    README.md
-    SOLUTION.md
-  03-extend-agent/                        # [TBD — see Open Questions]
-    README.md
-    SOLUTION.md
-    starter/                              # Scaffolded starting point for extension
+  exercises/
+    01-safe-fulfillment-handoff/
+      README.md                           # Exercise narrative + guided questions (3 acts)
+      SOLUTION.md                         # Step-by-step CLI + expected output + the "why"
+    02-shipping-agent/                    # [TBD — see Open Questions]
+      README.md
+      SOLUTION.md
+    03-extend-agent/                      # [TBD — see Open Questions]
+      README.md
+      SOLUTION.md
+      starter/                            # Scaffolded starting point for extension
 
 .devcontainer/
   devcontainer.json                       # Codespaces config — see Dependencies
@@ -100,9 +100,12 @@ AI labs build on.
 `processing.Order` to `apps.Order` without disrupting in-flight orders or hiding rollout policy in
 workflow code?"
 
-The current planning spec for this foundation exercise lives in the top-level workshop exercises
-directory:
-[`../exercises/01-safe-fulfillment-handoff/spec.md`](../exercises/01-safe-fulfillment-handoff/spec.md).
+The planning spec for this foundation exercise lives under `specs/`; the implemented lab lives
+under the root `workshop/` directory:
+
+- Spec: [`../exercises/01-safe-fulfillment-handoff/spec.md`](../exercises/01-safe-fulfillment-handoff/spec.md)
+- Lab guide: [`../../../workshop/exercises/01-safe-fulfillment-handoff/README.md`](../../../workshop/exercises/01-safe-fulfillment-handoff/README.md)
+- Solution: [`../../../workshop/exercises/01-safe-fulfillment-handoff/SOLUTION.md`](../../../workshop/exercises/01-safe-fulfillment-handoff/SOLUTION.md)
 
 The chosen approach is a combination of:
 
@@ -144,7 +147,7 @@ See [Dependencies](#dependencies) for full detail. The exercises assume:
 - Temporal UI at `localhost:8233`
 - `temporal` CLI available on PATH
 - `jq` and `curl` available on PATH
-- All Java workers pre-built (so first run is fast)
+- Baseline Java workers already running; Maven dependencies warm enough for the v2 rebuild steps
 
 ---
 
@@ -160,11 +163,10 @@ Deliverables:
 ### Phase 2: Exercise 01
 
 Deliverables:
-- [ ] `exercises/README.md`
-- [ ] `exercises/01-nexus-migration/README.md` (3-act narrative)
-- [ ] `exercises/01-nexus-migration/SOLUTION.md`
-- [ ] `exercises/01-nexus-migration/scripts/submit-orders.sh`
-- [ ] `exercises/01-nexus-migration/scripts/check-parity.sh`
+- [x] `workshop/README.md`
+- [x] `workshop/exercises/01-safe-fulfillment-handoff/README.md`
+- [x] `workshop/exercises/01-safe-fulfillment-handoff/SOLUTION.md`
+- [ ] Optional helper: generated-order inspection script, if Temporal UI proof is too slow live
 
 ### Phase 3: Exercises 02 and 03
 
@@ -175,11 +177,7 @@ Deliverables: TBD pending design decisions in Open Questions.
 To Create:
 - `.devcontainer/devcontainer.json`
 - `scripts/workshop-start.sh`
-- `exercises/README.md`
-- `exercises/01-nexus-migration/README.md`
-- `exercises/01-nexus-migration/SOLUTION.md`
-- `exercises/01-nexus-migration/scripts/submit-orders.sh`
-- `exercises/01-nexus-migration/scripts/check-parity.sh`
+- Optional generated-order inspection helper for Exercise 01
 
 To Modify:
 - `specs/README.md` — add workshop spec entry
@@ -190,8 +188,8 @@ To Modify:
 
 ### Exercise 01 Validation
 
-- [ ] `submit-orders.sh` posts orders and returns IDs without errors (requires all workers running)
-- [ ] `check-parity.sh` correctly identifies v1 vs v2 path from admin endpoint response
+- [ ] `WorkerVersionEnablement` keeps submitting orders while `processing` and `apps` deployments change
+- [ ] Generated orders can be inspected to identify v1 vs v2 path from Temporal UI and the Kafka admin endpoint
 - [ ] CLI ramp commands succeed on local Temporal dev server (requires Temporal server >= 1.25 for Worker Deployments API)
 - [ ] Both paths result in a `Completed` `fulfillment.Order` workflow
 - [ ] Kafka admin endpoint at 8071 is accessible in Codespaces (port forwarded)
@@ -211,9 +209,9 @@ To Modify:
 |------|--------|------------|-----------|
 | Temporal dev server version < 1.25 doesn't support Worker Deployments API | High — Exercise 01 Act 2 blocked | Medium | Pin Temporal CLI version in devcontainer; add version check to `workshop-start.sh` |
 | Codespaces cold start too slow (Java build time) | Medium — workshop pacing killed | Medium | `postCreateCommand` pre-builds during container creation; participants work while it builds |
-| `check-parity.sh` false-positive: Kafka admin returns 404 for missing orders | Low — misleading output | Low | Script must distinguish 404 (never sent) from empty body (sent but no message) |
+| Generated-order proof is slow to inspect manually | Low — pacing drag | Medium | Add a read-only inspection helper if needed; do not replace the enablements load generator |
 | Python worker fails to start (missing API key) | Medium — Exercise 02/03 blocked | Medium | `workshop-start.sh` warns on missing keys but starts workers anyway; exercises that need real API keys are explicitly called out |
-| In-flight v1 workflows don't complete before sunset step in Act 3 | Low — minor confusion | Low | `workshop-start.sh` uses test order IDs with fast-completing scenarios; sunset delay is explicit in the exercise |
+| In-flight v1 workflows don't complete before sunset step in Act 3 | Low — minor confusion | Low | The enablements generator uses fast generated orders; sunset delay is explicit in the exercise |
 
 ---
 
@@ -254,7 +252,8 @@ Minimum devcontainer config:
 
 ### Implementation Notes
 
-- `submit-orders.sh` should use deterministic order IDs (e.g., `workshop-{timestamp}-{n}`) so `check-parity.sh` can correlate without state tracking
+- Exercise 01 should not call `scripts/scenarios/*`; `WorkerVersionEnablement` is the traffic source
+  and keeps pumping orders through during the rollout.
 - The Codespaces machine type needs to be specified in `devcontainer.json` — 4-core minimum to run Temporal + 5 JVM processes + Python worker without OOM
 - `setup-temporal-namespaces.sh` already handles `set-current-version` for build-id `local` — `workshop-start.sh` must call this after starting workers, not before
 - Exercise 01 Act 2 requires Temporal Server to support `set-ramping-version` — verify this command exists in the pinned CLI version before Phase 2 begins

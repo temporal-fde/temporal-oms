@@ -115,8 +115,8 @@ Current repo observations that affect planning:
 - `proto/acme/processing/domain/v1/workflows.proto` does not yet include
   `optional bool send_fulfillment = 3`.
 - `java/processing/processing-core/src/main/java/com/acme/processing/workflows/OrderImpl.java`
-  currently uses `Workflow.getVersion("remove-kafka-fulfillment", ...)` to skip the Kafka handoff,
-  rather than the planned routing-slip option.
+  no longer uses `Workflow.getVersion("remove-kafka-fulfillment", ...)`; the remaining hard-code
+  gap is to add the planned `send_fulfillment` routing-slip guard around the Kafka handoff.
 - `java/apps/apps-core/src/main/java/com/acme/apps/workflows/OrderImpl.java` already starts
   `fulfillment.Order` and calls processing, but it does not set `send_fulfillment=false` because the
   field does not exist yet.
@@ -141,7 +141,7 @@ Current repo observations that affect planning:
 
 | Option | Fit for Exercise 01 | Pros | Cons | Recommendation |
 |---|---|---|---|---|
-| Plain local processes in Codespaces | High | Lowest runtime surface area; no Docker image build loop; direct Temporal CLI; easiest to explain Worker Deployment commands | Needs a reliable process supervisor and prebuilt v1/v2 artifacts | Use for attendee hands-on exercises |
+| Plain local processes in Codespaces | High | Lowest runtime surface area; no Docker image build loop; direct Temporal CLI; easiest to explain Worker Deployment commands | Needs a reliable process supervisor and warm Java builds | Use for attendee hands-on exercises |
 | Docker Compose in Codespaces | Medium | One command can start services; isolates per-service env | Still requires Docker and image builds/pulls; no TWC benefit; extra networking/logging failure modes | Keep as fallback only if local supervision proves unreliable |
 | KinD in Codespaces | Low for hands-on, medium for TWC | Existing scripts and manifests support KinD; good fallback and known local path | Heavier control plane; image load loop; not needed for Exercise 01 | Keep as supported instructor/demo path |
 | k3d in Codespaces | Low for hands-on, promising for TWC | k3d runs lightweight k3s in Docker; K3s is designed for lighter environments; k3d has image import and managed registry support; local TWC validation passed | Codespaces Docker networking and resource behavior still need validation; apps and fulfillment TWD manifests still need to be added | Add as a parallel instructor/demo path, not the attendee Exercise 01 path |
@@ -264,17 +264,22 @@ Required runtime behavior:
 - `processing v2` skips the legacy Kafka handoff only when `send_fulfillment=false`.
 - Old pinned executions remain on their original build IDs.
 - New executions route according to the Temporal Worker Deployment current/ramping version.
+- The enablements `WorkerVersionEnablement` workflow generates sustained order traffic before and
+  during the rollout.
 
-Required artifact model:
+Required live build/deploy model:
 
-- Attendees must not edit files, copy files, or rebuild during the exercise.
-- The v1 artifacts must contain the actual legacy behavior, not only the current source tree started
-  with `TEMPORAL_WORKER_BUILD_ID=v1`.
-- The workshop must provide deterministic v1/v2 worker artifacts or classpaths for:
-  - `apps-workers:v1`
-  - `apps-workers:v2`
-  - `processing-workers:v1`
-  - `processing-workers:v2`
+- `apps-workers v1` and `processing-workers v1` are already running before participants edit code.
+- Participants can apply the provided `processing v2` and `apps v2` solution snippets during the
+  exercise.
+- Rebuilding after a code change creates the code used by the next `v2` worker process.
+- The existing `v1` worker processes stay running after the source tree changes; do not stop them
+  until pinned executions drain.
+- The workshop must make it obvious which process is running each build ID:
+  - `apps-workers` with build ID `v1`
+  - `apps-workers` with build ID `v2`
+  - `processing-workers` with build ID `v1`
+  - `processing-workers` with build ID `v2`
 - Each worker process must have an obvious name and log file:
   - `apps-v1.log`
   - `apps-v2.log`
@@ -285,7 +290,7 @@ Required artifact model:
 ```bash
 TEMPORAL_DEPLOYMENT_NAME=processing \
 TEMPORAL_WORKER_BUILD_ID=v2 \
-java -jar .workshop/artifacts/processing-workers-v2.jar
+java -jar java/processing/processing-workers/target/processing-workers-1.0.0-SNAPSHOT.jar
 ```
 
 Recommended attendee command flow:
@@ -300,6 +305,18 @@ temporal worker deployment set-current-version \
   --deployment-name apps \
   --build-id v1 \
   --namespace apps
+```
+
+```bash
+export ENABLEMENT_ID="safe-handoff-$(date +%Y%m%d%H%M%S)"
+
+temporal workflow start \
+  --task-queue enablements \
+  --type WorkerVersionEnablement \
+  --workflow-id "${ENABLEMENT_ID}" \
+  --namespace default \
+  --input "{\"enablementId\":\"${ENABLEMENT_ID}\",\"orderCount\":1000,\"submitRatePerMin\":12,\"timeout\":\"900s\",\"orderIdSeed\":\"order\"}" \
+  --input-meta 'encoding=json/protobuf'
 ```
 
 ```bash
@@ -324,6 +341,13 @@ temporal worker deployment set-current-version \
   --namespace apps
 ```
 
+```bash
+temporal workflow terminate \
+  --workflow-id "${ENABLEMENT_ID}" \
+  --namespace default \
+  --reason "Exercise 01 complete"
+```
+
 Hard code gap to close before scripting:
 
 - Add `optional bool send_fulfillment = 3` to
@@ -332,9 +356,9 @@ Hard code gap to close before scripting:
 - Update `processing.Order` to use the routing slip with legacy-compatible default:
   absent `send_fulfillment` means `true`.
 - Update `apps v2` to send `send_fulfillment=false`.
-- Decide whether the existing `Workflow.getVersion("remove-kafka-fulfillment", ...)` branch is
-  removed, retained only for replay safety, or converted into a compatibility shim.
-- Add replay/compatibility tests before publishing exercise artifacts.
+- Keep `processing.Order` free of a `Workflow.getVersion` handoff branch; pinned Worker Versioning
+  preserves old executions and the routing slip controls new per-order behavior.
+- Add compatibility tests before relying on the exercise solution snippets.
 
 ## TWC Demo Requirements
 
@@ -461,8 +485,8 @@ cd java && mvn -DskipTests install
 cd ../python && uv sync
 ```
 
-Prebuild should also produce workshop artifacts if the selected v1/v2 artifact strategy requires
-materializing jars under `.workshop/artifacts/`.
+Prebuild should warm Maven and Python dependencies. Exercise 01 still builds new worker jars after
+participants apply the v2 code changes.
 
 Do not rely on `postCreateCommand` for expensive dependency setup if the goal is prebuild caching.
 GitHub prebuilds run `onCreateCommand` and `updateContentCommand`, but not `postCreateCommand`.
@@ -532,7 +556,7 @@ Useful status output:
 | Java processes consume too much memory | OOM during workshop | Start from jars with explicit `JAVA_TOOL_OPTIONS` or per-process `-Xmx`; validate on 4 core / 16 GB |
 | Dependency downloads happen during workshop | Timebox blown | Use Codespaces prebuilds; no Maven/uv install in `workshop-start.sh` |
 | Current code does not match routing-slip Exercise 01 | Exercise scripts would teach the wrong mechanism | Close proto/code/test gap before exercise scripting |
-| v1/v2 artifacts are ambiguous | Attendees cannot reason about build IDs | Prebuild immutable artifacts with names and logs that include `apps-v1`, `apps-v2`, `processing-v1`, `processing-v2` |
+| v1/v2 worker processes are ambiguous | Attendees cannot reason about build IDs | Name terminals/logs by service and build ID: `apps-v1`, `apps-v2`, `processing-v1`, `processing-v2` |
 | Worker management ports collide | One or more local workers fail to start | Assign unique management ports or disable management web servers for workers that do not need HTTP health |
 | Worker Deployment current version not set | Workers poll but tasks do not route | `setup-temporal-namespaces.sh` and readiness checks must explicitly set and describe current versions |
 | Kafka proof endpoint is HTML/null ambiguous | Exercise validation confusion | Add or plan a machine-readable check before scripts, or make check script robust to current HTML |
@@ -540,16 +564,15 @@ Useful status output:
 | TWC demo fails live | Weak production bridge | Instructor preflight, prebuilt images, recorded fallback, and CLI transcript |
 | k3d behaves differently from KinD | Demo blocked | Treat k3d as validation work, not initial dependency |
 | `host.docker.internal` does not resolve from k3d/KinD in Codespaces | Kubernetes pods cannot reach local Temporal | Validate networking; prefer Temporal Cloud or in-cluster Temporal for k8s demo if needed |
-| Stale Maven jars or Docker images do not match source | Runtime behavior differs between local source runs and k8s images | Prebuild from a clean reactor, verify packaged artifacts, and never require live rebuild debugging in Exercise 01 |
+| Stale Maven jars or Docker images do not match source | Runtime behavior differs between local source runs and k8s images | Build each v2 worker after its code change and verify the running process reports the expected build ID |
 | TWD coverage exists only for processing | TWC demo does not match workshop topology | Add and validate TWD manifests for `apps`, `processing`, and `fulfillment` before relying on the demo |
 
 ## Open Questions
 
-- What is the final v1/v2 artifact strategy for `apps-workers` and `processing-workers`?
-- Should v1/v2 artifacts be built from git tags, Maven profiles, source snapshots, or a dedicated
-  workshop packaging module?
-- Should `processing.Order` retain the existing `Workflow.getVersion` branch for replay-only
-  compatibility after the routing slip is added?
+- What exact wrapper commands should start `apps-v2` and `processing-v2` after participants build
+  the changed code?
+- What is the exact acceptance test that proves `processing v2` preserves legacy behavior for
+  absent `send_fulfillment` and skips the Kafka handoff for `send_fulfillment=false`?
 - Which Temporal CLI and Temporal dev server versions should be pinned?
 - Should the enablements namespace remain `default`, or should the workshop use an explicit
   `enablements` namespace to reduce attendee confusion?
@@ -627,7 +650,7 @@ TWC validation:
 - Update processing for legacy-compatible routing-slip behavior.
 - Update apps v2 to send `send_fulfillment=false`.
 - Add replay and compatibility tests.
-- Build v1/v2 artifacts without attendee file copying.
+- Build and run `processing-v2` and `apps-v2` from the changed source without attendee file copying.
 
 ### Phase 3: Codespaces foundation
 
