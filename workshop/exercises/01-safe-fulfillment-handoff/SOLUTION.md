@@ -3,7 +3,9 @@
 Source spec: [spec.md](../../../specs/workshop/exercises/01-safe-fulfillment-handoff/spec.md)  
 Participant guide: [README.md](README.md)
 
-This file contains the code solution used during the exercise.
+This file contains the code solution used during the exercise. Use it as a sidecar to the
+[participant guide](README.md): the README controls the exercise flow, and this file only covers
+the code edits for the implementation steps.
 
 You may apply the `processing v2` and `apps v2` code changes separately, matching the exercise
 steps, or apply all code changes in one pass. The safe rollout order is still:
@@ -17,6 +19,10 @@ directory. The exercise step scripts can still be run from
 `workshop/exercises/01-safe-fulfillment-handoff`.
 
 ## Processing v2 Code
+
+You are here from [README Step 4: Implement `processing v2`](README.md#4-implement-processing-v2).
+After completing this section, return to
+[README Step 5: Start `processing v2`](README.md#5-start-processing-v2).
 
 Treat the processing change as a copy/paste safety patch. The goal is not to make attendees reason
 through Java control flow; the goal is to preserve the old Kafka handoff unless a caller explicitly
@@ -137,7 +143,13 @@ What this does: when processing is no longer responsible for fulfillment, enrich
 Do not use `Workflow.getVersion` for this handoff. Pinned Worker Versioning keeps old executions on
 old code; the routing slip records the per-order contract.
 
+Return to [README Step 5: Start `processing v2`](README.md#5-start-processing-v2).
+
 ## Apps v2 Code
+
+You are here from [README Step 7: Implement `apps v2`](README.md#7-implement-apps-v2).
+After completing this section, return to
+[README Step 8: Start Fulfillment Workers For The New Path](README.md#8-start-fulfillment-workers-for-the-new-path).
 
 File:
 [java/apps/apps-core/src/main/java/com/acme/apps/workflows/OrderImplV1.java](../../../java/apps/apps-core/src/main/java/com/acme/apps/workflows/OrderImplV1.java)
@@ -228,6 +240,9 @@ and then sends enriched items to `fulfillment.Order`.
 The behavior to verify in Temporal UI is that new `ProcessOrderRequest` inputs visibly include
 `send_fulfillment=false`, and new-path orders create `fulfillment.Order` workflows instead of Kafka
 handoff records.
+
+Return to
+[README Step 8: Start Fulfillment Workers For The New Path](README.md#8-start-fulfillment-workers-for-the-new-path).
 
 ## Worker Deployment Properties
 
