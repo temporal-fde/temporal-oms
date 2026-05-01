@@ -127,8 +127,10 @@ For the margin and SLA tracks, the proof point is:
 find_alternate_warehouse happens before the accepted MARGIN_SPIKE or SLA_BREACH recommendation.
 ```
 
-That is the reliability harness. The prompt asks the model to check for alternatives, and the
-workflow layer enforces the rule if the model tries to finalize a negative outcome too early.
+The prompt tells the agent what good reasoning looks like. The workflow enforces the minimum
+process contract. The model still owns the recommendation, but the workflow makes one prerequisite
+non-negotiable: before `MARGIN_SPIKE` or `SLA_BREACH` can be accepted, the alternate-warehouse check
+must have happened.
 
 ## 4. Inspect The Fulfillment Decision
 

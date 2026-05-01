@@ -50,8 +50,8 @@ The visible reliability harness includes:
 - `get_location_events` on the `agents` task queue, backed by `enablements-api`
 - `find_alternate_warehouse` through the integrations Nexus endpoint before negative outcomes
 - internal `finalize_recommendation` tool handling, so structured output is not parsed from prose
-- workflow-layer rejection when the LLM tries to finalize `MARGIN_SPIKE` or `SLA_BREACH` before
-  calling `find_alternate_warehouse`
+- workflow-layer process contract that appends a `REJECTED` tool result when the LLM tries to
+  finalize `MARGIN_SPIKE` or `SLA_BREACH` before calling `find_alternate_warehouse`
 
 `ShippingAgent` recommends. `fulfillment.Order` decides. The recommendation is applied by
 `fulfillment.Order`, which records fulfillment state and upserts fulfillment Search Attributes such
@@ -236,22 +236,24 @@ Participants inspect the `ShippingAgent` history and label each boundary:
 - LLM Activity call
 - tool calls dispatched as Temporal Activities or Nexus operations
 - internal finalization tool
-- workflow-layer rejection or acceptance
+- workflow-layer `REJECTED` tool result or acceptance
 - returned recommendation
 
-For the margin and SLA tracks, participants must find the hard guard:
+For the margin and SLA tracks, participants must find the process contract:
 
 ```text
 finalize_recommendation(MARGIN_SPIKE or SLA_BREACH)
-  -> rejected because find_alternate_warehouse has not happened yet
+  -> workflow appends a REJECTED tool result because find_alternate_warehouse has not happened yet
 find_alternate_warehouse
   -> returns no usable alternate
 finalize_recommendation(...)
   -> accepted
 ```
 
-The point is that correctness does not depend only on prompt compliance. The workflow tracks the
-required action and refuses an unsafe final answer.
+The prompt tells the agent what good reasoning looks like. The workflow enforces the minimum
+process contract. The model still owns the recommendation, but the workflow makes one prerequisite
+non-negotiable: before `MARGIN_SPIKE` or `SLA_BREACH` can be accepted, the alternate-warehouse check
+must have happened.
 
 ### Act 4: Show Who Decides
 
