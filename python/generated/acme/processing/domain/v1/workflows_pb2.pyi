@@ -32,9 +32,11 @@ class ProcessOrderRequestExecutionOptions(_message.Message):
     __slots__ = ()
     PROCESSING_TIMEOUT_SECS_FIELD_NUMBER: _ClassVar[int]
     OMS_PROPERTIES_FIELD_NUMBER: _ClassVar[int]
+    SEND_FULFILLMENT_FIELD_NUMBER: _ClassVar[int]
     processing_timeout_secs: int
     oms_properties: _message_pb2.OmsProperties
-    def __init__(self, processing_timeout_secs: _Optional[int] = ..., oms_properties: _Optional[_Union[_message_pb2.OmsProperties, _Mapping]] = ...) -> None: ...
+    send_fulfillment: bool
+    def __init__(self, processing_timeout_secs: _Optional[int] = ..., oms_properties: _Optional[_Union[_message_pb2.OmsProperties, _Mapping]] = ..., send_fulfillment: _Optional[bool] = ...) -> None: ...
 
 class GetProcessOrderStateResponse(_message.Message):
     __slots__ = ()

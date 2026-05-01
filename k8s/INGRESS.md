@@ -1,15 +1,21 @@
 # Apps API Ingress Setup
 
-The apps-api service is exposed via Traefik ingress controller running in your KinD cluster, making it accessible from your local machine.
+The apps-api service is exposed via Traefik ingress controller running in your KinD or k3d cluster,
+making it accessible from your local machine.
 
 ## Quick Start
 
 ```bash
 # Full setup with KinD cluster and ingress
-./scripts/demo-up.sh
+./scripts/kind/demo-up.sh
+
+# Or full setup with k3d cluster and ingress
+./scripts/k3d/demo-up.sh
 
 # In a new terminal, port-forward Traefik to localhost:8080
-./scripts/tunnel.sh
+./scripts/kind/tunnel.sh
+# or
+./scripts/k3d/tunnel.sh
 
 # Now you can access the API
 curl http://localhost:8080/api/actuator/health
@@ -21,7 +27,12 @@ curl http://localhost:8080/api/actuator/health
 
 ```bash
 export KUBECONFIG=/tmp/kind-config.yaml
-./scripts/tunnel.sh
+# or
+export KUBECONFIG=/tmp/k3d-config.yaml
+
+./scripts/kind/tunnel.sh
+# or
+./scripts/k3d/tunnel.sh
 # API available at: http://localhost:8080/api
 ```
 
@@ -88,10 +99,14 @@ curl http://localhost:8080/api/v1/commerce-app/clothing
 **Cannot reach API (connection refused):**
 ```bash
 # Make sure tunnel.sh is running in another terminal
-./scripts/tunnel.sh
+./scripts/kind/tunnel.sh
+# or
+./scripts/k3d/tunnel.sh
 
 # Check Traefik pods
 export KUBECONFIG=/tmp/kind-config.yaml
+# or
+export KUBECONFIG=/tmp/k3d-config.yaml
 kubectl get pods -n traefik
 
 # Check Ingress is created
@@ -113,12 +128,16 @@ kubectl describe ingress apps-api -n temporal-oms-apps
 **View Traefik logs for debugging:**
 ```bash
 export KUBECONFIG=/tmp/kind-config.yaml
+# or
+export KUBECONFIG=/tmp/k3d-config.yaml
 kubectl logs -n traefik -l app.kubernetes.io/name=traefik -f
 ```
 
 **View apps-api logs:**
 ```bash
 export KUBECONFIG=/tmp/kind-config.yaml
+# or
+export KUBECONFIG=/tmp/k3d-config.yaml
 kubectl logs -n temporal-oms-apps -l app=apps-api --tail=50
 ```
 
@@ -126,7 +145,9 @@ kubectl logs -n temporal-oms-apps -l app=apps-api --tail=50
 
 Ingress is torn down with the rest of the demo:
 ```bash
-./scripts/demo-down.sh
+./scripts/kind/demo-down.sh
+# or
+./scripts/k3d/demo-down.sh
 ```
 
-This removes the entire KinD cluster including all services, ingress, and pods.
+This removes the entire selected cluster including all services, ingress, and pods.

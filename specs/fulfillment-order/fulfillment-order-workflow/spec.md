@@ -210,8 +210,8 @@ fulfillment.Order (fulfillment namespace)
 
 #### `processing.Order` — new version (Worker Versioning)
 
-- **New behavior vs. old:** Removes `Fulfillments.fulfillOrder()` activity call after enrichment
-- **Mechanism:** `Workflow.getVersion("remove-kafka-fulfillment", DEFAULT_VERSION, 1)` branch skips the activity on new executions; old in-flight workflows replay the original path
+- **New behavior vs. old:** Keeps legacy fulfillment as the default, but skips `Fulfillments.fulfillOrder()` when the caller explicitly sets `ProcessOrderRequest.options.send_fulfillment=false`
+- **Mechanism:** routing slip plus pinned Worker Versioning. `apps v1` omits the option, so `processing v2` still publishes the legacy Kafka handoff. `apps v2` sets `send_fulfillment=false` because it owns `fulfillment.Order` orchestration directly.
 
 #### `AddressVerification` Activity (`fulfillment-core`)
 
@@ -341,7 +341,7 @@ Deliverables:
   - `execute()`: open detached compensation scope → `Workflow.await()` for fulfillOrder or cancel/timeout → fire compensation if needed
   - `validateOrder` Update handler: `AddressVerification.verifyAddress()` → store `address_id` in state → return `ValidateOrderResponse`
   - `execute()` body (after `validateOrder`): `loadOptions` (LocalActivity) → `holdItems` → open detached compensation scope → `Workflow.await()` for `fulfillOrder` or cancel/timeout
-  - `fulfillOrder` Update handler: `reserveItems` → `ShippingAgent.calculateShippingOptions(...)` → recommendation application + `margin_leak`/`sla_breach_days` SearchAttributes as needed → concurrent (`printShippingLabel` + `deductInventory`) → await `notifyDeliveryStatus`
+  - `fulfillOrder` Update handler: `reserveItems` → `ShippingAgent.recommendShippingOption(...)` → recommendation application + `margin_leak`/`sla_breach_days` SearchAttributes as needed → concurrent (`printShippingLabel` + `deductInventory`) → await `notifyDeliveryStatus`
   - `cancelOrder` Signal handler: set cancellation flag
   - `notifyDeliveryStatus` Signal handler: set delivery status
   - `getState` Query: return `GetFulfillmentOrderStateResponse`
@@ -380,7 +380,8 @@ Gate new behavior behind new build-ids so existing in-flight workflows are unaff
 
 #### `processing.Order` new version
 
-- [ ] Add `Workflow.getVersion("remove-kafka-fulfillment", DEFAULT_VERSION, 1)` branch in `OrderImpl.execute()` to skip `Fulfillments.fulfillOrder()` on new executions
+- [ ] Add `optional bool send_fulfillment = 3` to `ProcessOrderRequestExecutionOptions`
+- [ ] Update `OrderImpl.execute()` so absent `send_fulfillment` means `true`, and `false` skips `Fulfillments.fulfillOrder()`
 - [ ] Deploy `processing-workers` with new build-id; mark as new default via Worker Versioning
 
 #### Validation
@@ -425,7 +426,7 @@ Deliverables:
 - `proto/acme/fulfillment/domain/v1/workflows.proto` — add new Java fulfillment messages (Phase 1)
 - `java/fulfillment/fulfillment-core/src/main/resources/acme.fulfillment.yaml` — register workflow + activity beans (Phase 3)
 - `java/apps/apps-core/src/main/java/com/acme/apps/workflows/OrderImpl.java` — add Fulfillment Nexus stub + calls (Phase 5, new build-id)
-- `java/processing/processing-core/src/main/java/com/acme/processing/workflows/OrderImpl.java` — version branch to skip `Fulfillments.fulfillOrder()` (Phase 5, new build-id)
+- `java/processing/processing-core/src/main/java/com/acme/processing/workflows/OrderImpl.java` — routing-slip guard around `Fulfillments.fulfillOrder()` (Phase 5, new build-id)
 
 ---
 
@@ -451,7 +452,8 @@ Deliverables:
 
 ### Workflow Versioning Tests (Phase 7)
 
-- `processing.Order`: replay old history (pre-version branch) with new code: old path preserved
+- `processing.Order`: absent `send_fulfillment` keeps the legacy Kafka handoff for `apps v1` callers
+- `processing.Order`: `send_fulfillment=false` skips the legacy Kafka handoff for `apps v2` callers
 - `fulfillment.Order` V2: no replay test needed — PINNED V1 workflows complete on V1 workers; V2 build-id is a clean new deployment
 
 ### Validation Checklist
@@ -473,7 +475,7 @@ Deliverables:
 | Worker Versioning in `apps` namespace: `apps.Order` V2 tries to call `fulfillment.Order` but `fulfillment-workers` not yet deployed | High | Medium | Deploy `fulfillment-workers` and register Nexus endpoint before deploying new `apps-workers` build-id |
 | Detached scope for inventory compensation is easy to break in refactors | High | Medium | Dedicated unit tests for both cancel and timeout compensation paths; CI must run these |
 | Proto naming conflict: existing Python-era `FulfillOrderRequest` in same package | Low | High | New Java messages use distinct names (`StartOrderFulfillmentRequest`, not `FulfillOrderRequest`); long-term, split into separate `.proto` files |
-| `Workflow.getVersion()` branch in `processing.Order` — wrong placement causes non-determinism on replay | High | Low | Follow existing `VersioningBehavior.PINNED` pattern in `processing.OrderImpl`; write replay test before deploying new build-id |
+| `send_fulfillment` default is wrong in `processing.Order` | High | Low | Treat absent as `true`; add compatibility tests for old `apps v1` requests before promoting `processing v2` |
 | Nexus integration backend depends on enablements availability | Medium | Medium | Keep `enablements-api` and enablements workers in the local/workshop startup path |
 
 ---
@@ -493,7 +495,7 @@ Deliverables:
 - **`order-fulfillment` Nexus endpoint:** Must be registered in Temporal cluster and wired into `apps.Order` OMS properties before Phase 5 ships
 - **`margin_leak` SearchAttribute registration:** One-time cluster operation; must precede first `fulfillment.Order` execution that sets it
 - **`fulfillment-workers` deployment order:** Must be running and Nexus endpoint registered before `apps-workers` new build-id is marked as default
-- **`processing.Order` build-id:** New build-id must be tested for replay safety before being marked as default in the `processing` namespace
+- **`processing.Order` build-id:** New build-id must be tested for backward compatibility with `apps v1` requests before being marked as default in the `processing` namespace
 
 ### Rollout Blockers
 
@@ -525,7 +527,7 @@ Deliverables:
 - **`easypost_address.id` lifetime:** Set on the stored `Address` during `validateOrder`, then supplied to ShippingAgent for fixture-backed rate lookup.
 - **`EasyPostAddress` lives on `common.Address`:** No separate `ValidatedAddress` type. The `easypost_address` field on `common.Address` carries the external-address identity fields the existing contracts expect.
 - **Sequencing in `apps.Order`:** After `Workflow.await()` resolves (both `submitOrder` + `capturePayment` accumulated), `apps.Order` fires `validateOrder` Nexus first, then `processOrder` Nexus. Both can be launched as concurrent `Promise` instances from `execute()` — `validateOrder` starts `fulfillment.Order` and validates the address; `processOrder` drives enrichment; after `processOrder` completes, `fulfillOrder` Update closes the loop.
-- **`Workflow.getVersion()` in `processing.Order`:** Place the version branch immediately before the `fulfillments.fulfillOrder()` call. Version name: `"remove-kafka-fulfillment"`. Old path = `DEFAULT_VERSION`, new path = `1`.
+- **Routing slip in `processing.Order`:** Do not use `Workflow.getVersion` for this handoff. Read `ProcessOrderRequest.options.send_fulfillment` immediately before the legacy `fulfillments.fulfillOrder()` call; absent means `true`, `false` skips the call.
 - **Proto naming:** Existing Python-era messages in `workflows.proto` use names like `FulfillOrderRequest`, `Item`, `Status`. New Java messages must not reuse these names. Consider a comment block separator in the proto file marking the Java section.
 - **`margin_leak` SearchAttribute:** Call `Workflow.upsertTypedSearchAttributes(SearchAttributeKey.forLong("margin_leak").valueSet(delta))` only when delta > 0 (delta is cents integer). Never set to 0 or a negative value.
 - **Concurrent activities:** Use `Promise.allOf(Async.function(carriers::printShippingLabel, ...), Async.function(allocations::deductInventory, ...))`. Do NOT use `ExecutorService` — not deterministic in Temporal workflows.

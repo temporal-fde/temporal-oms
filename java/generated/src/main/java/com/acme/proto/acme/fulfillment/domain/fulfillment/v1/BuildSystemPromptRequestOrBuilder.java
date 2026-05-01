@@ -11,17 +11,17 @@ public interface BuildSystemPromptRequestOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest request = 1 [json_name = "request"];</code>
+   * <code>.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest request = 1 [json_name = "request"];</code>
    * @return Whether the request field is set.
    */
   boolean hasRequest();
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest request = 1 [json_name = "request"];</code>
+   * <code>.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest request = 1 [json_name = "request"];</code>
    * @return The request.
    */
-  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest getRequest();
+  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest getRequest();
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest request = 1 [json_name = "request"];</code>
+   * <code>.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest request = 1 [json_name = "request"];</code>
    */
-  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequestOrBuilder getRequestOrBuilder();
+  com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequestOrBuilder getRequestOrBuilder();
 }

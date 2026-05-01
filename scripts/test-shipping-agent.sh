@@ -17,7 +17,7 @@ temporal workflow update execute \
   --address "$TEMPORAL_ADDRESS" \
   --namespace "$NAMESPACE" \
   --workflow-id "$WORKFLOW_ID" \
-  --name calculate_shipping_options \
+  --name recommend_shipping_option \
   --input '{
     "order_id": "order-001",
     "customer_id": "cust-123",

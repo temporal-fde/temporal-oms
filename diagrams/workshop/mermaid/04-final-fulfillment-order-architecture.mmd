@@ -1,0 +1,33 @@
+sequenceDiagram
+  participant Apps as apps.Order
+  participant Fulfillment as fulfillment.Order
+  participant Processing as processing.Order
+  participant Inventory as Inventory / Allocations
+  participant Agent as ShippingAgent
+  participant Carrier as Carrier / Shipping
+
+  Apps->>Fulfillment: validateOrder Nexus operation<br/>UpdateWithStart
+  Fulfillment->>Fulfillment: verify address
+  Fulfillment->>Inventory: holdItems
+
+  par Processing path
+    Apps->>Processing: processOrder Nexus operation
+    Processing-->>Apps: ProcessedOrder
+  and Fulfillment path
+    Fulfillment->>Fulfillment: wait for fulfillOrder Update
+  end
+
+  Apps->>Fulfillment: fulfillOrder Update<br/>ProcessedOrder
+  Fulfillment->>Inventory: reserveItems
+  Fulfillment->>Agent: recommendShippingOption Nexus operation
+  Agent-->>Fulfillment: ShippingRecommendation + options
+  Fulfillment->>Fulfillment: apply business decision<br/>set margin/SLA attributes
+
+  par Terminal fulfillment work
+    Fulfillment->>Carrier: printShippingLabel
+  and
+    Fulfillment->>Inventory: deductInventory
+  end
+
+  Fulfillment->>Fulfillment: wait for notifyDeliveryStatus Signal
+

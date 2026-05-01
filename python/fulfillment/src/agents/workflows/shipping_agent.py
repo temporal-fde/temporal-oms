@@ -23,13 +23,13 @@ with workflow.unsafe.imports_passed_through():
     from acme.fulfillment.domain.v1.shipping_agent_p2p import (
         BuildSystemPromptRequest,
         BuildSystemPromptResponse,
-        CalculateShippingOptionsRequest,
-        CalculateShippingOptionsResponse,
         GetLocationEventsRequest,
         GetLocationEventsResponse,
         GetShippingRatesRequest,
         GetShippingRatesResponse,
         RecommendationOutcome,
+        RecommendShippingOptionRequest,
+        RecommendShippingOptionResponse,
         ShippingOption,
         ShippingOptionsResult,
         ShippingRecommendation,
@@ -213,15 +213,15 @@ class ShippingAgent:
         await workflow.wait_condition(lambda: False)
 
     @workflow.update
-    async def calculate_shipping_options(
-        self, request: CalculateShippingOptionsRequest
-    ) -> CalculateShippingOptionsResponse:
+    async def recommend_shipping_option(
+        self, request: RecommendShippingOptionRequest
+    ) -> RecommendShippingOptionResponse:
         return await self._run_react_loop(request)
 
     async def _run_react_loop(
         self,
-        request: CalculateShippingOptionsRequest,
-    ) -> CalculateShippingOptionsResponse:
+        request: RecommendShippingOptionRequest,
+    ) -> RecommendShippingOptionResponse:
         # Pre-fetch origin and destination in parallel before the LLM loop.
         # Results are embedded directly in the task prompt so the LLM can call
         # get_carrier_rates + get_location_events concurrently on its first turn.
@@ -274,7 +274,7 @@ class ShippingAgent:
             now = workflow.now()
             age_secs = (now - cached.cached_at.replace(tzinfo=timezone.utc)).total_seconds()
             if age_secs < self._cache_ttl_secs:
-                return CalculateShippingOptionsResponse(
+                return RecommendShippingOptionResponse(
                     recommendation=cached.recommendation,
                     options=list(cached.options),
                     cache_hit=True,
@@ -341,7 +341,7 @@ class ShippingAgent:
             else ""
         )
         task_text = (
-            f"Calculate shipping options for order {request.order_id}.\n"
+            f"Recommend a shipping option for order {request.order_id}.\n"
             f"destination: {_addr_line(dest_ep)}\n"
             f"origin (resolved from inventory): {_addr_line(origin_ep)}\n"
             f"items: {items_desc}\n"
@@ -468,15 +468,15 @@ class ShippingAgent:
             cached_at=workflow.now(),
         )
 
-        return CalculateShippingOptionsResponse(
+        return RecommendShippingOptionResponse(
             recommendation=recommendation,
             options=all_options,
             cache_hit=False,
         )
 
-    @calculate_shipping_options.validator
-    def validate_calculate_shipping_options(
-        self, request: CalculateShippingOptionsRequest
+    @recommend_shipping_option.validator
+    def validate_recommend_shipping_option(
+        self, request: RecommendShippingOptionRequest
     ) -> None:
         if not request.order_id:
             raise ValueError("order_id is required")

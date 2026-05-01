@@ -1,151 +1,210 @@
 # Demo Scripts
 
-Modular scripts for managing the Temporal OMS Kubernetes deployment with KinD.
+Modular scripts for managing the Temporal OMS Kubernetes deployment with either KinD or k3d.
 
-> For complete deployment documentation including Temporal Cloud API key setup, see [../DEPLOYMENT.md](../DEPLOYMENT.md)
+> For complete deployment documentation including Temporal Cloud API key setup, see [../DEPLOYMENT.md](../DEPLOYMENT.md).
+
+## Runtime Paths
+
+| Path | Purpose |
+|---|---|
+| `scripts/kind/*` | KinD implementation |
+| `scripts/k3d/*` | k3d implementation |
+
+The two cluster-specific directories intentionally duplicate the small driver scripts. This keeps
+the operational paths easy to read and avoids cluster-driver conditionals inside every shell script.
 
 ## Quick Start
 
-**For Temporal Cloud deployment (OVERLAY=cloud):**
+KinD with Temporal Cloud:
+
 ```bash
-OVERLAY=cloud ./scripts/demo-up.sh
+OVERLAY=cloud ./scripts/kind/demo-up.sh
 ```
 
-**For local Temporal deployment (OVERLAY=local):**
+k3d with Temporal Cloud:
+
 ```bash
-OVERLAY=local ./scripts/demo-up.sh
+OVERLAY=cloud ./scripts/k3d/demo-up.sh
 ```
 
-**For live coding (after infrastructure is up):**
+KinD with local Temporal:
+
 ```bash
-# Make code changes...
-OVERLAY=cloud ./scripts/app-deploy.sh
-# Repeat as needed
+temporal server start-dev
+OVERLAY=local ./scripts/kind/demo-up.sh
 ```
 
-**Tear everything down:**
+k3d with local Temporal:
+
 ```bash
-./scripts/demo-down.sh
+temporal server start-dev --ip 0.0.0.0 --ui-ip 0.0.0.0
+OVERLAY=local ./scripts/k3d/demo-up.sh
+```
+
+For live coding after infrastructure is up:
+
+```bash
+OVERLAY=cloud ./scripts/kind/app-deploy.sh
+OVERLAY=local ./scripts/k3d/app-deploy.sh
+```
+
+Tear everything down:
+
+```bash
+./scripts/kind/demo-down.sh
+./scripts/k3d/demo-down.sh
 ```
 
 ## Modular Workflow
 
-For more control, use individual scripts:
+Use one directory consistently for a session:
 
-### Infrastructure Only
 ```bash
-# Create KinD cluster, create namespaces, install Traefik ingress
-./scripts/infra-up.sh
-
-# In another terminal, expose API via port-forward
-./scripts/tunnel.sh
-
-# ... make code changes ...
-
-# Redeploy apps (fast - skips infra setup)
-OVERLAY=cloud ./scripts/app-deploy.sh
-
-# Tear down just apps (keeps KinD cluster running)
-./scripts/app-down.sh
-
-# Stop everything (delete KinD cluster)
-./scripts/infra-down.sh
+./scripts/kind/infra-up.sh
+./scripts/kind/tunnel.sh
+OVERLAY=cloud ./scripts/kind/app-deploy.sh
+./scripts/kind/app-down.sh
+./scripts/kind/infra-down.sh
 ```
 
-### Check Status Anytime
 ```bash
-./scripts/status.sh
+./scripts/k3d/infra-up.sh
+./scripts/k3d/tunnel.sh
+OVERLAY=local ./scripts/k3d/app-deploy.sh
+./scripts/k3d/app-down.sh
+./scripts/k3d/infra-down.sh
 ```
 
-### Run Demo Scenarios
+Check status anytime:
+
 ```bash
-# Select from all scenarios discovered under scripts/scenarios
+./scripts/kind/status.sh
+./scripts/k3d/status.sh
+```
+
+Run demo scenarios:
+
+```bash
 ./scripts/runscenario.sh
-
-# Run a specific scenario without step prompts
 ./scripts/runscenario.sh valid-order --yes
 ```
 
-## What Each Script Does
+## Temporary Workshop API Key Distribution
+
+For public-repo workshops where attendees should not bring their own API keys, the instructor can
+serve a short-lived dotenv payload behind Basic Auth and a Cloudflare quick tunnel:
+
+```bash
+brew install caddy cloudflared
+./scripts/serve-workshop-api-keys.sh
+```
+
+The script reads:
+
+```text
+~/.config/anthropic/tmp-replay-26-partners-day.key
+~/.config/openai/tmp-replay-26-partners-day.key
+```
+
+It prints a random HTTPS URL, Basic Auth credentials, and the attendee command that appends the keys
+to each attendee's gitignored `.env.local`. Stop the script after setup and revoke the provider keys
+after the workshop.
+
+For k3d/KinD runs, `scripts/k3d/app-deploy.sh` and `scripts/kind/app-deploy.sh` read `.env.local`
+and patch `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` into the in-cluster `temporal-oms-secrets`
+Secrets after Kustomize applies its placeholder values.
+
+Defaults:
+
+```text
+local port: 7001
+username: workshop
+password: replay26-<4 hex chars>
+path: /replay26.env
+```
+
+Override them when needed:
+
+```bash
+WORKSHOP_SECRET_USER=replay \
+WORKSHOP_SECRET_PASSWORD=replay26 \
+WORKSHOP_SECRET_PORT=7001 \
+WORKSHOP_SECRET_PATH=/replay26.env \
+./scripts/serve-workshop-api-keys.sh
+```
+
+The script writes and live-tails an access log so the instructor can see every request for the key
+payload. Cloudflare quick tunnels always use a generated `trycloudflare.com` subdomain; use a named
+Cloudflare tunnel and a domain you control if you need a stable hostname such as
+`replay26.example.com`.
+
+In an interactive terminal, the script pins the attendee access details at the top of the screen and
+scrolls access logs underneath. Disable that terminal control if needed:
+
+```bash
+WORKSHOP_PIN_OUTPUT=false ./scripts/serve-workshop-api-keys.sh
+```
+
+## What Each Cluster Directory Provides
 
 | Script | Purpose |
-|--------|---------|
-| `infra-up.sh` | Create KinD cluster, create namespaces, install Traefik ingress |
-| `app-deploy.sh` | Build Java projects, build Docker images, load to KinD, deploy apps |
-| `app-down.sh` | Remove applications (keeps KinD cluster running) |
-| `infra-down.sh` | Delete KinD cluster and all infrastructure |
-| `demo-up.sh` | Full setup: runs infra-up + app-deploy |
-| `demo-down.sh` | Full teardown: runs app-down + infra-down |
-| `runscenario.sh` | Dynamic selector for scenario subdirectories under `scripts/scenarios` |
-| `tunnel.sh` | Port-forward Traefik to localhost:8080 (run in another terminal) |
-| `status.sh` | Show current deployment status (pods, KinD cluster, Temporal server)
-
-## Live Coding Workflow
-
-1. **Initial setup** (once per session):
-   ```bash
-   OVERLAY=cloud ./scripts/demo-up.sh
-   ```
-
-2. **Port-forward** (in another terminal):
-   ```bash
-   ./scripts/tunnel.sh
-   ```
-
-3. **Edit code** in your IDE
-
-4. **Quick redeploy** (takes ~30 seconds):
-   ```bash
-   OVERLAY=cloud ./scripts/app-deploy.sh
-   ```
-
-5. **Repeat steps 3-4** as needed
-
-6. **Clean up** when done:
-   ```bash
-   ./scripts/demo-down.sh
-   ```
+|---|---|
+| `infra-up.sh` | Create cluster, create namespaces, install cert-manager, TWC, and Traefik |
+| `app-deploy.sh` | Build Java projects, build Docker images, load/import images, deploy apps |
+| `app-down.sh` | Remove applications while keeping the cluster running |
+| `infra-down.sh` | Delete the cluster and all infrastructure |
+| `demo-up.sh` | Full setup: runs `infra-up.sh` and `app-deploy.sh` |
+| `demo-down.sh` | Full teardown: runs `app-down.sh` and `infra-down.sh` |
+| `deploy-processing-workers.sh` | Build and deploy a new processing worker image through TWC |
+| `tunnel.sh` | Port-forward APIs |
+| `status.sh` | Show deployment status |
 
 ## Requirements
 
-- `kubectl` - Kubernetes CLI
-- `kind` - KinD (Kubernetes in Docker) cluster
-- `docker` - Docker CLI
-- `temporal` - Temporal CLI for server (install: `brew install temporal`)
-- Maven - For Java builds (uses asdf from .tool-versions)
-- Java 21+ - For compiling (uses asdf from .tool-versions)
+- `kubectl`
+- `docker`
+- `kind` for `scripts/kind/*`
+- `k3d` for `scripts/k3d/*`
+- `helm`
+- `temporal`
+- Maven and Java 21+
 
 ## Overlays
 
-Scripts support environment overlays via `OVERLAY` variable:
+Scripts support environment overlays through `OVERLAY`:
 
 ```bash
-# Temporal Cloud deployment (requires API key setup - see DEPLOYMENT.md)
-OVERLAY=cloud ./scripts/demo-up.sh
-
-# Local Temporal deployment (uses host.docker.internal:7233)
-OVERLAY=local ./scripts/demo-up.sh
-
-# Default is 'local' if not specified
-./scripts/demo-up.sh
+OVERLAY=cloud ./scripts/kind/demo-up.sh
+OVERLAY=local ./scripts/kind/demo-up.sh
+OVERLAY=local ./scripts/k3d/demo-up.sh
 ```
+
+Default is `local` if `OVERLAY` is not set.
 
 ## Troubleshooting
 
-**Pods stuck in ContainerCreating:**
+Pods stuck in `ContainerCreating`:
+
 ```bash
-./scripts/status.sh
+./scripts/kind/status.sh
+./scripts/k3d/status.sh
 kubectl describe pod POD_NAME -n NAMESPACE
 ```
 
-**Need to see logs:**
+Need logs:
+
 ```bash
 kubectl logs -n temporal-oms-apps -l app=apps-worker -f
 kubectl logs -n temporal-oms-processing -l app=processing-workers -f
 ```
 
-**Reset everything:**
+Reset everything:
+
 ```bash
-./scripts/demo-down.sh
-./scripts/demo-up.sh
+./scripts/kind/demo-down.sh
+./scripts/kind/demo-up.sh
+
+./scripts/k3d/demo-down.sh
+./scripts/k3d/demo-up.sh
 ```

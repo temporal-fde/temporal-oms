@@ -73,7 +73,7 @@ Phase 5 cannot start until Phases 3 and 4 are both complete and the deployment s
 - [x] `validateOrder` Update handler: `AddressVerification.verifyAddress()` → store verified `Address` in state → return `ValidateOrderResponse`
 - [x] `fulfillOrder` Update handler:
   - `reserveItems`
-  - `ShippingAgent.calculateShippingOptions(...)` through Nexus
+  - `ShippingAgent.recommendShippingOption(...)` through Nexus
   - Apply recommendation; set `margin_leak` / `sla_breach_days` SearchAttributes when applicable
   - Fallback selection for `MARGIN_SPIKE` / `SLA_BREACH`
   - Concurrent: `Carriers.printShippingLabel()` + `Allocations.deductInventory()` via `Promise.allOf`
@@ -116,8 +116,9 @@ Phase 5 cannot start until Phases 3 and 4 are both complete and the deployment s
 - [ ] Build and deploy `apps-workers` with new build-id; mark as default
 
 #### `processing.Order` new build-id
-- [x] Add `Workflow.getVersion("remove-kafka-fulfillment", DEFAULT_VERSION, 1)` branch in `OrderImpl.execute()` immediately before `Fulfillments.fulfillOrder()` call; new version skips the activity
-- [ ] Write replay test against a captured V1 history before deploying
+- [x] Remove `Workflow.getVersion("remove-kafka-fulfillment", ...)` from `OrderImpl.execute()`; the handoff decision is no longer a workflow-version branch
+- [ ] Add `send_fulfillment` routing-slip support with legacy-compatible default: absent means `true`, `false` skips `Fulfillments.fulfillOrder()`
+- [ ] Write compatibility tests for absent `send_fulfillment` and `send_fulfillment=false` before deploying
 - [ ] Build and deploy `processing-workers` with new build-id; mark as default
 
 #### Validation
@@ -136,7 +137,7 @@ Phase 5 cannot start until Phases 3 and 4 are both complete and the deployment s
 
 ### Phase 7 — V2 ShippingAgent Nexus Integration
 
-- [x] `fulfillment.Order` calls `ShippingAgent.calculateShippingOptions` through Nexus
+- [x] `fulfillment.Order` calls `ShippingAgent.recommendShippingOption` through Nexus
 - [x] `fulfillment.Order` applies the returned recommendation and selected shipping option
 - [x] `fulfillment.Order` prints labels through fixture-backed `CarriersImpl`
 
@@ -177,4 +178,5 @@ Phase 5 cannot start until Phases 3 and 4 are both complete and the deployment s
 | 2026-04-15 | Temporal FDE Team | Initial spec + PROGRESS.md |
 | 2026-04-15 | Temporal FDE Team | Moved to Planning; detailed task breakdown added |
 | 2026-04-15 | Temporal FDE Team | Phases 1–4 implemented: proto schema, workflow + activity interfaces, OrderImpl, FulfillmentNexusHandler, stub activity beans |
-| 2026-04-24 | Mike Nichols | Phase 5 code complete: Fulfillment Nexus fulfillOrder operation (ACCEPTED stage), apps.Order PINNED + concurrent validateOrder/processOrder + fulfillOrder dispatch, processing.Order getVersion branch, acme.apps.yaml deployment-properties enabled |
+| 2026-04-24 | Mike Nichols | Phase 5 code complete: Fulfillment Nexus fulfillOrder operation (ACCEPTED stage), apps.Order PINNED + concurrent validateOrder/processOrder + fulfillOrder dispatch, initial processing.Order handoff branch, acme.apps.yaml deployment-properties enabled |
+| 2026-04-30 | Mike Nichols | Removed `Workflow.getVersion` from the processing handoff path; docs now track the `send_fulfillment` routing slip as the required mechanism. |

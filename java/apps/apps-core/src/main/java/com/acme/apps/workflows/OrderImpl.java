@@ -297,7 +297,9 @@ public class OrderImpl implements Order {
                     .setOptions(ProcessOrderRequestExecutionOptions.newBuilder()
                             .setProcessingTimeoutSecs(
                                     state.getOptions().getProcessingTimeoutSecs()
-                            ).build())).build();
+                            )
+                            .setSendFulfillment(false)
+                            .build())).build();
         }
     }
 

@@ -1,0 +1,88 @@
+{
+  "name": "Temporal OMS Workshop",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "16gb",
+    "storage": "64gb"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "21",
+      "installMaven": true,
+      "mavenVersion": "3.9.9"
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "25.2.1"
+    },
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.13"
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "moby": true
+    },
+    "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
+      "version": "1.28.2",
+      "helm": "3.9.0",
+      "minikube": "none"
+    }
+  },
+  "containerEnv": {
+    "TEMPORAL_ADDRESS": "127.0.0.1:7233",
+    "TEMPORAL_APPS_ADDRESS": "localhost:7233",
+    "TEMPORAL_PROCESSING_ADDRESS": "localhost:7233",
+    "TEMPORAL_FULFILLMENT_ADDRESS": "localhost:7233",
+    "TEMPORAL_ENABLEMENTS_ADDRESS": "localhost:7233",
+    "ENABLEMENTS_API_BASE_URL": "http://localhost:8050",
+    "ENVIRONMENT": "local"
+  },
+  "forwardPorts": [
+    7233,
+    8233,
+    8080,
+    8050,
+    8070,
+    8071
+  ],
+  "portsAttributes": {
+    "7233": {
+      "label": "Temporal gRPC",
+      "onAutoForward": "silent"
+    },
+    "8233": {
+      "label": "Temporal UI",
+      "onAutoForward": "notify"
+    },
+    "8080": {
+      "label": "Apps API",
+      "onAutoForward": "notify"
+    },
+    "8050": {
+      "label": "Enablements API",
+      "onAutoForward": "silent"
+    },
+    "8070": {
+      "label": "Processing API",
+      "onAutoForward": "silent"
+    },
+    "8071": {
+      "label": "Processing Worker Admin",
+      "onAutoForward": "silent"
+    }
+  },
+  "onCreateCommand": "bash .devcontainer/on-create.sh",
+  "postCreateCommand": "cp -n .env.codespaces .env.local",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "ms-python.python",
+        "redhat.vscode-yaml",
+        "bierner.markdown-mermaid"
+      ]
+    }
+  }
+}

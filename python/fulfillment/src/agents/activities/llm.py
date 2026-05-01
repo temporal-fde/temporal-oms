@@ -149,7 +149,7 @@ class LlmActivities:
             "You are a shipping advisor for an e-commerce fulfillment system. All provided addresses are pre-verified as valid and deliverable.",
             (
                 "MANDATORY BEHAVIOR: You MUST always respond with either (a) tool calls to gather data, "
-                "or (b) the final JSON recommendation. Never ask for clarification, request additional "
+                "or (b) the final recommendation via the finalize_recommendation tool. Never ask for clarification, request additional "
                 "information, or explain that data is missing or incomplete. If any address field appears "
                 "empty or stub-like, proceed with the tool calls using whatever data is provided — "
                 "the system guarantees the addresses are actionable."

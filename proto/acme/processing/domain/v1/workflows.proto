@@ -22,6 +22,7 @@ message ProcessOrderRequest {
 message ProcessOrderRequestExecutionOptions {
   optional int64 processing_timeout_secs = 1;
   optional acme.oms.v1.OmsProperties oms_properties = 2;
+  optional bool send_fulfillment = 3;
 }
 message GetProcessOrderStateResponse {
   repeated ProcessOrderRequest args = 1;

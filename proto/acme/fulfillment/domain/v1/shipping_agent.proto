@@ -82,14 +82,14 @@ message ShippingAgentExecutionOptions {
   optional int64 cache_ttl_secs = 1; // default 1800 (30 minutes)
 }
 
-// CalculateShippingOptionsRequest is the Update input for the ShippingAgent agentic loop.
+// RecommendShippingOptionRequest is the Update input for the ShippingAgent agentic loop.
 // The caller provides items with sku_id; the LLM always calls lookup_inventory_location
 // first to resolve the warehouse origin from inventory. Both the fulfillment path
 // (EnrichedItem sku_ids) and the cart path (cart item sku_ids) use the same flow.
 // Cache key is derived from the resolved from_address.easypost_address.id (set after
 // lookup_inventory_location returns) and to_address.easypost_address.id (pre-populated
 // by fulfillment.Order validateOrder).
-message CalculateShippingOptionsRequest {
+message RecommendShippingOptionRequest {
   string order_id    = 1;
   string customer_id = 2;
   // to_address: easypost_address pre-populated by fulfillment.Order validateOrder.
@@ -98,14 +98,14 @@ message CalculateShippingOptionsRequest {
   acme.common.v1.Shipment selected_shipment = 5;
 }
 
-// CalculateShippingOptionsResponse is the Update response from the ShippingAgent.
-message CalculateShippingOptionsResponse {
+// RecommendShippingOptionResponse is the Update response from the ShippingAgent.
+message RecommendShippingOptionResponse {
   ShippingRecommendation  recommendation = 1;
   repeated ShippingOption options        = 2;
   bool                    cache_hit      = 3;
 }
 
-// ShippingOptionsResult is a single cached calculation result.
+// ShippingOptionsResult is a single cached recommendation result.
 message ShippingOptionsResult {
   ShippingRecommendation  recommendation = 1;
   repeated ShippingOption options        = 2;
@@ -137,7 +137,7 @@ message GetShippingRatesResponse {
 
 // BuildSystemPromptRequest is the LocalActivity input for computing the LLM system prompt.
 message BuildSystemPromptRequest {
-  CalculateShippingOptionsRequest request = 1;
+  RecommendShippingOptionRequest request = 1;
 }
 
 // BuildSystemPromptResponse carries the rendered system prompt string.

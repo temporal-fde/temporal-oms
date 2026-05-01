@@ -100,9 +100,9 @@ class StartShippingAgentRequest(BaseModel):
     execution_options: typing.Optional[ShippingAgentExecutionOptions] = Field(default_factory=ShippingAgentExecutionOptions)
     customer_id: str = Field(default="")
 
-class CalculateShippingOptionsRequest(BaseModel):
+class RecommendShippingOptionRequest(BaseModel):
     """
-     CalculateShippingOptionsRequest is the Update input for the ShippingAgent agentic loop.
+     RecommendShippingOptionRequest is the Update input for the ShippingAgent agentic loop.
  The caller provides items with sku_id; the LLM always calls lookup_inventory_location
  first to resolve the warehouse origin from inventory. Both the fulfillment path
  (EnrichedItem sku_ids) and the cart path (cart item sku_ids) use the same flow.
@@ -118,9 +118,9 @@ class CalculateShippingOptionsRequest(BaseModel):
     items: typing.List[ShippingLineItem] = Field(default_factory=list)
     selected_shipment: Shipment = Field(default_factory=Shipment)
 
-class CalculateShippingOptionsResponse(BaseModel):
+class RecommendShippingOptionResponse(BaseModel):
     """
-     CalculateShippingOptionsResponse is the Update response from the ShippingAgent.
+     RecommendShippingOptionResponse is the Update response from the ShippingAgent.
     """
 
     recommendation: ShippingRecommendation = Field(default_factory=ShippingRecommendation)
@@ -129,7 +129,7 @@ class CalculateShippingOptionsResponse(BaseModel):
 
 class ShippingOptionsResult(BaseModel):
     """
-     ShippingOptionsResult is a single cached calculation result.
+     ShippingOptionsResult is a single cached recommendation result.
     """
 
     recommendation: ShippingRecommendation = Field(default_factory=ShippingRecommendation)
@@ -164,7 +164,7 @@ class BuildSystemPromptRequest(BaseModel):
      BuildSystemPromptRequest is the LocalActivity input for computing the LLM system prompt.
     """
 
-    request: CalculateShippingOptionsRequest = Field(default_factory=CalculateShippingOptionsRequest)
+    request: RecommendShippingOptionRequest = Field(default_factory=RecommendShippingOptionRequest)
 
 class BuildSystemPromptResponse(BaseModel):
     """

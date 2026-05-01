@@ -47,6 +47,7 @@ public class OrderImpl implements Order {
         if (!opts.hasOmsProperties()) {
             opts = this.optionsActs.getOptions(opts);
         }
+        boolean sendFulfillment = !opts.hasSendFulfillment() || opts.getSendFulfillment();
 
         var integrationsEndpoint = opts.getOmsProperties().getProcessing().getNexus().getEndpointsOrThrow("integrations");
         final long timeoutSecs = opts.getProcessingTimeoutSecs() > 0 ? opts.getProcessingTimeoutSecs() : 86400L;
@@ -100,11 +101,7 @@ public class OrderImpl implements Order {
                     pimService.enrichOrder(EnrichOrderRequest.newBuilder()
                             .setOrder(request.getOrder()).build())).build();
 
-            // V1: publish to Kafka fulfillment topic (legacy path)
-            // V2 (new build-id): skip — fulfillment.Order is started by apps.Order via Nexus
-            int removeKafkaFulfillmentVersion = Workflow.getVersion(
-                    "remove-kafka-fulfillment", Workflow.DEFAULT_VERSION, 1);
-            if (removeKafkaFulfillmentVersion == Workflow.DEFAULT_VERSION) {
+            if (sendFulfillment) {
                 try {
                     this.state = this.state.toBuilder().setFulfillment(this.fulfillments.fulfillOrder(FulfillOrderRequest.newBuilder()
                             .setOrder(request.getOrder()).addAllItems(this.state.getEnrichment().getItemsList()).build())).build();
@@ -118,7 +115,7 @@ public class OrderImpl implements Order {
         });
 
         Workflow.newTimer(Duration.ofSeconds(timeoutSecs)).thenApply(result -> {
-            if (!state.hasFulfillment()) {
+            if (!state.hasEnrichment() || (sendFulfillment && !state.hasFulfillment())) {
                 scope.cancel();
             }
             return null;

@@ -103,7 +103,7 @@ class ShippingAgentExecutionOptions(_message.Message):
     cache_ttl_secs: int
     def __init__(self, cache_ttl_secs: _Optional[int] = ...) -> None: ...
 
-class CalculateShippingOptionsRequest(_message.Message):
+class RecommendShippingOptionRequest(_message.Message):
     __slots__ = ()
     ORDER_ID_FIELD_NUMBER: _ClassVar[int]
     CUSTOMER_ID_FIELD_NUMBER: _ClassVar[int]
@@ -117,7 +117,7 @@ class CalculateShippingOptionsRequest(_message.Message):
     selected_shipment: _values_pb2_1.Shipment
     def __init__(self, order_id: _Optional[str] = ..., customer_id: _Optional[str] = ..., to_address: _Optional[_Union[_values_pb2_1.Address, _Mapping]] = ..., items: _Optional[_Iterable[_Union[_values_pb2.ShippingLineItem, _Mapping]]] = ..., selected_shipment: _Optional[_Union[_values_pb2_1.Shipment, _Mapping]] = ...) -> None: ...
 
-class CalculateShippingOptionsResponse(_message.Message):
+class RecommendShippingOptionResponse(_message.Message):
     __slots__ = ()
     RECOMMENDATION_FIELD_NUMBER: _ClassVar[int]
     OPTIONS_FIELD_NUMBER: _ClassVar[int]
@@ -173,8 +173,8 @@ class GetShippingRatesResponse(_message.Message):
 class BuildSystemPromptRequest(_message.Message):
     __slots__ = ()
     REQUEST_FIELD_NUMBER: _ClassVar[int]
-    request: CalculateShippingOptionsRequest
-    def __init__(self, request: _Optional[_Union[CalculateShippingOptionsRequest, _Mapping]] = ...) -> None: ...
+    request: RecommendShippingOptionRequest
+    def __init__(self, request: _Optional[_Union[RecommendShippingOptionRequest, _Mapping]] = ...) -> None: ...
 
 class BuildSystemPromptResponse(_message.Message):
     __slots__ = ()

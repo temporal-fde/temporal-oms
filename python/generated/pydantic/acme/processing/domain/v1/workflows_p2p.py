@@ -15,6 +15,7 @@ import typing
 class ProcessOrderRequestExecutionOptions(BaseModel):
     processing_timeout_secs: typing.Optional[int] = Field(default=0)
     oms_properties: typing.Optional[OmsProperties] = Field(default_factory=OmsProperties)
+    send_fulfillment: typing.Optional[bool] = Field(default=False)
 
 class ProcessOrderRequest(BaseModel):
     """

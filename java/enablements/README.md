@@ -52,7 +52,7 @@ Always use `:v1`, `:v2`, etc.
 >
 > Without the controller (e.g. running workers locally for Level 1 development), `set-current-version` must be called manually. The `scripts/setup-temporal-namespaces.sh` script does this with `--allow-no-pollers` so it can run before workers start. If you ever see orders submitted but never progressing, a missing current version is the first thing to check:
 > ```bash
-> temporal worker deployment describe --deployment-name processing --namespace processing
+> temporal worker deployment describe --name processing --namespace processing
 > ```
 
 **Rollout strategy (configured in `k8s/processing-versioned/base/temporal-worker-deployment.yaml`):**
