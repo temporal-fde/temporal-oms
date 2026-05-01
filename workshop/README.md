@@ -11,3 +11,4 @@ when validating behavior, and any exercise-specific `scripts/` needed to run the
 | Exercise | Guide | Solution | Source Spec |
 |---|---|---|---|
 | 01: Safely Move Fulfillment Ownership | [README.md](exercises/01-safe-fulfillment-handoff/README.md) | [SOLUTION.md](exercises/01-safe-fulfillment-handoff/SOLUTION.md) | [spec.md](../specs/workshop/exercises/01-safe-fulfillment-handoff/spec.md) |
+| 02: Observe The ShippingAgent Reliability Harness | [README.md](exercises/02-observe-shipping-agent/README.md) | N/A | [spec.md](../specs/workshop/exercises/02-observe-shipping-agent/spec.md) |

@@ -32,7 +32,7 @@
 | Phase 1 - Devcontainer | Complete | Completed April 30, 2026 |
 | Phase 1b - Workshop startup runner | Not Started | Confirm local service startup command shape |
 | Phase 2 - Exercise 01 | Implemented lab material; validation pending | Workshop startup runner or manual startup |
-| Phase 3 - Exercise 02 | Spec drafted; lab material not started | Live LLM/fallback decision |
+| Phase 3 - Exercise 02 | Guide and helper scripts implemented; fallback decision open | Live LLM/fallback decision |
 | Phase 4 - Exercise 03 | Not Started | Exercise scope confirmed |
 
 ---

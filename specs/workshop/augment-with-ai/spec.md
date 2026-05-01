@@ -44,7 +44,8 @@ minutes. Exercise 03 is the planned extension lab.
 - [ ] Exercise 01 completes end-to-end: Kafka drain observed, Nexus path verified
 - [ ] Exercise 02 completes: participants can observe ShippingAgent workflow history, identify tool boundaries, and explain how `fulfillment.Order` applies the recommendation
 - [ ] Exercise 03 completes: modified ShippingAgent runs with new tool, existing sessions unaffected
-- [ ] Each exercise has a SOLUTION.md that explains the "why" not just the "what"
+- [ ] Each exercise guide explains the "why" not just the "what"; exercises with code changes also
+      include a SOLUTION.md
 
 ---
 
@@ -83,7 +84,6 @@ workshop/
       SOLUTION.md                         # Step-by-step CLI + expected output + the "why"
     02-observe-shipping-agent/
       README.md
-      SOLUTION.md
       scripts/
     03-extend-agent/                      # [TBD — see Open Questions]
       README.md
@@ -165,7 +165,7 @@ breaking in-flight ShippingAgent sessions.
 | Decision | Rationale | Alternative Considered |
 |----------|-----------|------------------------|
 | Exercises are narrative-first, scripts second | The "why" must land before the "how"; scripts support, not replace, understanding | Script-first walk-throughs — participants follow steps without internalizing the concept |
-| SOLUTION.md is a separate file, not hints | Keeps exercise friction intentional; participants must choose to look | Hints directory with progressive reveals — adds file complexity for marginal benefit |
+| SOLUTION.md is a separate file when an exercise has code changes | Keeps exercise friction intentional; participants must choose to look | Hints directory with progressive reveals — adds file complexity for marginal benefit |
 | Ramp via Temporal CLI (not TWC CRD) in Codespaces | Codespaces runs Level 1 (no k8s); CLI is the direct API the CRD wraps | Docker Compose with k8s-in-docker — over-engineering for a workshop that doesn't need production infra |
 | exercise scripts use known fixed ports | Ports are stable in the devcontainer (8080, 8071, 8233); no service discovery needed | Port discovery via env vars — adds indirection for no benefit in this context |
 
@@ -214,9 +214,8 @@ Deliverables:
 
 Deliverables:
 - [x] `specs/workshop/exercises/02-observe-shipping-agent/spec.md`
-- [ ] `workshop/exercises/02-observe-shipping-agent/README.md`
-- [ ] `workshop/exercises/02-observe-shipping-agent/SOLUTION.md`
-- [ ] Exercise helper scripts for status checks and scenario launch
+- [x] `workshop/exercises/02-observe-shipping-agent/README.md`
+- [x] Exercise helper scripts for status checks and scenario launch
 - [ ] Optional deterministic LLM fallback or pre-recorded history fallback
 
 ### Phase 4: Exercise 03
@@ -230,9 +229,6 @@ To Create:
 - `scripts/workshop-status.sh`
 - `scripts/workshop-stop.sh`
 - Optional generated-order inspection helper for Exercise 01
-- `workshop/exercises/02-observe-shipping-agent/README.md`
-- `workshop/exercises/02-observe-shipping-agent/SOLUTION.md`
-- `workshop/exercises/02-observe-shipping-agent/scripts/*`
 
 To Modify:
 - `specs/README.md` — add workshop spec entry
@@ -265,7 +261,7 @@ To Modify:
 - [ ] Run `workshop-start.sh` to ready state
 - [ ] Complete Exercise 01 end-to-end in < 45 minutes
 - [ ] Complete Exercise 02 end-to-end in < 55 minutes
-- [ ] SOLUTION.md commands work verbatim — no editing required
+- [ ] Exercise commands work verbatim - no editing required
 
 ---
 

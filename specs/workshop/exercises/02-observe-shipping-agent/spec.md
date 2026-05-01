@@ -305,7 +305,6 @@ Create attendee-facing material under:
 ```text
 workshop/exercises/02-observe-shipping-agent/
   README.md
-  SOLUTION.md
   scripts/
 ```
 
