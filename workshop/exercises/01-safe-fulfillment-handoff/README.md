@@ -167,7 +167,7 @@ Apply the processing changes from [SOLUTION.md](SOLUTION.md#processing-v2-code):
 - Regenerate protobuf outputs with the
   [project-root generate script](../../../scripts/generate.sh).
 - Guard the legacy Kafka handoff in
-  [processing OrderImpl.java](../../../java/processing/processing-core/src/main/java/com/acme/processing/workflows/OrderImpl.java).
+  [processing OrderImplV1.java](../../../java/processing/processing-core/src/main/java/com/acme/processing/workflows/OrderImplV1.java).
 - Keep the default backward-compatible: absent `send_fulfillment` means `true`.
 
 The solution file shows repo-root paths. Keep this terminal in the exercise directory for the
@@ -215,7 +215,7 @@ absent field as `true`, so old app traffic still publishes the legacy Kafka hand
 ## 7. Implement `apps v2`
 
 Apply the apps changes from [SOLUTION.md](SOLUTION.md#apps-v2-code) in
-[apps OrderImpl.java](../../../java/apps/apps-core/src/main/java/com/acme/apps/workflows/OrderImpl.java):
+[apps OrderImplV1.java](../../../java/apps/apps-core/src/main/java/com/acme/apps/workflows/OrderImplV1.java):
 
 - Start `fulfillment.Order` through the `Fulfillment` Nexus service.
 - Continue calling `processing.Order`.

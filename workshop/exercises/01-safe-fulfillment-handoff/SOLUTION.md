@@ -49,7 +49,7 @@ Do not hand-edit generated files.
 ### 2. Guard The Legacy Kafka Handoff
 
 File:
-[java/processing/processing-core/src/main/java/com/acme/processing/workflows/OrderImpl.java](../../../java/processing/processing-core/src/main/java/com/acme/processing/workflows/OrderImpl.java)
+[java/processing/processing-core/src/main/java/com/acme/processing/workflows/OrderImplV1.java](../../../java/processing/processing-core/src/main/java/com/acme/processing/workflows/OrderImplV1.java)
 
 Read the routing slip after request options have been loaded or merged:
 
@@ -87,7 +87,7 @@ old code; the routing slip records the per-order contract.
 ## Apps v2 Code
 
 File:
-[java/apps/apps-core/src/main/java/com/acme/apps/workflows/OrderImpl.java](../../../java/apps/apps-core/src/main/java/com/acme/apps/workflows/OrderImpl.java)
+[java/apps/apps-core/src/main/java/com/acme/apps/workflows/OrderImplV1.java](../../../java/apps/apps-core/src/main/java/com/acme/apps/workflows/OrderImplV1.java)
 
 The `apps v2` behavior is:
 
@@ -159,6 +159,7 @@ cd ..
 Run `processing v2`:
 
 ```bash
+ACME_PROCESSING_ORDER_WORKFLOW_CLASS=com.acme.processing.workflows.OrderImplV1 \
 TEMPORAL_DEPLOYMENT_NAME=processing \
 TEMPORAL_WORKER_BUILD_ID=v2 \
 java -jar java/processing/processing-workers/target/processing-workers-1.0.0-SNAPSHOT.jar \
@@ -177,6 +178,7 @@ cd ..
 Run `apps v2`:
 
 ```bash
+ACME_APPS_ORDER_WORKFLOW_CLASS=com.acme.apps.workflows.OrderImplV1 \
 TEMPORAL_DEPLOYMENT_NAME=apps \
 TEMPORAL_WORKER_BUILD_ID=v2 \
 java -jar java/apps/apps-workers/target/apps-workers-1.0.0-SNAPSHOT.jar \

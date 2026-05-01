@@ -52,6 +52,8 @@ public class OrderImplV1 implements Order {
         if (!opts.hasOmsProperties()) {
             opts = this.optionsActs.getOptions(opts);
         }
+        boolean sendFulfillment =
+                !opts.hasSendFulfillment() || opts.getSendFulfillment();
 
         var integrationsEndpoint = opts.getOmsProperties().getProcessing().getNexus().getEndpointsOrThrow("integrations");
         final long timeoutSecs = opts.getProcessingTimeoutSecs() > 0 ? opts.getProcessingTimeoutSecs() : 86400L;
@@ -105,13 +107,15 @@ public class OrderImplV1 implements Order {
                     pimService.enrichOrder(EnrichOrderRequest.newBuilder()
                             .setOrder(request.getOrder()).build())).build();
 
-            try {
-                this.state = this.state.toBuilder().setFulfillment(this.fulfillments.fulfillOrder(FulfillOrderRequest.newBuilder()
-                        .setOrder(request.getOrder()).addAllItems(this.state.getEnrichment().getItemsList()).build())).build();
-            } catch (ApplicationFailure e) {
-                if (e.isNonRetryable()) {
-                    // permanent failure
-                    // move this to the support workflow
+            if(sendFulfillment) {
+                try {
+                    this.state = this.state.toBuilder().setFulfillment(this.fulfillments.fulfillOrder(FulfillOrderRequest.newBuilder()
+                            .setOrder(request.getOrder()).addAllItems(this.state.getEnrichment().getItemsList()).build())).build();
+                } catch (ApplicationFailure e) {
+                    if (e.isNonRetryable()) {
+                        // permanent failure
+                        // move this to the support workflow
+                    }
                 }
             }
         });
