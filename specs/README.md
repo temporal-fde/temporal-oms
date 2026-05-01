@@ -92,14 +92,15 @@ Provide feedback in PROGRESS.md → Feedback Items section.
 - **Goal:** Codespaces-based workshop teaching safe traffic migration (Kafka → Nexus) and AI-augmented Temporal workflows; exercise series for teams evaluating the new architecture
 - **Owner:** Temporal FDE Team
 - **Spec:** `specs/workshop/augment-with-ai/`
-- **Next:** Tech lead review — confirm exercise list and Codespaces machine/key requirements
+- **Exercise Specs:** `specs/workshop/exercises/01-safe-fulfillment-handoff/`, `specs/workshop/exercises/02-observe-shipping-agent/`
+- **Next:** Tech lead review - confirm Exercise 03 scope, API key requirements, workshop startup runner, and Exercise 02 live LLM fallback
 
 ### Workshop: Codespaces Support
-- **Status:** Planning
+- **Status:** Devcontainer implemented; startup runner validation pending
 - **Goal:** Define the Codespaces architecture, sizing, startup model, caching, risks, and validation plan for the Replay 2026 Temporal OMS workshop
 - **Owner:** Temporal FDE Team
 - **Spec:** `specs/workshop/codespaces-support/`
-- **Next:** Decide v1/v2 artifact strategy and validate local-process startup in a fresh Codespace
+- **Next:** Implement/validate the workshop startup runner and local-process startup in a fresh Codespace
 
 ### Workshop: Integration Stubs
 - **Status:** Runtime implementation complete; workshop material follow-up

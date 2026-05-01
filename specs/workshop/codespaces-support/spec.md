@@ -1,8 +1,8 @@
 # Codespaces Support Planning Spec
 
 **Workshop:** Replay 2026 Temporal OMS workshop
-**Status:** Planning
-**Updated:** 2026-04-30
+**Status:** Devcontainer implemented; startup runner validation pending
+**Updated:** 2026-05-01
 
 ## Overview
 
@@ -12,6 +12,11 @@ OMS as plain local processes inside a devcontainer. Kubernetes remains relevant 
 Temporal Worker Controller demo, but that demo should be instructor-controlled until the k8s path is
 validated in Codespaces. A local k3d spike has validated the basic Kubernetes feasibility on a
 developer machine; Codespaces validation is still pending.
+
+Update, May 1, 2026: the Codespaces/devcontainer implementation was completed on April 30, 2026.
+The repo now includes `.devcontainer/devcontainer.json`, `.devcontainer/Dockerfile`,
+`.devcontainer/on-create.sh`, and k9s defaults. Remaining work is the attendee startup/status/stop
+runner layer and fresh Codespaces validation.
 
 For the concrete remote k3d validation procedure, use
 [`k3d-remote-runbook.md`](./k3d-remote-runbook.md). The runbook is intentionally scoped to
@@ -50,10 +55,10 @@ External facts checked while preparing this spec:
 
 ## Goals
 
-- Provide a Codespaces plan that can support 40-50 attendees for a 3.5 hour workshop.
+- Provide a Codespaces plan that supports repeatable workshop delivery.
 - Keep Exercise 01 within a 45 minute timebox.
 - Make Exercise 01 reliable without Kubernetes, Docker image builds, manual file copying, or
-  attendee-specific rebuild debugging.
+  ad hoc rebuild debugging.
 - Preserve the intended learning objective: manual Temporal Worker Deployment commands first,
   Temporal Worker Controller automation later.
 - Define runtime topology, ports, machine sizing, dependency caching, secrets handling, readiness
@@ -61,7 +66,8 @@ External facts checked while preparing this spec:
 
 ## Non-goals
 
-- Do not implement the full devcontainer, process supervisor, or Exercise 01 scripts in this phase.
+- The devcontainer implementation is complete. Do not treat the remaining process supervisor or
+  Exercise 01 scripts as devcontainer blockers.
 - Do not replace or remove KinD support. k3d support is a parallel path.
 - Do not require TWC, Kubernetes, Temporal Cloud, Docker Compose, EasyPost, or PredictHQ for
   Exercise 01.
@@ -197,13 +203,16 @@ Rationale:
 - The Kubernetes manifests currently allow up to `1Gi` for APIs and `2Gi` for several worker pods;
   local JVMs need explicit memory caps so they do not collectively consume the 16 GB machine.
 
-Recommended attendee devcontainer:
+Implemented attendee devcontainer:
 
-- Java 21 and Maven 3.9.x, matching `.tool-versions`.
-- Python via `uv`; use the repo's `python/uv.lock`.
+- Base image `mcr.microsoft.com/devcontainers/base:ubuntu-24.04`.
+- Host requirements: 4 cores / 16 GB RAM / 64 GB storage.
+- Java 21 with Maven 3.9.9.
+- Python 3.13 with `uv` 0.11.6.
 - Temporal CLI pinned to `1.7.0`, which supports the Worker Deployment commands used by the lab.
-- `jq`, `curl` or `xh`, `git`, `procps`, and shell utilities.
-- No Docker requirement for the default attendee path.
+- `jq`, `curl`, `xh`, `git`, `procps`, `lsof`, and shell utilities.
+- Docker-in-Docker, kubectl/helm, kind, k3d, and k9s are included for instructor/demo workflows,
+  but attendee hands-on exercises should still use local processes by default.
 - `forwardPorts` for `8233`, `8080`, `8050`, `8070`, and `8071`; optionally `7233` for CLI access
   from outside the codespace.
 - `portsAttributes` labels so attendees can identify Temporal UI, Apps API, Enablements API,
@@ -372,7 +381,7 @@ Reasons:
   demo becomes final executable material.
 - `scripts/kind/demo-up.sh` and `scripts/k3d/demo-up.sh` install cert-manager, TWC CRDs, the TWC
   chart, and Traefik, then build and load/import many Docker images. That is too much workshop risk
-  for 40-50 attendee environments.
+  for participant-run environments.
 - The demo is observational. The learning objective is mapping manual Worker Deployment commands to
   TWC behavior, not having every attendee debug a local Kubernetes cluster.
 
@@ -602,7 +611,7 @@ Phase 0 validation before exercise scripting:
 
 Codespaces validation:
 
-- Create a fresh Codespace from the workshop branch using the proposed devcontainer.
+- Create a fresh Codespace from the workshop branch using the implemented devcontainer.
 - Confirm the selected machine is at least 4 cores / 16 GB / 64 GB.
 - Confirm prebuild creation includes Maven and uv dependency setup.
 - Run `scripts/workshop-start.sh`.
@@ -654,10 +663,10 @@ TWC validation:
 
 ### Phase 3: Codespaces foundation
 
-- Add `.devcontainer/devcontainer.json` with 4 core / 16 GB / 64 GB host requirements.
-- Add prebuild-friendly dependency setup.
-- Add `scripts/workshop-start.sh`, `scripts/workshop-status.sh`, and `scripts/workshop-stop.sh`.
-- Add readiness checks and log/PID conventions.
+- [x] Add `.devcontainer/devcontainer.json` with 4 core / 16 GB / 64 GB host requirements.
+- [x] Add prebuild-friendly dependency setup.
+- [ ] Add `scripts/workshop-start.sh`, `scripts/workshop-status.sh`, and `scripts/workshop-stop.sh`.
+- [ ] Add readiness checks and log/PID conventions.
 
 ### Phase 4: Exercise scripting
 

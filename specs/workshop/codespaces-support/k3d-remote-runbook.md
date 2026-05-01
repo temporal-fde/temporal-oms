@@ -1,6 +1,5 @@
 # Codespaces k3d Remote Runbook
 
-**Audience:** instructor or maintainer validating the optional Kubernetes/TWC demo path.
 **Status:** remote validation guide, not attendee workshop setup.
 **Last updated:** 2026-04-30
 

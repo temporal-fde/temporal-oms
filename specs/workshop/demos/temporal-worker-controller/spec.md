@@ -321,7 +321,7 @@ raw commands are fallback and validation aids.
 
 ## Success Criteria
 
-- The audience can map each manual Exercise 01 Worker Deployment command to the corresponding TWC
+- Participants can map each manual Exercise 01 Worker Deployment command to the corresponding TWC
   behavior.
 - The demo shows at least one new Worker Deployment Version becoming available.
 - The demo shows a ramp or promotion controlled by `TemporalWorkerDeployment` policy.
@@ -336,7 +336,7 @@ raw commands are fallback and validation aids.
 |---|---|---|
 | Kubernetes manifests are stale | Demo cannot run | Complete k8s/KinD topology update before scripting this demo |
 | Rollout takes too long for live workshop | Timebox blown | Pre-stage images and keep traffic lightweight; use short pause/sunset durations in workshop overlay |
-| Controller status is hard to read live | Audience misses the point | Use k9s as the primary view, with Temporal CLI describe and Temporal UI as supporting proof |
+| Controller status is hard to read live | Main point gets lost | Use k9s as the primary view, with Temporal CLI describe and Temporal UI as supporting proof |
 | k9s does not expose a friendly alias for `TemporalWorkerDeployment` | Demo friction | Use the k9s command prompt with `temporalworkerdeployments`, or fall back to `kubectl get temporalworkerdeployment ... -w` |
 | Image build or KinD load fails | Demo blocked | Build/load images before workshop; use a scripted preflight |
 | TWC behavior looks like magic | Weak learning transfer from Exercise 01 | Always narrate the mapping from manual commands to controller actions |

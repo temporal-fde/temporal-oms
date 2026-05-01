@@ -43,6 +43,8 @@ Equip your team to deliver real-world solutions that require a reliable bridge b
 
 * Exercise 01 spec: [Safely Move Fulfillment Ownership](./exercises/01-safe-fulfillment-handoff/spec.md)
 
+* Exercise 02 spec: [Observe The ShippingAgent Reliability Harness](./exercises/02-observe-shipping-agent/spec.md)
+
 * Demo spec: [Temporal Worker Controller Rollout](./demos/temporal-worker-controller/spec.md)
 
 * Python: Augmenting plain ShippingAPI with agent ReAct via Nexus
