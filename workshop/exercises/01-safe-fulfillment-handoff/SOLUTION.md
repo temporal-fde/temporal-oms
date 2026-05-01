@@ -18,6 +18,10 @@ directory. The exercise step scripts can still be run from
 
 ## Processing v2 Code
 
+Treat the processing change as a copy/paste safety patch. The goal is not to make attendees reason
+through Java control flow; the goal is to preserve the old Kafka handoff unless a caller explicitly
+opts out.
+
 ### 1. Add The Routing Slip Field
 
 Edit
@@ -46,21 +50,43 @@ If your terminal is still in the exercise directory from the participant guide, 
 
 Do not hand-edit generated files.
 
-### 2. Guard The Legacy Kafka Handoff
+### 2. Add The Compatibility Guard
 
 File:
 [java/processing/processing-core/src/main/java/com/acme/processing/workflows/OrderImplV1.java](../../../java/processing/processing-core/src/main/java/com/acme/processing/workflows/OrderImplV1.java)
 
-Read the routing slip after request options have been loaded or merged:
+Find the request options block near the top of `execute(...)`:
 
 ```java
-boolean sendFulfillment =
-    !opts.hasSendFulfillment() || opts.getSendFulfillment();
+var opts = request.hasOptions()
+        ? request.getOptions()
+        : ProcessOrderRequestExecutionOptions.getDefaultInstance();
+if (!opts.hasOmsProperties()) {
+    opts = this.optionsActs.getOptions(opts);
+}
 ```
 
-Use the value around the legacy Kafka handoff:
+Paste this immediately after it:
 
 ```java
+// Exercise 01: missing send_fulfillment means legacy callers still use Kafka fulfillment.
+boolean sendFulfillment =
+        !opts.hasSendFulfillment() || opts.getSendFulfillment();
+```
+
+What this does: `apps v1` does not know about `send_fulfillment`, so `processing v2` treats the
+missing field as `true` and keeps the legacy handoff working.
+
+### 3. Wrap The Legacy Kafka Handoff
+
+In the same file, find the existing `try/catch` block that calls
+`this.fulfillments.fulfillOrder(...)`. It appears after order enrichment inside the cancellation
+scope.
+
+Replace only that `try/catch` block with this guarded version:
+
+```java
+// Exercise 01: only processing-owned fulfillment publishes the legacy Kafka handoff.
 if (sendFulfillment) {
     try {
         this.state = this.state.toBuilder()
@@ -78,8 +104,35 @@ if (sendFulfillment) {
 }
 ```
 
-The default is intentionally legacy-compatible. If `apps v1` omits `send_fulfillment`,
-`processing v2` still publishes the Kafka fulfillment handoff.
+What this does: old callers still get Kafka fulfillment; new callers can set
+`send_fulfillment=false` and move fulfillment ownership to `apps.Order`.
+
+### 4. Update The Timeout Guard
+
+Find the timer block immediately after the cancellation scope:
+
+```java
+Workflow.newTimer(Duration.ofSeconds(timeoutSecs)).thenApply(result -> {
+    if (!state.hasFulfillment()) {
+        scope.cancel();
+    }
+    return null;
+});
+```
+
+Replace the condition with this:
+
+```java
+Workflow.newTimer(Duration.ofSeconds(timeoutSecs)).thenApply(result -> {
+    if (!state.hasEnrichment() || (sendFulfillment && !state.hasFulfillment())) {
+        scope.cancel();
+    }
+    return null;
+});
+```
+
+What this does: when processing is no longer responsible for fulfillment, enrichment is enough for
+`processing.Order` to complete successfully.
 
 Do not use `Workflow.getVersion` for this handoff. Pinned Worker Versioning keeps old executions on
 old code; the routing slip records the per-order contract.
@@ -89,25 +142,92 @@ old code; the routing slip records the per-order contract.
 File:
 [java/apps/apps-core/src/main/java/com/acme/apps/workflows/OrderImplV1.java](../../../java/apps/apps-core/src/main/java/com/acme/apps/workflows/OrderImplV1.java)
 
-The `apps v2` behavior is:
+The Java-heavy fulfillment code is already in private helper methods at the bottom of this class.
+Those helpers have `WORKSHOP Exercise 01` comments explaining what they do. The exercise is to make
+the `execute(...)` path call them and to set the routing slip sent to processing.
 
-1. Create a `Fulfillment` Nexus stub from the `order-fulfillment` endpoint in `OmsProperties`.
-2. Build `StartOrderFulfillmentRequest` from the submitted order.
-3. Start `fulfillment.validateOrder(...)` with `Async.function(...)`.
-4. Call `processing.processOrder(...)`.
-5. After processing succeeds, wait for the fulfillment validation promise.
-6. Call `fulfillment.fulfillOrder(...)` with enriched items.
-7. Set the routing slip when building the processing request:
+### 1. Configure The Fulfillment Nexus Stub
+
+Find this `WORKSHOP` marker after the existing processing Nexus stub:
+
+```java
+// WORKSHOP Exercise 01: apps v2 also configures the fulfillment Nexus stub here:
+// configureFulfillmentNexusStub(remainingTime);
+```
+
+Uncomment the method call:
+
+```java
+configureFulfillmentNexusStub(remainingTime);
+```
+
+What this does: `apps.Order` now has a Nexus client for `fulfillment.Order`, but no fulfillment work
+has started yet.
+
+### 2. Start Fulfillment Validation Before Processing
+
+Find this `WORKSHOP` marker after the cancellation check:
+
+```java
+// WORKSHOP Exercise 01: apps v2 starts fulfillment.Order validation before processing:
+// var validatePromise = startFulfillmentValidation();
+```
+
+Uncomment the method call:
+
+```java
+var validatePromise = startFulfillmentValidation();
+```
+
+What this does: `apps.Order` starts `fulfillment.Order` and validates the shipping address while
+`processing.Order` validates and enriches the order.
+
+### 3. Send The Routing Slip - Coding Activity
+
+In `tryScheduleProcessOrder()`, find the processing request options builder:
 
 ```java
 .setOptions(ProcessOrderRequestExecutionOptions.newBuilder()
-        .setProcessingTimeoutSecs(state.getOptions().getProcessingTimeoutSecs())
-        .setSendFulfillment(false)
-        .build())
+        .setProcessingTimeoutSecs(
+                state.getOptions().getProcessingTimeoutSecs()
+        ).build())).build();
 ```
 
-That final field is the duplicate-handoff guard. `apps v2` is not complete until new processing
-workflow inputs visibly include `send_fulfillment=false`.
+Add the routing slip line before `.build()`:
+
+```java
+.setOptions(ProcessOrderRequestExecutionOptions.newBuilder()
+        .setProcessingTimeoutSecs(
+                state.getOptions().getProcessingTimeoutSecs()
+        )
+        .setSendFulfillment(false)
+        .build())).build();
+```
+
+This is the important handoff contract: `apps v2` tells `processing v2` not to publish the legacy
+Kafka fulfillment handoff.
+
+### 4. Finish Fulfillment After Processing
+
+Find this `WORKSHOP` marker in the success block after `scope.run()`:
+
+```java
+// WORKSHOP Exercise 01: apps v2 completes fulfillment after processing succeeds:
+// finishFulfillmentAfterProcessing(validatePromise);
+```
+
+Uncomment the method call:
+
+```java
+finishFulfillmentAfterProcessing(validatePromise);
+```
+
+What this does: after processing enriches the order, `apps.Order` waits for fulfillment validation
+and then sends enriched items to `fulfillment.Order`.
+
+The behavior to verify in Temporal UI is that new `ProcessOrderRequest` inputs visibly include
+`send_fulfillment=false`, and new-path orders create `fulfillment.Order` workflows instead of Kafka
+handoff records.
 
 ## Worker Deployment Properties
 

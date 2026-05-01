@@ -1,9 +1,12 @@
 package com.acme.apps.workflows;
 
 import com.acme.apps.workflows.activities.Options;
+import com.acme.oms.services.Fulfillment;
 import com.acme.oms.services.Processing;
 import com.acme.proto.acme.apps.domain.apps.v1.*;
 import com.acme.proto.acme.apps.domain.apps.v1.Errors;
+import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.*;
+import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest;
 import com.acme.proto.acme.processing.domain.processing.v1.*;
 import io.temporal.activity.LocalActivityOptions;
 import io.temporal.common.VersioningBehavior;
@@ -29,6 +32,7 @@ public class OrderImplV1 implements Order {
     private GetCompleteOrderStateResponse state;
     private final Logger logger = LoggerFactory.getLogger(OrderImplV1.class);
     private Processing processing;
+    private Fulfillment fulfillment;
 
     @WorkflowInit
     public OrderImplV1(CompleteOrderRequest args) {
@@ -80,6 +84,8 @@ public class OrderImplV1 implements Order {
                                 .build())
                         .setEndpoint(processingEndpoint)
                         .build());
+        // WORKSHOP Exercise 01: apps v2 also configures the fulfillment Nexus stub here:
+        // configureFulfillmentNexusStub(remainingTime);
 
         // wait for processing timeout to fire OR
         // wait until any processOrder operation has been completed or needs to be cancelled and reexecuted
@@ -97,6 +103,8 @@ public class OrderImplV1 implements Order {
             this.compensateOrder();
             return;
         }
+        // WORKSHOP Exercise 01: apps v2 starts fulfillment.Order validation before processing:
+        // var validatePromise = startFulfillmentValidation();
 
         CancellationScope scope = Workflow.newCancellationScope(() -> {
             var processedOrder = this.processing.processOrder(this.state.getProcessOrder());
@@ -122,6 +130,8 @@ public class OrderImplV1 implements Order {
         }
 
         if(this.state.getErrorsCount() == 0) {
+            // WORKSHOP Exercise 01: apps v2 completes fulfillment after processing succeeds:
+            // finishFulfillmentAfterProcessing(validatePromise);
             Workflow.await(Workflow::isEveryHandlerFinished);
             return;
         }
@@ -221,6 +231,8 @@ public class OrderImplV1 implements Order {
                     .setOptions(ProcessOrderRequestExecutionOptions.newBuilder()
                             .setProcessingTimeoutSecs(
                                     state.getOptions().getProcessingTimeoutSecs()
+                            // WORKSHOP Exercise 01: apps v2 adds .setSendFulfillment(false)
+                            // here so processing v2 skips the legacy Kafka fulfillment handoff.
                             ).build())).build();
         }
     }
@@ -248,6 +260,83 @@ public class OrderImplV1 implements Order {
             + this.state.getArgs().getTimestamp().getNanos() / 1_000_000;
         long elapsedMillis = Workflow.currentTimeMillis() - startMillis;
         return Duration.ofMillis(elapsedMillis);
+    }
+
+    private void configureFulfillmentNexusStub(long remainingTime) {
+        var fulfillmentEndpoint = this.state.getOptions()
+                .getOmsProperties()
+                .getApps()
+                .getNexus()
+                .getEndpointsOrThrow("order-fulfillment");
+
+        // WORKSHOP Exercise 01: apps v2 talks directly to fulfillment.Order through Nexus.
+        // The timeout is capped because validateOrder is a short pre-fulfillment check.
+        this.fulfillment = Workflow.newNexusServiceStub(Fulfillment.class,
+                NexusServiceOptions.newBuilder()
+                        .setOperationOptions(NexusOperationOptions.newBuilder()
+                                .setScheduleToCloseTimeout(Duration.ofSeconds(Math.min(remainingTime, 120)))
+                                .setCancellationType(NexusOperationCancellationType.WAIT_REQUESTED)
+                                .build())
+                        .setEndpoint(fulfillmentEndpoint)
+                        .build());
+    }
+
+    private Promise<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ValidateOrderResponse> startFulfillmentValidation() {
+        var order = this.state.getProcessOrder().getOrder();
+        var fulfillmentStartBuilder = StartOrderFulfillmentRequest.newBuilder()
+                .setOrderId(this.state.getArgs().getOrderId())
+                .setCustomerId(this.state.getArgs().getCustomerId())
+                .setPlacedOrder(PlacedOrder.newBuilder()
+                        .setOrderId(this.state.getArgs().getOrderId())
+                        .setCustomerId(this.state.getArgs().getCustomerId())
+                        .addAllItems(order.getItemsList().stream()
+                                .map(item -> FulfillmentItem.newBuilder()
+                                        .setItemId(item.getItemId())
+                                        .setQuantity(item.getQuantity())
+                                        .build())
+                                .toList())
+                        .setShippingAddress(order.getShippingAddress())
+                        .build());
+
+        if (order.hasSelectedShipment()) {
+            fulfillmentStartBuilder.setSelectedShipment(order.getSelectedShipment());
+        }
+
+        // WORKSHOP Exercise 01: validateOrder starts fulfillment.Order and verifies the
+        // shipping address while processing validates payment and enriches the order.
+        return Async.function(this.fulfillment::validateOrder, fulfillmentStartBuilder.build());
+    }
+
+    private void finishFulfillmentAfterProcessing(
+            Promise<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ValidateOrderResponse> validatePromise) {
+        // WORKSHOP Exercise 01: apps v2 waits for fulfillment validation before buying
+        // the label. Processing is done, so fulfillment now receives enriched items.
+        validatePromise.get();
+
+        var order = this.state.getProcessOrder().getOrder();
+        var fulfillOrderBuilder = FulfillOrderRequest.newBuilder()
+                .setProcessedOrder(ProcessedOrder.newBuilder()
+                        .setOrderId(this.state.getArgs().getOrderId())
+                        .setCustomerId(this.state.getArgs().getCustomerId())
+                        .addAllItems(this.state.getProcessedOrder().getEnrichment().getItemsList().stream()
+                                .map(item -> FulfillmentItem.newBuilder()
+                                        .setItemId(item.getItemId())
+                                        .setSkuId(item.getSkuId())
+                                        .setBrandCode(item.getBrandCode())
+                                        .setQuantity(item.getQuantity())
+                                        .build())
+                                .toList())
+                        .build())
+                .setDeliveryStatusRequest(
+                        NotifyDeliveryStatusRequest.newBuilder()
+                                .setDeliveryStatusValue(DeliveryStatus.DELIVERY_STATUS_DELIVERED_VALUE));
+
+        if (order.hasSelectedShipment()) {
+            fulfillOrderBuilder.setSelectedShipment(order.getSelectedShipment());
+        }
+
+        // WORKSHOP Exercise 01: this hands fulfillment ownership to fulfillment.Order.
+        this.fulfillment.fulfillOrder(fulfillOrderBuilder.build());
     }
 
 }

@@ -160,10 +160,11 @@ records.
 
 ## 4. Implement `processing v2`
 
-> Only make the following changes to the **processing** OrderImplV1 Java file. 
-> The apps context will change shortly.
+> Only edit the processing proto contract and the **processing** OrderImplV1 Java file in this
+> step. The apps context will change shortly.
 
-Apply the **processing** changes from [SOLUTION.md](SOLUTION.md#processing-v2-code):
+Apply the **processing** changes from [SOLUTION.md](SOLUTION.md#processing-v2-code). This is a
+guided copy/paste change:
 
 - Add `send_fulfillment` to the
   [processing proto contract](../../../proto/acme/processing/domain/v1/workflows.proto).
@@ -218,7 +219,9 @@ absent field as `true`, so old app traffic still publishes the legacy Kafka hand
 ## 7. Implement `apps v2`
 
 Apply the **apps** changes from [SOLUTION.md](SOLUTION.md#apps-v2-code) in
-[apps OrderImplV1.java](../../../java/apps/apps-core/src/main/java/com/acme/apps/workflows/OrderImplV1.java):
+[apps OrderImplV1.java](../../../java/apps/apps-core/src/main/java/com/acme/apps/workflows/OrderImplV1.java).
+The fulfillment wiring helpers are already in the class. The coding activity is calling those
+helpers from the workflow path and setting `send_fulfillment=false` on the processing request:
 
 - Start `fulfillment.Order` through the `Fulfillment` Nexus service.
 - Continue calling `processing.Order`.
