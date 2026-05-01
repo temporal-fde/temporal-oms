@@ -11,6 +11,9 @@ steps, or apply all code changes in one pass. The safe rollout order is still:
 1. Start and promote `processing v2`.
 2. Start and ramp or promote `apps v2`.
 
+Paths and code-generation commands in this file are repo-root relative. The exercise step scripts
+can still be run from `workshop/exercises/01-safe-fulfillment-handoff`.
+
 ## Processing v2 Code
 
 ### 1. Add The Routing Slip Field
@@ -130,6 +133,9 @@ Rules:
 
 ## Build And Run Commands
 
+The participant guide uses exercise-specific scripts for these steps. The commands below are the
+manual equivalent that those scripts wrap.
+
 Build processing after applying `processing v2`:
 
 ```bash
@@ -200,4 +206,3 @@ Minimum acceptance checks:
 - A new-path order creates a `fulfillment.Order` execution.
 - A new-path order does not create a Kafka fulfillment record.
 - Old pinned `apps.Order` and `processing.Order` executions complete on their original build IDs.
-

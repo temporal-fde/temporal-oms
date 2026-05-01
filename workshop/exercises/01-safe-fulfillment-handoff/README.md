@@ -19,34 +19,93 @@ up front. The operational rollout order stays the same:
 2. Start sustained order traffic.
 3. Implement and start `processing v2`.
 4. Promote `processing v2` to current.
-5. Implement and start `apps v2`.
-6. Ramp or promote `apps v2`.
-7. Verify `fulfillment.Order` receives new-path traffic and Kafka handoffs stop for that path.
+5. Implement `apps v2`.
+6. Start fulfillment-side workers for the new path.
+7. Start and ramp or promote `apps v2`.
+8. Verify `fulfillment.Order` receives new-path traffic and Kafka handoffs stop for that path.
 
-## Starting Assumptions
+## Starting Assumptions And Setup
 
-The facilitator or setup script has already started:
+The only workshop state assumed before this exercise is steps 1 and 2 in
+[WORKSHOP.md](../../../WORKSHOP.md): you have access to keys and `.env.local` is present in your
+Codespace.
 
-- Temporal server and UI.
-- `apps-api`, `processing-api`, `fulfillment-api`, and integration services.
-- `apps-workers v1` with `TEMPORAL_DEPLOYMENT_NAME=apps` and `TEMPORAL_WORKER_BUILD_ID=v1`.
-- `processing-workers v1` with `TEMPORAL_DEPLOYMENT_NAME=processing` and
-  `TEMPORAL_WORKER_BUILD_ID=v1`.
-- `fulfillment-workers` and Python fulfillment workers.
-- `enablements-workers` polling the `enablements` task queue.
+Do not assume any local services are already running. Start Temporal, set up namespaces, then start
+the explicit service list below.
+
+Run the exercise from its directory:
+
+```bash
+cd workshop/exercises/01-safe-fulfillment-handoff
+```
+
+The `scripts/` directory contains the step runners for this exercise. They start foreground
+Java services and Python workers as background processes, write logs under
+`.workshop/exercises/01-safe-fulfillment-handoff/logs`, and write PID files under the matching
+`run` directory. Temporal CLI commands are shown directly in the steps because they are the
+important rollout mechanics.
+
+Start Temporal server in its own terminal and leave it running:
+
+```bash
+temporal server start-dev \
+  --ip 0.0.0.0 \
+  --port 7233 \
+  --ui-ip 0.0.0.0 \
+  --ui-port 8233
+```
+
+Set up namespaces and Nexus endpoints:
+
+```bash
+../../../scripts/setup-temporal-namespaces.sh
+```
+
+## Initial Services
+
+Start only the services needed for baseline order traffic and the enablements load generator:
+
+- `apps-api`
+- `apps-workers v1`
+- `processing-api`
+- `processing-workers v1`
+- `enablements-api`
+- `enablements-workers`
+
+Do not start fulfillment workers yet. The legacy path should prove that orders are flowing through
+`apps v1 -> processing -> Kafka fulfillment` before `apps v2` starts using `fulfillment.Order`.
+
+```bash
+./scripts/start-initial-services.sh
+```
+
+`start-initial-services.sh` builds Java, starts the six initial services, and waits for readiness.
+It does not run Worker Deployment commands.
+
+Useful runtime commands:
+
+```bash
+./scripts/status.sh
+./scripts/logs.sh apps-workers-v1
+./scripts/stop.sh
+```
 
 ## 1. Confirm `v1` Is Current
+
+Set both deployments to `v1`, then confirm the state:
 
 ```bash
 temporal worker deployment set-current-version \
   --deployment-name processing \
   --build-id v1 \
-  --namespace processing
+  --namespace processing \
+  --yes
 
 temporal worker deployment set-current-version \
   --deployment-name apps \
   --build-id v1 \
-  --namespace apps
+  --namespace apps \
+  --yes
 ```
 
 ```bash
@@ -108,27 +167,18 @@ Apply the processing changes from [SOLUTION.md](SOLUTION.md#processing-v2-code):
 - Guard the legacy Kafka handoff in `processing.OrderImpl`.
 - Keep the default backward-compatible: absent `send_fulfillment` means `true`.
 
-Build the processing worker after the code change:
-
-```bash
-cd java
-mvn -pl processing/processing-workers -am -DskipTests install
-cd ..
-```
+The solution file shows repo-root paths. Keep this terminal in the exercise directory for the
+scripts, but make code edits against the repo-root files it names.
 
 ## 5. Start `processing v2`
 
-Run a second processing worker process with the same deployment name and a new build ID:
+Build and run a second processing worker process with the same deployment name and a new build ID:
 
 ```bash
-TEMPORAL_DEPLOYMENT_NAME=processing \
-TEMPORAL_WORKER_BUILD_ID=v2 \
-java -jar java/processing/processing-workers/target/processing-workers-1.0.0-SNAPSHOT.jar \
-  --server.port=8072 \
-  --management.server.port=9083
+./scripts/start-processing-v2.sh
 ```
 
-In another terminal, confirm `v2` is polling:
+Confirm `processing v2` is polling:
 
 ```bash
 temporal worker deployment describe \
@@ -144,6 +194,13 @@ Do not stop `processing v1`. Existing pinned executions may still need it.
 temporal worker deployment set-current-version \
   --deployment-name processing \
   --build-id v2 \
+  --namespace processing \
+  --yes
+```
+
+```bash
+temporal worker deployment describe \
+  --deployment-name processing \
   --namespace processing
 ```
 
@@ -161,27 +218,31 @@ Apply the apps changes from [SOLUTION.md](SOLUTION.md#apps-v2-code):
 - Send `send_fulfillment=false` in the processing request.
 - After processing succeeds, send `fulfillment.fulfillOrder(...)`.
 
-Build the apps worker after the code change:
+## 8. Start Fulfillment Workers For The New Path
+
+Do this after the legacy path is proven and before any `apps v2` worker receives traffic. The
+initial service list intentionally left fulfillment stopped so the baseline generator shows
+`apps v1 -> processing -> Kafka fulfillment`.
 
 ```bash
-cd java
-mvn -pl apps/apps-workers -am -DskipTests install
-cd ..
+./scripts/start-fulfillment.sh
 ```
 
-## 8. Start `apps v2`
+Expected result: Java fulfillment workers are healthy and the Python worker logs
+`All workers polling`.
 
-Run a second apps worker process with the same deployment name and a new build ID:
+You do not need to start `fulfillment-api` for this exercise. The new path reaches
+`fulfillment.Order` through the `oms-fulfillment-v1` Nexus endpoint.
+
+## 9. Start `apps v2`
+
+Build and run a second apps worker process with the same deployment name and a new build ID:
 
 ```bash
-TEMPORAL_DEPLOYMENT_NAME=apps \
-TEMPORAL_WORKER_BUILD_ID=v2 \
-java -jar java/apps/apps-workers/target/apps-workers-1.0.0-SNAPSHOT.jar \
-  --server.port=8082 \
-  --management.server.port=9093
+./scripts/start-apps-v2.sh
 ```
 
-Confirm `v2` is polling:
+Confirm `apps v2` is polling:
 
 ```bash
 temporal worker deployment describe \
@@ -191,7 +252,7 @@ temporal worker deployment describe \
 
 Do not stop `apps v1`. Existing pinned executions may still need it.
 
-## 9. Move Traffic To `apps v2`
+## 10. Move Traffic To `apps v2`
 
 For a visible mixed period, ramp `apps v2` first:
 
@@ -203,12 +264,20 @@ temporal worker deployment set-ramping-version \
   --namespace apps
 ```
 
-If you want a direct cutover instead, use `set-current-version` for `apps v2`.
+If you want a direct cutover instead:
+
+```bash
+temporal worker deployment set-current-version \
+  --deployment-name apps \
+  --build-id v2 \
+  --namespace apps \
+  --yes
+```
 
 Expected result during the ramp: the generator keeps submitting orders; some new `apps.Order`
 executions run on `apps v1`, and some run on `apps v2`.
 
-## 10. Inspect Proof
+## 11. Inspect Proof
 
 In Temporal UI:
 
@@ -228,13 +297,14 @@ curl -s "http://localhost:8071/admin/order-fulfillment/${ORDER_ID}"
 Expected result: old-path orders have a Kafka record; new-path orders have a `fulfillment.Order`
 workflow and no Kafka record.
 
-## 11. Complete The Cutover
+## 12. Complete The Cutover
 
 ```bash
 temporal worker deployment set-current-version \
   --deployment-name apps \
   --build-id v2 \
-  --namespace apps
+  --namespace apps \
+  --yes
 ```
 
 ```bash
@@ -259,9 +329,14 @@ temporal workflow terminate \
   --reason "Exercise 01 complete"
 ```
 
+Stop exercise services when you are done:
+
+```bash
+./scripts/stop.sh
+```
+
 ## Takeaway
 
 Code changes create new worker behavior. Starting a worker with a new build ID makes that behavior
 available to Temporal. Worker Deployment commands decide when new workflow executions receive that
 behavior.
-

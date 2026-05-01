@@ -88,11 +88,15 @@ material lives under the root `workshop/` directory:
 
 - Participant guide: `workshop/exercises/01-safe-fulfillment-handoff/README.md`
 - Solution and code snippets: `workshop/exercises/01-safe-fulfillment-handoff/SOLUTION.md`
+- Step runners: `workshop/exercises/01-safe-fulfillment-handoff/scripts/`
 
 Exercise 01 is a live code-and-rollout exercise. Participants may apply the `processing v2` and
 `apps v2` code changes during the lab, then start new worker processes with build ID `v2` while
 the original `v1` workers keep running. `SOLUTION.md` records the code snippets and build/run
 commands.
+
+Exercise-specific scripts wrap the repetitive local process management so participants do not need
+one terminal per service during the lab.
 
 ## Rollout Model
 
@@ -100,23 +104,31 @@ The exercise uses manual Worker Deployment commands so attendees see what TWC au
 
 The safe rollout sequence is:
 
-1. Implement, build, and start `processing v2` with support for `send_fulfillment`.
-2. Use Worker Versioning to make `processing v2` current.
-3. Keep `processing v1` available only for already-pinned in-flight processing workflows.
-4. Implement, build, and start `apps v2`.
-5. Use Worker Versioning to ramp `apps v2`.
-6. New `apps v2` executions start `fulfillment.Order` and set `send_fulfillment=false`.
-7. Old `apps v1` executions continue to call processing without the option and still get the
+1. Start only the baseline services needed for generated v1 traffic: `apps-api`, `apps-workers v1`,
+   `processing-api`, `processing-workers v1`, `enablements-api`, and `enablements-workers`.
+2. Start the enablements order generator so traffic is flowing continuously.
+3. Implement, build, and start `processing v2` with support for `send_fulfillment`.
+4. Use Worker Versioning to make `processing v2` current.
+5. Keep `processing v1` available only for already-pinned in-flight processing workflows.
+6. Implement and build `apps v2`.
+7. Start the fulfillment-side workers required by the new path.
+8. Start `apps v2` and use Worker Versioning to ramp it.
+9. New `apps v2` executions start `fulfillment.Order` and set `send_fulfillment=false`.
+10. Old `apps v1` executions continue to call processing without the option and still get the
    legacy Kafka handoff.
-8. After `apps v1` and `processing v1` drain, sunset the old worker versions.
+11. After `apps v1` and `processing v1` drain, sunset the old worker versions.
 
 The important ordering rule:
 
-`processing v2` must be available before `apps v2` receives traffic.
+`processing v2` and the fulfillment-side workers must be available before `apps v2` receives
+traffic.
 
 If `apps v2` calls `processing v1`, the old processing code ignores `send_fulfillment=false` and
 would still publish the Kafka handoff, causing duplicate fulfillment. Worker Deployment promotion
 order gives us the operational control to avoid that mixed state.
+
+If `apps v2` receives traffic before fulfillment workers are polling, new-path orders can start but
+cannot make useful progress through `fulfillment.Order`.
 
 ### Manual Commands Used In The Lab
 
@@ -136,16 +148,18 @@ The participant experience is implemented in
 
 Participants will:
 
-1. Start the enablements order generator so traffic is flowing continuously.
+1. Start the explicit baseline service set, then start the enablements order generator so traffic is
+   flowing continuously.
 2. Observe the old path under load: `apps v1 -> processing -> Kafka fulfillment`.
 3. Implement, build, and start `processing v2`, which supports the routing slip while preserving
    legacy behavior for old callers, then promote it to current.
-4. Implement, build, and start `apps v2`, which now starts `fulfillment.Order` and sets
-   `send_fulfillment=false`, then ramp it to 50%.
-5. Let the generator continue during the ramp and verify that old and new orders both complete, but
+4. Implement and build `apps v2`, which now starts `fulfillment.Order` and sets
+   `send_fulfillment=false`.
+5. Start fulfillment-side workers, then start and ramp `apps v2` to 50%.
+6. Let the generator continue during the ramp and verify that old and new orders both complete, but
    only the old path creates Kafka fulfillment records.
-6. Promote `apps v2` to current.
-7. Inspect Temporal UI to confirm each execution kept its chosen behavior through workflow history.
+7. Promote `apps v2` to current.
+8. Inspect Temporal UI to confirm each execution kept its chosen behavior through workflow history.
 
 ## Proposed Timing
 
