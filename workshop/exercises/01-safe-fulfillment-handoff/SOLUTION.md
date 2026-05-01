@@ -11,14 +11,17 @@ steps, or apply all code changes in one pass. The safe rollout order is still:
 1. Start and promote `processing v2`.
 2. Start and ramp or promote `apps v2`.
 
-Paths and code-generation commands in this file are repo-root relative. The exercise step scripts
-can still be run from `workshop/exercises/01-safe-fulfillment-handoff`.
+Paths and code-generation commands in this file are repo-root relative. Any command that starts
+with `scripts/` means the project-root `scripts/` directory, not this exercise's local `scripts/`
+directory. The exercise step scripts can still be run from
+`workshop/exercises/01-safe-fulfillment-handoff`.
 
 ## Processing v2 Code
 
 ### 1. Add The Routing Slip Field
 
-Edit `proto/acme/processing/domain/v1/workflows.proto`:
+Edit
+[proto/acme/processing/domain/v1/workflows.proto](../../../proto/acme/processing/domain/v1/workflows.proto):
 
 ```proto
 message ProcessOrderRequestExecutionOptions {
@@ -28,10 +31,17 @@ message ProcessOrderRequestExecutionOptions {
 }
 ```
 
-Regenerate protobuf outputs:
+Regenerate protobuf outputs with project-root
+[scripts/generate.sh](../../../scripts/generate.sh):
 
 ```bash
 scripts/generate.sh
+```
+
+If your terminal is still in the exercise directory from the participant guide, run:
+
+```bash
+../../../scripts/generate.sh
 ```
 
 Do not hand-edit generated files.
@@ -39,7 +49,7 @@ Do not hand-edit generated files.
 ### 2. Guard The Legacy Kafka Handoff
 
 File:
-`java/processing/processing-core/src/main/java/com/acme/processing/workflows/OrderImpl.java`
+[java/processing/processing-core/src/main/java/com/acme/processing/workflows/OrderImpl.java](../../../java/processing/processing-core/src/main/java/com/acme/processing/workflows/OrderImpl.java)
 
 Read the routing slip after request options have been loaded or merged:
 
@@ -77,7 +87,7 @@ old code; the routing slip records the per-order contract.
 ## Apps v2 Code
 
 File:
-`java/apps/apps-core/src/main/java/com/acme/apps/workflows/OrderImpl.java`
+[java/apps/apps-core/src/main/java/com/acme/apps/workflows/OrderImpl.java](../../../java/apps/apps-core/src/main/java/com/acme/apps/workflows/OrderImpl.java)
 
 The `apps v2` behavior is:
 
@@ -105,6 +115,7 @@ Both worker configs must use Temporal Worker Deployment properties. The build ID
 configuration, not a source edit.
 
 Apps config:
+[java/apps/apps-core/src/main/resources/acme.apps.yaml](../../../java/apps/apps-core/src/main/resources/acme.apps.yaml)
 
 ```yaml
 deployment-properties:
@@ -115,6 +126,7 @@ deployment-properties:
 ```
 
 Processing config:
+[java/processing/processing-core/src/main/resources/acme.processing.yaml](../../../java/processing/processing-core/src/main/resources/acme.processing.yaml)
 
 ```yaml
 deployment-properties:
