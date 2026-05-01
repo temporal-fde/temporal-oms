@@ -1,8 +1,13 @@
 Implemented exercises live in [workshop/README.md](workshop/README.md). Specs live under
 [specs/workshop/](specs/workshop/).
 
-1. Visit here to get access to keys: https://codeshare.io/2jEVPM
-2. Check the `.env.local` is in your codespace and has API keys.
+1. Create `.env.local` if it does not already exist:
+```sh
+cp -n .env.codespaces .env.local
+```
+2. Follow the link your instructor gives you to get the command that updates `.env.local` with
+`ANTHROPIC_API_KEY` and `OPENAI_API_KEY`. Alternatively, add your own values for those keys to
+`.env.local`.
 3. Start Temporal server
 ```sh
 temporal server start-dev \

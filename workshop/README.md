@@ -6,6 +6,20 @@ Specs remain under `specs/workshop/` and describe the intent, constraints, and d
 Exercise directories here are the runnable lab material: what to do, what to observe, where to look
 when validating behavior, and any exercise-specific `scripts/` needed to run the lab.
 
+## Initial Setup
+
+Before starting the exercises:
+
+1. Create `.env.local` if it does not already exist:
+
+   ```sh
+   cp -n .env.codespaces .env.local
+   ```
+
+2. Follow the link your instructor gives you to get the command that updates `.env.local` with
+   `ANTHROPIC_API_KEY` and `OPENAI_API_KEY`. Alternatively, add your own values for those keys to
+   `.env.local`.
+
 ## Exercises
 
 | Exercise | Guide | Solution | Source Spec |
