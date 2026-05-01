@@ -49,7 +49,7 @@ Identified during planning; all resolved.
 | Q1 | `src/worker.py` does not exist but `Dockerfile` runs `python -m src.worker`. Missing placeholder? | Phase 2 — Worker registration | ✅ Create it in Phase 2; it's a gap, not a choice |
 | Q2 | Worker process structure: 3 separate containers or one process with 3 `Worker` objects? | Phase 2 — Worker registration | ✅ One process, 3 `Worker` objects started concurrently; consistent with single `Dockerfile`; each `Worker` enforces its own `max_activities_per_second` independently |
 | Q3 | `call_llm` I/O types: Anthropic SDK types, custom Pydantic mirrors, or plain `dict`? | Phase 2 — `call_llm` | ✅ Use Anthropic SDK types directly — they are already Pydantic models; Temporal's data converter handles them without any wrapper |
-| Q4 | Margin threshold source for `MARGIN_SPIKE` condition? | Phase 1 — proto, Phase 3 — system prompt | ✅ Use `selected_shipment.paid_price` from `CalculateShippingOptionsRequest`; prompt text calls this the customer paid price. |
+| Q4 | Margin threshold source for `MARGIN_SPIKE` condition? | Phase 1 — proto, Phase 3 — system prompt | ✅ Use `selected_shipment.paid_price` from `RecommendShippingOptionRequest`; prompt text calls this the customer paid price. |
 | Q5 | EasyPost parcel dimensions missing from `GetCarrierRatesRequest` — activity needs weight/dims | Phase 1 — proto, Phase 2 — `get_carrier_rates` | ✅ Hardcode default parcel for V1 (1 lb, 6×6×4 in); no proto field added; noted inline in activity |
 | Q6 | Define new `VerifyShippingAddressRequest/Response` in `shipping_agent.proto` or reuse Java `VerifyAddressRequest/Response` from `workflows.proto`? | Phase 1 — proto | ✅ Reuse existing Java types — `VerifyAddressRequest_p2p` / `VerifyAddressResponse_p2p` already generated from fulfillment-order Phase 1; removes two Phase 1 proto tasks |
 | Q7 | Must Java `AddressVerificationImpl` be updated to populate `EasyPostAddress.coordinate` after Phase 1? | Phase 2/3 integration | ✅ Yes — add explicit task to fulfillment-order Phase 6 breakdown; without it `to_address.easypost_address.coordinate` is null and destination SCRM silently fails; block ShippingAgent end-to-end integration testing on it |
@@ -91,11 +91,11 @@ Identified during planning; all resolved.
   - Enum values: `RECOMMENDATION_OUTCOME_UNSPECIFIED = 0`, `PROCEED = 1`, `CHEAPER_AVAILABLE = 2`, `FASTER_AVAILABLE = 3`, `MARGIN_SPIKE = 4`, `SLA_BREACH = 5`
   - `ShippingRecommendation` fields: `outcome: RecommendationOutcome`, `recommended_option_id: string`, `reasoning: string`, `margin_delta_cents: int64`, `origin_risk_level: acme.fulfillment.domain.fulfillment.v1.RiskLevel`, `destination_risk_level: acme.fulfillment.domain.fulfillment.v1.RiskLevel`
 
-- [x] Replace `CalculateShippingOptionsRequest` stub in `shipping_agent.proto` with full definition
+- [x] Replace `RecommendShippingOptionRequest` stub in `shipping_agent.proto` with full definition
   - Fields: `order_id: string`, `customer_id: string`, `to_address: acme.common.v1.Address` (easypost_address pre-populated by fulfillment.Order validateOrder), `items: repeated ShippingLineItem`, `selected_shipment: acme.common.v1.Shipment`
   - Remove the current `address` (field 1) and `coordinate` (field 2) stub fields; they are replaced by the fields above
 
-- [x] Replace `CalculateShippingOptionsResponse` stub in `shipping_agent.proto` with full definition
+- [x] Replace `RecommendShippingOptionResponse` stub in `shipping_agent.proto` with full definition
   - Fields: `recommendation: ShippingRecommendation`, `options: repeated ShippingOption`, `cache_hit: bool`
 
 - [x] Add `ShippingOptionsResult` and `ShippingOptionsCache` messages to `shipping_agent.proto` (workflow state and `get_options` Query return type)
@@ -113,7 +113,7 @@ Identified during planning; all resolved.
 
 - [x] Run `buf generate`; verify:
   - `python/generated/pydantic/acme/common/v1/llm_p2p.py` exists and contains `LlmTextBlock`, `LlmToolUseBlock` (with `input: Dict[str, Any]`), `LlmToolResultBlock`, `LlmContentBlock` (with `type: str` and three non-oneof message fields), `LlmMessage`, `LlmResponse`, `LlmToolDefinition` (with `input_schema: Dict[str, Any]`)
-  - Pydantic `*_p2p` classes generated for all other new/modified messages: `ShippingLineItem`, `ShippingOption`, `ShippingRecommendation`, `RecommendationOutcome`, `CalculateShippingOptionsRequest`, `CalculateShippingOptionsResponse`, `ShippingOptionsResult`, `ShippingOptionsCache`, `ShippingAgentExecutionOptions`, `LookupInventoryLocationRequest/Response`, `GetShippingRatesRequest/Response`
+  - Pydantic `*_p2p` classes generated for all other new/modified messages: `ShippingLineItem`, `ShippingOption`, `ShippingRecommendation`, `RecommendationOutcome`, `RecommendShippingOptionRequest`, `RecommendShippingOptionResponse`, `ShippingOptionsResult`, `ShippingOptionsCache`, `ShippingAgentExecutionOptions`, `LookupInventoryLocationRequest/Response`, `GetShippingRatesRequest/Response`
   - Updated `EasyPostAddress` Pydantic class includes `coordinate` field
   - Java classes compile in `fulfillment-core` with no errors
 
@@ -193,7 +193,7 @@ Identified during planning; all resolved.
   - `@workflow.query`
   - Return `ShippingOptionsCache_p2p` populated from `_cache`
 
-- [x] `calculate_shipping_options` Update validator
+- [x] `recommend_shipping_option` Update validator
   - `@workflow.update_validator`
   - Assert `request.order_id`, `request.customer_id`, `request.to_address`, and at least one item are present
 
@@ -205,7 +205,7 @@ Identified during planning; all resolved.
   - Return `False` if `key` not in `_cache_meta`
   - Return `False` if `workflow.now() - _cache_meta[key] > timedelta(seconds=cache_ttl_secs)`
 
-- [x] System prompt builder `_build_system_prompt(request: CalculateShippingOptionsRequest_p2p) -> str` *(implemented as inline helper — see refactor task below)*
+- [x] System prompt builder `_build_system_prompt(request: RecommendShippingOptionRequest_p2p) -> str` *(implemented as inline helper — see refactor task below)*
   - Include: margin spike rule from `request.selected_shipment.paid_price`, SLA rule from
     `request.selected_shipment.easypost.selected_rate.delivery_days`, path instruction,
     concurrency instruction, final tool output format
@@ -222,11 +222,11 @@ Identified during planning; all resolved.
   - Each `LlmToolDefinition_p2p`: `name`, `description`, `input_schema` as `dict` (JSON Schema derived from corresponding `_p2p` request type via `model_json_schema()`)
   - Note: `call_llm` is NOT a tool definition — it is the activity that calls Claude, not a tool Claude calls
 
-- [x] `calculate_shipping_options` Update handler — early cache check (fulfillment path)
-  - If `request.location_id` and `request.from_address` are both present: compute cache key immediately and return `CalculateShippingOptionsResponse(cache_hit=True, ...)` if hit and within TTL; skip LLM entirely
+- [x] `recommend_shipping_option` Update handler — early cache check (fulfillment path)
+  - If `request.location_id` and `request.from_address` are both present: compute cache key immediately and return `RecommendShippingOptionResponse(cache_hit=True, ...)` if hit and within TTL; skip LLM entirely
 
-- [x] Agentic loop implementation inside `calculate_shipping_options` handler
-  - Build initial messages list from request context (user turn describing the shipping calculation task)
+- [x] Agentic loop implementation inside `recommend_shipping_option` handler
+  - Build initial messages list from request context (user turn describing the shipping recommendation task)
   - Loop:
     1. Execute `call_llm` activity with `task_queue="fulfillment"`, `schedule_to_close_timeout` from config
     2. If `response.stop_reason == LlmStopReason.LLM_STOP_REASON_TOOL_USE`:
@@ -239,7 +239,7 @@ Identified during planning; all resolved.
     3. If `response.stop_reason == LlmStopReason.LLM_STOP_REASON_TOOL_USE` and block name is `finalize_recommendation`: extract `ShippingRecommendation` directly from `block.tool_use.input` dict; break loop — **do not dispatch this block as an activity**
     4. If `response.stop_reason == LlmStopReason.LLM_STOP_REASON_END_TURN` with no preceding `finalize_recommendation`: raise retryable `ApplicationError("LLM ended without calling finalize_recommendation")`
   - After loop: store `ShippingOptionsResult` in `_cache[key]`, store `workflow.now()` in `_cache_meta[key]`
-  - Return `CalculateShippingOptionsResponse(recommendation=..., options=..., cache_hit=False)`;
+  - Return `RecommendShippingOptionResponse(recommendation=..., options=..., cache_hit=False)`;
     options include the de-duped union of rates returned by all primary and alternate
     `get_carrier_rates` calls
 
@@ -264,13 +264,13 @@ All tests use Temporal Python test framework (`temporalio.testing.WorkflowEnviro
 
 - [x] Concurrent activity dispatch — mock `call_llm` to return two `tool_use` blocks in one response (e.g., `get_location_events` for origin and destination); assert both activities are dispatched concurrently before either result is appended to messages
 
-- [x] `PROCEED` outcome — mock `call_llm` final turn to return JSON with `"outcome": "PROCEED"`; assert `CalculateShippingOptionsResponse.recommendation.outcome == PROCEED`
+- [x] `PROCEED` outcome — mock `call_llm` final turn to call `finalize_recommendation` with `"outcome": "PROCEED"`; assert `RecommendShippingOptionResponse.recommendation.outcome == PROCEED`
 
-- [x] `MARGIN_SPIKE` outcome — mock final turn JSON with `"outcome": "MARGIN_SPIKE"` and positive `margin_delta_cents`; assert correct outcome and `margin_delta_cents` propagated
+- [x] `MARGIN_SPIKE` outcome — mock final `finalize_recommendation` tool input with `"outcome": "MARGIN_SPIKE"` and positive `margin_delta_cents`; assert correct outcome and `margin_delta_cents` propagated
 
-- [x] `SLA_BREACH` outcome — mock final turn JSON with `"outcome": "SLA_BREACH"`; assert outcome returned (not raised as error — caller decides what to do)
+- [x] `SLA_BREACH` outcome — mock final `finalize_recommendation` tool input with `"outcome": "SLA_BREACH"`; assert outcome returned (not raised as error — caller decides what to do)
 
-- [x] TTL expiry triggers re-fetch — seed cache with entry whose `cached_at` is older than `cache_ttl_secs`; assert `call_llm` IS called on subsequent `calculate_shipping_options` Update
+- [x] TTL expiry triggers re-fetch — seed cache with entry whose `cached_at` is older than `cache_ttl_secs`; assert `call_llm` IS called on subsequent `recommend_shipping_option` Update
 
 ---
 

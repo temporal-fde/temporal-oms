@@ -19,7 +19,7 @@ sequenceDiagram
 
   Apps->>Fulfillment: fulfillOrder Update<br/>ProcessedOrder
   Fulfillment->>Inventory: reserveItems
-  Fulfillment->>Agent: calculateShippingOptions Nexus operation
+  Fulfillment->>Agent: recommendShippingOption Nexus operation
   Agent-->>Fulfillment: ShippingRecommendation + options
   Fulfillment->>Fulfillment: apply business decision<br/>set margin/SLA attributes
 

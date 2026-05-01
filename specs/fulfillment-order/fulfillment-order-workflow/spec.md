@@ -341,7 +341,7 @@ Deliverables:
   - `execute()`: open detached compensation scope → `Workflow.await()` for fulfillOrder or cancel/timeout → fire compensation if needed
   - `validateOrder` Update handler: `AddressVerification.verifyAddress()` → store `address_id` in state → return `ValidateOrderResponse`
   - `execute()` body (after `validateOrder`): `loadOptions` (LocalActivity) → `holdItems` → open detached compensation scope → `Workflow.await()` for `fulfillOrder` or cancel/timeout
-  - `fulfillOrder` Update handler: `reserveItems` → `ShippingAgent.calculateShippingOptions(...)` → recommendation application + `margin_leak`/`sla_breach_days` SearchAttributes as needed → concurrent (`printShippingLabel` + `deductInventory`) → await `notifyDeliveryStatus`
+  - `fulfillOrder` Update handler: `reserveItems` → `ShippingAgent.recommendShippingOption(...)` → recommendation application + `margin_leak`/`sla_breach_days` SearchAttributes as needed → concurrent (`printShippingLabel` + `deductInventory`) → await `notifyDeliveryStatus`
   - `cancelOrder` Signal handler: set cancellation flag
   - `notifyDeliveryStatus` Signal handler: set delivery status
   - `getState` Query: return `GetFulfillmentOrderStateResponse`

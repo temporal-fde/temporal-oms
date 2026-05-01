@@ -7,7 +7,7 @@ package com.acme.proto.acme.fulfillment.domain.fulfillment.v1;
 
 /**
  * <pre>
- * CalculateShippingOptionsRequest is the Update input for the ShippingAgent agentic loop.
+ * RecommendShippingOptionRequest is the Update input for the ShippingAgent agentic loop.
  * The caller provides items with sku_id; the LLM always calls lookup_inventory_location
  * first to resolve the warehouse origin from inventory. Both the fulfillment path
  * (EnrichedItem sku_ids) and the cart path (cart item sku_ids) use the same flow.
@@ -16,13 +16,13 @@ package com.acme.proto.acme.fulfillment.domain.fulfillment.v1;
  * by fulfillment.Order validateOrder).
  * </pre>
  *
- * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest}
+ * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest}
  */
 @com.google.protobuf.Generated
-public final class CalculateShippingOptionsRequest extends
+public final class RecommendShippingOptionRequest extends
     com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest)
-    CalculateShippingOptionsRequestOrBuilder {
+    // @@protoc_insertion_point(message_implements:acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest)
+    RecommendShippingOptionRequestOrBuilder {
 private static final long serialVersionUID = 0L;
   static {
     com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
@@ -31,13 +31,13 @@ private static final long serialVersionUID = 0L;
       /* minor= */ 34,
       /* patch= */ 1,
       /* suffix= */ "",
-      "CalculateShippingOptionsRequest");
+      "RecommendShippingOptionRequest");
   }
-  // Use CalculateShippingOptionsRequest.newBuilder() to construct.
-  private CalculateShippingOptionsRequest(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+  // Use RecommendShippingOptionRequest.newBuilder() to construct.
+  private RecommendShippingOptionRequest(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
   }
-  private CalculateShippingOptionsRequest() {
+  private RecommendShippingOptionRequest() {
     orderId_ = "";
     customerId_ = "";
     items_ = java.util.Collections.emptyList();
@@ -45,20 +45,20 @@ private static final long serialVersionUID = 0L;
 
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_CalculateShippingOptionsRequest_descriptor;
+    return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_RecommendShippingOptionRequest_descriptor;
   }
 
   @java.lang.Override
   public com.google.protobuf.Descriptors.Descriptor getDescriptorForType() {
-    return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_CalculateShippingOptionsRequest_descriptor;
+    return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_RecommendShippingOptionRequest_descriptor;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_CalculateShippingOptionsRequest_fieldAccessorTable
+    return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_RecommendShippingOptionRequest_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
-            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest.class, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest.Builder.class);
+            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest.class, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest.Builder.class);
   }
 
   private int bitField0_;
@@ -75,7 +75,7 @@ private static final long serialVersionUID = 0L;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
-      com.google.protobuf.ByteString bs =
+      com.google.protobuf.ByteString bs = 
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
       orderId_ = s;
@@ -91,7 +91,7 @@ private static final long serialVersionUID = 0L;
       getOrderIdBytes() {
     java.lang.Object ref = orderId_;
     if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b =
+      com.google.protobuf.ByteString b = 
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
       orderId_ = b;
@@ -114,7 +114,7 @@ private static final long serialVersionUID = 0L;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
-      com.google.protobuf.ByteString bs =
+      com.google.protobuf.ByteString bs = 
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
       customerId_ = s;
@@ -130,7 +130,7 @@ private static final long serialVersionUID = 0L;
       getCustomerIdBytes() {
     java.lang.Object ref = customerId_;
     if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b =
+      com.google.protobuf.ByteString b = 
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
       customerId_ = b;
@@ -192,7 +192,7 @@ private static final long serialVersionUID = 0L;
    * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingLineItem items = 4 [json_name = "items"];</code>
    */
   @java.lang.Override
-  public java.util.List<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItemOrBuilder>
+  public java.util.List<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItemOrBuilder> 
       getItemsOrBuilderList() {
     return items_;
   }
@@ -316,10 +316,10 @@ private static final long serialVersionUID = 0L;
     if (obj == this) {
      return true;
     }
-    if (!(obj instanceof com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest)) {
+    if (!(obj instanceof com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest)) {
       return super.equals(obj);
     }
-    com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest other = (com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest) obj;
+    com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest other = (com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest) obj;
 
     if (!getOrderId()
         .equals(other.getOrderId())) return false;
@@ -369,44 +369,44 @@ private static final long serialVersionUID = 0L;
     return hash;
   }
 
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest parseFrom(
       java.nio.ByteBuffer data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest parseFrom(
       java.nio.ByteBuffer data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest parseFrom(
       com.google.protobuf.ByteString data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest parseFrom(byte[] data)
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest parseFrom(byte[] data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest parseFrom(
       byte[] data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest parseFrom(java.io.InputStream input)
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest parseFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessage
         .parseWithIOException(PARSER, input);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest parseFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -414,26 +414,26 @@ private static final long serialVersionUID = 0L;
         .parseWithIOException(PARSER, input, extensionRegistry);
   }
 
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest parseDelimitedFrom(java.io.InputStream input)
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest parseDelimitedFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessage
         .parseDelimitedWithIOException(PARSER, input);
   }
 
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest parseDelimitedFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest parseDelimitedFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessage
         .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest parseFrom(
       com.google.protobuf.CodedInputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessage
         .parseWithIOException(PARSER, input);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest parseFrom(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -446,7 +446,7 @@ private static final long serialVersionUID = 0L;
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-  public static Builder newBuilder(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest prototype) {
+  public static Builder newBuilder(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
   @java.lang.Override
@@ -463,7 +463,7 @@ private static final long serialVersionUID = 0L;
   }
   /**
    * <pre>
-   * CalculateShippingOptionsRequest is the Update input for the ShippingAgent agentic loop.
+   * RecommendShippingOptionRequest is the Update input for the ShippingAgent agentic loop.
    * The caller provides items with sku_id; the LLM always calls lookup_inventory_location
    * first to resolve the warehouse origin from inventory. Both the fulfillment path
    * (EnrichedItem sku_ids) and the cart path (cart item sku_ids) use the same flow.
@@ -472,26 +472,26 @@ private static final long serialVersionUID = 0L;
    * by fulfillment.Order validateOrder).
    * </pre>
    *
-   * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest}
+   * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest}
    */
   public static final class Builder extends
       com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest)
-      com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequestOrBuilder {
+      // @@protoc_insertion_point(builder_implements:acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest)
+      com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequestOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_CalculateShippingOptionsRequest_descriptor;
+      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_RecommendShippingOptionRequest_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_CalculateShippingOptionsRequest_fieldAccessorTable
+      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_RecommendShippingOptionRequest_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest.class, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest.Builder.class);
+              com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest.class, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest.Builder.class);
     }
 
-    // Construct using com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest.newBuilder()
+    // Construct using com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest.newBuilder()
     private Builder() {
       maybeForceBuilderInitialization();
     }
@@ -538,17 +538,17 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_CalculateShippingOptionsRequest_descriptor;
+      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_RecommendShippingOptionRequest_descriptor;
     }
 
     @java.lang.Override
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest getDefaultInstanceForType() {
-      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest.getDefaultInstance();
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest getDefaultInstanceForType() {
+      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest.getDefaultInstance();
     }
 
     @java.lang.Override
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest build() {
-      com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest result = buildPartial();
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest build() {
+      com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest result = buildPartial();
       if (!result.isInitialized()) {
         throw newUninitializedMessageException(result);
       }
@@ -556,15 +556,15 @@ private static final long serialVersionUID = 0L;
     }
 
     @java.lang.Override
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest buildPartial() {
-      com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest result = new com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest(this);
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest buildPartial() {
+      com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest result = new com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest(this);
       buildPartialRepeatedFields(result);
       if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
     }
 
-    private void buildPartialRepeatedFields(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest result) {
+    private void buildPartialRepeatedFields(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest result) {
       if (itemsBuilder_ == null) {
         if (((bitField0_ & 0x00000008) != 0)) {
           items_ = java.util.Collections.unmodifiableList(items_);
@@ -576,7 +576,7 @@ private static final long serialVersionUID = 0L;
       }
     }
 
-    private void buildPartial0(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest result) {
+    private void buildPartial0(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest result) {
       int from_bitField0_ = bitField0_;
       if (((from_bitField0_ & 0x00000001) != 0)) {
         result.orderId_ = orderId_;
@@ -602,16 +602,16 @@ private static final long serialVersionUID = 0L;
 
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
-      if (other instanceof com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest) {
-        return mergeFrom((com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest)other);
+      if (other instanceof com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest) {
+        return mergeFrom((com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest)other);
       } else {
         super.mergeFrom(other);
         return this;
       }
     }
 
-    public Builder mergeFrom(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest other) {
-      if (other == com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest.getDefaultInstance()) return this;
+    public Builder mergeFrom(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest other) {
+      if (other == com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest.getDefaultInstance()) return this;
       if (!other.getOrderId().isEmpty()) {
         orderId_ = other.orderId_;
         bitField0_ |= 0x00000001;
@@ -643,7 +643,7 @@ private static final long serialVersionUID = 0L;
             itemsBuilder_ = null;
             items_ = other.items_;
             bitField0_ = (bitField0_ & ~0x00000008);
-            itemsBuilder_ =
+            itemsBuilder_ = 
               com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                  internalGetItemsFieldBuilder() : null;
           } else {
@@ -759,7 +759,7 @@ private static final long serialVersionUID = 0L;
         getOrderIdBytes() {
       java.lang.Object ref = orderId_;
       if (ref instanceof String) {
-        com.google.protobuf.ByteString b =
+        com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         orderId_ = b;
@@ -831,7 +831,7 @@ private static final long serialVersionUID = 0L;
         getCustomerIdBytes() {
       java.lang.Object ref = customerId_;
       if (ref instanceof String) {
-        com.google.protobuf.ByteString b =
+        com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         customerId_ = b;
@@ -1022,7 +1022,7 @@ private static final long serialVersionUID = 0L;
      * <code>.acme.common.v1.Address to_address = 3 [json_name = "toAddress"];</code>
      */
     private com.google.protobuf.SingleFieldBuilder<
-        com.acme.proto.acme.common.v1.Address, com.acme.proto.acme.common.v1.Address.Builder, com.acme.proto.acme.common.v1.AddressOrBuilder>
+        com.acme.proto.acme.common.v1.Address, com.acme.proto.acme.common.v1.Address.Builder, com.acme.proto.acme.common.v1.AddressOrBuilder> 
         internalGetToAddressFieldBuilder() {
       if (toAddressBuilder_ == null) {
         toAddressBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -1230,7 +1230,7 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingLineItem items = 4 [json_name = "items"];</code>
      */
-    public java.util.List<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItemOrBuilder>
+    public java.util.List<? extends com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItemOrBuilder> 
          getItemsOrBuilderList() {
       if (itemsBuilder_ != null) {
         return itemsBuilder_.getMessageOrBuilderList();
@@ -1256,12 +1256,12 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>repeated .acme.fulfillment.domain.fulfillment.v1.ShippingLineItem items = 4 [json_name = "items"];</code>
      */
-    public java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItem.Builder>
+    public java.util.List<com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItem.Builder> 
          getItemsBuilderList() {
       return internalGetItemsFieldBuilder().getBuilderList();
     }
     private com.google.protobuf.RepeatedFieldBuilder<
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItem, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItem.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItemOrBuilder>
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItem, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItem.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingLineItemOrBuilder> 
         internalGetItemsFieldBuilder() {
       if (itemsBuilder_ == null) {
         itemsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -1383,7 +1383,7 @@ private static final long serialVersionUID = 0L;
      * <code>.acme.common.v1.Shipment selected_shipment = 5 [json_name = "selectedShipment"];</code>
      */
     private com.google.protobuf.SingleFieldBuilder<
-        com.acme.proto.acme.common.v1.Shipment, com.acme.proto.acme.common.v1.Shipment.Builder, com.acme.proto.acme.common.v1.ShipmentOrBuilder>
+        com.acme.proto.acme.common.v1.Shipment, com.acme.proto.acme.common.v1.Shipment.Builder, com.acme.proto.acme.common.v1.ShipmentOrBuilder> 
         internalGetSelectedShipmentFieldBuilder() {
       if (selectedShipmentBuilder_ == null) {
         selectedShipmentBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -1396,23 +1396,23 @@ private static final long serialVersionUID = 0L;
       return selectedShipmentBuilder_;
     }
 
-    // @@protoc_insertion_point(builder_scope:acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest)
+    // @@protoc_insertion_point(builder_scope:acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest)
   }
 
-  // @@protoc_insertion_point(class_scope:acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest)
-  private static final com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest DEFAULT_INSTANCE;
+  // @@protoc_insertion_point(class_scope:acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest)
+  private static final com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest();
+    DEFAULT_INSTANCE = new com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest();
   }
 
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest getDefaultInstance() {
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest getDefaultInstance() {
     return DEFAULT_INSTANCE;
   }
 
-  private static final com.google.protobuf.Parser<CalculateShippingOptionsRequest>
-      PARSER = new com.google.protobuf.AbstractParser<CalculateShippingOptionsRequest>() {
+  private static final com.google.protobuf.Parser<RecommendShippingOptionRequest>
+      PARSER = new com.google.protobuf.AbstractParser<RecommendShippingOptionRequest>() {
     @java.lang.Override
-    public CalculateShippingOptionsRequest parsePartialFrom(
+    public RecommendShippingOptionRequest parsePartialFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -1431,17 +1431,17 @@ private static final long serialVersionUID = 0L;
     }
   };
 
-  public static com.google.protobuf.Parser<CalculateShippingOptionsRequest> parser() {
+  public static com.google.protobuf.Parser<RecommendShippingOptionRequest> parser() {
     return PARSER;
   }
 
   @java.lang.Override
-  public com.google.protobuf.Parser<CalculateShippingOptionsRequest> getParserForType() {
+  public com.google.protobuf.Parser<RecommendShippingOptionRequest> getParserForType() {
     return PARSER;
   }
 
   @java.lang.Override
-  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest getDefaultInstanceForType() {
+  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest getDefaultInstanceForType() {
     return DEFAULT_INSTANCE;
   }
 

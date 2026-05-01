@@ -431,7 +431,7 @@ The same `selected_shipment` is carried through:
 - `acme.oms.v1.Order.selected_shipment`
 - `StartOrderFulfillmentRequest.selected_shipment`
 - `FulfillOrderRequest.selected_shipment`
-- `CalculateShippingOptionsRequest.selected_shipment`
+- `RecommendShippingOptionRequest.selected_shipment`
 - `GetShippingRatesRequest.selected_shipment`
 
 This removes the fulfillment-specific `SelectedShippingOption` duplication and gives shipping one

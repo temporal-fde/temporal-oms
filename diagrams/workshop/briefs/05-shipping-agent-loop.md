@@ -17,7 +17,7 @@ as activities, and the result is a recommendation that `fulfillment.Order` evalu
 
 | Concept | Workshop Explanation |
 |---|---|
-| Long-running workflow | The agent caches repeated calculations per customer. |
+| Long-running workflow | The agent caches repeated recommendations per customer. |
 | Tool calls as activities | LLM tool use maps to visible, durable Temporal activity execution. |
 | Concurrent tools | Multiple LLM tool calls in one response can run as concurrent activities. |
 | Structured finalization | `finalize_recommendation` avoids fragile JSON text parsing. |
@@ -32,4 +32,3 @@ observable control flow.
 
 Be explicit that `fulfillment.Order` receives a `ShippingRecommendation`, not an instruction it
 blindly follows.
-

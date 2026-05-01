@@ -54,9 +54,9 @@ private static final long serialVersionUID = 0L;
 
   private int bitField0_;
   public static final int REQUEST_FIELD_NUMBER = 1;
-  private com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest request_;
+  private com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest request_;
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest request = 1 [json_name = "request"];</code>
+   * <code>.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest request = 1 [json_name = "request"];</code>
    * @return Whether the request field is set.
    */
   @java.lang.Override
@@ -64,19 +64,19 @@ private static final long serialVersionUID = 0L;
     return ((bitField0_ & 0x00000001) != 0);
   }
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest request = 1 [json_name = "request"];</code>
+   * <code>.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest request = 1 [json_name = "request"];</code>
    * @return The request.
    */
   @java.lang.Override
-  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest getRequest() {
-    return request_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest.getDefaultInstance() : request_;
+  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest getRequest() {
+    return request_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest.getDefaultInstance() : request_;
   }
   /**
-   * <code>.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest request = 1 [json_name = "request"];</code>
+   * <code>.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest request = 1 [json_name = "request"];</code>
    */
   @java.lang.Override
-  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequestOrBuilder getRequestOrBuilder() {
-    return request_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest.getDefaultInstance() : request_;
+  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequestOrBuilder getRequestOrBuilder() {
+    return request_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest.getDefaultInstance() : request_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -398,31 +398,31 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest request_;
+    private com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest request_;
     private com.google.protobuf.SingleFieldBuilder<
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequestOrBuilder> requestBuilder_;
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequestOrBuilder> requestBuilder_;
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest request = 1 [json_name = "request"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest request = 1 [json_name = "request"];</code>
      * @return Whether the request field is set.
      */
     public boolean hasRequest() {
       return ((bitField0_ & 0x00000001) != 0);
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest request = 1 [json_name = "request"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest request = 1 [json_name = "request"];</code>
      * @return The request.
      */
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest getRequest() {
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest getRequest() {
       if (requestBuilder_ == null) {
-        return request_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest.getDefaultInstance() : request_;
+        return request_ == null ? com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest.getDefaultInstance() : request_;
       } else {
         return requestBuilder_.getMessage();
       }
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest request = 1 [json_name = "request"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest request = 1 [json_name = "request"];</code>
      */
-    public Builder setRequest(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest value) {
+    public Builder setRequest(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest value) {
       if (requestBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
@@ -436,10 +436,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest request = 1 [json_name = "request"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest request = 1 [json_name = "request"];</code>
      */
     public Builder setRequest(
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest.Builder builderForValue) {
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest.Builder builderForValue) {
       if (requestBuilder_ == null) {
         request_ = builderForValue.build();
       } else {
@@ -450,13 +450,13 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest request = 1 [json_name = "request"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest request = 1 [json_name = "request"];</code>
      */
-    public Builder mergeRequest(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest value) {
+    public Builder mergeRequest(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest value) {
       if (requestBuilder_ == null) {
         if (((bitField0_ & 0x00000001) != 0) &&
           request_ != null &&
-          request_ != com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest.getDefaultInstance()) {
+          request_ != com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest.getDefaultInstance()) {
           getRequestBuilder().mergeFrom(value);
         } else {
           request_ = value;
@@ -471,7 +471,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest request = 1 [json_name = "request"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest request = 1 [json_name = "request"];</code>
      */
     public Builder clearRequest() {
       bitField0_ = (bitField0_ & ~0x00000001);
@@ -484,33 +484,33 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest request = 1 [json_name = "request"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest request = 1 [json_name = "request"];</code>
      */
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest.Builder getRequestBuilder() {
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest.Builder getRequestBuilder() {
       bitField0_ |= 0x00000001;
       onChanged();
       return internalGetRequestFieldBuilder().getBuilder();
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest request = 1 [json_name = "request"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest request = 1 [json_name = "request"];</code>
      */
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequestOrBuilder getRequestOrBuilder() {
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequestOrBuilder getRequestOrBuilder() {
       if (requestBuilder_ != null) {
         return requestBuilder_.getMessageOrBuilder();
       } else {
         return request_ == null ?
-            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest.getDefaultInstance() : request_;
+            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest.getDefaultInstance() : request_;
       }
     }
     /**
-     * <code>.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest request = 1 [json_name = "request"];</code>
+     * <code>.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest request = 1 [json_name = "request"];</code>
      */
     private com.google.protobuf.SingleFieldBuilder<
-        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequestOrBuilder> 
+        com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequestOrBuilder>
         internalGetRequestFieldBuilder() {
       if (requestBuilder_ == null) {
         requestBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequest.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsRequestOrBuilder>(
+            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequest.Builder, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionRequestOrBuilder>(
                 getRequest(),
                 getParentForChildren(),
                 isClean());

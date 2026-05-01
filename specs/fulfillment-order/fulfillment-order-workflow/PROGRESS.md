@@ -73,7 +73,7 @@ Phase 5 cannot start until Phases 3 and 4 are both complete and the deployment s
 - [x] `validateOrder` Update handler: `AddressVerification.verifyAddress()` → store verified `Address` in state → return `ValidateOrderResponse`
 - [x] `fulfillOrder` Update handler:
   - `reserveItems`
-  - `ShippingAgent.calculateShippingOptions(...)` through Nexus
+  - `ShippingAgent.recommendShippingOption(...)` through Nexus
   - Apply recommendation; set `margin_leak` / `sla_breach_days` SearchAttributes when applicable
   - Fallback selection for `MARGIN_SPIKE` / `SLA_BREACH`
   - Concurrent: `Carriers.printShippingLabel()` + `Allocations.deductInventory()` via `Promise.allOf`
@@ -137,7 +137,7 @@ Phase 5 cannot start until Phases 3 and 4 are both complete and the deployment s
 
 ### Phase 7 — V2 ShippingAgent Nexus Integration
 
-- [x] `fulfillment.Order` calls `ShippingAgent.calculateShippingOptions` through Nexus
+- [x] `fulfillment.Order` calls `ShippingAgent.recommendShippingOption` through Nexus
 - [x] `fulfillment.Order` applies the returned recommendation and selected shipping option
 - [x] `fulfillment.Order` prints labels through fixture-backed `CarriersImpl`
 

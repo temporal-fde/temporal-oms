@@ -25,7 +25,7 @@ That gap is now closed for the current scripts:
   workflow isolated per order.
 - Orders can include `selectedShipment.paidPriceCents`.
 - Orders can include explicit `selectedShipment.deliveryDays`, including zero.
-- ShippingAgent receives that context as `CalculateShippingOptionsRequest.selected_shipment`.
+- ShippingAgent receives that context as `RecommendShippingOptionRequest.selected_shipment`.
 - Runtime shipping and location-event tool calls go through `enablements-api`, not EasyPost.
 
 The Nexus integration handlers for commerce-app, PIMS, and inventory now use `enablements-api` as
@@ -50,7 +50,7 @@ is now `ShippingActivities.get_carrier_rates` on the `fulfillment-shipping` task
 `enablements-api` and returns fixture-backed rates.
 
 The activity accumulates rate options from both primary and alternate warehouse calls so the final
-`CalculateShippingOptionsResponse.options` contains whichever option the LLM recommends.
+`RecommendShippingOptionResponse.options` contains whichever option the LLM recommends.
 
 ### Location Events
 

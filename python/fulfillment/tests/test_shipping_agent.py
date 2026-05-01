@@ -43,8 +43,8 @@ from acme.common.v1.values_p2p import (
 from acme.fulfillment.domain.v1.shipping_agent_p2p import (
     BuildSystemPromptRequest,
     BuildSystemPromptResponse,
-    CalculateShippingOptionsRequest,
-    CalculateShippingOptionsResponse,
+    RecommendShippingOptionRequest,
+    RecommendShippingOptionResponse,
     GetLocationEventsRequest,
     GetLocationEventsResponse,
     GetShippingRatesRequest,
@@ -157,7 +157,7 @@ def _base_request(
     *,
     selected_paid_price: Money | None = None,
     selected_delivery_days: int | None = None,
-) -> CalculateShippingOptionsRequest:
+) -> RecommendShippingOptionRequest:
     kwargs = {
         "order_id": _ORDER_ID,
         "customer_id": _CUSTOMER_ID,
@@ -175,7 +175,7 @@ def _base_request(
             ),
             paid_price=selected_paid_price or Money(currency="USD", units=0),
         )
-    return CalculateShippingOptionsRequest(**kwargs)
+    return RecommendShippingOptionRequest(**kwargs)
 
 
 _START_REQUEST = StartShippingAgentRequest(
@@ -345,14 +345,14 @@ async def test_cache_hit_skips_llm() -> None:
             handle = await _start_agent(env.client)
 
             req = _base_request()
-            resp1: CalculateShippingOptionsResponse = await handle.execute_update(
-                ShippingAgent.calculate_shipping_options, req
+            resp1: RecommendShippingOptionResponse = await handle.execute_update(
+                ShippingAgent.recommend_shipping_option, req
             )
             assert resp1.cache_hit is False
             assert llm_call_count == 1
 
-            resp2: CalculateShippingOptionsResponse = await handle.execute_update(
-                ShippingAgent.calculate_shipping_options, req
+            resp2: RecommendShippingOptionResponse = await handle.execute_update(
+                ShippingAgent.recommend_shipping_option, req
             )
             assert resp2.cache_hit is True
             assert llm_call_count == 1  # call_llm NOT called again
@@ -395,7 +395,7 @@ async def test_lookup_always_called() -> None:
         ):
             handle = await _start_agent(env.client)
             req = _base_request()
-            await handle.execute_update(ShippingAgent.calculate_shipping_options, req)
+            await handle.execute_update(ShippingAgent.recommend_shipping_option, req)
 
     assert lookup_called
 
@@ -445,7 +445,7 @@ async def test_cart_path_calls_lookup() -> None:
             handle = await _start_agent(env.client)
             # Cart path: no from_address
             req = _base_request()
-            resp = await handle.execute_update(ShippingAgent.calculate_shipping_options, req)
+            resp = await handle.execute_update(ShippingAgent.recommend_shipping_option, req)
 
     assert lookup_called
     assert resp.cache_hit is False
@@ -505,7 +505,7 @@ async def test_sequential_tool_dispatch() -> None:
         ):
             handle = await _start_agent(env.client)
             req = _base_request()
-            await handle.execute_update(ShippingAgent.calculate_shipping_options, req)
+            await handle.execute_update(ShippingAgent.recommend_shipping_option, req)
 
     assert call_order == ["find_alternate_warehouse", "get_carrier_rates"]
 
@@ -564,7 +564,7 @@ async def test_concurrent_activity_dispatch() -> None:
         ):
             handle = await _start_agent(env.client)
             req = _base_request()
-            await handle.execute_update(ShippingAgent.calculate_shipping_options, req)
+            await handle.execute_update(ShippingAgent.recommend_shipping_option, req)
 
     # Both location event calls from the same LLM turn must have been dispatched
     assert events_call_count == 2
@@ -581,7 +581,7 @@ async def test_proceed_outcome() -> None:
         async with workers[0], workers[1], workers[2]:
             handle = await _start_agent(env.client)
             req = _base_request()
-            resp = await handle.execute_update(ShippingAgent.calculate_shipping_options, req)
+            resp = await handle.execute_update(ShippingAgent.recommend_shipping_option, req)
 
     assert resp.recommendation.outcome == RecommendationOutcome.PROCEED
 
@@ -607,7 +607,7 @@ async def test_margin_spike_outcome() -> None:
         async with workers[0], workers[1], workers[2]:
             handle = await _start_agent(env.client)
             req = _base_request(selected_paid_price=Money(currency="USD", units=1))
-            resp = await handle.execute_update(ShippingAgent.calculate_shipping_options, req)
+            resp = await handle.execute_update(ShippingAgent.recommend_shipping_option, req)
 
     assert resp.recommendation.outcome == RecommendationOutcome.MARGIN_SPIKE
     assert resp.recommendation.margin_delta_cents == 1500
@@ -634,7 +634,7 @@ async def test_sla_breach_outcome() -> None:
         async with workers[0], workers[1], workers[2]:
             handle = await _start_agent(env.client)
             req = _base_request(selected_delivery_days=2)
-            resp = await handle.execute_update(ShippingAgent.calculate_shipping_options, req)
+            resp = await handle.execute_update(ShippingAgent.recommend_shipping_option, req)
 
     assert resp.recommendation.outcome == RecommendationOutcome.SLA_BREACH
     assert resp.cache_hit is False
@@ -733,7 +733,7 @@ async def test_options_accumulate_across_primary_and_alternate_rate_calls() -> N
         ):
             handle = await _start_agent(env.client)
             req = _base_request(selected_delivery_days=0)
-            resp = await handle.execute_update(ShippingAgent.calculate_shipping_options, req)
+            resp = await handle.execute_update(ShippingAgent.recommend_shipping_option, req)
 
     assert resp.recommendation.recommended_option_id == primary_rate_id
     assert [option.id for option in resp.options] == [primary_rate_id, alternate_rate_id]
@@ -792,7 +792,7 @@ async def test_margin_spike_enforces_alternate_warehouse() -> None:
         ):
             handle = await _start_agent(env.client)
             req = _base_request(selected_paid_price=Money(currency="USD", units=1))
-            resp = await handle.execute_update(ShippingAgent.calculate_shipping_options, req)
+            resp = await handle.execute_update(ShippingAgent.recommend_shipping_option, req)
 
     assert resp.recommendation.outcome == RecommendationOutcome.MARGIN_SPIKE
     assert alternate_called, "find_alternate_warehouse must have been called"
@@ -849,7 +849,7 @@ async def test_sla_breach_enforces_alternate_warehouse() -> None:
         ):
             handle = await _start_agent(env.client)
             req = _base_request(selected_delivery_days=2)
-            resp = await handle.execute_update(ShippingAgent.calculate_shipping_options, req)
+            resp = await handle.execute_update(ShippingAgent.recommend_shipping_option, req)
 
     assert resp.recommendation.outcome == RecommendationOutcome.SLA_BREACH
     assert alternate_called, "find_alternate_warehouse must have been called"
@@ -887,7 +887,7 @@ async def test_ttl_expiry_triggers_refetch() -> None:
             req = _base_request()
 
             # First call — cache miss, LLM called
-            resp1 = await handle.execute_update(ShippingAgent.calculate_shipping_options, req)
+            resp1 = await handle.execute_update(ShippingAgent.recommend_shipping_option, req)
             assert resp1.cache_hit is False
             assert llm_call_count == 1
 
@@ -895,6 +895,6 @@ async def test_ttl_expiry_triggers_refetch() -> None:
             await env.sleep(timedelta(seconds=2))
 
             # Second call — TTL expired, LLM called again
-            resp2 = await handle.execute_update(ShippingAgent.calculate_shipping_options, req)
+            resp2 = await handle.execute_update(ShippingAgent.recommend_shipping_option, req)
             assert resp2.cache_hit is False
             assert llm_call_count == 2

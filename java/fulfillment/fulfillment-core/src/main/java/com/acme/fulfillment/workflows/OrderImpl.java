@@ -24,7 +24,7 @@ import java.util.List;
  * Lifecycle:
  *  1. [UpdateWithStart] validateOrder → Carriers.verifyAddress → store verified Address → return
  *  2. execute() unblocks → loadOptions (LocalActivity) → InventoryService.holdItems → await fulfillOrder/cancel/timeout
- *  3. [Update] fulfillOrder → stores request → InventoryService.reserveItems → ShippingAgent.calculateShippingOptions (Nexus)
+ *  3. [Update] fulfillOrder → stores request → InventoryService.reserveItems → ShippingAgent.recommendShippingOption (Nexus)
  *               → apply recommendation → concurrent: Carriers.printShippingLabel + InventoryService.deductInventory → return response
  *  4. execute() awaits state.notifyDeliveryStatus → updates delivery_status + status → complete
  *  5. [Signal] notifyDeliveryStatus → stores NotifyDeliveryStatusRequest in state
@@ -223,7 +223,7 @@ public class OrderImpl implements Order {
         Shipment selectedShipment = resolveSelectedShipment(request);
 
         // Get AI-driven shipping recommendation via ShippingAgent Nexus operation (UpdateWithStart)
-        var shippingRequestBuilder = CalculateShippingOptionsRequest.newBuilder()
+        var shippingRequestBuilder = RecommendShippingOptionRequest.newBuilder()
                         .setOrderId(orderId)
                         .setCustomerId(request.getProcessedOrder().getCustomerId())
                         .setToAddress(state.getValidatedAddress())
@@ -233,7 +233,7 @@ public class OrderImpl implements Order {
             shippingRequestBuilder.setSelectedShipment(selectedShipment);
         }
 
-        var shippingResponse = shippingAgent.calculateShippingOptions(shippingRequestBuilder.build());
+        var shippingResponse = shippingAgent.recommendShippingOption(shippingRequestBuilder.build());
 
         // Apply recommendation: select rate and compute margin delta
         var selection = applyRecommendation(shippingResponse, state.getOptions().getShippingMargin());
@@ -320,7 +320,7 @@ public class OrderImpl implements Order {
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    private ShippingOption findOption(CalculateShippingOptionsResponse response, String optionId) {
+    private ShippingOption findOption(RecommendShippingOptionResponse response, String optionId) {
         return response.getOptionsList().stream()
                 .filter(o -> o.getId().equals(optionId))
                 .findFirst()
@@ -328,7 +328,7 @@ public class OrderImpl implements Order {
                         "Recommended option not found in ShippingAgent response: " + optionId, "NO_OPTION"));
     }
 
-    private ShippingSelection applyRecommendation(CalculateShippingOptionsResponse response, Money shippingMargin) {
+    private ShippingSelection applyRecommendation(RecommendShippingOptionResponse response, Money shippingMargin) {
         var rec    = response.getRecommendation();
         var option = findOption(response, rec.getRecommendedOptionId());
         long delta = Math.max(0L, option.getCost().getUnits() - shippingMargin.getUnits());

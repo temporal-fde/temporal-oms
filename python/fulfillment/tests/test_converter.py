@@ -16,8 +16,8 @@ from src.converter._converters import (
 from src.converter._registry import REGISTRY
 
 from acme.fulfillment.domain.v1.shipping_agent_p2p import (
-    CalculateShippingOptionsRequest,
-    CalculateShippingOptionsResponse,
+    RecommendShippingOptionRequest,
+    RecommendShippingOptionResponse,
     ShippingOption,
 )
 from acme.fulfillment.domain.v1.workflows_p2p import (
@@ -42,8 +42,8 @@ from acme.common.v1.values_p2p import (
 # ---------------------------------------------------------------------------
 
 @pytest.fixture
-def simple_request() -> CalculateShippingOptionsRequest:
-    return CalculateShippingOptionsRequest(
+def simple_request() -> RecommendShippingOptionRequest:
+    return RecommendShippingOptionRequest(
         order_id="order-123",
         customer_id="cust-456",
     )
@@ -94,9 +94,9 @@ def test_json_proto_roundtrip(simple_request):
     assert payload.metadata[b"encoding"] == b"json/protobuf"
     assert payload.metadata[b"messageType"] != b""
 
-    result = conv.from_payload(payload, type_hint=CalculateShippingOptionsRequest)
+    result = conv.from_payload(payload, type_hint=RecommendShippingOptionRequest)
 
-    assert isinstance(result, CalculateShippingOptionsRequest)
+    assert isinstance(result, RecommendShippingOptionRequest)
     assert result.order_id == simple_request.order_id
     assert result.customer_id == simple_request.customer_id
 
@@ -118,14 +118,14 @@ def test_json_proto_omits_unset_selected_shipment(simple_request):
 
     assert "selectedShipment" not in data
 
-    result = conv.from_payload(payload, type_hint=CalculateShippingOptionsRequest)
+    result = conv.from_payload(payload, type_hint=RecommendShippingOptionRequest)
 
     assert "selected_shipment" not in result.model_fields_set
 
 
 def test_json_proto_preserves_explicit_zero_delivery_days():
     conv = PydanticJsonProtoPayloadConverter()
-    request = CalculateShippingOptionsRequest(
+    request = RecommendShippingOptionRequest(
         order_id="order-123",
         customer_id="cust-456",
         selected_shipment=Shipment(
@@ -142,7 +142,7 @@ def test_json_proto_preserves_explicit_zero_delivery_days():
 
     assert data["selectedShipment"]["easypost"]["selectedRate"]["deliveryDays"] == "0"
 
-    result = conv.from_payload(payload, type_hint=CalculateShippingOptionsRequest)
+    result = conv.from_payload(payload, type_hint=RecommendShippingOptionRequest)
     selected_rate = result.selected_shipment.easypost.selected_rate
 
     assert "selected_shipment" in result.model_fields_set
@@ -155,7 +155,7 @@ def test_json_proto_message_type_header(simple_request):
     payload = conv.to_payload(simple_request)
     msg_type = payload.metadata[b"messageType"].decode()
     # Must be the fully-qualified proto type name
-    assert "CalculateShippingOptionsRequest" in msg_type
+    assert "RecommendShippingOptionRequest" in msg_type
     assert msg_type.startswith("acme.")
 
 
@@ -172,9 +172,9 @@ def test_binary_proto_roundtrip(simple_request):
     assert payload.metadata[b"encoding"] == b"binary/protobuf"
     assert payload.metadata[b"messageType"] != b""
 
-    result = conv.from_payload(payload, type_hint=CalculateShippingOptionsRequest)
+    result = conv.from_payload(payload, type_hint=RecommendShippingOptionRequest)
 
-    assert isinstance(result, CalculateShippingOptionsRequest)
+    assert isinstance(result, RecommendShippingOptionRequest)
     assert result.order_id == simple_request.order_id
     assert result.customer_id == simple_request.customer_id
 
@@ -283,7 +283,7 @@ def test_json_from_payload_no_hint_returns_pb2(simple_request):
     conv = PydanticJsonProtoPayloadConverter()
     payload = conv.to_payload(simple_request)
     result = conv.from_payload(payload, type_hint=None)
-    assert isinstance(result, shipping_agent_pb2.CalculateShippingOptionsRequest)
+    assert isinstance(result, shipping_agent_pb2.RecommendShippingOptionRequest)
 
 
 # ---------------------------------------------------------------------------

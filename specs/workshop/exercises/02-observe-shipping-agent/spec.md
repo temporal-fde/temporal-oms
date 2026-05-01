@@ -21,7 +21,7 @@ apps.Order
   -> fulfillment.Order validateOrder, via Nexus endpoint oms-fulfillment-v1
   -> processing.Order, with send_fulfillment=false after Exercise 01
   -> fulfillment.Order fulfillOrder
-  -> ShippingAgent.calculateShippingOptions, via Nexus endpoint oms-fulfillment-agents-v1
+  -> ShippingAgent.recommendShippingOption, via Nexus endpoint oms-fulfillment-agents-v1
   -> ShippingAgent workflow, Python, fulfillment namespace, agents task queue
   -> fixture-backed shipping and integration tools
 ```
@@ -29,12 +29,12 @@ apps.Order
 `ShippingAgent` is a long-running per-customer workflow. Its workflow ID is `customer_id`, and the
 Python Nexus handler starts or reuses that workflow with UpdateWithStart:
 
-- Nexus service handler: `ShippingAgentImpl.calculate_shipping_options`
+- Nexus service handler: `ShippingAgentImpl.recommend_shipping_option`
 - Temporal workflow type: `ShippingAgent`
 - Workflow ID: `customer_id`
 - Task queue: `agents`
 - Conflict policy: use the existing workflow if it is already running
-- Update name: `calculate_shipping_options`
+- Update name: `recommend_shipping_option`
 - Update ID: the Nexus request ID when present
 
 The current implementation pre-resolves the inventory origin, and verifies the destination when
@@ -122,11 +122,11 @@ Possible implementation directions:
 
 The current implementation is an important constraint for that discussion:
 
-- `fulfillment.Order` calls `ShippingAgent.calculateShippingOptions` through a synchronous Nexus
+- `fulfillment.Order` calls `ShippingAgent.recommendShippingOption` through a synchronous Nexus
   operation.
 - The current `ShippingAgent` Nexus operation timeout in `fulfillment.Order` is 120 seconds.
 - The Python Nexus handler is a synchronous operation that waits for the `ShippingAgent`
-  `calculate_shipping_options` Update result.
+  `recommend_shipping_option` Update result.
 - A manual approval that waits minutes, hours, or days would keep the fulfillment update and Nexus
   operation open far longer than the current contract allows.
 
@@ -170,7 +170,7 @@ design decision. The lab should make that tradeoff visible rather than resolve i
 | Option | Mechanism | Pros | Cons |
 |---|---|---|---|
 | Instructor-only demo | Instructor runs valid, margin, and SLA scenarios while attendees watch Temporal UI | Lowest runtime risk; no attendee setup variance | Too passive for a hands-on workshop; attendees do not practice inspection |
-| Direct `ShippingAgent` update | Start `ShippingAgent` and call `calculate_shipping_options` with a handcrafted Temporal CLI payload | Isolates the AI workflow; easiest way to show cache behavior | Bypasses the full `apps -> fulfillment -> ShippingAgent` story that Exercise 01 set up |
+| Direct `ShippingAgent` update | Start `ShippingAgent` and call `recommend_shipping_option` with a handcrafted Temporal CLI payload | Isolates the AI workflow; easiest way to show cache behavior | Bypasses the full `apps -> fulfillment -> ShippingAgent` story that Exercise 01 set up |
 | Existing order scenarios | Use `scripts/scenarios/valid-order`, `margin-spike`, and `sla-breach` | Exercises the real order path; already fixture-backed; ties directly to Search Attributes | Needs Exercise 01 solution state; can create too many LLM calls if everyone runs all scenarios |
 | Unit-test style mocked LLM | Run Python tests or a local deterministic LLM stub | Fully deterministic; no external LLM key or rate limits | Less compelling as an operations/debugging exercise; hides the live activity and Nexus path |
 | Code extension | Add a new tool or modify prompt behavior | Strong hands-on learning | Wrong timebox and support load for Exercise 02; should be Exercise 03 |
@@ -225,7 +225,7 @@ In Temporal UI:
 3. Open the `fulfillment` namespace and find `ShippingAgent` for `CUSTOMER_ID`.
 
 They should observe that `ShippingAgent` is not a per-order child workflow. It is a long-running
-per-customer workflow that receives a `calculate_shipping_options` Update.
+per-customer workflow that receives a `recommend_shipping_option` Update.
 
 ### Act 3: Inspect The AI Reliability Harness
 

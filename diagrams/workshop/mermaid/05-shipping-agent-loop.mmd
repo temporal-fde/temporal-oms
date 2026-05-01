@@ -1,6 +1,6 @@
 flowchart TB
   Fulfillment["fulfillment.Order<br/>deterministic business workflow"]
-  Nexus["Nexus operation<br/>calculateShippingOptions"]
+  Nexus["Nexus operation<br/>recommendShippingOption"]
   Agent["ShippingAgent workflow<br/>WorkflowID: customer_id"]
   Cache{"cache hit?"}
   Prompt["build_system_prompt<br/>LocalActivity"]

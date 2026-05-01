@@ -18,7 +18,7 @@ caching shipping advisor. It is called by `fulfillment.Order` via a Nexus operat
 LLM-driven agent that accounts for real-world supply chain risk, inventory location, and margin
 protection.
 
-The workflow is keyed on `customer_id` and never concludes. It caches shipping calculations by
+The workflow is keyed on `customer_id` and never concludes. It caches shipping recommendations by
 a content hash of the request inputs so repeated calls for the same order characteristics are
 served from state without re-invoking the LLM or external APIs.
 
@@ -40,7 +40,7 @@ the LLM's reasoning. What `fulfillment.Order` does with that recommendation is i
 logic.
 
 Both the fulfillment path (`fulfillment.Order` V2 via Nexus) and the cart/UI path (storefront
-checkout rates) use the same workflow and the same `CalculateShippingOptionsRequest`. The caller
+checkout rates) use the same workflow and the same `RecommendShippingOptionRequest`. The caller
 always provides `items` with `sku_id`; the LLM always calls `lookup_inventory_location` first
 to resolve the warehouse origin from inventory. There is no pre-resolved `from_address` in the
 request — warehouse resolution is the agent's job regardless of caller.
@@ -57,13 +57,13 @@ request — warehouse resolution is the agent's job regardless of caller.
   activities; students see every step
 - Goal 3: Demonstrate durable concurrency — Claude dispatches multiple tools in parallel and
   Temporal executes them as concurrent activities, safely and durably
-- Goal 4: Cache shipping calculations by content hash within the long-running agent workflow so
+- Goal 4: Cache shipping recommendations by content hash within the long-running agent workflow so
   repeated calls are cheap
 
 ### Acceptance Criteria
 
 - [ ] `ShippingAgent` starts via UpdateWithStart from `fulfillment.Order`'s Nexus call
-- [ ] `calculate_shipping_options` Update triggers the agentic loop and returns a `ShippingRecommendation`
+- [ ] `recommend_shipping_option` Update triggers the agentic loop and returns a `ShippingRecommendation`
 - [ ] The LLM always calls `lookup_inventory_location` first, resolving the warehouse origin
       from `sku_id`s — no `from_address` is provided in the request by either caller
 - [ ] The LLM dispatches `get_carrier_rates` and `get_location_events` (origin + destination)
@@ -93,7 +93,7 @@ request — warehouse resolution is the agent's job regardless of caller.
   recommendation.
 - Shipping and location-event tool activities call `enablements-api`; runtime EasyPost calls have
   been removed from the workshop path.
-- `CalculateShippingOptionsRequest` carries `selected_shipment`, whose `paid_price` and
+- `RecommendShippingOptionRequest` carries `selected_shipment`, whose `paid_price` and
   `easypost.selected_rate.delivery_days` drive deterministic margin and SLA scenarios.
 - `ShippingAgent` accumulates and de-dupes every option returned by primary and alternate
   `get_carrier_rates` calls so `fulfillment.Order` can select any recommended option ID.
@@ -117,7 +117,7 @@ items: [{sku_id, qty}]                items: [{sku_id, qty}]
 to_address: (pre-verified)            to_address: (from user input)
         │                                     │
         └──────────────┬──────────────────────┘
-                       │  calculateShippingOptions Update
+                       │  recommendShippingOption Update
                        ▼
        ShippingAgent (Python, fulfillment namespace)
        WorkflowID: customer_id
@@ -139,7 +139,7 @@ to_address: (pre-verified)            to_address: (from user input)
            └── LLM final turn: reason across rates + SCRM (origin + dest)
                → ShippingRecommendation
                → cache result (keyed by from_easypost_id + items + destination)
-               → return CalculateShippingOptionsResponse
+               → return RecommendShippingOptionResponse
 
 fulfillment.Order applies recommendation (selects rate, sets margin_leak SA, etc.)
 ```
@@ -152,10 +152,10 @@ The workflow runs a standard hand-rolled agentic loop:
    call since the warehouse is not known until `lookup_inventory_location` returns)
 2. Build system prompt via `build_system_prompt` LocalActivity — result is memoized in event
    history so prompt changes do not affect replay of in-flight workflows and do not require a
-   build-id bump. The activity receives the full `CalculateShippingOptionsRequest` and returns
+   build-id bump. The activity receives the full `RecommendShippingOptionRequest` and returns
    the system prompt string. Includes: margin threshold rule, SLA rule, path instruction
    (warehouse resolution vs. pre-verified `from_address`), concurrency instruction, and final
-   JSON output format.
+   `finalize_recommendation` tool instruction.
 3. Build tool definitions: the four registered activity tools plus a fifth internal-only
    `finalize_recommendation` tool (see Design Decisions — Structured output via `finalize_recommendation`)
 4. Iterate:
@@ -174,7 +174,7 @@ The workflow runs a standard hand-rolled agentic loop:
    d. If `END_TURN` fires without a preceding `finalize_recommendation` call: raise a
       retryable `ApplicationError` — the LLM did not follow instructions
 5. Cache result keyed by content hash with TTL
-6. Return `CalculateShippingOptionsResponse`
+6. Return `RecommendShippingOptionResponse`
 
 ### Recommendation Outcomes
 
@@ -221,7 +221,7 @@ Cache key: `fn(sorted(from_easypost_ids), sorted([(skuId, qty)]), destinationPos
 
 | Decision | Rationale | Alternative Considered |
 |---|---|---|
-| Long-running per-`customer_id` workflow | Enables in-memory caching of rate calculations across multiple calls for the same customer without an external cache | Per-request short-lived workflow — no caching benefit, cold start on every call |
+| Long-running per-`customer_id` workflow | Enables in-memory caching of recommendations across multiple calls for the same customer without an external cache | Per-request short-lived workflow — no caching benefit, cold start on every call |
 | Hand-rolled agentic loop | Transparent to Workshop students; every LLM ↔ activity step is visible in workflow history | PydanticAI plugin — abstracts the loop, less teachable, adds dependency |
 | Fixed registered activities as tools (not dynamic dispatch) | Activities are already registered on the worker by name; no dispatch broker needed | Dynamic activity lookup — adds indirection with no benefit when tools are known |
 | LLM dispatches tools (not pre-fetched) | Shows students the LLM making real decisions about what to call and when; more interesting for teaching | Pre-fetch SCRM + rates before LLM — skips the agentic reasoning the workshop is designed to show |
@@ -244,7 +244,7 @@ Cache key: `fn(sorted(from_easypost_ids), sorted([(skuId, qty)]), destinationPos
 - **Namespace:** `fulfillment`
 - **Versioning:** PINNED
 - **Interfaces:**
-  - Update: `calculate_shipping_options(CalculateShippingOptionsRequest) → CalculateShippingOptionsResponse`
+  - Update: `recommend_shipping_option(RecommendShippingOptionRequest) → RecommendShippingOptionResponse`
   - Query: `get_options() → ShippingOptionsCache` (reads cached state, no LLM call)
 - **State:**
   - `cache: dict[str, ShippingOptionsResult]` — keyed by content hash
@@ -308,7 +308,7 @@ to its designated task queue via `ActivityOptions(task_queue=...)`.
 - Input: `Coordinate`, `within_km`, `active_from`, `active_to`, `timezone`
 - Output: `LocationRiskSummary`, `[LocationEvent]`
 - Currently stubbed — returns no events; see `specs/fulfillment/location-events/spec.md` for planned implementation
-- Called twice per calculation (origin + destination) — expected to run concurrently
+- Called twice per recommendation (origin + destination) — expected to run concurrently
 
 **`find_alternate_warehouse`**
 - **Task Queue:** Nexus (`fulfillment` namespace via `integrations` endpoint)
@@ -321,7 +321,7 @@ to its designated task queue via `ActivityOptions(task_queue=...)`.
 #### Nexus Service
 
 - **Interface:** `ShippingAgent` Nexus service (in `java/oms/src/main/java/com/acme/oms/services/ShippingAgent.java`)
-- **Operation:** `calculateShippingOptions(CalculateShippingOptionsRequest) → CalculateShippingOptionsResponse`
+- **Operation:** `recommendShippingOption(RecommendShippingOptionRequest) → RecommendShippingOptionResponse`
 - **Handler:** `ShippingAgentImpl` in Python `fulfillment` workers
 - **Endpoint name:** `shipping-agent`
 - **Pattern:** UpdateWithStart with `WORKFLOW_ID_CONFLICT_POLICY_USE_EXISTING` (same as `fulfillment.Order` ← `apps.Order`)
@@ -332,7 +332,7 @@ Proto definitions are the source of truth. This section describes intent only.
 
 #### `proto/acme/fulfillment/domain/v1/shipping_agent.proto` — extensions
 
-**`CalculateShippingOptionsRequest`** — replaces current stub. Carries:
+**`RecommendShippingOptionRequest`** — replaces current stub. Carries:
 - `order_id`, `customer_id`
 - `to_address` (`common.Address` with `easypost_address` already populated from `fulfillment.Order`
   `validateOrder` in the fulfillment path; raw address in the cart path — LLM may call
@@ -342,7 +342,7 @@ Proto definitions are the source of truth. This section describes intent only.
 - `selected_shipment`: optional `common.Shipment`; `paid_price` supplies the customer-paid margin
   context, and `easypost.selected_rate.delivery_days` supplies the selected delivery-days SLA.
 
-**`CalculateShippingOptionsResponse`** — replaces current stub. Carries:
+**`RecommendShippingOptionResponse`** — replaces current stub. Carries:
 - `recommendation`: `ShippingRecommendation`
 - `options`: `[ShippingOption]` (full accumulated set of available rates, including rates fetched
   after alternate warehouse lookup)
@@ -393,7 +393,7 @@ from packaged shipping fixtures, and `get_location_events` uses them when presen
 
 ### Phase 1 — Proto Schema
 
-- [x] Extend `CalculateShippingOptionsRequest` and `CalculateShippingOptionsResponse` with fields above
+- [x] Extend `RecommendShippingOptionRequest` and `RecommendShippingOptionResponse` with fields above
 - [x] Add `ShippingRecommendation` message and `RecommendationOutcome` enum
 - [x] Add `coordinate` field to `EasyPostAddress` in `common/v1/values.proto` (see Data Model note)
 - [x] Extend `ShippingAgentExecutionOptions` with `cache_ttl_secs`
@@ -414,7 +414,7 @@ from packaged shipping fixtures, and `get_location_events` uses them when presen
 ### Phase 3 — ShippingAgent Workflow
 
 - [ ] `ShippingAgent` workflow class: `@workflow.defn`, WorkflowID = `customer_id`
-- [ ] `calculate_shipping_options` Update handler:
+- [ ] `recommend_shipping_option` Update handler:
   - [ ] Compute cache key after `lookup_inventory_location` returns (warehouse `easypost_address.id`
         not known until then); return cached result if hit and within TTL
   - [ ] Call `build_system_prompt` LocalActivity to compute the system prompt string before
@@ -422,9 +422,9 @@ from packaged shipping fixtures, and `get_location_events` uses them when presen
         build-id bump (see Design Decisions)
   - [ ] Build tool definitions from the four activity signatures
   - [ ] Agentic loop: call LLM → dispatch concurrent activities for all tool_use blocks → append results → repeat
-  - [ ] Parse `ShippingRecommendation` from final text response
+  - [ ] Extract `ShippingRecommendation` from the `finalize_recommendation` tool input
   - [ ] Store result in cache with TTL metadata
-  - [ ] Return `CalculateShippingOptionsResponse`
+  - [ ] Return `RecommendShippingOptionResponse`
 - [ ] `get_options` Query handler: return current cache state
 - [ ] Unit tests:
   - [ ] Cache hit — LLM not called (after `lookup_inventory_location` resolves the key)
@@ -536,7 +536,7 @@ Each is a candidate for a follow-up spec or Workshop extension exercise.
 ### Warehouse address caching in workflow state
 
 **What:** Cache the `LookupInventoryLocationResponse` in workflow state after the first
-`lookup_inventory_location` call. On subsequent `calculate_shipping_options` updates, skip
+`lookup_inventory_location` call. On subsequent `recommend_shipping_option` updates, skip
 the activity entirely and inject the resolved warehouse address directly into the task context
 — removing it from the tool definitions so the LLM never has to call it.
 

@@ -6,8 +6,8 @@
 package com.acme.proto.acme.fulfillment.domain.fulfillment.v1;
 
 @com.google.protobuf.Generated
-public interface CalculateShippingOptionsResponseOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse)
+public interface RecommendShippingOptionResponseOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse)
     com.google.protobuf.MessageOrBuilder {
 
   /**

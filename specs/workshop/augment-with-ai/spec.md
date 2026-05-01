@@ -251,7 +251,7 @@ To Modify:
 
 ### Exercise 02 Validation
 
-- [ ] Valid-order scenario reaches `ShippingAgent.calculateShippingOptions`
+- [ ] Valid-order scenario reaches `ShippingAgent.recommendShippingOption`
 - [ ] Margin-spike scenario shows `find_alternate_warehouse` before accepted `MARGIN_SPIKE`
 - [ ] SLA-breach scenario shows `find_alternate_warehouse` before accepted `SLA_BREACH`
 - [ ] `fulfillment.Order` exposes `margin_leak` or `sla_breach_days` for the relevant scenarios

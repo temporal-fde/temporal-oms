@@ -7,16 +7,16 @@ package com.acme.proto.acme.fulfillment.domain.fulfillment.v1;
 
 /**
  * <pre>
- * CalculateShippingOptionsResponse is the Update response from the ShippingAgent.
+ * RecommendShippingOptionResponse is the Update response from the ShippingAgent.
  * </pre>
  *
- * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse}
+ * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse}
  */
 @com.google.protobuf.Generated
-public final class CalculateShippingOptionsResponse extends
+public final class RecommendShippingOptionResponse extends
     com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse)
-    CalculateShippingOptionsResponseOrBuilder {
+    // @@protoc_insertion_point(message_implements:acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse)
+    RecommendShippingOptionResponseOrBuilder {
 private static final long serialVersionUID = 0L;
   static {
     com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
@@ -25,32 +25,32 @@ private static final long serialVersionUID = 0L;
       /* minor= */ 34,
       /* patch= */ 1,
       /* suffix= */ "",
-      "CalculateShippingOptionsResponse");
+      "RecommendShippingOptionResponse");
   }
-  // Use CalculateShippingOptionsResponse.newBuilder() to construct.
-  private CalculateShippingOptionsResponse(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+  // Use RecommendShippingOptionResponse.newBuilder() to construct.
+  private RecommendShippingOptionResponse(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
   }
-  private CalculateShippingOptionsResponse() {
+  private RecommendShippingOptionResponse() {
     options_ = java.util.Collections.emptyList();
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_CalculateShippingOptionsResponse_descriptor;
+    return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_RecommendShippingOptionResponse_descriptor;
   }
 
   @java.lang.Override
   public com.google.protobuf.Descriptors.Descriptor getDescriptorForType() {
-    return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_CalculateShippingOptionsResponse_descriptor;
+    return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_RecommendShippingOptionResponse_descriptor;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_CalculateShippingOptionsResponse_fieldAccessorTable
+    return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_RecommendShippingOptionResponse_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
-            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse.class, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse.Builder.class);
+            com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse.class, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse.Builder.class);
   }
 
   private int bitField0_;
@@ -191,10 +191,10 @@ private static final long serialVersionUID = 0L;
     if (obj == this) {
      return true;
     }
-    if (!(obj instanceof com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse)) {
+    if (!(obj instanceof com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse)) {
       return super.equals(obj);
     }
-    com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse other = (com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse) obj;
+    com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse other = (com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse) obj;
 
     if (hasRecommendation() != other.hasRecommendation()) return false;
     if (hasRecommendation()) {
@@ -232,44 +232,44 @@ private static final long serialVersionUID = 0L;
     return hash;
   }
 
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse parseFrom(
       java.nio.ByteBuffer data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse parseFrom(
       java.nio.ByteBuffer data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse parseFrom(
       com.google.protobuf.ByteString data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse parseFrom(byte[] data)
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse parseFrom(byte[] data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse parseFrom(
       byte[] data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse parseFrom(java.io.InputStream input)
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse parseFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessage
         .parseWithIOException(PARSER, input);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse parseFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -277,26 +277,26 @@ private static final long serialVersionUID = 0L;
         .parseWithIOException(PARSER, input, extensionRegistry);
   }
 
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse parseDelimitedFrom(java.io.InputStream input)
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse parseDelimitedFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessage
         .parseDelimitedWithIOException(PARSER, input);
   }
 
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse parseDelimitedFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse parseDelimitedFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessage
         .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse parseFrom(
       com.google.protobuf.CodedInputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessage
         .parseWithIOException(PARSER, input);
   }
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse parseFrom(
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse parseFrom(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -309,7 +309,7 @@ private static final long serialVersionUID = 0L;
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-  public static Builder newBuilder(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse prototype) {
+  public static Builder newBuilder(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
   @java.lang.Override
@@ -326,29 +326,29 @@ private static final long serialVersionUID = 0L;
   }
   /**
    * <pre>
-   * CalculateShippingOptionsResponse is the Update response from the ShippingAgent.
+   * RecommendShippingOptionResponse is the Update response from the ShippingAgent.
    * </pre>
    *
-   * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse}
+   * Protobuf type {@code acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse}
    */
   public static final class Builder extends
       com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse)
-      com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponseOrBuilder {
+      // @@protoc_insertion_point(builder_implements:acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse)
+      com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponseOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_CalculateShippingOptionsResponse_descriptor;
+      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_RecommendShippingOptionResponse_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_CalculateShippingOptionsResponse_fieldAccessorTable
+      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_RecommendShippingOptionResponse_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse.class, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse.Builder.class);
+              com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse.class, com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse.Builder.class);
     }
 
-    // Construct using com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse.newBuilder()
+    // Construct using com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse.newBuilder()
     private Builder() {
       maybeForceBuilderInitialization();
     }
@@ -388,17 +388,17 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_CalculateShippingOptionsResponse_descriptor;
+      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.ShippingAgentProto.internal_static_acme_fulfillment_domain_fulfillment_v1_RecommendShippingOptionResponse_descriptor;
     }
 
     @java.lang.Override
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse getDefaultInstanceForType() {
-      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse.getDefaultInstance();
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse getDefaultInstanceForType() {
+      return com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse.getDefaultInstance();
     }
 
     @java.lang.Override
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse build() {
-      com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse result = buildPartial();
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse build() {
+      com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse result = buildPartial();
       if (!result.isInitialized()) {
         throw newUninitializedMessageException(result);
       }
@@ -406,15 +406,15 @@ private static final long serialVersionUID = 0L;
     }
 
     @java.lang.Override
-    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse buildPartial() {
-      com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse result = new com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse(this);
+    public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse buildPartial() {
+      com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse result = new com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse(this);
       buildPartialRepeatedFields(result);
       if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
     }
 
-    private void buildPartialRepeatedFields(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse result) {
+    private void buildPartialRepeatedFields(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse result) {
       if (optionsBuilder_ == null) {
         if (((bitField0_ & 0x00000002) != 0)) {
           options_ = java.util.Collections.unmodifiableList(options_);
@@ -426,7 +426,7 @@ private static final long serialVersionUID = 0L;
       }
     }
 
-    private void buildPartial0(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse result) {
+    private void buildPartial0(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse result) {
       int from_bitField0_ = bitField0_;
       int to_bitField0_ = 0;
       if (((from_bitField0_ & 0x00000001) != 0)) {
@@ -443,16 +443,16 @@ private static final long serialVersionUID = 0L;
 
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
-      if (other instanceof com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse) {
-        return mergeFrom((com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse)other);
+      if (other instanceof com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse) {
+        return mergeFrom((com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse)other);
       } else {
         super.mergeFrom(other);
         return this;
       }
     }
 
-    public Builder mergeFrom(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse other) {
-      if (other == com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse.getDefaultInstance()) return this;
+    public Builder mergeFrom(com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse other) {
+      if (other == com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse.getDefaultInstance()) return this;
       if (other.hasRecommendation()) {
         mergeRecommendation(other.getRecommendation());
       }
@@ -946,23 +946,23 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    // @@protoc_insertion_point(builder_scope:acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse)
+    // @@protoc_insertion_point(builder_scope:acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse)
   }
 
-  // @@protoc_insertion_point(class_scope:acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse)
-  private static final com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse DEFAULT_INSTANCE;
+  // @@protoc_insertion_point(class_scope:acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse)
+  private static final com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse();
+    DEFAULT_INSTANCE = new com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse();
   }
 
-  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse getDefaultInstance() {
+  public static com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse getDefaultInstance() {
     return DEFAULT_INSTANCE;
   }
 
-  private static final com.google.protobuf.Parser<CalculateShippingOptionsResponse>
-      PARSER = new com.google.protobuf.AbstractParser<CalculateShippingOptionsResponse>() {
+  private static final com.google.protobuf.Parser<RecommendShippingOptionResponse>
+      PARSER = new com.google.protobuf.AbstractParser<RecommendShippingOptionResponse>() {
     @java.lang.Override
-    public CalculateShippingOptionsResponse parsePartialFrom(
+    public RecommendShippingOptionResponse parsePartialFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -981,17 +981,17 @@ private static final long serialVersionUID = 0L;
     }
   };
 
-  public static com.google.protobuf.Parser<CalculateShippingOptionsResponse> parser() {
+  public static com.google.protobuf.Parser<RecommendShippingOptionResponse> parser() {
     return PARSER;
   }
 
   @java.lang.Override
-  public com.google.protobuf.Parser<CalculateShippingOptionsResponse> getParserForType() {
+  public com.google.protobuf.Parser<RecommendShippingOptionResponse> getParserForType() {
     return PARSER;
   }
 
   @java.lang.Override
-  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.CalculateShippingOptionsResponse getDefaultInstanceForType() {
+  public com.acme.proto.acme.fulfillment.domain.fulfillment.v1.RecommendShippingOptionResponse getDefaultInstanceForType() {
     return DEFAULT_INSTANCE;
   }
 
