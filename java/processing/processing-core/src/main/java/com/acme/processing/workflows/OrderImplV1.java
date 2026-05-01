@@ -17,14 +17,19 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 
-public class OrderImpl implements Order {
+/**
+ * Legacy processing.Order implementation used as the workshop starting point.
+ *
+ * V1 always publishes the Kafka fulfillment handoff after validation and enrichment.
+ */
+public class OrderImplV1 implements Order {
     private final Options optionsActs;
     private final Fulfillments fulfillments;
     private GetProcessOrderStateResponse state;
-    private Logger logger = LoggerFactory.getLogger(OrderImpl.class);
+    private Logger logger = LoggerFactory.getLogger(OrderImplV1.class);
 
     @WorkflowInit
-    public OrderImpl(ProcessOrderRequest args) {
+    public OrderImplV1(ProcessOrderRequest args) {
         this.state = GetProcessOrderStateResponse.newBuilder().build();
         this.state = this.state.toBuilder().addArgs(args).build();
         this.optionsActs = Workflow.newLocalActivityStub(Options.class,
@@ -47,7 +52,6 @@ public class OrderImpl implements Order {
         if (!opts.hasOmsProperties()) {
             opts = this.optionsActs.getOptions(opts);
         }
-        boolean sendFulfillment = !opts.hasSendFulfillment() || opts.getSendFulfillment();
 
         var integrationsEndpoint = opts.getOmsProperties().getProcessing().getNexus().getEndpointsOrThrow("integrations");
         final long timeoutSecs = opts.getProcessingTimeoutSecs() > 0 ? opts.getProcessingTimeoutSecs() : 86400L;
@@ -101,21 +105,19 @@ public class OrderImpl implements Order {
                     pimService.enrichOrder(EnrichOrderRequest.newBuilder()
                             .setOrder(request.getOrder()).build())).build();
 
-            if (sendFulfillment) {
-                try {
-                    this.state = this.state.toBuilder().setFulfillment(this.fulfillments.fulfillOrder(FulfillOrderRequest.newBuilder()
-                            .setOrder(request.getOrder()).addAllItems(this.state.getEnrichment().getItemsList()).build())).build();
-                } catch (ApplicationFailure e) {
-                    if (e.isNonRetryable()) {
-                        // permanent failure
-                        // move this to the support workflow
-                    }
+            try {
+                this.state = this.state.toBuilder().setFulfillment(this.fulfillments.fulfillOrder(FulfillOrderRequest.newBuilder()
+                        .setOrder(request.getOrder()).addAllItems(this.state.getEnrichment().getItemsList()).build())).build();
+            } catch (ApplicationFailure e) {
+                if (e.isNonRetryable()) {
+                    // permanent failure
+                    // move this to the support workflow
                 }
             }
         });
 
         Workflow.newTimer(Duration.ofSeconds(timeoutSecs)).thenApply(result -> {
-            if (!state.hasEnrichment() || (sendFulfillment && !state.hasFulfillment())) {
+            if (!state.hasFulfillment()) {
                 scope.cancel();
             }
             return null;

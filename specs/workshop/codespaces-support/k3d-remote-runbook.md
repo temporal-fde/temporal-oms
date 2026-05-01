@@ -207,7 +207,7 @@ Check Temporal's view of the processing worker deployment:
 
 ```bash
 temporal --address localhost:7233 worker deployment list --namespace processing
-temporal --address localhost:7233 worker deployment describe --namespace processing --deployment-name processing
+temporal --address localhost:7233 worker deployment describe --namespace processing --name processing
 ```
 
 ## Phase 4: Verify k3d Pods Can Reach Host Temporal

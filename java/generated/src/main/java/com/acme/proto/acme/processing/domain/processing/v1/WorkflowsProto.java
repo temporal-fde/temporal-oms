@@ -28,97 +28,97 @@ public final class WorkflowsProto extends com.google.protobuf.GeneratedFile {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_acme_processing_domain_processing_v1_ProcessOrderRequest_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_acme_processing_domain_processing_v1_ProcessOrderRequest_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_acme_processing_domain_processing_v1_ProcessOrderRequestExecutionOptions_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_acme_processing_domain_processing_v1_ProcessOrderRequestExecutionOptions_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_acme_processing_domain_processing_v1_GetProcessOrderStateResponse_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_acme_processing_domain_processing_v1_GetProcessOrderStateResponse_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_acme_processing_domain_processing_v1_EnrichOrderRequest_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_acme_processing_domain_processing_v1_EnrichOrderRequest_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_acme_processing_domain_processing_v1_EnrichOrderResponse_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_acme_processing_domain_processing_v1_EnrichOrderResponse_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_acme_processing_domain_processing_v1_ValidateOrderRequest_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_acme_processing_domain_processing_v1_ValidateOrderRequest_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_acme_processing_domain_processing_v1_ValidateOrderResponse_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_acme_processing_domain_processing_v1_ValidateOrderResponse_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_acme_processing_domain_processing_v1_EnrichedItem_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_acme_processing_domain_processing_v1_EnrichedItem_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_acme_processing_domain_processing_v1_CompletePaymentRequest_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_acme_processing_domain_processing_v1_CompletePaymentRequest_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_acme_processing_domain_processing_v1_CompletePaymentResponse_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_acme_processing_domain_processing_v1_CompletePaymentResponse_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_acme_processing_domain_processing_v1_ValidatePaymentRequest_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_acme_processing_domain_processing_v1_ValidatePaymentRequest_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_acme_processing_domain_processing_v1_ValidatePaymentResponse_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_acme_processing_domain_processing_v1_ValidatePaymentResponse_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_acme_processing_domain_processing_v1_FulfillOrderRequest_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_acme_processing_domain_processing_v1_FulfillOrderRequest_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_acme_processing_domain_processing_v1_FulfillOrderResponse_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_acme_processing_domain_processing_v1_FulfillOrderResponse_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_acme_processing_domain_processing_v1_InitializeSupportTeam_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_acme_processing_domain_processing_v1_InitializeSupportTeam_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_acme_processing_domain_processing_v1_ManuallyValidateOrderRequest_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_acme_processing_domain_processing_v1_ManuallyValidateOrderRequest_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_acme_processing_domain_processing_v1_ManuallyValidateOrderResponse_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_acme_processing_domain_processing_v1_ManuallyValidateOrderResponse_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_acme_processing_domain_processing_v1_CompleteOrderValidationRequest_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_acme_processing_domain_processing_v1_CompleteOrderValidationRequest_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_acme_processing_domain_processing_v1_GetSupportTeamStateResponse_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_acme_processing_domain_processing_v1_GetSupportTeamStateResponse_fieldAccessorTable;
 
@@ -143,81 +143,82 @@ public final class WorkflowsProto extends com.google.protobuf.GeneratedFile {
       "(\tR\007orderId\022\037\n\013customer_id\030\004 \001(\tR\ncustom" +
       "erId\022(\n\005order\030\005 \001(\0132\022.acme.oms.v1.OrderR" +
       "\005order\022.\n\007payment\030\006 \001(\0132\024.acme.oms.v1.Pa" +
-      "ymentR\007paymentB\n\n\010_options\"\331\001\n#ProcessOr" +
+      "ymentR\007paymentB\n\n\010_options\"\236\002\n#ProcessOr" +
       "derRequestExecutionOptions\022;\n\027processing" +
       "_timeout_secs\030\001 \001(\003H\000R\025processingTimeout" +
       "Secs\210\001\001\022F\n\016oms_properties\030\002 \001(\0132\032.acme.o" +
-      "ms.v1.OmsPropertiesH\001R\romsProperties\210\001\001B" +
-      "\032\n\030_processing_timeout_secsB\021\n\017_oms_prop" +
-      "erties\"\233\003\n\034GetProcessOrderStateResponse\022" +
-      "M\n\004args\030\001 \003(\01329.acme.processing.domain.p" +
-      "rocessing.v1.ProcessOrderRequestR\004args\022[" +
-      "\n\nvalidation\030\002 \001(\0132;.acme.processing.dom" +
-      "ain.processing.v1.ValidateOrderResponseR" +
-      "\nvalidation\022Y\n\nenrichment\030\003 \001(\01329.acme.p" +
-      "rocessing.domain.processing.v1.EnrichOrd" +
-      "erResponseR\nenrichment\022\\\n\013fulfillment\030\004 " +
-      "\001(\0132:.acme.processing.domain.processing." +
-      "v1.FulfillOrderResponseR\013fulfillment\022\026\n\006" +
-      "errors\030\005 \003(\tR\006errors\">\n\022EnrichOrderReque" +
-      "st\022(\n\005order\030\001 \001(\0132\022.acme.oms.v1.OrderR\005o" +
-      "rder\"\211\001\n\023EnrichOrderResponse\022(\n\005order\030\001 " +
-      "\001(\0132\022.acme.oms.v1.OrderR\005order\022H\n\005items\030" +
-      "\002 \003(\01322.acme.processing.domain.processin" +
-      "g.v1.EnrichedItemR\005items\"\231\001\n\024ValidateOrd" +
-      "erRequest\0226\n\027validation_timeout_secs\030\001 \001" +
-      "(\003R\025validationTimeoutSecs\022\037\n\013customer_id" +
-      "\030\002 \001(\tR\ncustomerId\022(\n\005order\030\003 \001(\0132\022.acme" +
-      ".oms.v1.OrderR\005order\"\330\001\n\025ValidateOrderRe" +
-      "sponse\022(\n\005order\030\001 \001(\0132\022.acme.oms.v1.Orde" +
-      "rR\005order\0228\n\030manual_correction_needed\030\002 \001" +
-      "(\010R\026manualCorrectionNeeded\022*\n\021support_ti" +
-      "cket_id\030\003 \001(\tR\017supportTicketId\022/\n\023valida" +
-      "tion_failures\030\004 \003(\tR\022validationFailures\"" +
-      "y\n\014EnrichedItem\022\027\n\007item_id\030\001 \001(\tR\006itemId" +
-      "\022\025\n\006sku_id\030\002 \001(\tR\005skuId\022\035\n\nbrand_code\030\003 " +
-      "\001(\tR\tbrandCode\022\032\n\010quantity\030\004 \001(\005R\010quanti" +
-      "ty\"M\n\026CompletePaymentRequest\022\020\n\003rrn\030\001 \001(" +
-      "\tR\003rrn\022!\n\014amount_cents\030\002 \001(\003R\013amountCent" +
-      "s\"M\n\027CompletePaymentResponse\022\030\n\007success\030" +
-      "\001 \001(\010R\007success\022\030\n\007message\030\002 \001(\tR\007message" +
-      "\"^\n\026ValidatePaymentRequest\022\020\n\003rrn\030\001 \001(\tR" +
-      "\003rrn\0222\n\025expected_amount_cents\030\002 \001(\003R\023exp" +
-      "ectedAmountCents\"\206\001\n\027ValidatePaymentResp" +
-      "onse\022\024\n\005valid\030\001 \001(\010R\005valid\022%\n\016payment_st" +
-      "atus\030\002 \001(\tR\rpaymentStatus\022.\n\023actual_amou" +
-      "nt_cents\030\003 \001(\003R\021actualAmountCents\"\252\001\n\023Fu" +
-      "lfillOrderRequest\022\037\n\013customer_id\030\002 \001(\tR\n" +
-      "customerId\022(\n\005order\030\001 \001(\0132\022.acme.oms.v1." +
-      "OrderR\005order\022H\n\005items\030\003 \003(\01322.acme.proce" +
-      "ssing.domain.processing.v1.EnrichedItemR" +
-      "\005items\"\026\n\024FulfillOrderResponse\"\214\001\n\025Initi" +
-      "alizeSupportTeam\022s\n\023validation_requests\030" +
-      "\001 \003(\0132B.acme.processing.domain.processin" +
-      "g.v1.ManuallyValidateOrderRequestR\022valid" +
-      "ationRequests\"\253\001\n\034ManuallyValidateOrderR" +
-      "equest\022\037\n\013customer_id\030\001 \001(\tR\ncustomerId\022" +
-      "(\n\005order\030\002 \001(\0132\022.acme.oms.v1.OrderR\005orde" +
-      "r\022\037\n\013workflow_id\030\003 \001(\tR\nworkflowId\022\037\n\013ac" +
-      "tivity_id\030\004 \001(\tR\nactivityId\"\037\n\035ManuallyV" +
-      "alidateOrderResponse\"\201\002\n\036CompleteOrderVa" +
-      "lidationRequest\022q\n\022validation_request\030\001 " +
-      "\001(\0132B.acme.processing.domain.processing." +
-      "v1.ManuallyValidateOrderRequestR\021validat" +
-      "ionRequest\022l\n\023validation_response\030\002 \001(\0132" +
-      ";.acme.processing.domain.processing.v1.V" +
-      "alidateOrderResponseR\022validationResponse" +
-      "\"\222\001\n\033GetSupportTeamStateResponse\022s\n\023vali" +
-      "dation_requests\030\001 \003(\0132B.acme.processing." +
-      "domain.processing.v1.ManuallyValidateOrd" +
-      "erRequestR\022validationRequestsB\372\001\n3com.ac" +
-      "me.proto.acme.processing.domain.processi" +
-      "ng.v1B\016WorkflowsProtoP\001\242\002\004APDP\252\002$Acme.Pr" +
-      "ocessing.Domain.Processing.V1\312\002$Acme\\Pro" +
-      "cessing\\Domain\\Processing\\V1\342\0020Acme\\Proc" +
-      "essing\\Domain\\Processing\\V1\\GPBMetadata\352" +
-      "\002(Acme::Processing::Domain::Processing::" +
-      "V1b\006proto3"
+      "ms.v1.OmsPropertiesH\001R\romsProperties\210\001\001\022" +
+      ".\n\020send_fulfillment\030\003 \001(\010H\002R\017sendFulfill" +
+      "ment\210\001\001B\032\n\030_processing_timeout_secsB\021\n\017_" +
+      "oms_propertiesB\023\n\021_send_fulfillment\"\233\003\n\034" +
+      "GetProcessOrderStateResponse\022M\n\004args\030\001 \003" +
+      "(\01329.acme.processing.domain.processing.v" +
+      "1.ProcessOrderRequestR\004args\022[\n\nvalidatio" +
+      "n\030\002 \001(\0132;.acme.processing.domain.process" +
+      "ing.v1.ValidateOrderResponseR\nvalidation" +
+      "\022Y\n\nenrichment\030\003 \001(\01329.acme.processing.d" +
+      "omain.processing.v1.EnrichOrderResponseR" +
+      "\nenrichment\022\\\n\013fulfillment\030\004 \001(\0132:.acme." +
+      "processing.domain.processing.v1.FulfillO" +
+      "rderResponseR\013fulfillment\022\026\n\006errors\030\005 \003(" +
+      "\tR\006errors\">\n\022EnrichOrderRequest\022(\n\005order" +
+      "\030\001 \001(\0132\022.acme.oms.v1.OrderR\005order\"\211\001\n\023En" +
+      "richOrderResponse\022(\n\005order\030\001 \001(\0132\022.acme." +
+      "oms.v1.OrderR\005order\022H\n\005items\030\002 \003(\01322.acm" +
+      "e.processing.domain.processing.v1.Enrich" +
+      "edItemR\005items\"\231\001\n\024ValidateOrderRequest\0226" +
+      "\n\027validation_timeout_secs\030\001 \001(\003R\025validat" +
+      "ionTimeoutSecs\022\037\n\013customer_id\030\002 \001(\tR\ncus" +
+      "tomerId\022(\n\005order\030\003 \001(\0132\022.acme.oms.v1.Ord" +
+      "erR\005order\"\330\001\n\025ValidateOrderResponse\022(\n\005o" +
+      "rder\030\001 \001(\0132\022.acme.oms.v1.OrderR\005order\0228\n" +
+      "\030manual_correction_needed\030\002 \001(\010R\026manualC" +
+      "orrectionNeeded\022*\n\021support_ticket_id\030\003 \001" +
+      "(\tR\017supportTicketId\022/\n\023validation_failur" +
+      "es\030\004 \003(\tR\022validationFailures\"y\n\014Enriched" +
+      "Item\022\027\n\007item_id\030\001 \001(\tR\006itemId\022\025\n\006sku_id\030" +
+      "\002 \001(\tR\005skuId\022\035\n\nbrand_code\030\003 \001(\tR\tbrandC" +
+      "ode\022\032\n\010quantity\030\004 \001(\005R\010quantity\"M\n\026Compl" +
+      "etePaymentRequest\022\020\n\003rrn\030\001 \001(\tR\003rrn\022!\n\014a" +
+      "mount_cents\030\002 \001(\003R\013amountCents\"M\n\027Comple" +
+      "tePaymentResponse\022\030\n\007success\030\001 \001(\010R\007succ" +
+      "ess\022\030\n\007message\030\002 \001(\tR\007message\"^\n\026Validat" +
+      "ePaymentRequest\022\020\n\003rrn\030\001 \001(\tR\003rrn\0222\n\025exp" +
+      "ected_amount_cents\030\002 \001(\003R\023expectedAmount" +
+      "Cents\"\206\001\n\027ValidatePaymentResponse\022\024\n\005val" +
+      "id\030\001 \001(\010R\005valid\022%\n\016payment_status\030\002 \001(\tR" +
+      "\rpaymentStatus\022.\n\023actual_amount_cents\030\003 " +
+      "\001(\003R\021actualAmountCents\"\252\001\n\023FulfillOrderR" +
+      "equest\022\037\n\013customer_id\030\002 \001(\tR\ncustomerId\022" +
+      "(\n\005order\030\001 \001(\0132\022.acme.oms.v1.OrderR\005orde" +
+      "r\022H\n\005items\030\003 \003(\01322.acme.processing.domai" +
+      "n.processing.v1.EnrichedItemR\005items\"\026\n\024F" +
+      "ulfillOrderResponse\"\214\001\n\025InitializeSuppor" +
+      "tTeam\022s\n\023validation_requests\030\001 \003(\0132B.acm" +
+      "e.processing.domain.processing.v1.Manual" +
+      "lyValidateOrderRequestR\022validationReques" +
+      "ts\"\253\001\n\034ManuallyValidateOrderRequest\022\037\n\013c" +
+      "ustomer_id\030\001 \001(\tR\ncustomerId\022(\n\005order\030\002 " +
+      "\001(\0132\022.acme.oms.v1.OrderR\005order\022\037\n\013workfl" +
+      "ow_id\030\003 \001(\tR\nworkflowId\022\037\n\013activity_id\030\004" +
+      " \001(\tR\nactivityId\"\037\n\035ManuallyValidateOrde" +
+      "rResponse\"\201\002\n\036CompleteOrderValidationReq" +
+      "uest\022q\n\022validation_request\030\001 \001(\0132B.acme." +
+      "processing.domain.processing.v1.Manually" +
+      "ValidateOrderRequestR\021validationRequest\022" +
+      "l\n\023validation_response\030\002 \001(\0132;.acme.proc" +
+      "essing.domain.processing.v1.ValidateOrde" +
+      "rResponseR\022validationResponse\"\222\001\n\033GetSup" +
+      "portTeamStateResponse\022s\n\023validation_requ" +
+      "ests\030\001 \003(\0132B.acme.processing.domain.proc" +
+      "essing.v1.ManuallyValidateOrderRequestR\022" +
+      "validationRequestsB\372\001\n3com.acme.proto.ac" +
+      "me.processing.domain.processing.v1B\016Work" +
+      "flowsProtoP\001\242\002\004APDP\252\002$Acme.Processing.Do" +
+      "main.Processing.V1\312\002$Acme\\Processing\\Dom" +
+      "ain\\Processing\\V1\342\0020Acme\\Processing\\Doma" +
+      "in\\Processing\\V1\\GPBMetadata\352\002(Acme::Pro" +
+      "cessing::Domain::Processing::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -238,7 +239,7 @@ public final class WorkflowsProto extends com.google.protobuf.GeneratedFile {
     internal_static_acme_processing_domain_processing_v1_ProcessOrderRequestExecutionOptions_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_acme_processing_domain_processing_v1_ProcessOrderRequestExecutionOptions_descriptor,
-        new java.lang.String[] { "ProcessingTimeoutSecs", "OmsProperties", });
+        new java.lang.String[] { "ProcessingTimeoutSecs", "OmsProperties", "SendFulfillment", });
     internal_static_acme_processing_domain_processing_v1_GetProcessOrderStateResponse_descriptor =
       getDescriptor().getMessageType(2);
     internal_static_acme_processing_domain_processing_v1_GetProcessOrderStateResponse_fieldAccessorTable = new

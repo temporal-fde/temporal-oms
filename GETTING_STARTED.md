@@ -407,7 +407,7 @@ temporal worker deployment set-current-version \
 Verify the current version is set:
 ```bash
 temporal worker deployment describe \
-  --deployment-name processing \
+  --name processing \
   --namespace processing
 ```
 

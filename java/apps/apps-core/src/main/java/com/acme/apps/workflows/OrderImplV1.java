@@ -1,12 +1,9 @@
 package com.acme.apps.workflows;
 
 import com.acme.apps.workflows.activities.Options;
-import com.acme.oms.services.Fulfillment;
 import com.acme.oms.services.Processing;
 import com.acme.proto.acme.apps.domain.apps.v1.*;
 import com.acme.proto.acme.apps.domain.apps.v1.Errors;
-import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.*;
-import com.acme.proto.acme.fulfillment.domain.fulfillment.v1.FulfillOrderRequest;
 import com.acme.proto.acme.processing.domain.processing.v1.*;
 import io.temporal.activity.LocalActivityOptions;
 import io.temporal.common.VersioningBehavior;
@@ -22,22 +19,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Implementation of CompleteOrder Workflow
+ * Legacy CompleteOrder workflow used as the workshop starting point.
  *
- * Pattern: Application Service (Orchestrator)
- * - Coordinates across multiple bounded contexts
- * - Uses Nexus to start workflows in processing and fulfillment namespaces
- * - Manages order lifecycle via Updates
+ * V1 delegates fulfillment ownership to processing.Order, which publishes the
+ * Kafka fulfillment handoff after validation and enrichment.
  */
-public class OrderImpl implements Order {
+public class OrderImplV1 implements Order {
     private final Options optionsActs;
     private GetCompleteOrderStateResponse state;
-    private final Logger logger = LoggerFactory.getLogger(OrderImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(OrderImplV1.class);
     private Processing processing;
-    private Fulfillment fulfillment;
 
     @WorkflowInit
-    public OrderImpl(CompleteOrderRequest args) {
+    public OrderImplV1(CompleteOrderRequest args) {
 
         this.state = GetCompleteOrderStateResponse.newBuilder()
                 .setArgs(args)
@@ -77,13 +71,7 @@ public class OrderImpl implements Order {
                 .getApps()
                 .getNexus()
                 .getEndpointsOrThrow("order-processing");
-        var fulfillmentEndpoint = this.state.getOptions()
-                .getOmsProperties()
-                .getApps()
-                .getNexus()
-                .getEndpointsOrThrow("order-fulfillment");
 
-        // configure nexus interactions with processing namespace
         this.processing = Workflow.newNexusServiceStub(Processing.class,
                 NexusServiceOptions.newBuilder()
                         .setOperationOptions(NexusOperationOptions.newBuilder()
@@ -91,16 +79,6 @@ public class OrderImpl implements Order {
                                 .setCancellationType(NexusOperationCancellationType.WAIT_REQUESTED)
                                 .build())
                         .setEndpoint(processingEndpoint)
-                        .build());
-
-        // configure nexus interactions with fulfillment namespace
-        this.fulfillment = Workflow.newNexusServiceStub(Fulfillment.class,
-                NexusServiceOptions.newBuilder()
-                        .setOperationOptions(NexusOperationOptions.newBuilder()
-                                .setScheduleToCloseTimeout(Duration.ofSeconds(Math.min(remainingTime, 120)))
-                                .setCancellationType(NexusOperationCancellationType.WAIT_REQUESTED)
-                                .build())
-                        .setEndpoint(fulfillmentEndpoint)
                         .build());
 
         // wait for processing timeout to fire OR
@@ -120,32 +98,6 @@ public class OrderImpl implements Order {
             return;
         }
 
-        var order = this.state.getProcessOrder().getOrder();
-        var fulfillmentStartBuilder = StartOrderFulfillmentRequest.newBuilder()
-                .setOrderId(this.state.getArgs().getOrderId())
-                .setCustomerId(this.state.getArgs().getCustomerId())
-                .setPlacedOrder(PlacedOrder.newBuilder()
-                        .setOrderId(this.state.getArgs().getOrderId())
-                        .setCustomerId(this.state.getArgs().getCustomerId())
-                        .addAllItems(order.getItemsList().stream()
-                                .map(item -> FulfillmentItem.newBuilder()
-                                        .setItemId(item.getItemId())
-                                        .setQuantity(item.getQuantity())
-                                        .build())
-                                .toList())
-                        .setShippingAddress(order.getShippingAddress())
-                        .build());
-
-        if (order.hasSelectedShipment()) {
-            fulfillmentStartBuilder.setSelectedShipment(order.getSelectedShipment());
-        }
-
-        var fulfillmentStartRequest = fulfillmentStartBuilder.build();
-
-        // Launch validateOrder Nexus (starts fulfillment.Order + verifies address) concurrently with processOrder
-        var validatePromise = Async.function(this.fulfillment::validateOrder, fulfillmentStartRequest);
-
-        // process order now that we have all bits of data we need
         CancellationScope scope = Workflow.newCancellationScope(() -> {
             var processedOrder = this.processing.processOrder(this.state.getProcessOrder());
             this.state = this.state.toBuilder().setProcessedOrder(processedOrder).build();
@@ -170,34 +122,6 @@ public class OrderImpl implements Order {
         }
 
         if(this.state.getErrorsCount() == 0) {
-            // Ensure address validation completed before dispatching fulfillment
-            validatePromise.get();
-
-            // Dispatch fulfillOrder to fulfillment.Order — fire-and-forward via Nexus
-            // fulfillment.Order is the source of truth for fulfillment state after this point
-            var fulfillOrderBuilder = FulfillOrderRequest.newBuilder()
-                    .setProcessedOrder(ProcessedOrder.newBuilder()
-                            .setOrderId(this.state.getArgs().getOrderId())
-                            .setCustomerId(this.state.getArgs().getCustomerId())
-                            .addAllItems(this.state.getProcessedOrder().getEnrichment().getItemsList().stream()
-                                    .map(item -> FulfillmentItem.newBuilder()
-                                            .setItemId(item.getItemId())
-                                            .setSkuId(item.getSkuId())
-                                            .setBrandCode(item.getBrandCode())
-                                            .setQuantity(item.getQuantity())
-                                            .build())
-                                    .toList())
-                            .build())
-                    .setDeliveryStatusRequest(
-                            NotifyDeliveryStatusRequest.newBuilder()
-                                    .setDeliveryStatusValue(DeliveryStatus.DELIVERY_STATUS_DELIVERED_VALUE));
-
-            if (order.hasSelectedShipment()) {
-                fulfillOrderBuilder.setSelectedShipment(order.getSelectedShipment());
-            }
-
-            this.fulfillment.fulfillOrder(fulfillOrderBuilder.build());
-
             Workflow.await(Workflow::isEveryHandlerFinished);
             return;
         }
@@ -297,9 +221,7 @@ public class OrderImpl implements Order {
                     .setOptions(ProcessOrderRequestExecutionOptions.newBuilder()
                             .setProcessingTimeoutSecs(
                                     state.getOptions().getProcessingTimeoutSecs()
-                            )
-                            .setSendFulfillment(false)
-                            .build())).build();
+                            ).build())).build();
         }
     }
 

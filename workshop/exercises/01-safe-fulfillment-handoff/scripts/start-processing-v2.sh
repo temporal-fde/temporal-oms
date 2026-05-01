@@ -13,6 +13,7 @@ require_command curl
 build_processing_worker
 
 start_service processing-workers-v2 env \
+  ACME_PROCESSING_ORDER_WORKFLOW_CLASS=com.acme.processing.workflows.OrderImpl \
   TEMPORAL_DEPLOYMENT_NAME=processing \
   TEMPORAL_WORKER_BUILD_ID=v2 \
   java -jar "$ROOT_DIR/java/processing/processing-workers/target/processing-workers-1.0.0-SNAPSHOT.jar" \

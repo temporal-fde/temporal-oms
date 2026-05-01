@@ -1,6 +1,5 @@
 package com.acme.processing.workflows.activities;
 
-import com.acme.processing.workflows.OrderImpl;
 import com.acme.proto.acme.processing.domain.processing.v1.FulfillOrderRequest;
 import com.acme.proto.acme.processing.domain.processing.v1.FulfillOrderResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;

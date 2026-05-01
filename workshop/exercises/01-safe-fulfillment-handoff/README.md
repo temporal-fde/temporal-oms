@@ -110,11 +110,11 @@ temporal worker deployment set-current-version \
 
 ```bash
 temporal worker deployment describe \
-  --deployment-name processing \
+  --name processing \
   --namespace processing
 
 temporal worker deployment describe \
-  --deployment-name apps \
+  --name apps \
   --namespace apps
 ```
 
@@ -182,7 +182,7 @@ Confirm `processing v2` is polling:
 
 ```bash
 temporal worker deployment describe \
-  --deployment-name processing \
+  --name processing \
   --namespace processing
 ```
 
@@ -200,7 +200,7 @@ temporal worker deployment set-current-version \
 
 ```bash
 temporal worker deployment describe \
-  --deployment-name processing \
+  --name processing \
   --namespace processing
 ```
 
@@ -246,7 +246,7 @@ Confirm `apps v2` is polling:
 
 ```bash
 temporal worker deployment describe \
-  --deployment-name apps \
+  --name apps \
   --namespace apps
 ```
 
@@ -309,11 +309,11 @@ temporal worker deployment set-current-version \
 
 ```bash
 temporal worker deployment describe \
-  --deployment-name processing \
+  --name processing \
   --namespace processing
 
 temporal worker deployment describe \
-  --deployment-name apps \
+  --name apps \
   --namespace apps
 ```
 

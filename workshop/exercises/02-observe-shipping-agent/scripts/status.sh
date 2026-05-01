@@ -82,7 +82,7 @@ for entry in "apps:apps" "processing:processing"; do
   echo "$deployment / namespace $namespace"
   temporal --disable-config-file --disable-config-env --address "$TEMPORAL_ADDRESS" \
     worker deployment describe \
-    --deployment-name "$deployment" \
+    --name "$deployment" \
     --namespace "$namespace" \
     2>/dev/null || echo "  not available"
 done

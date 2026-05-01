@@ -353,7 +353,7 @@ describe_deployment() {
   local deployment_name="$1"
   local namespace="$2"
   temporal_cli worker deployment describe \
-    --deployment-name "$deployment_name" \
+    --name "$deployment_name" \
     --namespace "$namespace"
 }
 

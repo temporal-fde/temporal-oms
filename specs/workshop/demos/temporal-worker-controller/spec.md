@@ -218,7 +218,7 @@ Goal: trigger the TWC rollout and observe progressive promotion under load.
 
    ```bash
    temporal worker deployment describe \
-     --deployment-name processing \
+     --name processing \
      --namespace processing
    ```
 
@@ -296,7 +296,7 @@ kubectl get pods -n <namespace> -w
 
 ```bash
 temporal worker deployment describe \
-  --deployment-name <deployment> \
+  --name <deployment> \
   --namespace <temporal-namespace>
 ```
 
