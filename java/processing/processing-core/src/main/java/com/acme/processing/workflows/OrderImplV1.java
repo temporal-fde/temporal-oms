@@ -19,7 +19,7 @@ import java.time.Duration;
 
 /**
  * Legacy processing.Order implementation used as the workshop starting point.
- *
+ * <p>
  * V1 always publishes the Kafka fulfillment handoff after validation and enrichment.
  */
 public class OrderImplV1 implements Order {
@@ -52,8 +52,9 @@ public class OrderImplV1 implements Order {
         if (!opts.hasOmsProperties()) {
             opts = this.optionsActs.getOptions(opts);
         }
-        boolean sendFulfillment =
-                !opts.hasSendFulfillment() || opts.getSendFulfillment();
+
+        // WORKSHOP: Exercise 01: missing send_fulfillment means legacy callers still use Kafka fulfillment.
+        // boolean sendFulfillment = !opts.hasSendFulfillment() || opts.getSendFulfillment();
 
         var integrationsEndpoint = opts.getOmsProperties().getProcessing().getNexus().getEndpointsOrThrow("integrations");
         final long timeoutSecs = opts.getProcessingTimeoutSecs() > 0 ? opts.getProcessingTimeoutSecs() : 86400L;
@@ -75,6 +76,8 @@ public class OrderImplV1 implements Order {
                                 .setCancellationType(NexusOperationCancellationType.WAIT_REQUESTED)
                                 .build())
                         .build());
+
+
 
         // 1. validate order (immediate or manual correction via support)
         // 2. enrich order
@@ -107,17 +110,19 @@ public class OrderImplV1 implements Order {
                     pimService.enrichOrder(EnrichOrderRequest.newBuilder()
                             .setOrder(request.getOrder()).build())).build();
 
-            if(sendFulfillment) {
-                try {
-                    this.state = this.state.toBuilder().setFulfillment(this.fulfillments.fulfillOrder(FulfillOrderRequest.newBuilder()
-                            .setOrder(request.getOrder()).addAllItems(this.state.getEnrichment().getItemsList()).build())).build();
-                } catch (ApplicationFailure e) {
-                    if (e.isNonRetryable()) {
-                        // permanent failure
-                        // move this to the support workflow
-                    }
+            // WORKSHOP: Exercise 01: only processing-owned fulfillment publishes the legacy Kafka handoff.
+            // if (sendFulfillment) {
+            try {
+                this.state = this.state.toBuilder().setFulfillment(this.fulfillments.fulfillOrder(FulfillOrderRequest.newBuilder()
+                        .setOrder(request.getOrder()).addAllItems(this.state.getEnrichment().getItemsList()).build())).build();
+            } catch (ApplicationFailure e) {
+                if (e.isNonRetryable()) {
+                    // permanent failure
+                    // move this to the support workflow
                 }
             }
+            // }
+
         });
 
         Workflow.newTimer(Duration.ofSeconds(timeoutSecs)).thenApply(result -> {

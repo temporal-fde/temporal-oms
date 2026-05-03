@@ -47,7 +47,6 @@ public class OrderImpl implements Order {
         if (!opts.hasOmsProperties()) {
             opts = this.optionsActs.getOptions(opts);
         }
-        boolean sendFulfillment = !opts.hasSendFulfillment() || opts.getSendFulfillment();
 
         var integrationsEndpoint = opts.getOmsProperties().getProcessing().getNexus().getEndpointsOrThrow("integrations");
         final long timeoutSecs = opts.getProcessingTimeoutSecs() > 0 ? opts.getProcessingTimeoutSecs() : 86400L;
@@ -69,6 +68,8 @@ public class OrderImpl implements Order {
                                 .setCancellationType(NexusOperationCancellationType.WAIT_REQUESTED)
                                 .build())
                         .build());
+
+        boolean sendFulfillment = !opts.hasSendFulfillment() || opts.getSendFulfillment();
 
         // 1. validate order (immediate or manual correction via support)
         // 2. enrich order
@@ -100,6 +101,7 @@ public class OrderImpl implements Order {
             this.state = this.state.toBuilder().setEnrichment(
                     pimService.enrichOrder(EnrichOrderRequest.newBuilder()
                             .setOrder(request.getOrder()).build())).build();
+
 
             if (sendFulfillment) {
                 try {
