@@ -75,7 +75,7 @@ if (!opts.hasOmsProperties()) {
 Paste this immediately after it:
 
 ```java
-// Exercise 01: missing send_fulfillment means legacy callers still use Kafka fulfillment.
+// WORKSHOP: Exercise 01: missing send_fulfillment means legacy callers still use Kafka fulfillment.
 boolean sendFulfillment =
         !opts.hasSendFulfillment() || opts.getSendFulfillment();
 ```
