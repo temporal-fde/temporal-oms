@@ -1,5 +1,7 @@
 # Workshop Exercises
 
+> WELCOME!
+
 This directory contains the implemented, attendee-facing workshop exercises.
 
 Specs remain under `specs/workshop/` and describe the intent, constraints, and design decisions.

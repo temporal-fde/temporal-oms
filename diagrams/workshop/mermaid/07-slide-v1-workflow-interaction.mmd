@@ -1,0 +1,37 @@
+flowchart LR
+  OrderInput["Order Input<br/>Commerce webhook"]
+  PaymentInput["Payment Input<br/>Payment webhook"]
+  AppsOrder["apps.Order<br/>UpdateWithStart<br/>waits for both inputs"]
+  ProcessingOrder["processing.Order<br/>validate + enrich"]
+  SupportTeam["SupportTeam<br/>invalid order correction"]
+  Kafka["Kafka: order-fulfillment<br/>FulfillOrderRequest message"]
+  Boundary["V1 boundary<br/>message handoff<br/>not durable fulfillment"]
+
+  OrderInput -->|"submitOrder update"| AppsOrder
+  PaymentInput -->|"capturePayment update"| AppsOrder
+  AppsOrder -->|"processOrder Nexus call"| ProcessingOrder
+  ProcessingOrder -->|"if invalid"| SupportTeam
+  SupportTeam -->|"manual correction complete"| ProcessingOrder
+  ProcessingOrder ==>|"publish fulfillment handoff"| Kafka
+  Kafka --> Boundary
+
+  AppsNote["Order + payment<br/>can arrive in either order"]
+  ProcessingNote["Processing owns<br/>validation + enrichment"]
+  GapNote["Workshop starting gap:<br/>no durable fulfillment lifecycle"]
+
+  AppsNote -.-> AppsOrder
+  ProcessingNote -.-> ProcessingOrder
+  GapNote -.-> Boundary
+
+  classDef input fill:#e8f3ff,stroke:#2f6fbd,color:#222;
+  classDef workflow fill:#eee8ff,stroke:#6f42c1,color:#222;
+  classDef support fill:#fff4d6,stroke:#b7791f,color:#222;
+  classDef kafka fill:#fff0e5,stroke:#d46b08,color:#222;
+  classDef note fill:#f7f7f7,stroke:#999,color:#333,stroke-dasharray: 4 4;
+
+  class OrderInput,PaymentInput input;
+  class AppsOrder,ProcessingOrder workflow;
+  class SupportTeam support;
+  class Kafka,Boundary kafka;
+  class AppsNote,ProcessingNote,GapNote note;
+

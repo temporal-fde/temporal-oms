@@ -76,6 +76,11 @@
   "onCreateCommand": "bash .devcontainer/on-create.sh",
   "postCreateCommand": "cp -n .env.codespaces .env.local",
   "customizations": {
+    "codespaces": {
+      "openFiles": [
+        "workshop/README.md"
+      ]
+    },
     "vscode": {
       "extensions": [
         "vscjava.vscode-java-pack",

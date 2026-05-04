@@ -1,0 +1,50 @@
+flowchart TB
+  subgraph V1["V1: handoff"]
+    direction LR
+    V1Inputs["Order + Payment<br/>Inputs"]
+    V1Apps["apps.Order<br/>collects inputs"]
+    V1Processing["processing.Order<br/>validates + enriches"]
+    V1Kafka["Kafka message<br/>fulfillment handoff"]
+
+    V1Inputs -->|"updates"| V1Apps
+    V1Apps -->|"processOrder"| V1Processing
+    V1Processing ==>|"send fulfillment"| V1Kafka
+  end
+
+  Change["Change: fulfillment ownership moves<br/>from processing-side Kafka handoff<br/>to durable fulfillment.Order"]
+
+  subgraph V2["V2: durable fulfillment workflow"]
+    direction LR
+    V2Inputs["Order + Payment<br/>Inputs"]
+    V2Apps["apps.Order<br/>collects + coordinates"]
+    V2Processing["processing.Order<br/>validates + enriches only"]
+    V2Fulfillment["fulfillment.Order<br/>durable fulfillment lifecycle"]
+    V2Agent["ShippingAgent<br/>recommends"]
+
+    V2Inputs -->|"updates"| V2Apps
+    V2Apps -->|"validate early"| V2Fulfillment
+    V2Apps -->|"processOrder"| V2Processing
+    V2Processing -->|"processed order"| V2Apps
+    V2Apps -->|"fulfillOrder"| V2Fulfillment
+    V2Fulfillment -->|"recommend shipping"| V2Agent
+    V2Agent -->|"recommendation"| V2Fulfillment
+  end
+
+  V1 --> Change --> V2
+
+  RoutingSlip["routing slip:<br/>send_fulfillment=false"]
+  RoutingSlip -.-> V2Processing
+
+  classDef v1 fill:#f4f4f4,stroke:#aaa,color:#333;
+  classDef input fill:#e8f3ff,stroke:#2f6fbd,color:#222;
+  classDef workflow fill:#eee8ff,stroke:#6f42c1,color:#222;
+  classDef fulfillment fill:#e9f7ef,stroke:#218838,color:#222;
+  classDef kafka fill:#fff0e5,stroke:#d46b08,color:#222;
+  classDef note fill:#f7f7f7,stroke:#999,color:#333,stroke-dasharray: 4 4;
+
+  class V1Inputs,V2Inputs input;
+  class V1Apps,V1Processing,V2Apps,V2Processing,V2Agent workflow;
+  class V2Fulfillment fulfillment;
+  class V1Kafka kafka;
+  class Change,RoutingSlip note;
+
