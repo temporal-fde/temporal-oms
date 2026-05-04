@@ -25,6 +25,8 @@ public class OrderImpl implements Order {
 
     @WorkflowInit
     public OrderImpl(ProcessOrderRequest args) {
+        Workflow.setCurrentDetails("Implementation type: `" + this.getClass().getName() + "`");
+
         this.state = GetProcessOrderStateResponse.newBuilder().build();
         this.state = this.state.toBuilder().addArgs(args).build();
         this.optionsActs = Workflow.newLocalActivityStub(Options.class,

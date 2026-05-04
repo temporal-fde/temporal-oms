@@ -53,6 +53,8 @@ public class OrderImpl implements Order {
 
     @WorkflowInit
     public OrderImpl(StartOrderFulfillmentRequest args) {
+        Workflow.setCurrentDetails("Implementation type: `" + this.getClass().getName() + "`");
+
         this.state = GetFulfillmentOrderStateResponse.newBuilder()
                 .setArgs(args)
                 .setStatus(FulfillmentStatus.FULFILLMENT_STATUS_STARTED)

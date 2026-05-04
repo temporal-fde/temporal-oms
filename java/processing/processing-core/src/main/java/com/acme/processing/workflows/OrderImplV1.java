@@ -30,6 +30,8 @@ public class OrderImplV1 implements Order {
 
     @WorkflowInit
     public OrderImplV1(ProcessOrderRequest args) {
+        Workflow.setCurrentDetails("Implementation type: `" + this.getClass().getName() + "`");
+
         this.state = GetProcessOrderStateResponse.newBuilder().build();
         this.state = this.state.toBuilder().addArgs(args).build();
         this.optionsActs = Workflow.newLocalActivityStub(Options.class,
@@ -46,7 +48,6 @@ public class OrderImplV1 implements Order {
     @WorkflowVersioningBehavior(VersioningBehavior.PINNED)
     public GetProcessOrderStateResponse execute(ProcessOrderRequest request) {
         logger.info("V1: Processing order {}", request);
-
         var opts = request.hasOptions()
                 ? request.getOptions()
                 : ProcessOrderRequestExecutionOptions.getDefaultInstance();

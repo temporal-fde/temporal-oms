@@ -36,6 +36,7 @@ public class OrderImplV1 implements Order {
 
     @WorkflowInit
     public OrderImplV1(CompleteOrderRequest args) {
+        Workflow.setCurrentDetails("Implementation type: `" + this.getClass().getName() + "`");
 
         this.state = GetCompleteOrderStateResponse.newBuilder()
                 .setArgs(args)
