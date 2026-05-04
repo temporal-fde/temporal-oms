@@ -300,7 +300,11 @@ run_maven() {
   require_command mvn
   (
     cd "$ROOT_DIR/java"
-    mvn "$@"
+    if [[ "${CLEAN_BUILD:-0}" == "1" ]]; then
+      mvn clean "$@"
+    else
+      mvn "$@"
+    fi
   )
 }
 

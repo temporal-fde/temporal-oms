@@ -241,7 +241,7 @@ initial service list intentionally left fulfillment stopped so the baseline gene
 ```
 
 Expected result: Java fulfillment workers are healthy and the Python worker logs
-`All workers polling`.
+`python-fulfillment-worker ready` or `All workers polling`.
 
 You do not need to start `fulfillment-api` for this exercise. The new path reaches
 `fulfillment.Order` through the `oms-fulfillment-v1` Nexus endpoint.

@@ -38,13 +38,14 @@ public class OrderImplV1 implements Order {
                         .build());
         this.fulfillments = Workflow.newActivityStub(Fulfillments.class,
                 ActivityOptions.newBuilder()
+                        .setSummary("/admin/order-fulfillment/" + args.getOrderId() + "")
                         .setScheduleToCloseTimeout(Duration.ofSeconds(60)).build());
     }
 
     @Override
     @WorkflowVersioningBehavior(VersioningBehavior.PINNED)
     public GetProcessOrderStateResponse execute(ProcessOrderRequest request) {
-        logger.info("Processing order {}", request);
+        logger.info("V1: Processing order {}", request);
 
         var opts = request.hasOptions()
                 ? request.getOptions()

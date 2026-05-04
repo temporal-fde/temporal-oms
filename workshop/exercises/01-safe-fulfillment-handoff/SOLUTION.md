@@ -30,6 +30,7 @@ opts out.
 
 ### 1. Add The Routing Slip Field
 
+
 Edit
 [proto/acme/processing/domain/v1/workflows.proto](../../../proto/acme/processing/domain/v1/workflows.proto):
 
@@ -37,6 +38,10 @@ Edit
 message ProcessOrderRequestExecutionOptions {
   optional int64 processing_timeout_secs = 1;
   optional acme.oms.v1.OmsProperties oms_properties = 2;
+  // WORKSHOP: the send_fulfillment field is added to allow callers
+  // to forward processing.Order data downstream to Fulfillment.
+  
+  // DO NOT DUPLICATE `send_fulfillment` FIELD if it is already present. 
   optional bool send_fulfillment = 3;
 }
 ```
