@@ -125,6 +125,8 @@ Expected result: `processing` and `apps` both show `v1` as current.
 Start the enablements load generator and leave it running through the rollout:
 
 ```bash
+## scripts/start-load.sh 
+
 export ENABLEMENT_ID="safe-handoff-$(date +%Y%m%d%H%M%S)"
 
 temporal workflow start \
@@ -195,6 +197,9 @@ temporal worker deployment describe \
 ```
 
 Do not stop `processing v1`. Existing pinned executions may still need it.
+
+> **Pro Tip**:
+> Check out the Temporal UI at `/namespaces/processing/workers/deployments/processing` to see the current status of all Deployments.
 
 ## 6. Promote `processing v2`
 

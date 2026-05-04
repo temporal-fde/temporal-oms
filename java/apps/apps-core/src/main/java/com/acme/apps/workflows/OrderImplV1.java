@@ -231,10 +231,12 @@ public class OrderImplV1 implements Order {
                     .setTimestamp(ts)
                     .setOptions(ProcessOrderRequestExecutionOptions.newBuilder()
                             .setProcessingTimeoutSecs(
-                                    state.getOptions().getProcessingTimeoutSecs()
+                                    state.getOptions().getProcessingTimeoutSecs())
                             // WORKSHOP Exercise 01: apps v2 adds .setSendFulfillment(false)
                             // here so processing v2 skips the legacy Kafka fulfillment handoff.
-                            ).build())).build();
+                            // Uncomment the next line:
+                            // .setSendFulfillment(false)
+                            .build())).build();
         }
     }
 

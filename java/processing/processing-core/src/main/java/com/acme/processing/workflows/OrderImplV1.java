@@ -133,6 +133,14 @@ public class OrderImplV1 implements Order {
             }
             return null;
         });
+        // WORKSHOP: Replace the above timeout guard with the new send_fulfillment condition
+        // Workflow.newTimer(Duration.ofSeconds(timeoutSecs)).thenApply(result -> {
+        //      if (!state.hasEnrichment() || (sendFulfillment && !state.hasFulfillment())) {
+        //          scope.cancel();
+        //      }
+        //      return null;
+        // });
+
         try {
             scope.run();
         } catch (ActivityFailure e) {
