@@ -82,6 +82,11 @@
       ]
     },
     "vscode": {
+      "settings": {
+        "workbench.editorAssociations": {
+          "*.md": "vscode.markdown.preview.editor"
+        }
+      },
       "extensions": [
         "vscjava.vscode-java-pack",
         "ms-python.python",
