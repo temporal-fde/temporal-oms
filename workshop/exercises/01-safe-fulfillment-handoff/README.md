@@ -235,6 +235,14 @@ When that solution section is complete, come back here and continue with Step 8:
 - Send `send_fulfillment=false` in the processing request.
 - After processing succeeds, send `fulfillment.fulfillOrder(...)`.
 
+> **Shortcut:** If you'd rather skip the manual edits, run these two commands from the *repo root*:
+> ```bash
+> cp java/apps/apps-core/src/main/java/com/acme/apps/workflows/OrderImpl.java \
+>    java/apps/apps-core/src/main/java/com/acme/apps/workflows/OrderImplV1.java
+> sed -i '' 's/OrderImpl/OrderImplV1/g' \
+>    java/apps/apps-core/src/main/java/com/acme/apps/workflows/OrderImplV1.java
+> ```
+
 ## 8. Start Fulfillment Workers For The New Path
 
 Do this after the legacy path is proven and before any `apps v2` worker receives traffic. The
@@ -250,6 +258,9 @@ Expected result: Java fulfillment workers are healthy and the Python worker logs
 
 You do not need to start `fulfillment-api` for this exercise. The new path reaches
 `fulfillment.Order` through the `oms-fulfillment-v1` Nexus endpoint.
+
+> **Pro Tip**: 
+> Check out the fulfillment Worker running at `namespaces/fulfillment/workers/deployments`in the Temporal UI.
 
 ## 9. Start `apps v2`
 
