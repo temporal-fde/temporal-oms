@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+import json
+from typing import Any
+
 import anthropic
+from openai import AsyncOpenAI
 from temporalio import activity
 
 from src.config import settings
@@ -20,10 +24,11 @@ from acme.common.v1.llm_p2p import (
     LlmToolUseBlock,
 )
 
-# _MODEL = "claude-sonnet-4-6"
-_MODEL = "claude-haiku-4-5"
+_PROVIDER_ANTHROPIC = "anthropic"
+_PROVIDER_OPENAI = "openai"
 
-def _to_message_param(msg: LlmMessage) -> anthropic.types.MessageParam:
+
+def _to_anthropic_message_param(msg: LlmMessage) -> anthropic.types.MessageParam:
     content: list[anthropic.types.ContentBlockParam] = []
     for block in msg.content:
         if block.type == "text":
@@ -45,7 +50,7 @@ def _to_message_param(msg: LlmMessage) -> anthropic.types.MessageParam:
     return {"role": role, "content": content}
 
 
-def _to_tool_param(tool: LlmToolDefinition) -> anthropic.types.ToolParam:
+def _to_anthropic_tool_param(tool: LlmToolDefinition) -> anthropic.types.ToolParam:
     return {
         "name": tool.name,
         "description": tool.description,
@@ -53,8 +58,7 @@ def _to_tool_param(tool: LlmToolDefinition) -> anthropic.types.ToolParam:
     }
 
 
-
-def _to_llm_response(resp: anthropic.types.Message) -> LlmResponse:
+def _to_anthropic_llm_response(resp: anthropic.types.Message) -> LlmResponse:
     stop_reason = (
         LlmStopReason.LLM_STOP_REASON_TOOL_USE
         if resp.stop_reason == "tool_use"
@@ -79,17 +83,174 @@ def _to_llm_response(resp: anthropic.types.Message) -> LlmResponse:
     return LlmResponse(content=blocks, stop_reason=stop_reason)
 
 
-class LlmActivities:
-    """Temporal activity that calls the Anthropic Claude API.
+def _to_openai_message_params(messages: list[LlmMessage]) -> list[dict[str, Any]]:
+    message_params: list[dict[str, Any]] = []
+    for msg in messages:
+        text = "\n".join(
+            block.text.text
+            for block in msg.content
+            if block.type == "text" and block.text.text
+        )
+        tool_uses = [block.tool_use for block in msg.content if block.type == "tool_use"]
+        tool_results = [block.tool_result for block in msg.content if block.type == "tool_result"]
 
-    The workflow never imports from anthropic — all vendor types are converted
+        if msg.role == LlmRole.LLM_ROLE_ASSISTANT:
+            if tool_uses:
+                message_params.append({
+                    "role": "assistant",
+                    "content": text or None,
+                    "tool_calls": [
+                        {
+                            "id": tool_use.id,
+                            "type": "function",
+                            "function": {
+                                "name": tool_use.name,
+                                "arguments": json.dumps(tool_use.input),
+                            },
+                        }
+                        for tool_use in tool_uses
+                    ],
+                })
+            elif text:
+                message_params.append({"role": "assistant", "content": text})
+            continue
+
+        if text:
+            message_params.append({"role": "user", "content": text})
+        for tool_result in tool_results:
+            message_params.append({
+                "role": "tool",
+                "tool_call_id": tool_result.tool_use_id,
+                "content": tool_result.content,
+            })
+
+    return message_params
+
+
+def _to_openai_tool_param(tool: LlmToolDefinition) -> dict[str, Any]:
+    return {
+        "type": "function",
+        "function": {
+            "name": tool.name,
+            "description": tool.description,
+            "parameters": tool.input_schema,
+        },
+    }
+
+
+def _to_openai_llm_response(resp: Any) -> LlmResponse:
+    choice = resp.choices[0]
+    message = choice.message
+    tool_calls = list(message.tool_calls or [])
+    blocks: list[LlmContentBlock] = []
+
+    if message.content:
+        blocks.append(LlmContentBlock(
+            type="text",
+            text=LlmTextBlock(text=message.content),
+        ))
+
+    for tool_call in tool_calls:
+        if tool_call.type != "function":
+            continue
+        try:
+            tool_input = json.loads(tool_call.function.arguments or "{}")
+        except json.JSONDecodeError as exc:
+            raise ValueError(
+                f"OpenAI returned invalid JSON arguments for tool {tool_call.function.name!r}"
+            ) from exc
+        if not isinstance(tool_input, dict):
+            raise ValueError(
+                f"OpenAI returned non-object arguments for tool {tool_call.function.name!r}"
+            )
+        blocks.append(LlmContentBlock(
+            type="tool_use",
+            tool_use=LlmToolUseBlock(
+                id=tool_call.id,
+                name=tool_call.function.name,
+                input=tool_input,
+            ),
+        ))
+
+    stop_reason = (
+        LlmStopReason.LLM_STOP_REASON_TOOL_USE
+        if choice.finish_reason == "tool_calls" or tool_calls
+        else LlmStopReason.LLM_STOP_REASON_END_TURN
+    )
+    return LlmResponse(content=blocks, stop_reason=stop_reason)
+
+
+class _AnthropicLlmClient:
+    def __init__(self, *, api_key: str, model: str) -> None:
+        self._client = anthropic.AsyncAnthropic(api_key=api_key)
+        self._model = model
+
+    async def call(
+        self,
+        messages: list[LlmMessage],
+        tools: list[LlmToolDefinition],
+    ) -> LlmResponse:
+        message_params = [_to_anthropic_message_param(m) for m in messages]
+        tool_params = [_to_anthropic_tool_param(t) for t in tools]
+
+        resp = await self._client.messages.create(
+            model=self._model,
+            max_tokens=4096,
+            thinking={"type": "disabled"},
+            messages=message_params,
+            tools=tool_params,
+        )
+        return _to_anthropic_llm_response(resp)
+
+
+class _OpenAILlmClient:
+    def __init__(self, *, api_key: str, model: str) -> None:
+        kwargs = {"api_key": api_key} if api_key else {}
+        self._client = AsyncOpenAI(**kwargs)
+        self._model = model
+
+    async def call(
+        self,
+        messages: list[LlmMessage],
+        tools: list[LlmToolDefinition],
+    ) -> LlmResponse:
+        resp = await self._client.chat.completions.create(
+            model=self._model,
+            max_completion_tokens=4096,
+            messages=_to_openai_message_params(messages),
+            tools=[_to_openai_tool_param(t) for t in tools],
+            tool_choice="auto",
+            parallel_tool_calls=True,
+        )
+        return _to_openai_llm_response(resp)
+
+
+class LlmActivities:
+    """Temporal activity that calls the configured LLM provider.
+
+    The workflow never imports from provider SDKs; all vendor types are converted
     here; the agentic loop works entirely with llm_p2p types.
     """
 
-    def __init__(self) -> None:
-        self._client = anthropic.AsyncAnthropic(
-            api_key=settings.anthropic_api_key,
-        )
+    def __init__(self, provider: str | None = None) -> None:
+        self._provider = (
+            provider or settings.llm_provider or _PROVIDER_ANTHROPIC
+        ).strip().lower()
+        if self._provider == _PROVIDER_ANTHROPIC:
+            self._llm_client = _AnthropicLlmClient(
+                api_key=settings.anthropic_api_key,
+                model=settings.anthropic_model,
+            )
+        elif self._provider == _PROVIDER_OPENAI:
+            self._llm_client = _OpenAILlmClient(
+                api_key=settings.openai_api_key,
+                model=settings.openai_model,
+            )
+        else:
+            raise ValueError(
+                f"Unsupported llm_provider {self._provider!r}; "
+                f"expected {_PROVIDER_ANTHROPIC!r} or {_PROVIDER_OPENAI!r}"
+            )
 
     @activity.defn
     async def build_system_prompt(self, req: BuildSystemPromptRequest) -> BuildSystemPromptResponse:
@@ -199,14 +360,4 @@ class LlmActivities:
         messages: list[LlmMessage],
         tools: list[LlmToolDefinition],
     ) -> LlmResponse:
-        message_params = [_to_message_param(m) for m in messages]
-        tool_params = [_to_tool_param(t) for t in tools]
-
-        resp = await self._client.messages.create(
-            model=_MODEL,
-            max_tokens=4096,
-            thinking={"type": "disabled"},
-            messages=message_params,
-            tools=tool_params,
-        )
-        return _to_llm_response(resp)
+        return await self._llm_client.call(messages, tools)

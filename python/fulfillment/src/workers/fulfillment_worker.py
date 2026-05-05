@@ -37,4 +37,5 @@ async def build_fulfillment_worker() -> Worker:
             location_activities.get_location_events,
         ],
         nexus_service_handlers=[ShippingAgentImpl()],
+        max_task_queue_activities_per_second=3.0,
     )

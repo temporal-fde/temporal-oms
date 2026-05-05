@@ -22,8 +22,11 @@ class Settings(BaseSettings):
     temporal_fulfillment_address: str = "localhost:7233"
     temporal_fulfillment_api_key: str = ""
     temporal_fulfillment_namespace: str = "fulfillment"
+    llm_provider: str = "anthropic"
     anthropic_api_key: str = ""
+    anthropic_model: str = "claude-haiku-4-5"
     openai_api_key: str = ""
+    openai_model: str = "gpt-4.1-mini"
     enablements_api_base_url: str = "http://localhost:8050"
     integrations_endpoint: str = "oms-integrations-v1"
 

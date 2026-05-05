@@ -60,7 +60,8 @@ Expected result:
 - The Python fulfillment worker log includes `All workers polling`.
 
 If `ANTHROPIC_API_KEY` is missing or rate limited, the non-AI services may still be up, but the
-`ShippingAgent` LLM activity will fail when a scenario reaches it.
+`ShippingAgent` LLM activity will fail when a scenario reaches it. For workshop fallback, restart
+the Python fulfillment worker with `LLM_PROVIDER=openai` and a valid `OPENAI_API_KEY`.
 
 ## 1. Pick A Scenario
 
