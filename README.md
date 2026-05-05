@@ -6,7 +6,7 @@ A Java-based Order Management System demonstrating Temporal workflow orchestrati
 
 ---
 
-## Steps to Temporal Maturity
+## Steps to Temporal Deployment Maturity
 
 Start at Level 1 and work up. Each level builds on the previous.
 
