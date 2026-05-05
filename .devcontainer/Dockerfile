@@ -11,6 +11,25 @@ ARG K9S_VERSION=0.50.18
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
+# Devcontainer features run after this Dockerfile, so make apt resilient before
+# feature install scripts fetch Ubuntu packages.
+RUN set -eux; \
+    apt_sources=(/etc/apt/sources.list /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources); \
+    for source in "${apt_sources[@]}"; do \
+      if [[ -f "${source}" ]]; then \
+        sed -i \
+          -e 's|http://archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' \
+          -e 's|http://security.ubuntu.com/ubuntu|https://security.ubuntu.com/ubuntu|g' \
+          "${source}"; \
+      fi; \
+    done; \
+    printf '%s\n' \
+      'Acquire::Retries "5";' \
+      'Acquire::http::Timeout "30";' \
+      'Acquire::https::Timeout "30";' \
+      'Acquire::http::Pipeline-Depth "0";' \
+      > /etc/apt/apt.conf.d/80-retries
+
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
       ca-certificates \
@@ -19,6 +38,10 @@ RUN apt-get update \
       jq \
       lsof \
       procps \
+      python-is-python3 \
+      python3 \
+      python3-pip \
+      python3-venv \
       tar \
       unzip \
       xz-utils \

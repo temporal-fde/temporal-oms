@@ -9,7 +9,7 @@ A Java-based Order Management System powered by Temporal workflows.
 Use this repo's devcontainer. It installs the workshop toolchain for you:
 
 - Java 21 and Maven 3.9.9
-- Python 3.13 and `uv`
+- Python 3.12 and `uv`
 - Temporal CLI `1.7.0`
 - Docker-in-Docker
 - `kubectl`, Helm, `kind`, `k3d`, and `k9s`
