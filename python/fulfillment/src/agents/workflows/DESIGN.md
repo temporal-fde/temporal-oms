@@ -62,3 +62,60 @@ With Temporal the message history is the event log. The agent resumes
 mid-conversation with every prior tool result intact — the LLM does not
 re-evaluate decisions it already made, and completed activities (EasyPost calls,
 location event lookups) are not re-executed.
+
+## Recommendation cache
+
+`ShippingAgent` is a long-running workflow keyed by `customer_id`, so it can keep
+an in-workflow cache without introducing Redis, a database table, or another
+consistency boundary. The cache is `self._cache: dict[str, ShippingOptionsResult]`
+and stores the final recommendation, all accumulated shipping options, and the
+`cached_at` workflow timestamp.
+
+The workflow resolves context before checking the cache:
+
+1. Resolve the origin warehouse with `lookupInventoryAddress`.
+2. Use the caller's verified `to_address.easypost` when present; otherwise call
+   `verify_address`.
+3. Compute the cache key from origin EasyPost ID, destination postal code and
+   country, sorted `(sku_id, quantity)` pairs, and selected-shipment context.
+
+The selected-shipment context is part of the key because margin and SLA decisions
+depend on it. Two requests with the same origin, destination, and items should
+not share a recommendation if one request paid normal shipping and another paid
+one cent, or if one promised five delivery days and another promised zero.
+
+On a valid hit, the workflow returns the cached recommendation and options with
+`cache_hit=True`. That skips prompt construction, `call_llm`, carrier-rate
+lookup, location-event lookup, and alternate-warehouse reasoning. It does not
+skip the pre-loop origin lookup, or destination verification when the destination
+was not already verified, because those values are needed to build the key.
+
+Entries expire by age: `workflow.now() - cached_at < _cache_ttl_secs`. The
+default is `_DEFAULT_CACHE_TTL_SECS = 1800` seconds. A workflow can override the
+TTL only at start with `StartShippingAgentRequest.execution_options.cache_ttl_secs`.
+Expired entries are treated as misses and overwritten when the fresh
+recommendation is produced.
+
+## Determinism and TTL configuration
+
+The age check itself is replay-safe because it uses `workflow.now()`, not wall
+clock time. The replay risk is the TTL default. The normal Nexus handler starts
+`ShippingAgent` with only `customer_id`, so those workflows currently get the
+code fallback of 1800 seconds.
+
+Changing `_DEFAULT_CACHE_TTL_SECS` while existing default-TTL workflows are open
+can change replay branching. A cached result that was valid under the old value
+may be expired under the new value, causing replay to schedule the LLM/tool
+activities where history says the workflow returned a cache hit.
+
+Future improvements should remove that configuration risk before changing the
+default:
+
+- Pass `ShippingAgentExecutionOptions(cache_ttl_secs=1800)` from the Nexus
+  handler so the TTL is recorded in workflow history for new executions.
+- Use Temporal patch/versioning semantics for any default change that must
+  coexist with open workflows started under the old behavior.
+- Migrate or `continue_as_new` long-running workflows with an explicit TTL before
+  changing the fallback constant.
+- Add a read-only cache query if operators need to inspect cache contents without
+  reading raw workflow history.

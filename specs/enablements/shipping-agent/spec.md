@@ -4,7 +4,7 @@
 **Status:** Implemented for current workshop scenarios; Nexus integration reroute is follow-up
 **Owner:** Temporal FDE Team
 **Created:** 2026-04-27
-**Updated:** 2026-04-29
+**Updated:** 2026-05-05
 
 > **Note:** The parent `worker-version-enablement/` directory is being renamed to `enablements/`
 > to reflect its broader scope. This spec should move with that rename.
@@ -52,6 +52,23 @@ is now `ShippingActivities.get_carrier_rates` on the `fulfillment-shipping` task
 The activity accumulates rate options from both primary and alternate warehouse calls so the final
 `RecommendShippingOptionResponse.options` contains whichever option the LLM recommends.
 
+### Recommendation Cache
+
+`ShippingAgent` is a long-running workflow keyed by `customer_id`, so cache scope follows the
+customer/workflow ID. The current scenario scripts generate a unique customer ID for each run,
+which keeps workshop scenarios isolated and avoids accidental cross-scenario cache hits.
+
+When the same workflow receives the same shipping decision twice, the workflow checks an
+in-workflow cache after it resolves the origin warehouse and verified destination. The key includes
+origin EasyPost ID, destination postal code and country, sorted items, and selected-shipment
+context (`selected_rate.rate_id`, selected delivery days, paid-price currency, and paid-price
+units). A valid hit returns the cached recommendation and options with `cache_hit=true`, skipping
+the LLM/tool loop and fixture-backed rate/event calls.
+
+The default TTL is 1800 seconds (30 minutes). The normal Nexus handler currently starts
+`ShippingAgent` with only `customer_id`, so enablements/scenario traffic uses the workflow code's
+default TTL unless a workflow is started directly with `execution_options.cache_ttl_secs`.
+
 ### Location Events
 
 The current path calls `enablements-api` and returns `RISK_LEVEL_NONE`, an empty event list, and
@@ -63,6 +80,11 @@ the echoed request window/timezone. Real weather/event enrichment is a separate 
 
 - Add richer location-event enrichment behind `enablements-api`.
 - Add fixture-state query examples or scripts for workshop operators.
+- Record the cache TTL explicitly in `StartShippingAgentRequest` from the Nexus handler before
+  changing the default. Otherwise, changing the fallback constant can alter cache-hit/cache-miss
+  branching during Temporal replay for already-open default-TTL workflows.
+- Use Temporal patch/versioning semantics or a controlled workflow migration for any TTL default
+  change that must affect in-flight workflows.
 
 ---
 

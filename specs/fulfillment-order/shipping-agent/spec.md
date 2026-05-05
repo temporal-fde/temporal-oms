@@ -4,7 +4,7 @@
 **Status:** Implemented for workshop fixture-backed path; live location-events enrichment deferred
 **Owner:** Temporal FDE Team
 **Created:** 2026-04-15
-**Updated:** 2026-04-29
+**Updated:** 2026-05-05
 
 ---
 
@@ -19,16 +19,21 @@ LLM-driven agent that accounts for real-world supply chain risk, inventory locat
 protection.
 
 The workflow is keyed on `customer_id` and never concludes. It caches shipping recommendations by
-a content hash of the request inputs so repeated calls for the same order characteristics are
-served from state without re-invoking the LLM or external APIs.
+a content hash of the resolved origin, destination rate zone, items, and selected-shipment context.
+Repeated calls for the same shipping decision are served from workflow state without re-invoking
+the LLM, rate lookup, location-events lookup, or alternate-warehouse reasoning loop.
 
-The agent uses Claude (Anthropic API) with five registered Temporal activities as tools:
+The agent uses Claude (Anthropic API) with four external tool definitions plus an internal
+finalization tool:
 
-- `lookup_inventory_address` — resolve sku_ids to a warehouse address
-- `verify_address` — verify a raw address through fixture-backed `enablements-api` shipping data
+- `lookup_inventory_address` — available to resolve sku_ids to a warehouse address
 - `get_carrier_rates` — retrieve fixture-backed shipment rates through `enablements-api`
 - `get_location_events` — query for supply chain risk events at an address
 - `find_alternate_warehouse` — locate a different warehouse when all rates fail margin or SLA
+- `finalize_recommendation` — internal workflow-handled tool for structured final output
+
+Destination verification runs before the LLM loop when the caller provides an unverified address;
+it is not exposed as an LLM tool in the current implementation.
 
 Claude dispatches these tools in whatever order and concurrency it determines appropriate. When
 multiple tool calls are returned in a single LLM response, the implementation dispatches them as
@@ -41,9 +46,9 @@ logic.
 
 Both the fulfillment path (`fulfillment.Order` V2 via Nexus) and the cart/UI path (storefront
 checkout rates) use the same workflow and the same `RecommendShippingOptionRequest`. The caller
-always provides `items` with `sku_id`; the LLM always calls `lookup_inventory_location` first
-to resolve the warehouse origin from inventory. There is no pre-resolved `from_address` in the
-request — warehouse resolution is the agent's job regardless of caller.
+always provides `items` with `sku_id`; the workflow resolves the warehouse origin from inventory
+before the LLM loop. There is no pre-resolved `from_address` in the request — warehouse resolution
+is the agent workflow's job regardless of caller.
 
 ---
 
@@ -64,15 +69,18 @@ request — warehouse resolution is the agent's job regardless of caller.
 
 - [ ] `ShippingAgent` starts via UpdateWithStart from `fulfillment.Order`'s Nexus call
 - [ ] `recommend_shipping_option` Update triggers the agentic loop and returns a `ShippingRecommendation`
-- [ ] The LLM always calls `lookup_inventory_location` first, resolving the warehouse origin
-      from `sku_id`s — no `from_address` is provided in the request by either caller
+- [ ] The workflow resolves the warehouse origin from `sku_id`s before cache lookup and LLM
+      reasoning — no `from_address` is provided in the request by either caller
 - [ ] The LLM dispatches `get_carrier_rates` and `get_location_events` (origin + destination)
-      as Temporal activity tool calls; `verify_address` is a fallback for unverified addresses only
+      as Temporal activity tool calls; `verify_address` is a workflow-level fallback for
+      unverified destination addresses only
 - [ ] `get_location_events` for origin and destination execute concurrently when Claude requests
       both in the same tool call batch
 - [ ] `get_carrier_rates` and any concurrent `get_location_events` batch execute concurrently
-- [ ] Results are cached by `fn(locationId, sorted([(skuId, qty)]), postalCode, country)` → hash
-      with a configurable TTL; cache hits skip the LLM loop
+- [ ] Results are cached by
+      `fn(origin_easypost_id, sorted([(skuId, qty)]), destinationPostalCode,
+      destinationCountry, selectedShipmentContext)` → hash with a configurable TTL; cache hits
+      skip the LLM/tool loop after origin and destination have been resolved
 - [ ] `ShippingRecommendation` outcome is one of: `PROCEED`, `CHEAPER_AVAILABLE`,
       `FASTER_AVAILABLE`, `MARGIN_SPIKE`, `SLA_BREACH`
 - [ ] `fulfillment.Order` V2 receives the recommendation and applies its own decision logic
@@ -97,6 +105,10 @@ request — warehouse resolution is the agent's job regardless of caller.
   `easypost.selected_rate.delivery_days` drive deterministic margin and SLA scenarios.
 - `ShippingAgent` accumulates and de-dupes every option returned by primary and alternate
   `get_carrier_rates` calls so `fulfillment.Order` can select any recommended option ID.
+- `ShippingAgent` stores `ShippingOptionsResult` entries in workflow state with a default
+  1800-second (30-minute) TTL. The current Nexus handler starts workflows with only
+  `customer_id`, so normal service calls use the workflow code's default TTL unless a workflow
+  was started directly with `execution_options.cache_ttl_secs`.
 
 ### Pain Points in V1
 
@@ -122,23 +134,21 @@ to_address: (pre-verified)            to_address: (from user input)
        ShippingAgent (Python, fulfillment namespace)
        WorkflowID: customer_id
        │
+       ├── Resolve origin + destination
+       │
        ├── Cache hit? → return cached ShippingOptionsResult
        │
        └── Cache miss → agentic loop:
            │
-           ├── LLM turn 1: lookup_inventory_location(sku_ids)
-           │              → [{address (easypost pre-verified), items}]  (1 group in V1)
-           │              → cache check now possible; return hit if valid
-           │
-           ├── LLM turn 2: [concurrent — one get_carrier_rates per warehouse group]
-           │   ├── get_carrier_rates(group1.from_easypost_id, to_easypost_id, group1.items)
+           ├── LLM turn 1: [concurrent tool calls with resolved addresses]
+           │   ├── get_carrier_rates(origin_easypost_id, destination, items)
            │   │   → carrier rates
-           │   ├── get_location_events(group1.address.coordinate)   ← origin SCRM
+           │   ├── get_location_events(origin.address.coordinate)   ← origin SCRM
            │   └── get_location_events(to_address.coordinate)       ← destination SCRM
            │
            └── LLM final turn: reason across rates + SCRM (origin + dest)
                → ShippingRecommendation
-               → cache result (keyed by from_easypost_id + items + destination)
+               → cache result (keyed by origin + items + destination + selected-shipment context)
                → return RecommendShippingOptionResponse
 
 fulfillment.Order applies recommendation (selects rate, sets margin_leak SA, etc.)
@@ -148,17 +158,23 @@ fulfillment.Order applies recommendation (selects rate, sets margin_leak SA, etc
 
 The workflow runs a standard hand-rolled agentic loop:
 
-1. Check cache — return immediately on hit (requires `from_easypost_id`; skipped on first
-   call since the warehouse is not known until `lookup_inventory_location` returns)
-2. Build system prompt via `build_system_prompt` LocalActivity — result is memoized in event
+1. Pre-fetch workflow-owned context before the LLM loop:
+   a. Call `lookupInventoryAddress` through the integrations Nexus endpoint to resolve the origin
+      warehouse from `items`.
+   b. If `to_address.easypost.id` is absent, call `verify_address`; otherwise use the caller's
+      verified destination.
+2. Compute the cache key from the resolved origin, destination postal/country, sorted items, and
+   selected-shipment context. Return the cached `ShippingOptionsResult` on hit if it is still
+   inside the workflow's TTL.
+3. Build system prompt via `build_system_prompt` LocalActivity — result is memoized in event
    history so prompt changes do not affect replay of in-flight workflows and do not require a
    build-id bump. The activity receives the full `RecommendShippingOptionRequest` and returns
    the system prompt string. Includes: margin threshold rule, SLA rule, path instruction
    (warehouse resolution vs. pre-verified `from_address`), concurrency instruction, and final
    `finalize_recommendation` tool instruction.
-3. Build tool definitions: the four registered activity tools plus a fifth internal-only
+4. Build tool definitions: the four external tool definitions plus a fifth internal-only
    `finalize_recommendation` tool (see Design Decisions — Structured output via `finalize_recommendation`)
-4. Iterate:
+5. Iterate:
    a. Call Claude (via `call_llm` activity — Anthropic API)
    b. If response contains `tool_use` blocks and one block is `finalize_recommendation`:
       - If outcome is `MARGIN_SPIKE` or `SLA_BREACH` and `find_alternate_warehouse` was
@@ -173,8 +189,8 @@ The workflow runs a standard hand-rolled agentic loop:
       continue loop
    d. If `END_TURN` fires without a preceding `finalize_recommendation` call: raise a
       retryable `ApplicationError` — the LLM did not follow instructions
-5. Cache result keyed by content hash with TTL
-6. Return `RecommendShippingOptionResponse`
+6. Cache result keyed by content hash with `cached_at=workflow.now()`
+7. Return `RecommendShippingOptionResponse`
 
 ### Recommendation Outcomes
 
@@ -201,17 +217,37 @@ never empty.
 
 ### Caching
 
-Cache key: `fn(sorted(from_easypost_ids), sorted([(skuId, qty)]), destinationPostalCode, destinationCountry)` → SHA-256 hash
+Cache key:
+`fn(origin_easypost_id, sorted([(skuId, qty)]), destinationPostalCode, destinationCountry, selectedShipmentContext)` → first 16 hex chars of SHA-256.
 
-- `from_easypost_ids`: sorted list of `easypost_address.id` from all warehouse groups returned
-  by `lookup_inventory_location`. Sorting makes the key stable regardless of group order.
-  Always resolved by the LLM via the activity — never provided by the caller. Cache check is
-  deferred until after the first tool result.
-- Sorting skuId+qty pairs makes the key order-independent
-- Postal code + country is sufficient for rate zone resolution (street address does not change rates)
-- Cache entries store: `ShippingOptionsResult` (rates + SCRM snapshots + recommendation) + `cached_at` timestamp
-- TTL is configurable; entries older than TTL are treated as misses and re-fetched
-- Cache is in-memory workflow state — survives replays, lost on workflow restart (acceptable given TTL)
+- `origin_easypost_id` comes from the pre-loop `lookupInventoryAddress` Nexus operation. The cache
+  check is therefore after origin resolution, not before the workflow has an origin.
+- Destination matching uses postal code + country from the verified EasyPost destination. This is
+  sufficient for the fixture-backed rate-zone behavior; street lines are intentionally excluded.
+- Sorting skuId+qty pairs makes item order irrelevant.
+- `selectedShipmentContext` includes selected rate ID, selected delivery days, paid-price currency,
+  and paid-price units when `selected_shipment` is explicitly present. This prevents a cached
+  normal recommendation from being reused for a margin-spike or SLA-breach scenario with the same
+  origin, destination, and items.
+- Cache entries store `ShippingOptionsResult`: the final `ShippingRecommendation`, all accumulated
+  `ShippingOption` values returned by primary/alternate rate lookups, and `cached_at`.
+- The default TTL is `_DEFAULT_CACHE_TTL_SECS = 1800` seconds (30 minutes). A workflow can override
+  it at start with `StartShippingAgentRequest.execution_options.cache_ttl_secs`; otherwise it uses
+  the code default.
+- A hit returns `cache_hit=true` and skips prompt construction, `call_llm`, carrier-rate lookup,
+  location-events lookup, and alternate-warehouse calls. The origin lookup, and destination
+  verification when needed, still run before the key can be checked.
+- Expired entries are treated as misses and overwritten by the refreshed result. There is no
+  proactive cleanup pass.
+- Cache state is workflow state. It survives worker restarts and workflow replay, but it is not an
+  external shared cache and must be carried forward explicitly if the workflow later uses
+  `continue_as_new`.
+
+Temporal determinism note: `workflow.now()` is replay-safe for the age calculation. The replay risk
+is changing the code default for `_DEFAULT_CACHE_TTL_SECS` while existing workflows that did not
+record an explicit TTL are still open. A different fallback TTL can make a replayed cache branch
+expire where the original execution returned a hit, or vice versa. Future changes to the default
+must use recorded workflow input, Temporal versioning/patching, or a controlled migration.
 
 ---
 
@@ -227,7 +263,7 @@ Cache key: `fn(sorted(from_easypost_ids), sorted([(skuId, qty)]), destinationPos
 | LLM dispatches tools (not pre-fetched) | Shows students the LLM making real decisions about what to call and when; more interesting for teaching | Pre-fetch SCRM + rates before LLM — skips the agentic reasoning the workshop is designed to show |
 | Concurrency from multi-tool LLM responses | Claude returns multiple `tool_use` blocks in one response when it recognizes no dependency; implementation dispatches them as concurrent activities | Sequential tool dispatch — loses latency benefit, doesn't demonstrate Temporal's concurrent activity pattern |
 | ShippingAgent recommends, `fulfillment.Order` decides | Keeps the agent focused on logistics reasoning; business rules (margin policy, SLA enforcement) stay in `fulfillment.Order` | Agent makes the final selection — couples business rules to the Python agent |
-| `lookup_inventory_location` always called; no `from_address` in request | Caller provides `sku_id`s — warehouse resolution is the agent's responsibility regardless of whether the caller is `fulfillment.Order` (EnrichedItem skus) or cart (cart item skus). Avoids a two-path design where callers must know about warehouse assignment. | Pre-resolve warehouse in caller and pass `from_address` — couples callers to inventory logic and creates a split path with different LLM behaviour |
+| Workflow resolves inventory origin; no `from_address` in request | Caller provides `sku_id`s — warehouse resolution is the agent workflow's responsibility regardless of whether the caller is `fulfillment.Order` (EnrichedItem skus) or cart (cart item skus). Avoids a two-path design where callers must know about warehouse assignment. | Pre-resolve warehouse in caller and pass `from_address` — couples callers to inventory logic and creates a split path with different behavior |
 | Separate `fulfillment-shipping` task queue | Shipping integration activities are blocking HTTP calls to `enablements-api`; isolating them keeps LLM/agent work on the `agents` queue and makes future vendor throttling easy to add behind the same boundary | Single shared queue — simpler but less operationally clear |
 | Worker Versioning (new build-id) for V2 cutover | `fulfillment.Order` is PINNED and has no history to bridge; old workflows complete on V1 workers, new ones pick up V2 cleanly | `Workflow.getVersion()` — unnecessary for a new workflow with no pre-existing history |
 | System prompt built in `build_system_prompt` LocalActivity (not inline workflow code) | LocalActivity result is memoized in event history; on replay, Temporal returns the memoized value and ignores the current implementation. Prompt text can be updated and redeployed without a build-id bump — in-flight workflows replay against the original prompt from history. Inline function: any text change produces different `call_llm` args than history → non-determinism error on replay. | Inline `_build_system_prompt` function — simple but couples prompt iteration to build-id lifecycle |
@@ -245,10 +281,10 @@ Cache key: `fn(sorted(from_easypost_ids), sorted([(skuId, qty)]), destinationPos
 - **Versioning:** PINNED
 - **Interfaces:**
   - Update: `recommend_shipping_option(RecommendShippingOptionRequest) → RecommendShippingOptionResponse`
-  - Query: `get_options() → ShippingOptionsCache` (reads cached state, no LLM call)
+  - Query: none currently; `ShippingOptionsCache` exists in proto as a future inspection surface
 - **State:**
-  - `cache: dict[str, ShippingOptionsResult]` — keyed by content hash
-  - `cache_metadata: dict[str, CacheEntry]` — TTL tracking per hash
+  - `_cache: dict[str, ShippingOptionsResult]` — keyed by content hash
+  - `_cache_ttl_secs: int` — workflow-level TTL, defaulting to 1800 unless provided at workflow start
 
 #### Activity Task Queues & Rate Limits
 
@@ -266,23 +302,22 @@ queue.
 The `fulfillment-shipping` worker keeps a conservative local activity rate guard. There is no
 runtime EasyPost quota in the fixture-backed path.
 
-#### Activities (LLM Tools)
+#### Activities and LLM Tools
 
-All five activities are registered on the Python worker(s) and exposed to Claude as tool
-definitions. The agentic loop dispatches them as standard Temporal activities, routing each
-to its designated task queue via `ActivityOptions(task_queue=...)`.
+The Python worker registers the activities and Nexus operations needed by the workflow. The
+LLM-visible tools are `lookup_inventory_address`, `get_carrier_rates`, `get_location_events`,
+and `find_alternate_warehouse`, plus the workflow-handled `finalize_recommendation` tool.
+`verify_address` is a pre-loop workflow activity, not an LLM-visible tool.
 
-**`lookup_inventory_location`**
+**`lookup_inventory_address` / `lookup_inventory_location`**
 - **Task Queue:** `fulfillment`
 - Input: `[{sku_id, quantity}]`
 - Output: `[{address: Address, items: [{sku_id, quantity}]}]` — items grouped by warehouse.
   Each group's `address.easypost_address` is pre-populated from seed data; `easypost_address.id`
   is ready to use as carrier origin and cache key component.
-- Note: **Always the first tool call** in every agentic loop execution. The agent calls
-  `get_carrier_rates` once per returned group (concurrently if multiple). The agent is
-  naturally plurality-aware — no agent changes needed when the inventory service returns more
-  groups. V1 inventory service (static TOML seed) returns a single group; future Inventory
-  Locations service may return multiple.
+- Note: The current workflow resolves the origin before cache lookup and before the LLM loop, so
+  this lookup is not normally the first LLM-selected tool call. The lookup tool remains available
+  to the LLM, but the cache key is based on the pre-loop resolved origin.
 
 **`verify_address`**
 - **Task Queue:** `fulfillment-shipping`
@@ -290,11 +325,9 @@ to its designated task queue via `ActivityOptions(task_queue=...)`.
 - Output: `EasyPostAddress` (id, residential, verified) + `Coordinate` from fixtures
 - Calls `enablements-api` shipping verification
 - Note: Fallback only in normal operation. `to_address` is pre-verified by `fulfillment.Order`
-  `validateOrder`; the warehouse address returned by `lookup_inventory_location` is
-  pre-verified from seed data. Both already carry `easypost_address.id`. The system prompt
-  instructs the LLM to skip `verify_address` when `easypost_address` is already set. Retained
-  as a tool for addresses that arrive unverified (e.g. storefront-supplied `to_address` in the
-  cart path before fixture verification).
+  `validateOrder`; the warehouse address returned by origin lookup is pre-verified from seed data.
+  When `to_address.easypost.id` is missing, the workflow calls this before cache lookup so the
+  destination is concrete before the LLM loop.
 
 **`get_carrier_rates`**
 - **Task Queue:** `fulfillment-shipping`
@@ -335,10 +368,10 @@ Proto definitions are the source of truth. This section describes intent only.
 **`RecommendShippingOptionRequest`** — replaces current stub. Carries:
 - `order_id`, `customer_id`
 - `to_address` (`common.Address` with `easypost_address` already populated from `fulfillment.Order`
-  `validateOrder` in the fulfillment path; raw address in the cart path — LLM may call
-  `verify_address` if `easypost_address` is absent)
-- `items`: `[{sku_id, quantity}]` — the LLM calls `lookup_inventory_location` with these to
-  resolve the warehouse origin; no `from_address` is provided by the caller
+  `validateOrder` in the fulfillment path; raw address in the cart path — the workflow calls
+  `verify_address` before cache lookup if `easypost_address` is absent)
+- `items`: `[{sku_id, quantity}]` — the workflow resolves the warehouse origin from these before
+  cache lookup and LLM reasoning; no `from_address` is provided by the caller
 - `selected_shipment`: optional `common.Shipment`; `paid_price` supplies the customer-paid margin
   context, and `easypost.selected_rate.delivery_days` supplies the selected delivery-days SLA.
 
@@ -415,21 +448,23 @@ from packaged shipping fixtures, and `get_location_events` uses them when presen
 
 - [ ] `ShippingAgent` workflow class: `@workflow.defn`, WorkflowID = `customer_id`
 - [ ] `recommend_shipping_option` Update handler:
-  - [ ] Compute cache key after `lookup_inventory_location` returns (warehouse `easypost_address.id`
-        not known until then); return cached result if hit and within TTL
+  - [ ] Resolve origin with `lookupInventoryAddress` and verify destination when needed before the
+        LLM loop
+  - [ ] Compute cache key from resolved origin, destination postal/country, sorted items, and
+        selected-shipment context; return cached result if hit and within TTL
   - [ ] Call `build_system_prompt` LocalActivity to compute the system prompt string before
         the agentic loop — result is memoized in history; prompt changes do not require a
         build-id bump (see Design Decisions)
   - [ ] Build tool definitions from the four activity signatures
   - [ ] Agentic loop: call LLM → dispatch concurrent activities for all tool_use blocks → append results → repeat
   - [ ] Extract `ShippingRecommendation` from the `finalize_recommendation` tool input
-  - [ ] Store result in cache with TTL metadata
+  - [ ] Store result in `_cache` with `cached_at=workflow.now()`
   - [ ] Return `RecommendShippingOptionResponse`
-- [ ] `get_options` Query handler: return current cache state
+- [ ] Future `get_options` Query handler: return current cache state
 - [ ] Unit tests:
-  - [ ] Cache hit — LLM not called (after `lookup_inventory_location` resolves the key)
-  - [ ] Cache miss — `lookup_inventory_location` always dispatched as first tool call
-  - [ ] Cache miss + multi-tool response (concurrent activity dispatch for turn 2)
+  - [ ] Cache hit — LLM not called after pre-loop context resolves the key
+  - [ ] Cache miss — origin lookup still happens before key evaluation
+  - [ ] Cache miss + multi-tool response (concurrent activity dispatch after pre-loop context)
   - [ ] Cache miss + multi-tool response (concurrent activity dispatch)
   - [ ] `PROCEED` outcome
   - [ ] `MARGIN_SPIKE` outcome
@@ -513,6 +548,7 @@ alternate warehouse path is reliably exercised and structurally enforced rather 
 | Location events tool returns no risk data in the first pass | Low | — | By design until real implementation lands; LLM reasons correctly with `RISK_LEVEL_NONE` |
 | Fixture route missing for a scenario address pair | Medium | Medium | Add the route to `shipping-fixtures.json` and keep scenario scripts aligned with fixture IDs |
 | Long-running `ShippingAgent` accumulates unbounded cache entries | Low | Medium | TTL eviction on cache reads; `continue_as_new` if cache map exceeds size threshold |
+| Cache TTL fallback constant changes while default-TTL workflows are open | High | Low | Treat `_DEFAULT_CACHE_TTL_SECS` as replay-sensitive. Record the desired TTL in `StartShippingAgentRequest`, or use Temporal versioning/patching/controlled migration before changing the fallback for in-flight workflows. |
 | LLM skips `find_alternate_warehouse` despite prompt instruction | Medium | Medium | Post-loop enforcement in Phase 6: the workflow rejects a premature MARGIN_SPIKE/SLA_BREACH finalize and forces another loop iteration; the LLM cannot skip the tool without receiving an explicit rejection |
 | Post-loop rejection loops indefinitely if LLM ignores the correction | Low | Low | The existing `ApplicationError` on `END_TURN` without finalize already surfaces as a retryable failure; a loop guard (max iterations counter) can be added if observed in practice |
 
@@ -535,10 +571,10 @@ Each is a candidate for a follow-up spec or Workshop extension exercise.
 
 ### Warehouse address caching in workflow state
 
-**What:** Cache the `LookupInventoryLocationResponse` in workflow state after the first
-`lookup_inventory_location` call. On subsequent `recommend_shipping_option` updates, skip
-the activity entirely and inject the resolved warehouse address directly into the task context
-— removing it from the tool definitions so the LLM never has to call it.
+**What:** Cache the inventory origin lookup response in workflow state after the first
+`lookupInventoryAddress` call. On subsequent `recommend_shipping_option` updates, skip
+the pre-loop origin lookup entirely and inject the resolved warehouse address directly into the
+task context.
 
 **Why deferred:** Warehouse-to-SKU assignment is stable in V1 (static TOML seed data), so
 every call pays the lookup cost unnecessarily. The optimization is safe to defer because the
@@ -551,18 +587,25 @@ invalidation Signal or a TTL would be needed before enabling this in production.
 
 ---
 
-### Shipping options cache
+### Cache TTL configuration hardening
 
-**What:** An in-workflow `dict` cache keyed by a content hash of
-`(from_easypost_id, items, destination_postal_code, destination_country)` that short-circuits
-the full agentic loop on repeated requests with identical inputs, returning the cached
-`ShippingRecommendation` directly.
+**What:** Make the cache TTL an explicitly recorded workflow configuration for every
+`ShippingAgent` execution. The Nexus handler currently starts the workflow with only
+`customer_id`, so workflows created through the normal service path use the code fallback
+`_DEFAULT_CACHE_TTL_SECS = 1800`.
 
-**Why deferred:** The cache was removed during implementation to reduce complexity and keep
-the agentic loop as the clear teaching path. For the Workshop, every call going through the
-full loop is a feature — students see every step every time. Re-enabling it is a natural
-extension exercise: add the `_cache` dict, compute the key after `lookup_inventory_location`
-resolves the warehouse, store the result, and short-circuit on hit.
+**Why deferred:** The current 30-minute default is acceptable for the workshop path and the
+behavior is covered by unit tests. The improvement is about operational safety when changing the
+default later, not about current correctness.
+
+**Consideration for production:** Changing the fallback constant while existing workflows are open
+can create a Temporal replay mismatch if a cached entry is valid under the old value but expired
+under the new one. Future work should either:
+
+- pass `ShippingAgentExecutionOptions(cache_ttl_secs=1800)` from `ShippingAgentImpl` so the value is
+  recorded in workflow history for new executions;
+- gate any default change with Temporal patch/versioning semantics; or
+- migrate/continue-as-new existing workflows with an explicit TTL before changing the fallback.
 
 ---
 

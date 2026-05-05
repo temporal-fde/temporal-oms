@@ -222,7 +222,7 @@ class ShippingAgent:
         self,
         request: RecommendShippingOptionRequest,
     ) -> RecommendShippingOptionResponse:
-        # Pre-fetch origin and destination in parallel before the LLM loop.
+        # Pre-fetch origin and destination in parallel BEFORE the LLM loop.
         # Results are embedded directly in the task prompt so the LLM can call
         # get_carrier_rates + get_location_events concurrently on its first turn.
         to_ep = request.to_address.easypost if request.to_address else None
