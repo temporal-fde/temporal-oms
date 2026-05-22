@@ -18,6 +18,7 @@
         <module>apps</module>
         <module>processing</module>
         <module>enablements</module>
+        <module>fulfillment</module>
         <module>generated</module>
     </modules>
 
@@ -26,6 +27,7 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.plugin.version>3.14.1</maven.compiler.plugin.version>
+        <javac.executable>javac</javac.executable>
 
         <!-- Temporal -->
         <temporal.version>1.33.0</temporal.version>
@@ -51,6 +53,9 @@
 
         <!-- Protocol Buffers -->
         <protobuf.version>4.34.1</protobuf.version>
+
+        <!-- Dotenv -->
+        <spring-dotenv.version>4.0.0</spring-dotenv.version>
     </properties>
 
     <dependencyManagement>
@@ -179,6 +184,13 @@
                 <version>${spring-boot.version}</version>
                 <scope>test</scope>
             </dependency>
+
+            <!-- Dotenv -->
+            <dependency>
+                <groupId>me.paulschwarz</groupId>
+                <artifactId>spring-dotenv</artifactId>
+                <version>${spring-dotenv.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -193,7 +205,7 @@
                         <source>21</source>
                         <target>21</target>
                         <fork>true</fork>
-                        <executable>${user.home}/.asdf/shims/javac</executable>
+                        <executable>${javac.executable}</executable>
                         <parameters>true</parameters>
                     </configuration>
                     <dependencies>

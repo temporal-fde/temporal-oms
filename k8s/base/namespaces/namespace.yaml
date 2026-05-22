@@ -17,3 +17,23 @@ metadata:
     name: temporal-oms-processing
     app: temporal-oms
     component: processing
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: temporal-oms-fulfillment
+  labels:
+    name: temporal-oms-fulfillment
+    app: temporal-oms
+    component: fulfillment
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: temporal-oms-enablements
+  labels:
+    name: temporal-oms-enablements
+    app: temporal-oms
+    component: enablements

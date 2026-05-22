@@ -1,11 +1,11 @@
 spring.config.import: classpath:acme.apps.yaml
+spring.profiles.default: local
 spring.application.name: apps-api
 spring.temporal.start-workers: false
 
 management.server.port: 9091
 
-server:
-  port: 8080
+server.port: 8080
 
 # Swagger/OpenAPI Configuration (MANDATORY per stack-api-rest)
 springdoc:

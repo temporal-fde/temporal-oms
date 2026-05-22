@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: enablements-workers
+  namespace: temporal-oms-enablements
+  labels:
+    app: enablements-workers
+    component: worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: enablements-workers
+  template:
+    metadata:
+      labels:
+        app: enablements-workers
+        component: worker
+        version: "1.0.0"
+      annotations:
+        instrumentation.opentelemetry.io/inject-sdk: "true"
+    spec:
+      containers:
+      - name: worker
+        image: temporal-oms/enablements-workers:latest
+        imagePullPolicy: Never
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: k8s
+        - name: JAVA_OPTS
+          value: "-Dgrpc.netty.keepaliveTime=30 -Dgrpc.netty.keepaliveTimeout=5 -Dgrpc.netty.keepaliveWithoutCalls=true"
+        envFrom:
+        - configMapRef:
+            name: temporal-oms-config
+        - secretRef:
+            name: temporal-oms-secrets
+        volumeMounts:
+        - name: temporal-config
+          mountPath: /etc/config/temporal
+          readOnly: true
+        - name: temporal-secret
+          mountPath: /etc/config/temporal-secret
+          readOnly: true
+        resources:
+          requests:
+            memory: "384Mi"
+            cpu: "200m"
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
+      volumes:
+      - name: temporal-config
+        configMap:
+          name: temporal-enablements-config
+          defaultMode: 0444
+      - name: temporal-secret
+        secret:
+          secretName: temporal-enablements-api-key
+          defaultMode: 0444

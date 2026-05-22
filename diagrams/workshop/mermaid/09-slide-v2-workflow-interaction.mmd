@@ -1,0 +1,37 @@
+flowchart LR
+  Inputs["Order + Payment<br/>Inputs"]
+  AppsOrder["apps.Order<br/>collects inputs<br/>coordinates order"]
+  ProcessingOrder["processing.Order<br/>validates + enriches"]
+  FulfillmentOrder["fulfillment.Order<br/>validate, hold, ship, track"]
+  ShippingAgent["ShippingAgent<br/>recommends shipping option"]
+  FulfillmentState["Fulfillment state<br/>label, inventory, delivery<br/>margin/SLA visibility"]
+
+  Inputs -->|"updates"| AppsOrder
+  AppsOrder -->|"validateOrder early"| FulfillmentOrder
+  AppsOrder -->|"processOrder"| ProcessingOrder
+  ProcessingOrder -->|"processed order"| AppsOrder
+  AppsOrder -->|"fulfillOrder"| FulfillmentOrder
+  FulfillmentOrder -->|"recommendShippingOption"| ShippingAgent
+  ShippingAgent -->|"recommendation"| FulfillmentOrder
+  FulfillmentOrder -->|"records outcome"| FulfillmentState
+
+  NoKafka["No Kafka handoff<br/>for new path"]
+  AgentBoundary["Agent recommends;<br/>fulfillment decides"]
+
+  NoKafka -.-> ProcessingOrder
+  AgentBoundary -.-> ShippingAgent
+
+  classDef input fill:#e8f3ff,stroke:#2f6fbd,color:#222;
+  classDef workflow fill:#eee8ff,stroke:#6f42c1,color:#222;
+  classDef fulfillment fill:#e9f7ef,stroke:#218838,color:#222;
+  classDef agent fill:#f0e8ff,stroke:#7b3fe4,color:#222;
+  classDef state fill:#fff4d6,stroke:#b7791f,color:#222;
+  classDef note fill:#f7f7f7,stroke:#999,color:#333,stroke-dasharray: 4 4;
+
+  class Inputs input;
+  class AppsOrder,ProcessingOrder workflow;
+  class FulfillmentOrder fulfillment;
+  class ShippingAgent agent;
+  class FulfillmentState state;
+  class NoKafka,AgentBoundary note;
+

@@ -1,0 +1,488 @@
+from __future__ import annotations
+
+import asyncio
+import hashlib
+import json
+from datetime import datetime, timedelta, timezone
+
+from temporalio import workflow
+from temporalio.common import RetryPolicy
+from temporalio.exceptions import ApplicationError
+
+with workflow.unsafe.imports_passed_through():
+    from acme.common.v1.llm_p2p import (
+        LlmContentBlock,
+        LlmMessage,
+        LlmResponse,
+        LlmRole,
+        LlmStopReason,
+        LlmTextBlock,
+        LlmToolDefinition,
+        LlmToolResultBlock,
+    )
+    from acme.fulfillment.domain.v1.shipping_agent_p2p import (
+        BuildSystemPromptRequest,
+        BuildSystemPromptResponse,
+        GetLocationEventsRequest,
+        GetLocationEventsResponse,
+        GetShippingRatesRequest,
+        GetShippingRatesResponse,
+        RecommendationOutcome,
+        RecommendShippingOptionRequest,
+        RecommendShippingOptionResponse,
+        ShippingOption,
+        ShippingOptionsResult,
+        ShippingRecommendation,
+        StartShippingAgentRequest,
+    )
+    from acme.fulfillment.domain.v1.values_p2p import RiskLevel
+    from acme.fulfillment.domain.v1.inventory_p2p import (
+        FindAlternateWarehouseRequest,
+        FindAlternateWarehouseResponse,
+        LookupInventoryAddressRequest,
+        LookupInventoryAddressResponse,
+    )
+    from acme.fulfillment.domain.v1.workflows_p2p import VerifyAddressRequest, VerifyAddressResponse
+    from src.agents.activities.llm import LlmActivities
+    from src.agents.activities.location_events import LocationEventsActivities
+    from src.agents.activities.shipping import ShippingActivities
+    from src.agents.dispatch import activity_name, activity_tool, nexus_tool, ToolSpecs
+    from src.config import settings
+    from src.services.inventory_service import InventoryService
+
+_ACTIVITY_TIMEOUT = timedelta(seconds=30)
+_LLM_TIMEOUT = timedelta(seconds=120)
+_ACTIVITY_RETRY = RetryPolicy(maximum_attempts=3)
+
+_INTEGRATIONS_ENDPOINT = settings.integrations_endpoint
+
+_TOOLS = ToolSpecs(
+    nexus_tool(
+        "lookup_inventory_address",
+        "Resolve sku_ids to a warehouse location and address. "
+        "Call this first when from_address is not provided.",
+        endpoint=_INTEGRATIONS_ENDPOINT,
+        service_type=InventoryService,
+        operation=InventoryService.lookupInventoryAddress,
+        req_type=LookupInventoryAddressRequest,
+        result_type=LookupInventoryAddressResponse,
+        schedule_to_close_timeout=_ACTIVITY_TIMEOUT,
+    ),
+    activity_tool(
+        activity_name(ShippingActivities.get_carrier_rates),
+        "Retrieve fixture-backed shipment rates from the shipping integration.",
+        ShippingActivities.get_carrier_rates,
+        GetShippingRatesRequest,
+        GetShippingRatesResponse,
+        task_queue="fulfillment-shipping",
+        start_to_close_timeout=_ACTIVITY_TIMEOUT,
+        retry_policy=_ACTIVITY_RETRY,
+    ),
+    activity_tool(
+        activity_name(LocationEventsActivities.get_location_events),
+        "Query for supply chain risk events near a coordinate "
+        "(severe weather, disasters, airport delays, etc.) within the ship-to-delivery window. "
+        "Call for BOTH origin and destination. "
+        "Always use within_km=50.0. "
+        "Always populate coordinate and timezone from the verified EasyPost address — "
+        "both fields are required and must not be zero/empty.",
+        LocationEventsActivities.get_location_events,
+        GetLocationEventsRequest,
+        GetLocationEventsResponse,
+        task_queue="agents",
+        start_to_close_timeout=_ACTIVITY_TIMEOUT,
+        retry_policy=_ACTIVITY_RETRY,
+    ),
+    nexus_tool(
+        "find_alternate_warehouse",
+        "Find a warehouse that can fulfill the given items from a different address than "
+        "the one already tried. You MUST call this before returning MARGIN_SPIKE or SLA_BREACH — "
+        "a closer warehouse may offer cheaper or faster rates. Returns empty address if none available.",
+        endpoint=_INTEGRATIONS_ENDPOINT,
+        service_type=InventoryService,
+        operation=InventoryService.findAlternateWarehouse,
+        req_type=FindAlternateWarehouseRequest,
+        result_type=FindAlternateWarehouseResponse,
+        schedule_to_close_timeout=_ACTIVITY_TIMEOUT,
+    ),
+)
+
+
+_FINALIZE_TOOL_NAME = "finalize_recommendation"
+_FINALIZE_TOOL_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "outcome": {
+            "type": "string",
+            "enum": ["PROCEED", "CHEAPER_AVAILABLE", "FASTER_AVAILABLE", "MARGIN_SPIKE", "SLA_BREACH"],
+        },
+        "recommended_option_id": {
+            "type": "string",
+            "description": (
+                "Rate ID from get_carrier_rates. "
+                "For PROCEED, CHEAPER_AVAILABLE, FASTER_AVAILABLE: the chosen rate ID. "
+                "For MARGIN_SPIKE: the cheapest available rate ID (even if it exceeds paid price). "
+                "For SLA_BREACH: the fastest available rate ID (even if it misses the SLA). "
+                "Never an empty string."
+            ),
+        },
+        "reasoning": {"type": "string"},
+        "margin_delta_cents": {
+            "type": "integer",
+            "description": "Positive = cost exceeds paid price (overage). Negative = savings. Zero for non-margin outcomes.",
+        },
+        "origin_risk_level": {
+            "type": "string",
+            "enum": ["RISK_LEVEL_NONE", "RISK_LEVEL_LOW", "RISK_LEVEL_MODERATE", "RISK_LEVEL_HIGH", "RISK_LEVEL_CRITICAL"],
+        },
+        "destination_risk_level": {
+            "type": "string",
+            "enum": ["RISK_LEVEL_NONE", "RISK_LEVEL_LOW", "RISK_LEVEL_MODERATE", "RISK_LEVEL_HIGH", "RISK_LEVEL_CRITICAL"],
+        },
+    },
+    "required": ["outcome", "recommended_option_id", "reasoning", "margin_delta_cents", "origin_risk_level", "destination_risk_level"],
+}
+
+
+def _build_recommendation(data: dict) -> ShippingRecommendation:
+    outcome_str = data.get("outcome", "RECOMMENDATION_OUTCOME_UNSPECIFIED")
+    try:
+        outcome = RecommendationOutcome[outcome_str]
+    except KeyError:
+        raise ApplicationError(
+            f"Invalid RecommendationOutcome from LLM: {outcome_str!r}",
+            non_retryable=True,
+        )
+
+    def _risk(key: str) -> RiskLevel:
+        try:
+            return RiskLevel[data.get(key, "RISK_LEVEL_NONE")]
+        except KeyError:
+            return RiskLevel.RISK_LEVEL_NONE
+
+    return ShippingRecommendation(
+        outcome=outcome,
+        recommended_option_id=data.get("recommended_option_id", ""),
+        reasoning=data.get("reasoning", ""),
+        margin_delta_cents=int(data.get("margin_delta_cents", 0)),
+        origin_risk_level=_risk("origin_risk_level"),
+        destination_risk_level=_risk("destination_risk_level"),
+    )
+
+
+
+_NAME_RATES = activity_name(ShippingActivities.get_carrier_rates)
+_NAME_ALTERNATE_WAREHOUSE = "find_alternate_warehouse"
+_NEGATIVE_OUTCOMES = frozenset({"MARGIN_SPIKE", "SLA_BREACH"})
+
+_DEFAULT_CACHE_TTL_SECS = 1800
+
+
+def _cache_key(from_ep_id: str, to_ep: object, items: list, selected_shipment: object | None) -> str:
+    postal = getattr(to_ep, "zip", "") if to_ep else ""
+    country = getattr(to_ep, "country", "") if to_ep else ""
+    sorted_items = sorted((getattr(i, "sku_id", ""), getattr(i, "quantity", 0)) for i in items)
+    selected_ep = getattr(selected_shipment, "easypost", None) if selected_shipment else None
+    selected_rate = getattr(selected_ep, "selected_rate", None) if selected_ep else None
+    paid_price = getattr(selected_shipment, "paid_price", None) if selected_shipment else None
+    selected_context = (
+        getattr(selected_rate, "rate_id", "") if selected_rate else "",
+        getattr(selected_rate, "delivery_days", None) if selected_rate else None,
+        getattr(paid_price, "currency", "") if paid_price else "",
+        getattr(paid_price, "units", 0) if paid_price else 0,
+    )
+    raw = f"{from_ep_id}:{postal}:{country}:{sorted_items}:{selected_context}"
+    return hashlib.sha256(raw.encode()).hexdigest()[:16]
+
+
+@workflow.defn(name="ShippingAgent")
+class ShippingAgent:
+    """Long-running per-customer shipping advisor workflow.
+
+    WorkflowID: customer_id
+    """
+
+    def __init__(self) -> None:
+        self._cache: dict[str, ShippingOptionsResult] = {}
+        self._cache_ttl_secs: int = _DEFAULT_CACHE_TTL_SECS
+
+    @workflow.run
+    async def run(self, request: StartShippingAgentRequest) -> None:
+        if request.execution_options and request.execution_options.cache_ttl_secs:
+            self._cache_ttl_secs = request.execution_options.cache_ttl_secs
+        await workflow.wait_condition(lambda: False)
+
+    @workflow.update
+    async def recommend_shipping_option(
+        self, request: RecommendShippingOptionRequest
+    ) -> RecommendShippingOptionResponse:
+        return await self._run_react_loop(request)
+
+    async def _run_react_loop(
+        self,
+        request: RecommendShippingOptionRequest,
+    ) -> RecommendShippingOptionResponse:
+        # Pre-fetch origin and destination in parallel BEFORE the LLM loop.
+        # Results are embedded directly in the task prompt so the LLM can call
+        # get_carrier_rates + get_location_events concurrently on its first turn.
+        to_ep = request.to_address.easypost if request.to_address else None
+        needs_verify = not (to_ep and to_ep.id)
+
+        _inventory_client = workflow.create_nexus_client(
+            service=InventoryService,
+            endpoint=_INTEGRATIONS_ENDPOINT,
+        )
+
+        if needs_verify:
+            lookup_result, verify_result = await asyncio.gather(
+                _inventory_client.execute_operation(
+                    InventoryService.lookupInventoryAddress,
+                    LookupInventoryAddressRequest(items=request.items),
+                    output_type=LookupInventoryAddressResponse,
+                    schedule_to_close_timeout=_ACTIVITY_TIMEOUT,
+                ),
+                workflow.execute_activity(
+                    "verify_address",
+                    args=[VerifyAddressRequest(address=request.to_address)],
+                    result_type=VerifyAddressResponse,
+                    task_queue="fulfillment-shipping",
+                    start_to_close_timeout=_ACTIVITY_TIMEOUT,
+                    retry_policy=_ACTIVITY_RETRY,
+                ),
+            )
+            dest_ep = verify_result.address.easypost
+        else:
+            lookup_result = await _inventory_client.execute_operation(
+                InventoryService.lookupInventoryAddress,
+                LookupInventoryAddressRequest(items=request.items),
+                output_type=LookupInventoryAddressResponse,
+                schedule_to_close_timeout=_ACTIVITY_TIMEOUT,
+            )
+            dest_ep = to_ep
+
+        origin_ep = lookup_result.address.easypost if lookup_result.address else None
+
+        # Cache check — key derived from resolved origin + destination + items.
+        from_ep_id = origin_ep.id if (origin_ep and origin_ep.id) else ""
+        request_fields = getattr(request, "model_fields_set", set())
+        selected_shipment = (
+            request.selected_shipment if "selected_shipment" in request_fields else None
+        )
+        key = _cache_key(from_ep_id, dest_ep, request.items, selected_shipment)
+        cached = self._cache.get(key)
+        if cached is not None:
+            now = workflow.now()
+            age_secs = (now - cached.cached_at.replace(tzinfo=timezone.utc)).total_seconds()
+            if age_secs < self._cache_ttl_secs:
+                return RecommendShippingOptionResponse(
+                    recommendation=cached.recommendation,
+                    options=list(cached.options),
+                    cache_hit=True,
+                )
+
+        prompt_response: BuildSystemPromptResponse = await workflow.execute_local_activity(
+            LlmActivities.build_system_prompt,
+            BuildSystemPromptRequest(request=request),
+            result_type=BuildSystemPromptResponse,
+            start_to_close_timeout=timedelta(seconds=5),
+        )
+        system_prompt = prompt_response.system_prompt
+        tools = [
+            *_TOOLS.definitions(),
+            LlmToolDefinition(
+                name=_FINALIZE_TOOL_NAME,
+                description=(
+                    "Submit your final shipping recommendation. "
+                    "Call this tool when you have gathered all data needed — "
+                    "do not output text."
+                ),
+                input_schema=_FINALIZE_TOOL_SCHEMA,
+            ),
+        ]
+
+        def _addr_line(ep) -> str:
+            if not ep:
+                return "(unknown)"
+            coord = (
+                f"  lat={ep.coordinate.latitude} lng={ep.coordinate.longitude}"
+                if (ep.coordinate and (ep.coordinate.latitude or ep.coordinate.longitude))
+                else ""
+            )
+            tz = f"  timezone={ep.timezone}" if getattr(ep, "timezone", "") else ""
+            ep_id = ep.id if ep.id else "(unverified — call verify_address if needed)"
+            return f"{ep.street1}, {ep.city}, {ep.state} {ep.zip}  easypost_id={ep_id}{coord}{tz}"
+
+        items_desc = ", ".join(f"{i.sku_id}×{i.quantity}" for i in request.items)
+        selected_ep = selected_shipment.easypost if selected_shipment else None
+        selected_rate = selected_ep.selected_rate if selected_ep else None
+        paid_price = selected_shipment.paid_price if selected_shipment else None
+        selected_rate_fields = getattr(selected_rate, "model_fields_set", set()) if selected_rate else set()
+        has_delivery_days = (
+            selected_rate
+            and (
+                "delivery_days" in selected_rate_fields
+                or selected_rate.delivery_days not in (None, 0)
+            )
+        )
+        has_selected_context = bool(
+            (paid_price and paid_price.units > 0)
+            or (selected_rate and selected_rate.rate_id)
+            or has_delivery_days
+        )
+        selected_rate_id = selected_rate.rate_id if selected_rate else ""
+        selected_delivery_days = selected_rate.delivery_days if selected_rate else None
+        selected_paid_units = paid_price.units if paid_price else 0
+        selected_paid_currency = paid_price.currency if paid_price else ""
+        selected_desc = (
+            f"selected_shipment: paid_price={selected_paid_units} {selected_paid_currency}; "
+            f"selected_rate_id={selected_rate_id}; "
+            f"delivery_days={selected_delivery_days}\n"
+            if has_selected_context
+            else ""
+        )
+        task_text = (
+            f"Recommend a shipping option for order {request.order_id}.\n"
+            f"destination: {_addr_line(dest_ep)}\n"
+            f"origin (resolved from inventory): {_addr_line(origin_ep)}\n"
+            f"items: {items_desc}\n"
+            f"{selected_desc}"
+        )
+
+        # System instructions are embedded in the first user message (call_llm has no system param)
+        user_text = system_prompt + "\n\n---\n\n" + task_text
+
+        messages: list[LlmMessage] = [
+            LlmMessage(
+                role=LlmRole.LLM_ROLE_USER,
+                content=[LlmContentBlock(type="text", text=LlmTextBlock(text=user_text))],
+            )
+        ]
+
+        recommendation: ShippingRecommendation | None = None
+        all_options: list[ShippingOption] = []
+        options_by_id: dict[str, ShippingOption] = {}
+        alternate_warehouse_called = False
+
+        while True:
+            # ReAct: Reason — LLM evaluates state and decides next action (tool calls or final answer)
+            llm_response: LlmResponse = await workflow.execute_activity(
+                "call_llm",
+                args=[messages, tools],
+                result_type=LlmResponse,
+                start_to_close_timeout=_LLM_TIMEOUT,
+                retry_policy=_ACTIVITY_RETRY,
+            )
+
+            messages.append(LlmMessage(
+                role=LlmRole.LLM_ROLE_ASSISTANT,
+                content=list(llm_response.content),
+            ))
+
+            if llm_response.stop_reason == LlmStopReason.LLM_STOP_REASON_END_TURN:
+                raise ApplicationError(
+                    "LLM ended without calling finalize_recommendation",
+                    non_retryable=False,
+                )
+
+            if llm_response.stop_reason == LlmStopReason.LLM_STOP_REASON_TOOL_USE:
+                tool_blocks = [b for b in llm_response.content if b.type == "tool_use"]
+
+                finalize_block = next(
+                    (b for b in tool_blocks if b.tool_use.name == _FINALIZE_TOOL_NAME), None
+                )
+                if finalize_block is not None:
+                    outcome = finalize_block.tool_use.input.get("outcome", "")
+                    if outcome in _NEGATIVE_OUTCOMES and not alternate_warehouse_called:
+                        messages.append(LlmMessage(
+                            role=LlmRole.LLM_ROLE_USER,
+                            content=[LlmContentBlock(
+                                type="tool_result",
+                                tool_result=LlmToolResultBlock(
+                                    tool_use_id=finalize_block.tool_use.id,
+                                    content=(
+                                        '{"error": "REJECTED: You must call find_alternate_warehouse '
+                                        f'before returning {outcome}. Call it now, then re-submit '
+                                        'your recommendation."}'
+                                    ),
+                                ),
+                            )],
+                        ))
+                        continue
+                    recommendation = _build_recommendation(finalize_block.tool_use.input)
+                    break
+
+                # ReAct: Act — dispatch real activity tools concurrently, block until all resolve.
+                # The selected shipment is workflow context, not LLM-authored tool input, so attach
+                # it at dispatch time while keeping the public tool call shape stable.
+                dispatch_blocks = []
+                for block in tool_blocks:
+                    dispatch_block = block
+                    if block.tool_use.name == _NAME_RATES and selected_shipment:
+                        dispatch_block = block.model_copy(deep=True)
+                        dispatch_block.tool_use.input["selected_shipment"] = (
+                            selected_shipment.model_dump(mode="json")
+                        )
+                    dispatch_blocks.append(dispatch_block)
+
+                tool_results: list[str] = list(await asyncio.gather(
+                    *[_TOOLS.dispatch(b) for b in dispatch_blocks]
+                ))
+
+                for block in tool_blocks:
+                    if block.tool_use.name == _NAME_ALTERNATE_WAREHOUSE:
+                        alternate_warehouse_called = True
+
+                for block, result_json in zip(tool_blocks, tool_results):
+                    if block.tool_use.name == _NAME_RATES:
+                        try:
+                            data = json.loads(result_json)
+                            for option_json in data.get("options", []):
+                                option = ShippingOption(**option_json)
+                                option_id = option.id or option.rate_id
+                                if option_id not in options_by_id:
+                                    options_by_id[option_id] = option
+                                    all_options.append(option)
+                        except Exception:
+                            pass
+
+                messages.append(LlmMessage(
+                    role=LlmRole.LLM_ROLE_USER,
+                    content=[
+                        LlmContentBlock(
+                            type="tool_result",
+                            tool_result=LlmToolResultBlock(
+                                tool_use_id=b.tool_use.id,
+                                content=r,
+                            ),
+                        )
+                        for b, r in zip(tool_blocks, tool_results)
+                    ],
+                ))
+
+        if recommendation is None:
+            raise ApplicationError("LLM did not produce a recommendation", non_retryable=False)
+
+        self._cache[key] = ShippingOptionsResult(
+            recommendation=recommendation,
+            options=all_options,
+            cached_at=workflow.now(),
+        )
+
+        return RecommendShippingOptionResponse(
+            recommendation=recommendation,
+            options=all_options,
+            cache_hit=False,
+        )
+
+    @recommend_shipping_option.validator
+    def validate_recommend_shipping_option(
+        self, request: RecommendShippingOptionRequest
+    ) -> None:
+        if not request.order_id:
+            raise ValueError("order_id is required")
+        if not request.customer_id:
+            raise ValueError("customer_id is required")
+        if not request.to_address:
+            raise ValueError("to_address is required")
+        if not request.items:
+            raise ValueError("at least one item is required")

@@ -4,10 +4,27 @@ A Java-based Order Management System powered by Temporal workflows.
 
 ## Choose Your Setup Path
 
+### ☁️ Running in GitHub Codespaces for the Workshop?
+
+Use this repo's devcontainer. It installs the workshop toolchain for you:
+
+- Java 21 and Maven 3.9.9
+- Python 3.12 and `uv`
+- Temporal CLI `1.7.0`
+- Docker-in-Docker
+- `kubectl`, Helm, `kind`, `k3d`, and `k9s`
+- `jq`, `yq`, `curl`, and process utilities
+
+Create a Codespace from the workshop branch. The devcontainer also creates `.env.local` from the
+committed non-secret `.env.codespaces` file and prebuilds Java/Python dependencies.
+
+Instructor-only key distribution helpers (`caddy` and `cloudflared`) run from the instructor's
+local machine, not from attendee Codespaces.
+
 ### 🎯 Want to Deploy to Kubernetes?
 
-If you want to run the full application stack in Kubernetes (either locally via KinD or with Temporal Cloud), see **[DEPLOYMENT.md](DEPLOYMENT.md)** for:
-- One-liner deployment with `./scripts/demo-up.sh`
+If you want to run the full application stack in Kubernetes (locally via KinD/k3d or with Temporal Cloud), see **[DEPLOYMENT.md](DEPLOYMENT.md)** for:
+- Parallel Kubernetes runners under `scripts/kind/*` and `scripts/k3d/*`
 - Support for both local Temporal and Temporal Cloud
 - Production-like Kubernetes environment
 - Traefik ingress for API access
@@ -57,6 +74,44 @@ Continue below for pure local development without Kubernetes. This is great for:
    curl --version
    ```
 
+5. **uv** (Python package manager, for the Python fulfillment worker)
+   ```bash
+   # macOS
+   brew install uv
+
+   # Or: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+   # Install Python dependencies (run once from repo root)
+   cd python && uv sync
+   ```
+
+### Configure Environment
+
+Copy the environment template before starting any services:
+
+```bash
+cp .env.example .env.local
+```
+
+All Java services and Python workers load `.env.local` automatically — no extra steps needed once it exists. The defaults in `.env.example` are already correct for local Temporal (no API keys required for Temporal itself).
+
+For Codespaces/workshop runs, use the committed non-secret defaults instead:
+
+```bash
+cp .env.codespaces .env.local
+```
+
+Keep `ANTHROPIC_API_KEY` and `OPENAI_API_KEY` out of `.env.local` in Codespaces. Provide them as GitHub Codespaces secrets so they are exposed as runtime environment variables.
+
+API keys are only needed for integration features. Workers start and connect without them — activities that call external APIs will fail with a clear error message if the key is missing when that feature is exercised.
+
+| Variable | Where to get it | Needed for |
+|----------|----------------|------------|
+| `EASYPOST_API_KEY` | [easypost.com](https://www.easypost.com) → Dashboard → API Keys | Address verification, carrier rate quotes |
+| `ANTHROPIC_API_KEY` | [console.anthropic.com](https://console.anthropic.com) | AI shipping agent live Claude calls |
+| `OPENAI_API_KEY` | [platform.openai.com](https://platform.openai.com) | AI exercises or tooling that calls OpenAI APIs |
+| `PREDICTHQ_API_KEY` | [predicthq.com](https://www.predicthq.com) | Location risk events (weather/event disruption data) |
+
 ### Step 1: Start Local Temporal
 
 ```bash
@@ -83,6 +138,7 @@ Create Temporal namespaces and Nexus endpoints for cross-namespace communication
 This creates:
 - ✅ `apps` namespace — Order orchestration and data collection
 - ✅ `processing` namespace — Order validation, enrichment, fulfillment
+- ✅ `fulfillment` namespace — Order fulfillment
 - ✅ Nexus endpoints for Apps → Processing communication
 - ✅ Sets the current worker version for the `processing` deployment
 
@@ -131,21 +187,37 @@ mvn spring-boot:run
 **Terminal 2 — Apps Worker**:
 ```bash
 cd java/apps/apps-workers
-export TEMPORAL_NAMESPACE=apps
 mvn spring-boot:run
 ```
 
 **Terminal 3 — Processing Worker**:
 ```bash
 cd java/processing/processing-workers
-export TEMPORAL_NAMESPACE=processing
 mvn spring-boot:run
 ```
+
+**Terminal 4 — Fulfillment Worker** (Java):
+```bash
+cd java/fulfillment/fulfillment-workers
+mvn spring-boot:run
+```
+
+> Uses `EASYPOST_API_KEY` from `.env.local` for address verification. The worker starts without it, but address verification activities will fail with a clear error until the key is set.
+
+**Terminal 5 — Python Fulfillment Workers** (shipping agent + EasyPost + PredictHQ):
+```bash
+cd python/fulfillment
+uv run --project .. python -m src.worker
+```
+
+> Uses `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `EASYPOST_API_KEY`, and `PREDICTHQ_API_KEY` from the environment or `.env.local`. Workers connect and poll without them — activities that call these APIs surface a clear error when invoked without the key.
 
 All services are now ready:
 - ✅ Apps API running on `http://localhost:8080`
 - ✅ Apps Worker connected to `apps` namespace
 - ✅ Processing Worker connected to `processing` namespace
+- ✅ Fulfillment Worker connected to `fulfillment` namespace
+- ✅ Python Workers (shipping agent, EasyPost, PredictHQ) connected to `fulfillment` namespace
 - ✅ Temporal UI at `http://localhost:8233`
 
 ---
@@ -178,22 +250,7 @@ See `scripts/scenarios/README.md` for detailed demo instructions and talking poi
 
 ---
 
-## Review Orders Sent for Fulfillment 
-<<<<<<< HEAD
-To view orders sent to Kafka for fulfillment, navigate to:
-
-`http://localhost:8071/kafka/fulfillment/<orderId>`
-
-For example, the order fulfillment message created by the "Valid order (happy path)" scripts can be viewed by navigating to:
-
-`http://localhost:8071/kafka/fulfillment/valid-order-123`
-=======
-
-**Note:**
-
-*This feature is for diagnostic purposes.  The implementation and code should not be considered a production pattern or feature of the application.  
-It is only available when running the application using Option 3 (Everything Local w/o Kubernetes).*
-
+## Review Orders Sent for Fulfillment
 To view orders sent to Kafka for fulfillment, navigate to:
 
 `http://localhost:8071/admin/order-fulfillment/<orderId>`
@@ -201,9 +258,9 @@ To view orders sent to Kafka for fulfillment, navigate to:
 For example, the order fulfillment message created by the "Valid order (happy path)" scripts can be viewed by navigating to:
 
 `http://localhost:8071/admin/order-fulfillment/valid-order-123`
->>>>>>> d03c50b (Changes:)
 
-
+**Note:**
+This is only for demonstration purposes and not for production. It shows the fulfillment message was added to the Kafka topic.  At this time, it is only available when running the application locally (Level 1 - No Kubernetes, No Cloud).  
 ---
 
 ## API Endpoints
@@ -350,7 +407,7 @@ temporal worker deployment set-current-version \
 Verify the current version is set:
 ```bash
 temporal worker deployment describe \
-  --deployment-name processing \
+  --name processing \
   --namespace processing
 ```
 

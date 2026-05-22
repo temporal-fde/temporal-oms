@@ -68,6 +68,51 @@ private static final long serialVersionUID = 0L;
     return processingTimeoutSecs_;
   }
 
+  public static final int OMS_PROPERTIES_FIELD_NUMBER = 2;
+  private com.acme.proto.acme.oms.v1.OmsProperties omsProperties_;
+  /**
+   * <code>optional .acme.oms.v1.OmsProperties oms_properties = 2 [json_name = "omsProperties"];</code>
+   * @return Whether the omsProperties field is set.
+   */
+  @java.lang.Override
+  public boolean hasOmsProperties() {
+    return ((bitField0_ & 0x00000002) != 0);
+  }
+  /**
+   * <code>optional .acme.oms.v1.OmsProperties oms_properties = 2 [json_name = "omsProperties"];</code>
+   * @return The omsProperties.
+   */
+  @java.lang.Override
+  public com.acme.proto.acme.oms.v1.OmsProperties getOmsProperties() {
+    return omsProperties_ == null ? com.acme.proto.acme.oms.v1.OmsProperties.getDefaultInstance() : omsProperties_;
+  }
+  /**
+   * <code>optional .acme.oms.v1.OmsProperties oms_properties = 2 [json_name = "omsProperties"];</code>
+   */
+  @java.lang.Override
+  public com.acme.proto.acme.oms.v1.OmsPropertiesOrBuilder getOmsPropertiesOrBuilder() {
+    return omsProperties_ == null ? com.acme.proto.acme.oms.v1.OmsProperties.getDefaultInstance() : omsProperties_;
+  }
+
+  public static final int SEND_FULFILLMENT_FIELD_NUMBER = 3;
+  private boolean sendFulfillment_ = false;
+  /**
+   * <code>optional bool send_fulfillment = 3 [json_name = "sendFulfillment"];</code>
+   * @return Whether the sendFulfillment field is set.
+   */
+  @java.lang.Override
+  public boolean hasSendFulfillment() {
+    return ((bitField0_ & 0x00000004) != 0);
+  }
+  /**
+   * <code>optional bool send_fulfillment = 3 [json_name = "sendFulfillment"];</code>
+   * @return The sendFulfillment.
+   */
+  @java.lang.Override
+  public boolean getSendFulfillment() {
+    return sendFulfillment_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -85,6 +130,12 @@ private static final long serialVersionUID = 0L;
     if (((bitField0_ & 0x00000001) != 0)) {
       output.writeInt64(1, processingTimeoutSecs_);
     }
+    if (((bitField0_ & 0x00000002) != 0)) {
+      output.writeMessage(2, getOmsProperties());
+    }
+    if (((bitField0_ & 0x00000004) != 0)) {
+      output.writeBool(3, sendFulfillment_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -97,6 +148,14 @@ private static final long serialVersionUID = 0L;
     if (((bitField0_ & 0x00000001) != 0)) {
       size += com.google.protobuf.CodedOutputStream
         .computeInt64Size(1, processingTimeoutSecs_);
+    }
+    if (((bitField0_ & 0x00000002) != 0)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(2, getOmsProperties());
+    }
+    if (((bitField0_ & 0x00000004) != 0)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBoolSize(3, sendFulfillment_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -118,6 +177,16 @@ private static final long serialVersionUID = 0L;
       if (getProcessingTimeoutSecs()
           != other.getProcessingTimeoutSecs()) return false;
     }
+    if (hasOmsProperties() != other.hasOmsProperties()) return false;
+    if (hasOmsProperties()) {
+      if (!getOmsProperties()
+          .equals(other.getOmsProperties())) return false;
+    }
+    if (hasSendFulfillment() != other.hasSendFulfillment()) return false;
+    if (hasSendFulfillment()) {
+      if (getSendFulfillment()
+          != other.getSendFulfillment()) return false;
+    }
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -133,6 +202,15 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + PROCESSING_TIMEOUT_SECS_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
           getProcessingTimeoutSecs());
+    }
+    if (hasOmsProperties()) {
+      hash = (37 * hash) + OMS_PROPERTIES_FIELD_NUMBER;
+      hash = (53 * hash) + getOmsProperties().hashCode();
+    }
+    if (hasSendFulfillment()) {
+      hash = (37 * hash) + SEND_FULFILLMENT_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getSendFulfillment());
     }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
@@ -253,19 +331,31 @@ private static final long serialVersionUID = 0L;
 
     // Construct using com.acme.proto.acme.processing.domain.processing.v1.ProcessOrderRequestExecutionOptions.newBuilder()
     private Builder() {
-
+      maybeForceBuilderInitialization();
     }
 
     private Builder(
         com.google.protobuf.GeneratedMessage.BuilderParent parent) {
       super(parent);
-
+      maybeForceBuilderInitialization();
+    }
+    private void maybeForceBuilderInitialization() {
+      if (com.google.protobuf.GeneratedMessage
+              .alwaysUseFieldBuilders) {
+        internalGetOmsPropertiesFieldBuilder();
+      }
     }
     @java.lang.Override
     public Builder clear() {
       super.clear();
       bitField0_ = 0;
       processingTimeoutSecs_ = 0L;
+      omsProperties_ = null;
+      if (omsPropertiesBuilder_ != null) {
+        omsPropertiesBuilder_.dispose();
+        omsPropertiesBuilder_ = null;
+      }
+      sendFulfillment_ = false;
       return this;
     }
 
@@ -304,6 +394,16 @@ private static final long serialVersionUID = 0L;
         result.processingTimeoutSecs_ = processingTimeoutSecs_;
         to_bitField0_ |= 0x00000001;
       }
+      if (((from_bitField0_ & 0x00000002) != 0)) {
+        result.omsProperties_ = omsPropertiesBuilder_ == null
+            ? omsProperties_
+            : omsPropertiesBuilder_.build();
+        to_bitField0_ |= 0x00000002;
+      }
+      if (((from_bitField0_ & 0x00000004) != 0)) {
+        result.sendFulfillment_ = sendFulfillment_;
+        to_bitField0_ |= 0x00000004;
+      }
       result.bitField0_ |= to_bitField0_;
     }
 
@@ -321,6 +421,12 @@ private static final long serialVersionUID = 0L;
       if (other == com.acme.proto.acme.processing.domain.processing.v1.ProcessOrderRequestExecutionOptions.getDefaultInstance()) return this;
       if (other.hasProcessingTimeoutSecs()) {
         setProcessingTimeoutSecs(other.getProcessingTimeoutSecs());
+      }
+      if (other.hasOmsProperties()) {
+        mergeOmsProperties(other.getOmsProperties());
+      }
+      if (other.hasSendFulfillment()) {
+        setSendFulfillment(other.getSendFulfillment());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -353,6 +459,18 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000001;
               break;
             } // case 8
+            case 18: {
+              input.readMessage(
+                  internalGetOmsPropertiesFieldBuilder().getBuilder(),
+                  extensionRegistry);
+              bitField0_ |= 0x00000002;
+              break;
+            } // case 18
+            case 24: {
+              sendFulfillment_ = input.readBool();
+              bitField0_ |= 0x00000004;
+              break;
+            } // case 24
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -406,6 +524,167 @@ private static final long serialVersionUID = 0L;
     public Builder clearProcessingTimeoutSecs() {
       bitField0_ = (bitField0_ & ~0x00000001);
       processingTimeoutSecs_ = 0L;
+      onChanged();
+      return this;
+    }
+
+    private com.acme.proto.acme.oms.v1.OmsProperties omsProperties_;
+    private com.google.protobuf.SingleFieldBuilder<
+        com.acme.proto.acme.oms.v1.OmsProperties, com.acme.proto.acme.oms.v1.OmsProperties.Builder, com.acme.proto.acme.oms.v1.OmsPropertiesOrBuilder> omsPropertiesBuilder_;
+    /**
+     * <code>optional .acme.oms.v1.OmsProperties oms_properties = 2 [json_name = "omsProperties"];</code>
+     * @return Whether the omsProperties field is set.
+     */
+    public boolean hasOmsProperties() {
+      return ((bitField0_ & 0x00000002) != 0);
+    }
+    /**
+     * <code>optional .acme.oms.v1.OmsProperties oms_properties = 2 [json_name = "omsProperties"];</code>
+     * @return The omsProperties.
+     */
+    public com.acme.proto.acme.oms.v1.OmsProperties getOmsProperties() {
+      if (omsPropertiesBuilder_ == null) {
+        return omsProperties_ == null ? com.acme.proto.acme.oms.v1.OmsProperties.getDefaultInstance() : omsProperties_;
+      } else {
+        return omsPropertiesBuilder_.getMessage();
+      }
+    }
+    /**
+     * <code>optional .acme.oms.v1.OmsProperties oms_properties = 2 [json_name = "omsProperties"];</code>
+     */
+    public Builder setOmsProperties(com.acme.proto.acme.oms.v1.OmsProperties value) {
+      if (omsPropertiesBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        omsProperties_ = value;
+      } else {
+        omsPropertiesBuilder_.setMessage(value);
+      }
+      bitField0_ |= 0x00000002;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional .acme.oms.v1.OmsProperties oms_properties = 2 [json_name = "omsProperties"];</code>
+     */
+    public Builder setOmsProperties(
+        com.acme.proto.acme.oms.v1.OmsProperties.Builder builderForValue) {
+      if (omsPropertiesBuilder_ == null) {
+        omsProperties_ = builderForValue.build();
+      } else {
+        omsPropertiesBuilder_.setMessage(builderForValue.build());
+      }
+      bitField0_ |= 0x00000002;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional .acme.oms.v1.OmsProperties oms_properties = 2 [json_name = "omsProperties"];</code>
+     */
+    public Builder mergeOmsProperties(com.acme.proto.acme.oms.v1.OmsProperties value) {
+      if (omsPropertiesBuilder_ == null) {
+        if (((bitField0_ & 0x00000002) != 0) &&
+          omsProperties_ != null &&
+          omsProperties_ != com.acme.proto.acme.oms.v1.OmsProperties.getDefaultInstance()) {
+          getOmsPropertiesBuilder().mergeFrom(value);
+        } else {
+          omsProperties_ = value;
+        }
+      } else {
+        omsPropertiesBuilder_.mergeFrom(value);
+      }
+      if (omsProperties_ != null) {
+        bitField0_ |= 0x00000002;
+        onChanged();
+      }
+      return this;
+    }
+    /**
+     * <code>optional .acme.oms.v1.OmsProperties oms_properties = 2 [json_name = "omsProperties"];</code>
+     */
+    public Builder clearOmsProperties() {
+      bitField0_ = (bitField0_ & ~0x00000002);
+      omsProperties_ = null;
+      if (omsPropertiesBuilder_ != null) {
+        omsPropertiesBuilder_.dispose();
+        omsPropertiesBuilder_ = null;
+      }
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional .acme.oms.v1.OmsProperties oms_properties = 2 [json_name = "omsProperties"];</code>
+     */
+    public com.acme.proto.acme.oms.v1.OmsProperties.Builder getOmsPropertiesBuilder() {
+      bitField0_ |= 0x00000002;
+      onChanged();
+      return internalGetOmsPropertiesFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>optional .acme.oms.v1.OmsProperties oms_properties = 2 [json_name = "omsProperties"];</code>
+     */
+    public com.acme.proto.acme.oms.v1.OmsPropertiesOrBuilder getOmsPropertiesOrBuilder() {
+      if (omsPropertiesBuilder_ != null) {
+        return omsPropertiesBuilder_.getMessageOrBuilder();
+      } else {
+        return omsProperties_ == null ?
+            com.acme.proto.acme.oms.v1.OmsProperties.getDefaultInstance() : omsProperties_;
+      }
+    }
+    /**
+     * <code>optional .acme.oms.v1.OmsProperties oms_properties = 2 [json_name = "omsProperties"];</code>
+     */
+    private com.google.protobuf.SingleFieldBuilder<
+        com.acme.proto.acme.oms.v1.OmsProperties, com.acme.proto.acme.oms.v1.OmsProperties.Builder, com.acme.proto.acme.oms.v1.OmsPropertiesOrBuilder>
+        internalGetOmsPropertiesFieldBuilder() {
+      if (omsPropertiesBuilder_ == null) {
+        omsPropertiesBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+            com.acme.proto.acme.oms.v1.OmsProperties, com.acme.proto.acme.oms.v1.OmsProperties.Builder, com.acme.proto.acme.oms.v1.OmsPropertiesOrBuilder>(
+                getOmsProperties(),
+                getParentForChildren(),
+                isClean());
+        omsProperties_ = null;
+      }
+      return omsPropertiesBuilder_;
+    }
+
+    private boolean sendFulfillment_ ;
+    /**
+     * <code>optional bool send_fulfillment = 3 [json_name = "sendFulfillment"];</code>
+     * @return Whether the sendFulfillment field is set.
+     */
+    @java.lang.Override
+    public boolean hasSendFulfillment() {
+      return ((bitField0_ & 0x00000004) != 0);
+    }
+    /**
+     * <code>optional bool send_fulfillment = 3 [json_name = "sendFulfillment"];</code>
+     * @return The sendFulfillment.
+     */
+    @java.lang.Override
+    public boolean getSendFulfillment() {
+      return sendFulfillment_;
+    }
+    /**
+     * <code>optional bool send_fulfillment = 3 [json_name = "sendFulfillment"];</code>
+     * @param value The sendFulfillment to set.
+     * @return This builder for chaining.
+     */
+    public Builder setSendFulfillment(boolean value) {
+
+      sendFulfillment_ = value;
+      bitField0_ |= 0x00000004;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional bool send_fulfillment = 3 [json_name = "sendFulfillment"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearSendFulfillment() {
+      bitField0_ = (bitField0_ & ~0x00000004);
+      sendFulfillment_ = false;
       onChanged();
       return this;
     }

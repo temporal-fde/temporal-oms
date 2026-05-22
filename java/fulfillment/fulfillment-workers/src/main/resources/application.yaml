@@ -1,0 +1,10 @@
+spring.config.import: classpath:acme.fulfillment.yaml
+spring.profiles.default: local
+spring.application.name: fulfillment-workers
+spring.temporal.start-workers: true
+management.server.port: 9072
+server.port: 8061
+
+enablements:
+  api:
+    base-url: ${ENABLEMENTS_API_BASE_URL:http://localhost:8050}

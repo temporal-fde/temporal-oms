@@ -87,7 +87,50 @@ Provide feedback in PROGRESS.md → Feedback Items section.
 
 ## Current Specs
 
-### 🆕 Worker Version Enablement
+### Workshop: Augment with AI
+- **Status:** Draft
+- **Goal:** Codespaces-based workshop teaching safe traffic migration (Kafka → Nexus) and AI-augmented Temporal workflows; exercise series for teams evaluating the new architecture
+- **Owner:** Temporal FDE Team
+- **Spec:** `specs/workshop/augment-with-ai/`
+- **Exercise Specs:** `specs/workshop/exercises/01-safe-fulfillment-handoff/`, `specs/workshop/exercises/02-observe-shipping-agent/`
+- **Next:** Tech lead review - confirm Exercise 03 scope, API key requirements, workshop startup runner, and Exercise 02 live LLM fallback
+
+### Workshop: Codespaces Support
+- **Status:** Devcontainer implemented; startup runner validation pending
+- **Goal:** Define the Codespaces architecture, sizing, startup model, caching, risks, and validation plan for the Replay 2026 Temporal OMS workshop
+- **Owner:** Temporal FDE Team
+- **Spec:** `specs/workshop/codespaces-support/`
+- **Next:** Implement/validate the workshop startup runner and local-process startup in a fresh Codespace
+
+### Workshop: Integration Stubs
+- **Status:** Runtime implementation complete; workshop material follow-up
+- **Goal:** Document `enablements-api` as the workshop-owned integration fixture boundary for commerce-app, PIMS, inventory, shipping, and location-events
+- **Owner:** Temporal FDE Team
+- **Spec:** `specs/workshop/integrations/`
+- **Next:** Complete Phase 8 workshop material and fixture inspection examples
+
+### 🆕 fulfillment.Order (initiative)
+
+#### fulfillment.Order Workflow
+- **Status:** Implementing
+- **Goal:** Replace Kafka fulfillment path with durable Temporal workflow; add address validation, inventory holds, versioned shipping, delivery tracking
+- **Owner:** Temporal FDE Team
+- **Spec:** `specs/fulfillment-order/fulfillment-order-workflow/`
+- **Next:** Phase 1 (proto) is unblocked; 4 open questions to resolve before Phases 3/5/6 can complete (see PROGRESS.md)
+
+#### ShippingAgent
+- **Status:** Implemented for fixture-backed workshop path
+- **Goal:** LLM-driven shipping advisor (Claude + tool activities) called by `fulfillment.Order` via Nexus; shipping and first-pass location integrations are backed by `enablements-api`
+- **Owner:** Temporal FDE Team
+- **Spec:** `specs/fulfillment-order/shipping-agent/`
+- **Next:** Add richer location-event enrichment behind `enablements-api`
+
+#### Deployment (k8s / Worker Versioning rollout)
+- **Status:** Not Started — follow-up spec
+- **Goal:** K8s deployment changes for `fulfillment-workers`, Worker Versioning rollout for `apps` and `processing` task queues
+- **Next:** Spec to be written after fulfillment-order-workflow spec is approved
+
+### Worker Version Enablement
 - **Status:** Draft - Ready for Review
 - **Goal:** Generate load + deploy worker versions + validate zero failures
 - **Owner:** [Your Name]

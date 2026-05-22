@@ -183,6 +183,7 @@ minikube-data/
 # Logs
 logs/
 *.log
+.workshop/
 
 # Certificates and Keys
 certs/

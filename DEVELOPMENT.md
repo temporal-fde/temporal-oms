@@ -166,7 +166,7 @@ temporal workflow cancel --workflow-id {orderId} --namespace apps
 temporal operator nexus endpoint list
 
 # Temporal — worker versioning
-temporal worker deployment describe --deployment-name processing --namespace processing
+temporal worker deployment describe --name processing --namespace processing
 temporal worker deployment set-current-version --deployment-name processing --build-id local --namespace processing
 
 # Protocol Buffers

@@ -28,11 +28,6 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private Address() {
-    street_ = "";
-    city_ = "";
-    state_ = "";
-    postalCode_ = "";
-    country_ = "";
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
@@ -53,207 +48,43 @@ private static final long serialVersionUID = 0L;
             com.acme.proto.acme.common.v1.Address.class, com.acme.proto.acme.common.v1.Address.Builder.class);
   }
 
-  public static final int STREET_FIELD_NUMBER = 1;
-  @SuppressWarnings("serial")
-  private volatile java.lang.Object street_ = "";
-  /**
-   * <code>string street = 1 [json_name = "street"];</code>
-   * @return The street.
-   */
-  @java.lang.Override
-  public java.lang.String getStreet() {
-    java.lang.Object ref = street_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      street_ = s;
-      return s;
-    }
-  }
-  /**
-   * <code>string street = 1 [json_name = "street"];</code>
-   * @return The bytes for street.
-   */
-  @java.lang.Override
-  public com.google.protobuf.ByteString
-      getStreetBytes() {
-    java.lang.Object ref = street_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      street_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
-  }
-
-  public static final int CITY_FIELD_NUMBER = 2;
-  @SuppressWarnings("serial")
-  private volatile java.lang.Object city_ = "";
-  /**
-   * <code>string city = 2 [json_name = "city"];</code>
-   * @return The city.
-   */
-  @java.lang.Override
-  public java.lang.String getCity() {
-    java.lang.Object ref = city_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      city_ = s;
-      return s;
-    }
-  }
-  /**
-   * <code>string city = 2 [json_name = "city"];</code>
-   * @return The bytes for city.
-   */
-  @java.lang.Override
-  public com.google.protobuf.ByteString
-      getCityBytes() {
-    java.lang.Object ref = city_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      city_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
-  }
-
-  public static final int STATE_FIELD_NUMBER = 3;
-  @SuppressWarnings("serial")
-  private volatile java.lang.Object state_ = "";
-  /**
-   * <code>string state = 3 [json_name = "state"];</code>
-   * @return The state.
-   */
-  @java.lang.Override
-  public java.lang.String getState() {
-    java.lang.Object ref = state_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      state_ = s;
-      return s;
-    }
-  }
-  /**
-   * <code>string state = 3 [json_name = "state"];</code>
-   * @return The bytes for state.
-   */
-  @java.lang.Override
-  public com.google.protobuf.ByteString
-      getStateBytes() {
-    java.lang.Object ref = state_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      state_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
-  }
-
-  public static final int POSTAL_CODE_FIELD_NUMBER = 4;
-  @SuppressWarnings("serial")
-  private volatile java.lang.Object postalCode_ = "";
-  /**
-   * <code>string postal_code = 4 [json_name = "postalCode"];</code>
-   * @return The postalCode.
-   */
-  @java.lang.Override
-  public java.lang.String getPostalCode() {
-    java.lang.Object ref = postalCode_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      postalCode_ = s;
-      return s;
-    }
-  }
-  /**
-   * <code>string postal_code = 4 [json_name = "postalCode"];</code>
-   * @return The bytes for postalCode.
-   */
-  @java.lang.Override
-  public com.google.protobuf.ByteString
-      getPostalCodeBytes() {
-    java.lang.Object ref = postalCode_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      postalCode_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
-  }
-
-  public static final int COUNTRY_FIELD_NUMBER = 5;
-  @SuppressWarnings("serial")
-  private volatile java.lang.Object country_ = "";
+  private int bitField0_;
+  public static final int EASYPOST_FIELD_NUMBER = 1;
+  private com.acme.proto.acme.common.v1.EasyPostAddress easypost_;
   /**
    * <pre>
-   * ISO 3166-1 alpha-2
+   * populated after EasyPost verification
    * </pre>
    *
-   * <code>string country = 5 [json_name = "country"];</code>
-   * @return The country.
+   * <code>optional .acme.common.v1.EasyPostAddress easypost = 1 [json_name = "easypost"];</code>
+   * @return Whether the easypost field is set.
    */
   @java.lang.Override
-  public java.lang.String getCountry() {
-    java.lang.Object ref = country_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      country_ = s;
-      return s;
-    }
+  public boolean hasEasypost() {
+    return ((bitField0_ & 0x00000001) != 0);
   }
   /**
    * <pre>
-   * ISO 3166-1 alpha-2
+   * populated after EasyPost verification
    * </pre>
    *
-   * <code>string country = 5 [json_name = "country"];</code>
-   * @return The bytes for country.
+   * <code>optional .acme.common.v1.EasyPostAddress easypost = 1 [json_name = "easypost"];</code>
+   * @return The easypost.
    */
   @java.lang.Override
-  public com.google.protobuf.ByteString
-      getCountryBytes() {
-    java.lang.Object ref = country_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      country_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
+  public com.acme.proto.acme.common.v1.EasyPostAddress getEasypost() {
+    return easypost_ == null ? com.acme.proto.acme.common.v1.EasyPostAddress.getDefaultInstance() : easypost_;
+  }
+  /**
+   * <pre>
+   * populated after EasyPost verification
+   * </pre>
+   *
+   * <code>optional .acme.common.v1.EasyPostAddress easypost = 1 [json_name = "easypost"];</code>
+   */
+  @java.lang.Override
+  public com.acme.proto.acme.common.v1.EasyPostAddressOrBuilder getEasypostOrBuilder() {
+    return easypost_ == null ? com.acme.proto.acme.common.v1.EasyPostAddress.getDefaultInstance() : easypost_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -270,20 +101,8 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(street_)) {
-      com.google.protobuf.GeneratedMessage.writeString(output, 1, street_);
-    }
-    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(city_)) {
-      com.google.protobuf.GeneratedMessage.writeString(output, 2, city_);
-    }
-    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(state_)) {
-      com.google.protobuf.GeneratedMessage.writeString(output, 3, state_);
-    }
-    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(postalCode_)) {
-      com.google.protobuf.GeneratedMessage.writeString(output, 4, postalCode_);
-    }
-    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(country_)) {
-      com.google.protobuf.GeneratedMessage.writeString(output, 5, country_);
+    if (((bitField0_ & 0x00000001) != 0)) {
+      output.writeMessage(1, getEasypost());
     }
     getUnknownFields().writeTo(output);
   }
@@ -294,20 +113,9 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(street_)) {
-      size += com.google.protobuf.GeneratedMessage.computeStringSize(1, street_);
-    }
-    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(city_)) {
-      size += com.google.protobuf.GeneratedMessage.computeStringSize(2, city_);
-    }
-    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(state_)) {
-      size += com.google.protobuf.GeneratedMessage.computeStringSize(3, state_);
-    }
-    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(postalCode_)) {
-      size += com.google.protobuf.GeneratedMessage.computeStringSize(4, postalCode_);
-    }
-    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(country_)) {
-      size += com.google.protobuf.GeneratedMessage.computeStringSize(5, country_);
+    if (((bitField0_ & 0x00000001) != 0)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(1, getEasypost());
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -324,16 +132,11 @@ private static final long serialVersionUID = 0L;
     }
     com.acme.proto.acme.common.v1.Address other = (com.acme.proto.acme.common.v1.Address) obj;
 
-    if (!getStreet()
-        .equals(other.getStreet())) return false;
-    if (!getCity()
-        .equals(other.getCity())) return false;
-    if (!getState()
-        .equals(other.getState())) return false;
-    if (!getPostalCode()
-        .equals(other.getPostalCode())) return false;
-    if (!getCountry()
-        .equals(other.getCountry())) return false;
+    if (hasEasypost() != other.hasEasypost()) return false;
+    if (hasEasypost()) {
+      if (!getEasypost()
+          .equals(other.getEasypost())) return false;
+    }
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -345,16 +148,10 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    hash = (37 * hash) + STREET_FIELD_NUMBER;
-    hash = (53 * hash) + getStreet().hashCode();
-    hash = (37 * hash) + CITY_FIELD_NUMBER;
-    hash = (53 * hash) + getCity().hashCode();
-    hash = (37 * hash) + STATE_FIELD_NUMBER;
-    hash = (53 * hash) + getState().hashCode();
-    hash = (37 * hash) + POSTAL_CODE_FIELD_NUMBER;
-    hash = (53 * hash) + getPostalCode().hashCode();
-    hash = (37 * hash) + COUNTRY_FIELD_NUMBER;
-    hash = (53 * hash) + getCountry().hashCode();
+    if (hasEasypost()) {
+      hash = (37 * hash) + EASYPOST_FIELD_NUMBER;
+      hash = (53 * hash) + getEasypost().hashCode();
+    }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -474,23 +271,29 @@ private static final long serialVersionUID = 0L;
 
     // Construct using com.acme.proto.acme.common.v1.Address.newBuilder()
     private Builder() {
-
+      maybeForceBuilderInitialization();
     }
 
     private Builder(
         com.google.protobuf.GeneratedMessage.BuilderParent parent) {
       super(parent);
-
+      maybeForceBuilderInitialization();
+    }
+    private void maybeForceBuilderInitialization() {
+      if (com.google.protobuf.GeneratedMessage
+              .alwaysUseFieldBuilders) {
+        internalGetEasypostFieldBuilder();
+      }
     }
     @java.lang.Override
     public Builder clear() {
       super.clear();
       bitField0_ = 0;
-      street_ = "";
-      city_ = "";
-      state_ = "";
-      postalCode_ = "";
-      country_ = "";
+      easypost_ = null;
+      if (easypostBuilder_ != null) {
+        easypostBuilder_.dispose();
+        easypostBuilder_ = null;
+      }
       return this;
     }
 
@@ -524,21 +327,14 @@ private static final long serialVersionUID = 0L;
 
     private void buildPartial0(com.acme.proto.acme.common.v1.Address result) {
       int from_bitField0_ = bitField0_;
+      int to_bitField0_ = 0;
       if (((from_bitField0_ & 0x00000001) != 0)) {
-        result.street_ = street_;
+        result.easypost_ = easypostBuilder_ == null
+            ? easypost_
+            : easypostBuilder_.build();
+        to_bitField0_ |= 0x00000001;
       }
-      if (((from_bitField0_ & 0x00000002) != 0)) {
-        result.city_ = city_;
-      }
-      if (((from_bitField0_ & 0x00000004) != 0)) {
-        result.state_ = state_;
-      }
-      if (((from_bitField0_ & 0x00000008) != 0)) {
-        result.postalCode_ = postalCode_;
-      }
-      if (((from_bitField0_ & 0x00000010) != 0)) {
-        result.country_ = country_;
-      }
+      result.bitField0_ |= to_bitField0_;
     }
 
     @java.lang.Override
@@ -553,30 +349,8 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(com.acme.proto.acme.common.v1.Address other) {
       if (other == com.acme.proto.acme.common.v1.Address.getDefaultInstance()) return this;
-      if (!other.getStreet().isEmpty()) {
-        street_ = other.street_;
-        bitField0_ |= 0x00000001;
-        onChanged();
-      }
-      if (!other.getCity().isEmpty()) {
-        city_ = other.city_;
-        bitField0_ |= 0x00000002;
-        onChanged();
-      }
-      if (!other.getState().isEmpty()) {
-        state_ = other.state_;
-        bitField0_ |= 0x00000004;
-        onChanged();
-      }
-      if (!other.getPostalCode().isEmpty()) {
-        postalCode_ = other.postalCode_;
-        bitField0_ |= 0x00000008;
-        onChanged();
-      }
-      if (!other.getCountry().isEmpty()) {
-        country_ = other.country_;
-        bitField0_ |= 0x00000010;
-        onChanged();
+      if (other.hasEasypost()) {
+        mergeEasypost(other.getEasypost());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -605,30 +379,12 @@ private static final long serialVersionUID = 0L;
               done = true;
               break;
             case 10: {
-              street_ = input.readStringRequireUtf8();
+              input.readMessage(
+                  internalGetEasypostFieldBuilder().getBuilder(),
+                  extensionRegistry);
               bitField0_ |= 0x00000001;
               break;
             } // case 10
-            case 18: {
-              city_ = input.readStringRequireUtf8();
-              bitField0_ |= 0x00000002;
-              break;
-            } // case 18
-            case 26: {
-              state_ = input.readStringRequireUtf8();
-              bitField0_ |= 0x00000004;
-              break;
-            } // case 26
-            case 34: {
-              postalCode_ = input.readStringRequireUtf8();
-              bitField0_ |= 0x00000008;
-              break;
-            } // case 34
-            case 42: {
-              country_ = input.readStringRequireUtf8();
-              bitField0_ |= 0x00000010;
-              break;
-            } // case 42
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -646,384 +402,161 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private java.lang.Object street_ = "";
+    private com.acme.proto.acme.common.v1.EasyPostAddress easypost_;
+    private com.google.protobuf.SingleFieldBuilder<
+        com.acme.proto.acme.common.v1.EasyPostAddress, com.acme.proto.acme.common.v1.EasyPostAddress.Builder, com.acme.proto.acme.common.v1.EasyPostAddressOrBuilder> easypostBuilder_;
     /**
-     * <code>string street = 1 [json_name = "street"];</code>
-     * @return The street.
+     * <pre>
+     * populated after EasyPost verification
+     * </pre>
+     *
+     * <code>optional .acme.common.v1.EasyPostAddress easypost = 1 [json_name = "easypost"];</code>
+     * @return Whether the easypost field is set.
      */
-    public java.lang.String getStreet() {
-      java.lang.Object ref = street_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        street_ = s;
-        return s;
+    public boolean hasEasypost() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <pre>
+     * populated after EasyPost verification
+     * </pre>
+     *
+     * <code>optional .acme.common.v1.EasyPostAddress easypost = 1 [json_name = "easypost"];</code>
+     * @return The easypost.
+     */
+    public com.acme.proto.acme.common.v1.EasyPostAddress getEasypost() {
+      if (easypostBuilder_ == null) {
+        return easypost_ == null ? com.acme.proto.acme.common.v1.EasyPostAddress.getDefaultInstance() : easypost_;
       } else {
-        return (java.lang.String) ref;
+        return easypostBuilder_.getMessage();
       }
     }
     /**
-     * <code>string street = 1 [json_name = "street"];</code>
-     * @return The bytes for street.
+     * <pre>
+     * populated after EasyPost verification
+     * </pre>
+     *
+     * <code>optional .acme.common.v1.EasyPostAddress easypost = 1 [json_name = "easypost"];</code>
      */
-    public com.google.protobuf.ByteString
-        getStreetBytes() {
-      java.lang.Object ref = street_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        street_ = b;
-        return b;
+    public Builder setEasypost(com.acme.proto.acme.common.v1.EasyPostAddress value) {
+      if (easypostBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        easypost_ = value;
       } else {
-        return (com.google.protobuf.ByteString) ref;
+        easypostBuilder_.setMessage(value);
       }
-    }
-    /**
-     * <code>string street = 1 [json_name = "street"];</code>
-     * @param value The street to set.
-     * @return This builder for chaining.
-     */
-    public Builder setStreet(
-        java.lang.String value) {
-      if (value == null) { throw new NullPointerException(); }
-      street_ = value;
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>string street = 1 [json_name = "street"];</code>
-     * @return This builder for chaining.
+     * <pre>
+     * populated after EasyPost verification
+     * </pre>
+     *
+     * <code>optional .acme.common.v1.EasyPostAddress easypost = 1 [json_name = "easypost"];</code>
      */
-    public Builder clearStreet() {
-      street_ = getDefaultInstance().getStreet();
+    public Builder setEasypost(
+        com.acme.proto.acme.common.v1.EasyPostAddress.Builder builderForValue) {
+      if (easypostBuilder_ == null) {
+        easypost_ = builderForValue.build();
+      } else {
+        easypostBuilder_.setMessage(builderForValue.build());
+      }
+      bitField0_ |= 0x00000001;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * populated after EasyPost verification
+     * </pre>
+     *
+     * <code>optional .acme.common.v1.EasyPostAddress easypost = 1 [json_name = "easypost"];</code>
+     */
+    public Builder mergeEasypost(com.acme.proto.acme.common.v1.EasyPostAddress value) {
+      if (easypostBuilder_ == null) {
+        if (((bitField0_ & 0x00000001) != 0) &&
+          easypost_ != null &&
+          easypost_ != com.acme.proto.acme.common.v1.EasyPostAddress.getDefaultInstance()) {
+          getEasypostBuilder().mergeFrom(value);
+        } else {
+          easypost_ = value;
+        }
+      } else {
+        easypostBuilder_.mergeFrom(value);
+      }
+      if (easypost_ != null) {
+        bitField0_ |= 0x00000001;
+        onChanged();
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * populated after EasyPost verification
+     * </pre>
+     *
+     * <code>optional .acme.common.v1.EasyPostAddress easypost = 1 [json_name = "easypost"];</code>
+     */
+    public Builder clearEasypost() {
       bitField0_ = (bitField0_ & ~0x00000001);
+      easypost_ = null;
+      if (easypostBuilder_ != null) {
+        easypostBuilder_.dispose();
+        easypostBuilder_ = null;
+      }
       onChanged();
       return this;
     }
     /**
-     * <code>string street = 1 [json_name = "street"];</code>
-     * @param value The bytes for street to set.
-     * @return This builder for chaining.
+     * <pre>
+     * populated after EasyPost verification
+     * </pre>
+     *
+     * <code>optional .acme.common.v1.EasyPostAddress easypost = 1 [json_name = "easypost"];</code>
      */
-    public Builder setStreetBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) { throw new NullPointerException(); }
-      checkByteStringIsUtf8(value);
-      street_ = value;
+    public com.acme.proto.acme.common.v1.EasyPostAddress.Builder getEasypostBuilder() {
       bitField0_ |= 0x00000001;
       onChanged();
-      return this;
+      return internalGetEasypostFieldBuilder().getBuilder();
     }
-
-    private java.lang.Object city_ = "";
-    /**
-     * <code>string city = 2 [json_name = "city"];</code>
-     * @return The city.
-     */
-    public java.lang.String getCity() {
-      java.lang.Object ref = city_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        city_ = s;
-        return s;
-      } else {
-        return (java.lang.String) ref;
-      }
-    }
-    /**
-     * <code>string city = 2 [json_name = "city"];</code>
-     * @return The bytes for city.
-     */
-    public com.google.protobuf.ByteString
-        getCityBytes() {
-      java.lang.Object ref = city_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        city_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-    /**
-     * <code>string city = 2 [json_name = "city"];</code>
-     * @param value The city to set.
-     * @return This builder for chaining.
-     */
-    public Builder setCity(
-        java.lang.String value) {
-      if (value == null) { throw new NullPointerException(); }
-      city_ = value;
-      bitField0_ |= 0x00000002;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>string city = 2 [json_name = "city"];</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearCity() {
-      city_ = getDefaultInstance().getCity();
-      bitField0_ = (bitField0_ & ~0x00000002);
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>string city = 2 [json_name = "city"];</code>
-     * @param value The bytes for city to set.
-     * @return This builder for chaining.
-     */
-    public Builder setCityBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) { throw new NullPointerException(); }
-      checkByteStringIsUtf8(value);
-      city_ = value;
-      bitField0_ |= 0x00000002;
-      onChanged();
-      return this;
-    }
-
-    private java.lang.Object state_ = "";
-    /**
-     * <code>string state = 3 [json_name = "state"];</code>
-     * @return The state.
-     */
-    public java.lang.String getState() {
-      java.lang.Object ref = state_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        state_ = s;
-        return s;
-      } else {
-        return (java.lang.String) ref;
-      }
-    }
-    /**
-     * <code>string state = 3 [json_name = "state"];</code>
-     * @return The bytes for state.
-     */
-    public com.google.protobuf.ByteString
-        getStateBytes() {
-      java.lang.Object ref = state_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        state_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-    /**
-     * <code>string state = 3 [json_name = "state"];</code>
-     * @param value The state to set.
-     * @return This builder for chaining.
-     */
-    public Builder setState(
-        java.lang.String value) {
-      if (value == null) { throw new NullPointerException(); }
-      state_ = value;
-      bitField0_ |= 0x00000004;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>string state = 3 [json_name = "state"];</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearState() {
-      state_ = getDefaultInstance().getState();
-      bitField0_ = (bitField0_ & ~0x00000004);
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>string state = 3 [json_name = "state"];</code>
-     * @param value The bytes for state to set.
-     * @return This builder for chaining.
-     */
-    public Builder setStateBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) { throw new NullPointerException(); }
-      checkByteStringIsUtf8(value);
-      state_ = value;
-      bitField0_ |= 0x00000004;
-      onChanged();
-      return this;
-    }
-
-    private java.lang.Object postalCode_ = "";
-    /**
-     * <code>string postal_code = 4 [json_name = "postalCode"];</code>
-     * @return The postalCode.
-     */
-    public java.lang.String getPostalCode() {
-      java.lang.Object ref = postalCode_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        postalCode_ = s;
-        return s;
-      } else {
-        return (java.lang.String) ref;
-      }
-    }
-    /**
-     * <code>string postal_code = 4 [json_name = "postalCode"];</code>
-     * @return The bytes for postalCode.
-     */
-    public com.google.protobuf.ByteString
-        getPostalCodeBytes() {
-      java.lang.Object ref = postalCode_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        postalCode_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-    /**
-     * <code>string postal_code = 4 [json_name = "postalCode"];</code>
-     * @param value The postalCode to set.
-     * @return This builder for chaining.
-     */
-    public Builder setPostalCode(
-        java.lang.String value) {
-      if (value == null) { throw new NullPointerException(); }
-      postalCode_ = value;
-      bitField0_ |= 0x00000008;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>string postal_code = 4 [json_name = "postalCode"];</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearPostalCode() {
-      postalCode_ = getDefaultInstance().getPostalCode();
-      bitField0_ = (bitField0_ & ~0x00000008);
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>string postal_code = 4 [json_name = "postalCode"];</code>
-     * @param value The bytes for postalCode to set.
-     * @return This builder for chaining.
-     */
-    public Builder setPostalCodeBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) { throw new NullPointerException(); }
-      checkByteStringIsUtf8(value);
-      postalCode_ = value;
-      bitField0_ |= 0x00000008;
-      onChanged();
-      return this;
-    }
-
-    private java.lang.Object country_ = "";
     /**
      * <pre>
-     * ISO 3166-1 alpha-2
+     * populated after EasyPost verification
      * </pre>
      *
-     * <code>string country = 5 [json_name = "country"];</code>
-     * @return The country.
+     * <code>optional .acme.common.v1.EasyPostAddress easypost = 1 [json_name = "easypost"];</code>
      */
-    public java.lang.String getCountry() {
-      java.lang.Object ref = country_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        country_ = s;
-        return s;
+    public com.acme.proto.acme.common.v1.EasyPostAddressOrBuilder getEasypostOrBuilder() {
+      if (easypostBuilder_ != null) {
+        return easypostBuilder_.getMessageOrBuilder();
       } else {
-        return (java.lang.String) ref;
+        return easypost_ == null ?
+            com.acme.proto.acme.common.v1.EasyPostAddress.getDefaultInstance() : easypost_;
       }
     }
     /**
      * <pre>
-     * ISO 3166-1 alpha-2
+     * populated after EasyPost verification
      * </pre>
      *
-     * <code>string country = 5 [json_name = "country"];</code>
-     * @return The bytes for country.
+     * <code>optional .acme.common.v1.EasyPostAddress easypost = 1 [json_name = "easypost"];</code>
      */
-    public com.google.protobuf.ByteString
-        getCountryBytes() {
-      java.lang.Object ref = country_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        country_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
+    private com.google.protobuf.SingleFieldBuilder<
+        com.acme.proto.acme.common.v1.EasyPostAddress, com.acme.proto.acme.common.v1.EasyPostAddress.Builder, com.acme.proto.acme.common.v1.EasyPostAddressOrBuilder> 
+        internalGetEasypostFieldBuilder() {
+      if (easypostBuilder_ == null) {
+        easypostBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+            com.acme.proto.acme.common.v1.EasyPostAddress, com.acme.proto.acme.common.v1.EasyPostAddress.Builder, com.acme.proto.acme.common.v1.EasyPostAddressOrBuilder>(
+                getEasypost(),
+                getParentForChildren(),
+                isClean());
+        easypost_ = null;
       }
-    }
-    /**
-     * <pre>
-     * ISO 3166-1 alpha-2
-     * </pre>
-     *
-     * <code>string country = 5 [json_name = "country"];</code>
-     * @param value The country to set.
-     * @return This builder for chaining.
-     */
-    public Builder setCountry(
-        java.lang.String value) {
-      if (value == null) { throw new NullPointerException(); }
-      country_ = value;
-      bitField0_ |= 0x00000010;
-      onChanged();
-      return this;
-    }
-    /**
-     * <pre>
-     * ISO 3166-1 alpha-2
-     * </pre>
-     *
-     * <code>string country = 5 [json_name = "country"];</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearCountry() {
-      country_ = getDefaultInstance().getCountry();
-      bitField0_ = (bitField0_ & ~0x00000010);
-      onChanged();
-      return this;
-    }
-    /**
-     * <pre>
-     * ISO 3166-1 alpha-2
-     * </pre>
-     *
-     * <code>string country = 5 [json_name = "country"];</code>
-     * @param value The bytes for country to set.
-     * @return This builder for chaining.
-     */
-    public Builder setCountryBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) { throw new NullPointerException(); }
-      checkByteStringIsUtf8(value);
-      country_ = value;
-      bitField0_ |= 0x00000010;
-      onChanged();
-      return this;
+      return easypostBuilder_;
     }
 
     // @@protoc_insertion_point(builder_scope:acme.common.v1.Address)

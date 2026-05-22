@@ -61,5 +61,3 @@ message CapturePaymentRequest {
   google.protobuf.Timestamp timestamp = 1;
   acme.oms.v1.Payment payment = 2;
 }
-
-

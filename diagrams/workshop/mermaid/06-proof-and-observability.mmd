@@ -1,0 +1,29 @@
+flowchart LR
+  subgraph Evidence["Evidence after submitting orders"]
+    Kafka["Kafka admin endpoint<br/>old-path orders only"]
+    ProcessingInput["processing.Order input<br/>send_fulfillment=false"]
+    FulfillmentHistory["fulfillment.Order history<br/>validateOrder + fulfillOrder"]
+    AgentHistory["ShippingAgent history<br/>LLM turns + activity tools"]
+    SearchAttributes["Search Attributes<br/>margin_leak / sla_breach_days"]
+    DeliverySignal["notifyDeliveryStatus Signal<br/>lifecycle close"]
+  end
+
+  subgraph Claims["Claims proven"]
+    NoDuplicate["No duplicate fulfillment handoff"]
+    DurableLifecycle["Fulfillment is durable and inspectable"]
+    AgentVisible["Agent reasoning is wrapped in Temporal"]
+    BusinessVisible["Margin and SLA outcomes are queryable"]
+  end
+
+  Kafka --> NoDuplicate
+  ProcessingInput --> NoDuplicate
+  FulfillmentHistory --> DurableLifecycle
+  AgentHistory --> AgentVisible
+  SearchAttributes --> BusinessVisible
+  DeliverySignal --> DurableLifecycle
+
+  classDef evidence fill:#e8f3ff,stroke:#2f6fbd,color:#222;
+  classDef claim fill:#e9f7ef,stroke:#218838,color:#222;
+  class Kafka,ProcessingInput,FulfillmentHistory,AgentHistory,SearchAttributes,DeliverySignal evidence;
+  class NoDuplicate,DurableLifecycle,AgentVisible,BusinessVisible claim;
+

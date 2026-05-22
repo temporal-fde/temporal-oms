@@ -1,0 +1,115 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../local
+
+patches:
+  - target:
+      kind: ConfigMap
+      name: temporal-oms-config
+      namespace: temporal-oms-apps
+    patch: |-
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: temporal-oms-config
+        namespace: temporal-oms-apps
+      data:
+        TEMPORAL_APPS_ADDRESS: host.k3d.internal:7233
+  - target:
+      kind: ConfigMap
+      name: temporal-oms-config
+      namespace: temporal-oms-processing
+    patch: |-
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: temporal-oms-config
+        namespace: temporal-oms-processing
+      data:
+        TEMPORAL_PROCESSING_ADDRESS: host.k3d.internal:7233
+  - target:
+      kind: ConfigMap
+      name: temporal-oms-config
+      namespace: temporal-oms-fulfillment
+    patch: |-
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: temporal-oms-config
+        namespace: temporal-oms-fulfillment
+      data:
+        TEMPORAL_FULFILLMENT_ADDRESS: host.k3d.internal:7233
+  - target:
+      kind: ConfigMap
+      name: temporal-oms-config
+      namespace: temporal-oms-enablements
+    patch: |-
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: temporal-oms-config
+        namespace: temporal-oms-enablements
+      data:
+        TEMPORAL_ENABLEMENTS_ADDRESS: host.k3d.internal:7233
+  - target:
+      kind: ConfigMap
+      name: temporal-apps-config
+      namespace: temporal-oms-apps
+    patch: |-
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: temporal-apps-config
+        namespace: temporal-oms-apps
+      data:
+        temporal-config.yaml: |
+          spring.temporal.namespace: apps
+          spring.temporal.connection.target: host.k3d.internal:7233
+  - target:
+      kind: ConfigMap
+      name: temporal-processing-config
+      namespace: temporal-oms-processing
+    patch: |-
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: temporal-processing-config
+        namespace: temporal-oms-processing
+      data:
+        temporal-config.yaml: |
+          spring.temporal.namespace: processing
+          spring.temporal.connection.target: host.k3d.internal:7233
+  - target:
+      kind: ConfigMap
+      name: temporal-fulfillment-config
+      namespace: temporal-oms-fulfillment
+    patch: |-
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: temporal-fulfillment-config
+        namespace: temporal-oms-fulfillment
+      data:
+        temporal-config.yaml: |
+          spring.temporal.namespace: fulfillment
+          spring.temporal.connection.target: host.k3d.internal:7233
+          enablements.api.base-url: http://enablements-api.temporal-oms-enablements.svc.cluster.local:8050
+  - target:
+      kind: ConfigMap
+      name: temporal-enablements-config
+      namespace: temporal-oms-enablements
+    patch: |-
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: temporal-enablements-config
+        namespace: temporal-oms-enablements
+      data:
+        temporal-config.yaml: |
+          spring.temporal.namespace: default
+          spring.temporal.connection.target: host.k3d.internal:7233
+          enablements.api.base-url: http://enablements-api.temporal-oms-enablements.svc.cluster.local:8050
+          enablements.apps-api.base-url: http://apps-api.temporal-oms-apps.svc.cluster.local
+          enablements.processing-api.base-url: http://processing-api.temporal-oms-processing.svc.cluster.local

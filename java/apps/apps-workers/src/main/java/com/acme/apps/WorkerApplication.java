@@ -14,7 +14,6 @@ import org.springframework.context.annotation.ComponentScan;
 public class WorkerApplication {
 
     public static void main(String[] args) {
-
         SpringApplication app = new SpringApplication(WorkerApplication.class);
         app.run(args);
     }

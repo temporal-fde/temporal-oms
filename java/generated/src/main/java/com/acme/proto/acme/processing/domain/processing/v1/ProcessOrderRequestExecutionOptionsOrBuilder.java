@@ -20,4 +20,30 @@ public interface ProcessOrderRequestExecutionOptionsOrBuilder extends
    * @return The processingTimeoutSecs.
    */
   long getProcessingTimeoutSecs();
+
+  /**
+   * <code>optional .acme.oms.v1.OmsProperties oms_properties = 2 [json_name = "omsProperties"];</code>
+   * @return Whether the omsProperties field is set.
+   */
+  boolean hasOmsProperties();
+  /**
+   * <code>optional .acme.oms.v1.OmsProperties oms_properties = 2 [json_name = "omsProperties"];</code>
+   * @return The omsProperties.
+   */
+  com.acme.proto.acme.oms.v1.OmsProperties getOmsProperties();
+  /**
+   * <code>optional .acme.oms.v1.OmsProperties oms_properties = 2 [json_name = "omsProperties"];</code>
+   */
+  com.acme.proto.acme.oms.v1.OmsPropertiesOrBuilder getOmsPropertiesOrBuilder();
+
+  /**
+   * <code>optional bool send_fulfillment = 3 [json_name = "sendFulfillment"];</code>
+   * @return Whether the sendFulfillment field is set.
+   */
+  boolean hasSendFulfillment();
+  /**
+   * <code>optional bool send_fulfillment = 3 [json_name = "sendFulfillment"];</code>
+   * @return The sendFulfillment.
+   */
+  boolean getSendFulfillment();
 }

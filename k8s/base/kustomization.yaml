@@ -6,6 +6,11 @@ resources:
   - apps/deployment-api.yaml
   - apps/deployment-workers.yaml
   - processing/deployment-api.yaml
+  - processing/deployment-workers.yaml
+  - fulfillment/deployment-workers.yaml
+  - fulfillment/deployment-python-worker.yaml
+  - enablements/deployment-api.yaml
+  - enablements/deployment-workers.yaml
   - temporal-cloud-service.yaml
 
 # ConfigMaps and Secrets will be patched by overlays
@@ -18,19 +23,47 @@ configMapGenerator:
     literals:
       - ENVIRONMENT=local
       - TEMPORAL_TLS_ENABLED=false
+      - TEMPORAL_APPS_NAMESPACE=apps
+      - TEMPORAL_APPS_ADDRESS=host.docker.internal:7233
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector.opentelemetry-operator-system:4317
       - OTEL_SERVICE_NAME=temporal-oms
       - DB_PORT=5432
-      - DB_NAME=temporal_oms
+      - DB_NAME=temporal_oms_apps
   - name: temporal-oms-config
     namespace: temporal-oms-processing
     literals:
       - ENVIRONMENT=local
       - TEMPORAL_TLS_ENABLED=false
+      - TEMPORAL_PROCESSING_NAMESPACE=processing
+      - TEMPORAL_PROCESSING_ADDRESS=host.docker.internal:7233
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector.opentelemetry-operator-system:4317
       - OTEL_SERVICE_NAME=temporal-oms
       - DB_PORT=5432
-      - DB_NAME=temporal_oms
+      - DB_NAME=temporal_oms_processing
+  - name: temporal-oms-config
+    namespace: temporal-oms-fulfillment
+    literals:
+      - ENVIRONMENT=local
+      - TEMPORAL_TLS_ENABLED=false
+      - TEMPORAL_FULFILLMENT_NAMESPACE=fulfillment
+      - TEMPORAL_FULFILLMENT_ADDRESS=host.docker.internal:7233
+      - ENABLEMENTS_API_BASE_URL=http://enablements-api.temporal-oms-enablements.svc.cluster.local:8050
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector.opentelemetry-operator-system:4317
+      - OTEL_SERVICE_NAME=temporal-oms
+      - DB_PORT=5432
+      - DB_NAME=temporal_oms_fulfillment
+  - name: temporal-oms-config
+    namespace: temporal-oms-enablements
+    literals:
+      - ENVIRONMENT=local
+      - TEMPORAL_TLS_ENABLED=false
+      - TEMPORAL_ENABLEMENTS_NAMESPACE=default
+      - TEMPORAL_ENABLEMENTS_ADDRESS=host.docker.internal:7233
+      - ENABLEMENTS_API_BASE_URL=http://enablements-api.temporal-oms-enablements.svc.cluster.local:8050
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector.opentelemetry-operator-system:4317
+      - OTEL_SERVICE_NAME=temporal-oms
+      - DB_PORT=5432
+      - DB_NAME=temporal_oms_enablements
 
 secretGenerator:
   - name: temporal-oms-secrets
@@ -54,4 +87,20 @@ secretGenerator:
       - STRIPE_API_KEY=sk_test_PLACEHOLDER
       - STRIPE_WEBHOOK_SECRET=whsec_PLACEHOLDER
       - OPENAI_API_KEY=sk-PLACEHOLDER
+      - ANTHROPIC_API_KEY=sk-ant-PLACEHOLDER
+  - name: temporal-oms-secrets
+    namespace: temporal-oms-fulfillment
+    literals:
+      - DB_USERNAME=temporal_oms
+      - DB_PASSWORD=temporal_oms_password
+      - TEMPORAL_FULFILLMENT_API_KEY=
+      - ANTHROPIC_API_KEY=sk-ant-PLACEHOLDER
+  - name: temporal-oms-secrets
+    namespace: temporal-oms-enablements
+    literals:
+      - COMMERCE_API_KEY=dev-commerce-key-12345
+      - PAYMENTS_API_KEY=dev-payments-key-67890
+      - DB_USERNAME=temporal_oms
+      - DB_PASSWORD=temporal_oms_password
+      - TEMPORAL_ENABLEMENTS_API_KEY=
       - ANTHROPIC_API_KEY=sk-ant-PLACEHOLDER

@@ -1,0 +1,5 @@
+spring.temporal:
+  connection:
+    target: ${TEMPORAL_ENABLEMENTS_ADDRESS:localhost:7233}
+    api-key: ${TEMPORAL_ENABLEMENTS_API_KEY:}
+  namespace: ${TEMPORAL_ENABLEMENTS_NAMESPACE:default}

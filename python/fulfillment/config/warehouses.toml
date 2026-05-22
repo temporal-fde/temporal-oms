@@ -1,0 +1,29 @@
+[[warehouses]]
+location_id   = "WH-EAST-01"
+easypost_id   = "adr_wh_east_01"
+street1       = "100 Commerce Drive"
+city          = "Newark"
+state         = "NJ"
+zip           = "07102"
+country       = "US"
+sku_prefixes  = ["ELEC-", "GADG-", "TECH-"]
+
+[[warehouses]]
+location_id   = "WH-WEST-01"
+easypost_id   = "adr_wh_west_01"
+street1       = "500 Industrial Blvd"
+city          = "Los Angeles"
+state         = "CA"
+zip           = "90058"
+country       = "US"
+sku_prefixes  = ["APRL-", "HOME-", "SPRT-"]
+
+[[warehouses]]
+location_id   = "WH-CENT-01"
+easypost_id   = "adr_wh_cent_01"
+street1       = "200 Freight Way"
+city          = "Chicago"
+state         = "IL"
+zip           = "60612"
+country       = "US"
+sku_prefixes  = []

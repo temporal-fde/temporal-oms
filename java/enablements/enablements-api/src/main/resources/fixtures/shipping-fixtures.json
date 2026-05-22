@@ -1,0 +1,337 @@
+{
+  "addresses": [
+    {
+      "id": "adr_wh_east_01",
+      "company": "acme",
+      "street1": "540 Broad St",
+      "city": "Newark",
+      "state": "NJ",
+      "zip": "07102",
+      "country": "US",
+      "residential": false,
+      "coordinate": {"latitude": 40.7357, "longitude": -74.1724},
+      "timezone": "America/New_York"
+    },
+    {
+      "id": "adr_wh_west_01",
+      "company": "acme",
+      "street1": "388 Townsend St",
+      "city": "San Francisco",
+      "state": "CA",
+      "zip": "94107",
+      "country": "US",
+      "residential": false,
+      "coordinate": {"latitude": 37.7755, "longitude": -122.3972},
+      "timezone": "America/Los_Angeles"
+    },
+    {
+      "id": "adr_wh_east_02",
+      "company": "acme",
+      "street1": "417 Montgomery St",
+      "city": "San Francisco",
+      "state": "CA",
+      "zip": "94104",
+      "country": "US",
+      "residential": false,
+      "coordinate": {"latitude": 37.7930, "longitude": -122.4029},
+      "timezone": "America/Los_Angeles"
+    },
+    {
+      "id": "adr_wh_west_02",
+      "company": "acme",
+      "street1": "1600 Amphitheatre Pkwy",
+      "city": "Mountain View",
+      "state": "CA",
+      "zip": "94043",
+      "country": "US",
+      "residential": false,
+      "coordinate": {"latitude": 37.4220, "longitude": -122.0841},
+      "timezone": "America/Los_Angeles"
+    },
+    {
+      "id": "adr_wh_cent_01",
+      "company": "acme",
+      "street1": "1901 W Madison St",
+      "city": "Chicago",
+      "state": "IL",
+      "zip": "60612",
+      "country": "US",
+      "residential": false,
+      "coordinate": {"latitude": 41.8807, "longitude": -87.6742},
+      "timezone": "America/Chicago"
+    },
+    {
+      "id": "adr_dest_nyc_01",
+      "street1": "11 Wall St",
+      "city": "New York",
+      "state": "NY",
+      "zip": "10005",
+      "country": "US",
+      "residential": false,
+      "coordinate": {"latitude": 40.7074, "longitude": -74.0113},
+      "timezone": "America/New_York"
+    },
+    {
+      "id": "adr_dest_boston_01",
+      "street1": "1 Cambridge Center",
+      "city": "Cambridge",
+      "state": "MA",
+      "zip": "02142",
+      "country": "US",
+      "residential": false,
+      "coordinate": {"latitude": 42.3626, "longitude": -71.0843},
+      "timezone": "America/New_York"
+    },
+    {
+      "id": "adr_dest_austin_01",
+      "street1": "301 Congress Ave",
+      "city": "Austin",
+      "state": "TX",
+      "zip": "78701",
+      "country": "US",
+      "residential": false,
+      "coordinate": {"latitude": 30.2656, "longitude": -97.7430},
+      "timezone": "America/Chicago"
+    },
+    {
+      "id": "adr_dest_denver_01",
+      "street1": "1600 Broadway",
+      "city": "Denver",
+      "state": "CO",
+      "zip": "80202",
+      "country": "US",
+      "residential": false,
+      "coordinate": {"latitude": 39.7420, "longitude": -104.9876},
+      "timezone": "America/Denver"
+    },
+    {
+      "id": "adr_dest_seattle_01",
+      "street1": "401 5th Ave",
+      "city": "Seattle",
+      "state": "WA",
+      "zip": "98104",
+      "country": "US",
+      "residential": false,
+      "coordinate": {"latitude": 47.6021, "longitude": -122.3282},
+      "timezone": "America/Los_Angeles"
+    },
+    {
+      "id": "adr_dest_miami_01",
+      "street1": "1111 Lincoln Rd",
+      "city": "Miami Beach",
+      "state": "FL",
+      "zip": "33139",
+      "country": "US",
+      "residential": false,
+      "coordinate": {"latitude": 25.7907, "longitude": -80.1401},
+      "timezone": "America/New_York"
+    },
+    {
+      "id": "adr_dest_los_angeles_01",
+      "street1": "200 N Spring St",
+      "city": "Los Angeles",
+      "state": "CA",
+      "zip": "90012",
+      "country": "US",
+      "residential": false,
+      "coordinate": {"latitude": 34.0537, "longitude": -118.2428},
+      "timezone": "America/Los_Angeles"
+    },
+    {
+      "id": "adr_dest_phoenix_01",
+      "street1": "400 E Van Buren St",
+      "city": "Phoenix",
+      "state": "AZ",
+      "zip": "85004",
+      "country": "US",
+      "residential": false,
+      "coordinate": {"latitude": 33.4517, "longitude": -112.0696},
+      "timezone": "America/Phoenix"
+    },
+    {
+      "id": "adr_dest_atlanta_01",
+      "street1": "600 Peachtree St NE",
+      "city": "Atlanta",
+      "state": "GA",
+      "zip": "30308",
+      "country": "US",
+      "residential": false,
+      "coordinate": {"latitude": 33.7708, "longitude": -84.3851},
+      "timezone": "America/New_York"
+    },
+    {
+      "id": "adr_dest_portland_01",
+      "street1": "1120 SW 5th Ave",
+      "city": "Portland",
+      "state": "OR",
+      "zip": "97204",
+      "country": "US",
+      "residential": false,
+      "coordinate": {"latitude": 45.5152, "longitude": -122.6784},
+      "timezone": "America/Los_Angeles"
+    }
+  ],
+  "warehouses": [
+    {"warehouse_id": "WH-EAST-01", "address_id": "adr_wh_east_01", "sku_prefixes": ["ELEC-", "GADG-", "TECH-"]},
+    {"warehouse_id": "WH-WEST-01", "address_id": "adr_wh_west_01", "sku_prefixes": ["APRL-", "HOME-", "SPRT-"]},
+    {"warehouse_id": "WH-EAST-02", "address_id": "adr_wh_east_02", "sku_prefixes": ["ELEC-", "GADG-"]},
+    {"warehouse_id": "WH-WEST-02", "address_id": "adr_wh_west_02", "sku_prefixes": ["APRL-", "SPRT-"]},
+    {"warehouse_id": "WH-CENT-01", "address_id": "adr_wh_cent_01", "sku_prefixes": ["TECH-", "HOME-"]}
+  ],
+  "shipments": [
+    {
+      "shipment_id": "shp_adr_wh_east_01_to_adr_dest_nyc_01",
+      "from_address_id": "adr_wh_east_01",
+      "to_address_id": "adr_dest_nyc_01",
+      "parcel": {"weight_oz": 16, "length_in": 6, "width_in": 6, "height_in": 4},
+      "rates": [
+        {"rate_id": "rate_wh_east_01_nyc_ground", "carrier": "UPS", "service_level": "Ground", "cost": {"currency": "USD", "units": 780}, "estimated_days": 2, "delivery_days": 2},
+        {"rate_id": "rate_wh_east_01_nyc_2day", "carrier": "FedEx", "service_level": "2Day", "cost": {"currency": "USD", "units": 995}, "estimated_days": 2, "delivery_days": 2},
+        {"rate_id": "rate_wh_east_01_nyc_priority", "carrier": "USPS", "service_level": "Priority", "cost": {"currency": "USD", "units": 945}, "estimated_days": 3, "delivery_days": 3}
+      ],
+      "labels": []
+    },
+    {
+      "shipment_id": "shp_adr_wh_east_01_to_adr_wh_west_01",
+      "from_address_id": "adr_wh_east_01",
+      "to_address_id": "adr_wh_west_01",
+      "parcel": {"weight_oz": 16, "length_in": 6, "width_in": 6, "height_in": 4},
+      "rates": [
+        {"rate_id": "rate_wh_east_01_wh_west_01_ground", "carrier": "UPS", "service_level": "Ground", "cost": {"currency": "USD", "units": 1895}, "estimated_days": 5, "delivery_days": 5},
+        {"rate_id": "rate_wh_east_01_wh_west_01_2day", "carrier": "FedEx", "service_level": "2Day", "cost": {"currency": "USD", "units": 2495}, "estimated_days": 2, "delivery_days": 2},
+        {"rate_id": "rate_wh_east_01_wh_west_01_priority", "carrier": "USPS", "service_level": "Priority", "cost": {"currency": "USD", "units": 1815}, "estimated_days": 4, "delivery_days": 4}
+      ],
+      "labels": []
+    },
+    {
+      "shipment_id": "shp_adr_wh_east_02_to_adr_dest_nyc_01",
+      "from_address_id": "adr_wh_east_02",
+      "to_address_id": "adr_dest_nyc_01",
+      "parcel": {"weight_oz": 16, "length_in": 6, "width_in": 6, "height_in": 4},
+      "rates": [
+        {"rate_id": "rate_wh_east_02_nyc_ground", "carrier": "UPS", "service_level": "Ground", "cost": {"currency": "USD", "units": 890}, "estimated_days": 5, "delivery_days": 5},
+        {"rate_id": "rate_wh_east_02_nyc_2day", "carrier": "FedEx", "service_level": "2Day", "cost": {"currency": "USD", "units": 990}, "estimated_days": 2, "delivery_days": 2},
+        {"rate_id": "rate_wh_east_02_nyc_priority", "carrier": "USPS", "service_level": "Priority", "cost": {"currency": "USD", "units": 925}, "estimated_days": 4, "delivery_days": 4}
+      ],
+      "labels": []
+    },
+    {
+      "shipment_id": "shp_adr_wh_east_02_to_adr_wh_west_01",
+      "from_address_id": "adr_wh_east_02",
+      "to_address_id": "adr_wh_west_01",
+      "parcel": {"weight_oz": 16, "length_in": 6, "width_in": 6, "height_in": 4},
+      "rates": [
+        {"rate_id": "rate_wh_east_02_wh_west_01_ground", "carrier": "UPS", "service_level": "Ground", "cost": {"currency": "USD", "units": 1920}, "estimated_days": 5, "delivery_days": 5},
+        {"rate_id": "rate_wh_east_02_wh_west_01_2day", "carrier": "FedEx", "service_level": "2Day", "cost": {"currency": "USD", "units": 2520}, "estimated_days": 2, "delivery_days": 2},
+        {"rate_id": "rate_wh_east_02_wh_west_01_priority", "carrier": "USPS", "service_level": "Priority", "cost": {"currency": "USD", "units": 1840}, "estimated_days": 4, "delivery_days": 4}
+      ],
+      "labels": []
+    },
+    {
+      "shipment_id": "shp_adr_wh_west_01_to_adr_dest_nyc_01",
+      "from_address_id": "adr_wh_west_01",
+      "to_address_id": "adr_dest_nyc_01",
+      "parcel": {"weight_oz": 16, "length_in": 6, "width_in": 6, "height_in": 4},
+      "rates": [
+        {"rate_id": "rate_wh_west_01_nyc_ground", "carrier": "UPS", "service_level": "Ground", "cost": {"currency": "USD", "units": 1965}, "estimated_days": 5, "delivery_days": 5},
+        {"rate_id": "rate_wh_west_01_nyc_2day", "carrier": "FedEx", "service_level": "2Day", "cost": {"currency": "USD", "units": 2585}, "estimated_days": 2, "delivery_days": 2},
+        {"rate_id": "rate_wh_west_01_nyc_priority", "carrier": "USPS", "service_level": "Priority", "cost": {"currency": "USD", "units": 1915}, "estimated_days": 4, "delivery_days": 4}
+      ],
+      "labels": []
+    },
+    {
+      "shipment_id": "shp_adr_wh_west_02_to_adr_dest_nyc_01",
+      "from_address_id": "adr_wh_west_02",
+      "to_address_id": "adr_dest_nyc_01",
+      "parcel": {"weight_oz": 16, "length_in": 6, "width_in": 6, "height_in": 4},
+      "rates": [
+        {"rate_id": "rate_wh_west_02_nyc_ground", "carrier": "UPS", "service_level": "Ground", "cost": {"currency": "USD", "units": 2030}, "estimated_days": 5, "delivery_days": 5},
+        {"rate_id": "rate_wh_west_02_nyc_2day", "carrier": "FedEx", "service_level": "2Day", "cost": {"currency": "USD", "units": 2660}, "estimated_days": 2, "delivery_days": 2},
+        {"rate_id": "rate_wh_west_02_nyc_priority", "carrier": "USPS", "service_level": "Priority", "cost": {"currency": "USD", "units": 1995}, "estimated_days": 4, "delivery_days": 4}
+      ],
+      "labels": []
+    },
+    {
+      "shipment_id": "shp_adr_wh_cent_01_to_adr_dest_nyc_01",
+      "from_address_id": "adr_wh_cent_01",
+      "to_address_id": "adr_dest_nyc_01",
+      "parcel": {"weight_oz": 16, "length_in": 6, "width_in": 6, "height_in": 4},
+      "rates": [
+        {"rate_id": "rate_wh_cent_01_nyc_ground", "carrier": "UPS", "service_level": "Ground", "cost": {"currency": "USD", "units": 1125}, "estimated_days": 3, "delivery_days": 3},
+        {"rate_id": "rate_wh_cent_01_nyc_2day", "carrier": "FedEx", "service_level": "2Day", "cost": {"currency": "USD", "units": 1790}, "estimated_days": 2, "delivery_days": 2},
+        {"rate_id": "rate_wh_cent_01_nyc_priority", "carrier": "USPS", "service_level": "Priority", "cost": {"currency": "USD", "units": 1285}, "estimated_days": 3, "delivery_days": 3}
+      ],
+      "labels": []
+    },
+    {
+      "shipment_id": "shp_adr_wh_east_01_to_adr_dest_boston_01",
+      "from_address_id": "adr_wh_east_01",
+      "to_address_id": "adr_dest_boston_01",
+      "parcel": {"weight_oz": 16, "length_in": 6, "width_in": 6, "height_in": 4},
+      "rates": [
+        {"rate_id": "rate_wh_east_01_boston_ground", "carrier": "UPS", "service_level": "Ground", "cost": {"currency": "USD", "units": 825}, "estimated_days": 2, "delivery_days": 2},
+        {"rate_id": "rate_wh_east_01_boston_2day", "carrier": "FedEx", "service_level": "2Day", "cost": {"currency": "USD", "units": 1325}, "estimated_days": 2, "delivery_days": 2}
+      ],
+      "labels": []
+    },
+    {
+      "shipment_id": "shp_adr_wh_east_01_to_adr_dest_austin_01",
+      "from_address_id": "adr_wh_east_01",
+      "to_address_id": "adr_dest_austin_01",
+      "parcel": {"weight_oz": 16, "length_in": 6, "width_in": 6, "height_in": 4},
+      "rates": [
+        {"rate_id": "rate_wh_east_01_austin_ground", "carrier": "UPS", "service_level": "Ground", "cost": {"currency": "USD", "units": 1395}, "estimated_days": 4, "delivery_days": 4},
+        {"rate_id": "rate_wh_east_01_austin_2day", "carrier": "FedEx", "service_level": "2Day", "cost": {"currency": "USD", "units": 2195}, "estimated_days": 2, "delivery_days": 2}
+      ],
+      "labels": []
+    },
+    {
+      "shipment_id": "shp_adr_wh_east_01_to_adr_dest_denver_01",
+      "from_address_id": "adr_wh_east_01",
+      "to_address_id": "adr_dest_denver_01",
+      "parcel": {"weight_oz": 16, "length_in": 6, "width_in": 6, "height_in": 4},
+      "rates": [
+        {"rate_id": "rate_wh_east_01_denver_ground", "carrier": "UPS", "service_level": "Ground", "cost": {"currency": "USD", "units": 1510}, "estimated_days": 4, "delivery_days": 4},
+        {"rate_id": "rate_wh_east_01_denver_2day", "carrier": "FedEx", "service_level": "2Day", "cost": {"currency": "USD", "units": 2325}, "estimated_days": 2, "delivery_days": 2}
+      ],
+      "labels": []
+    },
+    {
+      "shipment_id": "shp_adr_wh_west_01_to_adr_dest_seattle_01",
+      "from_address_id": "adr_wh_west_01",
+      "to_address_id": "adr_dest_seattle_01",
+      "parcel": {"weight_oz": 16, "length_in": 6, "width_in": 6, "height_in": 4},
+      "rates": [
+        {"rate_id": "rate_wh_west_01_seattle_ground", "carrier": "UPS", "service_level": "Ground", "cost": {"currency": "USD", "units": 940}, "estimated_days": 3, "delivery_days": 3},
+        {"rate_id": "rate_wh_west_01_seattle_2day", "carrier": "FedEx", "service_level": "2Day", "cost": {"currency": "USD", "units": 1495}, "estimated_days": 2, "delivery_days": 2}
+      ],
+      "labels": []
+    },
+    {
+      "shipment_id": "shp_adr_wh_west_01_to_adr_dest_los_angeles_01",
+      "from_address_id": "adr_wh_west_01",
+      "to_address_id": "adr_dest_los_angeles_01",
+      "parcel": {"weight_oz": 16, "length_in": 6, "width_in": 6, "height_in": 4},
+      "rates": [
+        {"rate_id": "rate_wh_west_01_la_ground", "carrier": "UPS", "service_level": "Ground", "cost": {"currency": "USD", "units": 810}, "estimated_days": 2, "delivery_days": 2},
+        {"rate_id": "rate_wh_west_01_la_2day", "carrier": "FedEx", "service_level": "2Day", "cost": {"currency": "USD", "units": 1345}, "estimated_days": 2, "delivery_days": 2}
+      ],
+      "labels": []
+    },
+    {
+      "shipment_id": "shp_adr_wh_cent_01_to_adr_dest_atlanta_01",
+      "from_address_id": "adr_wh_cent_01",
+      "to_address_id": "adr_dest_atlanta_01",
+      "parcel": {"weight_oz": 16, "length_in": 6, "width_in": 6, "height_in": 4},
+      "rates": [
+        {"rate_id": "rate_wh_cent_01_atlanta_ground", "carrier": "UPS", "service_level": "Ground", "cost": {"currency": "USD", "units": 1015}, "estimated_days": 3, "delivery_days": 3},
+        {"rate_id": "rate_wh_cent_01_atlanta_2day", "carrier": "FedEx", "service_level": "2Day", "cost": {"currency": "USD", "units": 1695}, "estimated_days": 2, "delivery_days": 2}
+      ],
+      "labels": []
+    }
+  ],
+  "location_events": {
+    "mode": "empty",
+    "seeds": []
+  }
+}

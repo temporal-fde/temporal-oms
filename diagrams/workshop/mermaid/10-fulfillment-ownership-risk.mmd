@@ -1,0 +1,55 @@
+flowchart LR
+  subgraph Apps["apps namespace"]
+    AppsV1["apps.Order v1<br/>legacy caller"]
+    AppsV2["apps.Order v2<br/>new fulfillment owner"]
+  end
+
+  subgraph Processing["processing namespace"]
+    ProcV1["processing.Order v1<br/>always sends Kafka"]
+    ProcV2["processing.Order v2<br/>honors send_fulfillment"]
+    KafkaAct["Fulfillments.fulfillOrder()<br/>legacy Kafka activity"]
+    Kafka["Kafka fulfillment handoff"]
+  end
+
+  subgraph Fulfillment["fulfillment namespace"]
+    FulfillmentOrder["fulfillment.Order<br/>durable fulfillment workflow"]
+    FulfillmentWorkers["fulfillment workers"]
+  end
+
+  subgraph Risk["RISK: apps v2 is ramped before the safe plan"]
+    RiskOrder["same order"]
+    RiskA["apps v2 starts<br/>fulfillment.Order"]
+    RiskB["apps v2 calls processing<br/>send_fulfillment=false"]
+    RiskC["processing v1 ignores option"]
+    RiskD["legacy Kafka handoff still published"]
+    RiskFulfillment["fulfillment.Order already started"]
+    Duplicate["DUPLICATE FULFILLMENT<br/>fulfillment.Order + Kafka"]
+  end
+
+  AppsV1 -->|"processOrder<br/>send_fulfillment absent"| ProcV1
+  ProcV1 -->|"after enrichment"| KafkaAct
+  KafkaAct --> Kafka
+
+  AppsV2 -->|"1. start validation<br/>Nexus"| FulfillmentOrder
+  AppsV2 -->|"2. processOrder<br/>send_fulfillment=false"| ProcV2
+  ProcV2 -->|"skip legacy Kafka"| NoKafka["no Kafka handoff"]
+  AppsV2 -->|"3. fulfillOrder after processing"| FulfillmentOrder
+  FulfillmentWorkers --> FulfillmentOrder
+
+  RiskOrder --> RiskA
+  RiskOrder --> RiskB
+  RiskA --> RiskFulfillment
+  RiskB --> RiskC
+  RiskC --> RiskD
+  RiskD --> Duplicate
+  RiskFulfillment --> Duplicate
+
+  classDef legacy fill:#eeeeee,stroke:#777,color:#222;
+  classDef target fill:#e9f7ef,stroke:#218838,color:#222;
+  classDef risk fill:#fff0e5,stroke:#d46b08,color:#222;
+  classDef danger fill:#ffe3e3,stroke:#c92a2a,color:#7a0000,font-weight:bold;
+
+  class AppsV1,ProcV1,KafkaAct,Kafka legacy;
+  class AppsV2,ProcV2,FulfillmentOrder,FulfillmentWorkers,NoKafka target;
+  class Risk,RiskOrder,RiskA,RiskB,RiskC,RiskD,RiskFulfillment risk;
+  class Duplicate danger;

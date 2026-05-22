@@ -60,7 +60,7 @@ while sustained load is running — without dropping in-flight workflows.
        --input '{
          "enablementId": "demo-2026-03-22",
          "orderCount": 20,
-         "submitRatePerMin": 20,
+         "submitRatePerMin": 5,
          "timeout": "600s",
          "orderIdSeed": "invalid"
        }' \

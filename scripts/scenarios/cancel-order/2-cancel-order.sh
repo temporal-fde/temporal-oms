@@ -5,12 +5,17 @@
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../_lib.sh"
+scenario_resume "$SCRIPT_DIR"
+
 echo "❌ Canceling order..."
-echo "Workflow ID: cancel-order-123"
+echo "Workflow ID: ${ORDER_ID}"
+echo "Customer ID: ${CUSTOMER_ID}"
 echo ""
 
 temporal workflow update execute \
-  --workflow-id cancel-order-123 \
+  --workflow-id "${ORDER_ID}" \
   --name cancelOrder \
   --input '{"reason":"Customer requested cancellation","canceled_by":"demo-user"}' \
   --input-meta "encoding=json/protobuf" \

@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fulfillment-workers
+  namespace: temporal-oms-fulfillment
+  labels:
+    app: fulfillment-workers
+    component: worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fulfillment-workers
+  template:
+    metadata:
+      labels:
+        app: fulfillment-workers
+        component: worker
+        version: "1.0.0"
+      annotations:
+        instrumentation.opentelemetry.io/inject-sdk: "true"
+    spec:
+      containers:
+      - name: worker
+        image: temporal-oms/fulfillment-workers:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 9072
+          name: management
+          protocol: TCP
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: k8s
+        - name: JAVA_OPTS
+          value: "-Dgrpc.netty.keepaliveTime=30 -Dgrpc.netty.keepaliveTimeout=5 -Dgrpc.netty.keepaliveWithoutCalls=true"
+        envFrom:
+        - configMapRef:
+            name: temporal-oms-config
+        - secretRef:
+            name: temporal-oms-secrets
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 9072
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 9072
+          initialDelaySeconds: 20
+          periodSeconds: 5
+        volumeMounts:
+        - name: temporal-config
+          mountPath: /etc/config/temporal
+          readOnly: true
+        - name: temporal-secret
+          mountPath: /etc/config/temporal-secret
+          readOnly: true
+        resources:
+          requests:
+            memory: "384Mi"
+            cpu: "200m"
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
+      volumes:
+      - name: temporal-config
+        configMap:
+          name: temporal-fulfillment-config
+          defaultMode: 0444
+      - name: temporal-secret
+        secret:
+          secretName: temporal-fulfillment-api-key
+          defaultMode: 0444
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fulfillment-workers
+  namespace: temporal-oms-fulfillment
+  labels:
+    app: fulfillment-workers
+spec:
+  type: ClusterIP
+  selector:
+    app: fulfillment-workers
+  ports:
+  - port: 9072
+    targetPort: 9072
+    protocol: TCP
+    name: management
