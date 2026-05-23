@@ -1,6 +1,6 @@
 # Exercise 01: Safely Move Fulfillment Ownership
 
-Source spec: [spec.md](../../../specs/workshop/exercises/01-safe-fulfillment-handoff/spec.md)  
+Source spec: [spec.md](../../specs/workshop/safe-fulfillment-handoff/spec.md)  
 Code solution: [SOLUTION.md](SOLUTION.md)
 
 ## Goal
@@ -27,7 +27,7 @@ up front. The operational rollout order stays the same:
 ## Starting Assumptions And Setup
 
 The only workshop state assumed before this exercise is steps 1 and 2 in
-[WORKSHOP.md](../../../WORKSHOP.md): you have access to keys and `.env.local` is present in your
+[WORKSHOP.md](../../WORKSHOP.md): you have access to keys and `.env.local` is present in your
 Codespace.
 
 Do not assume any local services are already running. Start Temporal, set up namespaces, then start
@@ -36,12 +36,12 @@ the explicit service list below.
 Run the exercise from its directory:
 
 ```bash
-cd workshop/exercises/01-safe-fulfillment-handoff
+cd workshop/safe-fulfillment-handoff
 ```
 
 The `scripts/` directory contains the step runners for this exercise. They start foreground
 Java services and Python workers as background processes, write logs under
-`.workshop/exercises/01-safe-fulfillment-handoff/logs`, and write PID files under the matching
+`.workshop/safe-fulfillment-handoff/logs`, and write PID files under the matching
 `run` directory. Temporal CLI commands are shown directly in the steps because they are the
 important rollout mechanics.
 
@@ -58,7 +58,7 @@ temporal server start-dev \
 Set up namespaces and Nexus endpoints:
 
 ```bash
-../../../scripts/setup-temporal-namespaces.sh
+../../scripts/setup-temporal-namespaces.sh
 ```
 
 ## Initial Services
@@ -170,11 +170,11 @@ guided copy/paste change. When that solution section is complete, come back here
 Step 5.
 
 - Add `send_fulfillment` to the
-  [processing proto contract](../../../proto/acme/processing/domain/v1/workflows.proto).
+  [processing proto contract](../../proto/acme/processing/domain/v1/workflows.proto).
 - Regenerate protobuf outputs with the
-  [project-root generate script](../../../scripts/generate.sh).
+  [project-root generate script](../../scripts/generate.sh).
 - Guard the legacy Kafka handoff in
-  [processing OrderImplV1.java](../../../java/processing/processing-core/src/main/java/com/acme/processing/workflows/OrderImplV1.java).
+  [processing OrderImplV1.java](../../java/processing/processing-core/src/main/java/com/acme/processing/workflows/OrderImplV1.java).
 - Keep the default backward-compatible: absent `send_fulfillment` means `true`.
 
 The solution file shows repo-root paths. Keep this terminal in the exercise directory for the
@@ -225,7 +225,7 @@ absent field as `true`, so old app traffic still publishes the legacy Kafka hand
 ## 7. Implement `apps v2`
 
 Apply the **apps** changes from [SOLUTION.md](SOLUTION.md#apps-v2-code) in
-[apps OrderImplV1.java](../../../java/apps/apps-core/src/main/java/com/acme/apps/workflows/OrderImplV1.java).
+[apps OrderImplV1.java](../../java/apps/apps-core/src/main/java/com/acme/apps/workflows/OrderImplV1.java).
 The fulfillment wiring helpers are already in the class. The coding activity is calling those
 helpers from the workflow path and setting `send_fulfillment=false` on the processing request.
 When that solution section is complete, come back here and continue with Step 8:

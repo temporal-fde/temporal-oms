@@ -4,8 +4,8 @@ set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 EXERCISE_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-ROOT_DIR="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
-STATE_ROOT="$ROOT_DIR/.workshop/exercises/01-safe-fulfillment-handoff"
+ROOT_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+STATE_ROOT="$ROOT_DIR/.workshop/safe-fulfillment-handoff"
 RUN_DIR="$STATE_ROOT/run"
 LOG_DIR="$STATE_ROOT/logs"
 STATE_DIR="$STATE_ROOT/state"
@@ -370,8 +370,8 @@ Exercise runtime:
   PIDs:        $RUN_DIR
 
 Useful commands:
-  ./workshop/exercises/01-safe-fulfillment-handoff/scripts/status.sh
-  ./workshop/exercises/01-safe-fulfillment-handoff/scripts/logs.sh <service-name>
-  ./workshop/exercises/01-safe-fulfillment-handoff/scripts/stop.sh
+  ./workshop/safe-fulfillment-handoff/scripts/status.sh
+  ./workshop/safe-fulfillment-handoff/scripts/logs.sh <service-name>
+  ./workshop/safe-fulfillment-handoff/scripts/stop.sh
 EOF
 }
