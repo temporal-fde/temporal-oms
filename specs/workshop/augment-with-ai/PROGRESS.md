@@ -40,10 +40,10 @@
 ## Notes
 
 - The safe fulfillment handoff foundation exercise has a planning spec at
-  `specs/workshop/exercises/01-safe-fulfillment-handoff/spec.md`.
-  Hands-on lab material exists under `workshop/exercises/01-safe-fulfillment-handoff/`.
+  `specs/workshop/safe-fulfillment-handoff/spec.md`.
+  Hands-on lab material exists under `workshop/safe-fulfillment-handoff/`.
 - Exercise 02 now has a planning spec at
-  `specs/workshop/exercises/02-observe-shipping-agent/spec.md`.
+  `specs/workshop/observe-shipping-agent/spec.md`.
 - Exercise 03 is intentionally TBD until tech lead confirms the extension scope.
 - The Codespaces/devcontainer foundation is complete. Remaining setup work is the workshop startup,
   status, and stop runner layer.

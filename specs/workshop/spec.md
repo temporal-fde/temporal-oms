@@ -39,11 +39,11 @@ Equip your team to deliver real-world solutions that require a reliable bridge b
 
 ### Safe Extensibility
 
-* Exercise 01 guide: [Safely Move Fulfillment Ownership](../../workshop/exercises/01-safe-fulfillment-handoff/README.md)
+* Exercise 01 guide: [Safely Move Fulfillment Ownership](../../workshop/safe-fulfillment-handoff/README.md)
 
-* Exercise 01 spec: [Safely Move Fulfillment Ownership](./exercises/01-safe-fulfillment-handoff/spec.md)
+* Exercise 01 spec: [Safely Move Fulfillment Ownership](./safe-fulfillment-handoff/spec.md)
 
-* Exercise 02 spec: [Observe The ShippingAgent Reliability Harness](./exercises/02-observe-shipping-agent/spec.md)
+* Exercise 02 spec: [Observe The ShippingAgent Reliability Harness](./observe-shipping-agent/spec.md)
 
 * Demo spec: [Temporal Worker Controller Rollout](./demos/temporal-worker-controller/spec.md)
 

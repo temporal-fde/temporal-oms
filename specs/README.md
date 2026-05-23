@@ -92,7 +92,7 @@ Provide feedback in PROGRESS.md → Feedback Items section.
 - **Goal:** Codespaces-based workshop teaching safe traffic migration (Kafka → Nexus) and AI-augmented Temporal workflows; exercise series for teams evaluating the new architecture
 - **Owner:** Temporal FDE Team
 - **Spec:** `specs/workshop/augment-with-ai/`
-- **Exercise Specs:** `specs/workshop/exercises/01-safe-fulfillment-handoff/`, `specs/workshop/exercises/02-observe-shipping-agent/`
+- **Exercise Specs:** `specs/workshop/safe-fulfillment-handoff/`, `specs/workshop/observe-shipping-agent/`
 - **Next:** Tech lead review - confirm Exercise 03 scope, API key requirements, workshop startup runner, and Exercise 02 live LLM fallback
 
 ### Workshop: Codespaces Support

@@ -106,9 +106,9 @@ workflow code?"
 The planning spec for this foundation exercise lives under `specs/`; the implemented lab lives
 under the root `workshop/` directory:
 
-- Spec: [`../exercises/01-safe-fulfillment-handoff/spec.md`](../exercises/01-safe-fulfillment-handoff/spec.md)
-- Lab guide: [`../../../workshop/exercises/01-safe-fulfillment-handoff/README.md`](../../../workshop/exercises/01-safe-fulfillment-handoff/README.md)
-- Solution: [`../../../workshop/exercises/01-safe-fulfillment-handoff/SOLUTION.md`](../../../workshop/exercises/01-safe-fulfillment-handoff/SOLUTION.md)
+- Spec: [`../safe-fulfillment-handoff/spec.md`](../safe-fulfillment-handoff/spec.md)
+- Lab guide: [`../../../workshop/safe-fulfillment-handoff/README.md`](../../../workshop/safe-fulfillment-handoff/README.md)
+- Solution: [`../../../workshop/safe-fulfillment-handoff/SOLUTION.md`](../../../workshop/safe-fulfillment-handoff/SOLUTION.md)
 
 The chosen approach is a combination of:
 
@@ -127,7 +127,7 @@ The second lab is a guided trace exercise, not another rollout or coding lab.
 
 Planning spec:
 
-- [`../exercises/02-observe-shipping-agent/spec.md`](../exercises/02-observe-shipping-agent/spec.md)
+- [`../observe-shipping-agent/spec.md`](../observe-shipping-agent/spec.md)
 
 Exercise 02 starts after Exercise 01 has routed new orders through `fulfillment.Order`. Participants
 run or inspect one assigned order scenario, find the long-running `ShippingAgent` workflow by
@@ -206,15 +206,15 @@ Deliverables:
 
 Deliverables:
 - [x] `workshop/README.md`
-- [x] `workshop/exercises/01-safe-fulfillment-handoff/README.md`
-- [x] `workshop/exercises/01-safe-fulfillment-handoff/SOLUTION.md`
+- [x] `workshop/safe-fulfillment-handoff/README.md`
+- [x] `workshop/safe-fulfillment-handoff/SOLUTION.md`
 - [ ] Optional helper: generated-order inspection script, if Temporal UI proof is too slow live
 
 ### Phase 3: Exercise 02
 
 Deliverables:
-- [x] `specs/workshop/exercises/02-observe-shipping-agent/spec.md`
-- [x] `workshop/exercises/02-observe-shipping-agent/README.md`
+- [x] `specs/workshop/observe-shipping-agent/spec.md`
+- [x] `workshop/observe-shipping-agent/README.md`
 - [x] Exercise helper scripts for status checks and scenario launch
 - [ ] Optional deterministic LLM fallback or pre-recorded history fallback
 

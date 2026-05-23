@@ -305,7 +305,7 @@ The attendee-facing guide should have participants:
 Create attendee-facing material under:
 
 ```text
-workshop/exercises/02-observe-shipping-agent/
+workshop/observe-shipping-agent/
   README.md
   scripts/
 ```
@@ -433,7 +433,7 @@ Before the workshop, dry run the exercise from a clean Codespace or local worksp
 
 - Workshop overview: `specs/workshop/spec.md`
 - AI workshop arc: `specs/workshop/augment-with-ai/spec.md`
-- Exercise 01 spec: `specs/workshop/exercises/01-safe-fulfillment-handoff/spec.md`
+- Exercise 01 spec: `specs/workshop/safe-fulfillment-handoff/spec.md`
 - ShippingAgent workflow spec: `specs/fulfillment-order/shipping-agent/spec.md`
 - Enablements ShippingAgent integration spec: `specs/enablements/shipping-agent/spec.md`
 - ShippingAgent workflow implementation: `python/fulfillment/src/agents/workflows/shipping_agent.py`

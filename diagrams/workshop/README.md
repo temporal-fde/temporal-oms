@@ -34,7 +34,7 @@ diagrams/workshop/
 
 - [`fulfillment.Order` workflow spec](../../specs/fulfillment-order/fulfillment-order-workflow/spec.md)
 - [`ShippingAgent` spec](../../specs/fulfillment-order/shipping-agent/spec.md)
-- [Exercise 01 safe handoff spec](../../specs/workshop/exercises/01-safe-fulfillment-handoff/spec.md)
+- [Exercise 01 safe handoff spec](../../specs/workshop/safe-fulfillment-handoff/spec.md)
 - [Workshop spec](../../specs/workshop/spec.md)
 
 ## Working Rules

@@ -1,6 +1,6 @@
 # Exercise 02: Observe The ShippingAgent Reliability Harness
 
-Source spec: [spec.md](../../../specs/workshop/exercises/02-observe-shipping-agent/spec.md)
+Source spec: [spec.md](../../specs/workshop/observe-shipping-agent/spec.md)
 
 ## Goal
 
@@ -16,13 +16,13 @@ business decision.
 Run this exercise from its directory:
 
 ```bash
-cd workshop/exercises/02-observe-shipping-agent
+cd workshop/observe-shipping-agent
 ```
 
 If Exercise 01 services are still running, stop them first:
 
 ```bash
-../01-safe-fulfillment-handoff/scripts/stop.sh
+../safe-fulfillment-handoff/scripts/stop.sh
 ```
 
 This exercise uses the full local stack. Start Temporal server in its own terminal and leave it
@@ -39,7 +39,7 @@ temporal server start-dev \
 In another terminal, start the OMS services:
 
 ```bash
-../../../scripts/local-up.sh
+../../scripts/local-up.sh
 ```
 
 `local-up.sh` starts the APIs, Java workers, enablements workers, fulfillment workers, and the
@@ -233,7 +233,7 @@ Discussion prompts:
 Stop local services:
 
 ```bash
-../../../scripts/local-down.sh
+../../scripts/local-down.sh
 ```
 
 Stop the Temporal dev server terminal with `Ctrl-C`.

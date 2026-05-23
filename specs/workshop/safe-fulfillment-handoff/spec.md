@@ -86,9 +86,9 @@ whether processing should send the fulfillment handoff for this order.
 The spec stays focused on the architecture, constraints, and rollout model. The implemented lab
 material lives under the root `workshop/` directory:
 
-- Participant guide: `workshop/exercises/01-safe-fulfillment-handoff/README.md`
-- Solution and code snippets: `workshop/exercises/01-safe-fulfillment-handoff/SOLUTION.md`
-- Step runners: `workshop/exercises/01-safe-fulfillment-handoff/scripts/`
+- Participant guide: `workshop/safe-fulfillment-handoff/README.md`
+- Solution and code snippets: `workshop/safe-fulfillment-handoff/SOLUTION.md`
+- Step runners: `workshop/safe-fulfillment-handoff/scripts/`
 
 Exercise 01 is a live code-and-rollout exercise. Participants may apply the `processing v2` and
 `apps v2` code changes during the lab, then start new worker processes with build ID `v2` while
@@ -135,7 +135,7 @@ cannot make useful progress through `fulfillment.Order`.
 The exercise should expose the underlying Temporal operations explicitly. The exact participant
 commands live in the implemented guide:
 
-`workshop/exercises/01-safe-fulfillment-handoff/README.md`
+`workshop/safe-fulfillment-handoff/README.md`
 
 The later TWC/Kubernetes segment should show that the controller performs this same lifecycle from
 WorkerDeployment rollout state: register new build IDs, wait for pollers, ramp traffic, gate the
@@ -144,7 +144,7 @@ rollout, and sunset drained versions.
 ## What Participants Will Do
 
 The participant experience is implemented in
-`workshop/exercises/01-safe-fulfillment-handoff/README.md`.
+`workshop/safe-fulfillment-handoff/README.md`.
 
 Participants will:
 
