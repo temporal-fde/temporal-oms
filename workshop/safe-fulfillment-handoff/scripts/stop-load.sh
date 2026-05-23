@@ -19,7 +19,7 @@ fi
 temporal_cli workflow terminate \
   --workflow-id "$ENABLEMENT_ID" \
   --namespace "$TEMPORAL_ENABLEMENTS_NAMESPACE" \
-  --reason "Exercise 01 complete" || true
+  --reason "Workshop complete" || true
 
 rm -f "$STATE_DIR/enablement_id"
 echo "Load generator stopped: $ENABLEMENT_ID"

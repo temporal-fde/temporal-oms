@@ -1,14 +1,15 @@
-# Demo Spec: Temporal Worker Controller Rollout
+# Spec: Workshop 1 Part 2 - Temporal Worker Controller Rollout
 
-**Workshop Slot:** Post-Exercise 01 demo
+**Workshop Slot:** Workshop 1 (Safely Move Fulfillment Ownership), Part 2
 **Target Timebox:** 10-15 minutes
-**Demo Mode:** Instructor-led with k9s as the primary Kubernetes observation tool
-**Prerequisite:** Exercise 01 has shown the manual Worker Deployment commands
+**Mode:** Instructor-led with k9s as the primary Kubernetes observation tool
+**Prerequisite:** Part 1 has shown the manual Worker Deployment commands
 **Source Material:** `java/enablements/ENABLEMENT.md`
+**Participant guide:** [`workshop/safe-fulfillment-handoff/README.md`](../../../workshop/safe-fulfillment-handoff/README.md) (Part 2 section)
 
 ## Purpose
 
-Exercise 01 has participants run the Worker Deployment lifecycle directly for the fulfillment
+Part 1 has participants run the Worker Deployment lifecycle directly for the fulfillment
 handoff migration:
 
 1. promote `processing v2`
@@ -57,16 +58,16 @@ Show that TWC automates Worker Deployment rollout mechanics:
 - keeps in-flight pinned workflows on their original version
 - sunsets old worker versions after drain
 
-Secondary goal: show one place where `auto_upgrade` is useful. Exercise 01 rejects auto-upgrade for
+Secondary goal: show one place where `auto_upgrade` is useful. Part 1 rejects auto-upgrade for
 order workflows because each order must keep its chosen fulfillment path. This demo can contrast
 that with the long-running `support-team` workflow, where auto-upgrade can be used deliberately so
 an always-running workflow stops holding old worker pods alive.
 
 ## Narrative
 
-The talk track should explicitly connect Exercise 01's manual commands to the automated TWC flow:
+The talk track should explicitly connect Part 1's manual commands to the automated TWC flow:
 
-| Exercise 01 manual command | TWC production behavior |
+| Part 1 manual command | TWC production behavior |
 |---|---|
 | `set-current-version --deployment-name processing --build-id v2` | Controller promotes or ramps the new processing Worker Deployment Version after pollers appear |
 | `set-ramping-version --deployment-name apps --build-id v2 --percentage 50` | Controller applies progressive rollout steps from the `TemporalWorkerDeployment` spec |
@@ -264,11 +265,11 @@ case where auto-upgrade is appropriate.
      deleteDelay: 120s
    ```
 
-### Phase 6: Tie Back To Exercise 01
+### Phase 6: Tie Back To Part 1
 
 Reinforce the distinction:
 
-- Exercise 01 used manual Worker Deployment commands so participants could see the primitives.
+- Part 1 used manual Worker Deployment commands so participants could see the primitives.
 - TWC performs those operations from Kubernetes rollout state.
 - Auto-upgrade was not useful for the fulfillment handoff because each order must keep its chosen
   path.
@@ -321,7 +322,7 @@ raw commands are fallback and validation aids.
 
 ## Success Criteria
 
-- Participants can map each manual Exercise 01 Worker Deployment command to the corresponding TWC
+- Participants can map each manual Part 1 Worker Deployment command to the corresponding TWC
   behavior.
 - The demo shows at least one new Worker Deployment Version becoming available.
 - The demo shows a ramp or promotion controlled by `TemporalWorkerDeployment` policy.
@@ -339,13 +340,13 @@ raw commands are fallback and validation aids.
 | Controller status is hard to read live | Main point gets lost | Use k9s as the primary view, with Temporal CLI describe and Temporal UI as supporting proof |
 | k9s does not expose a friendly alias for `TemporalWorkerDeployment` | Demo friction | Use the k9s command prompt with `temporalworkerdeployments`, or fall back to `kubectl get temporalworkerdeployment ... -w` |
 | Image build or KinD load fails | Demo blocked | Build/load images before workshop; use a scripted preflight |
-| TWC behavior looks like magic | Weak learning transfer from Exercise 01 | Always narrate the mapping from manual commands to controller actions |
-| Auto-upgrade seems to contradict Exercise 01 | Conceptual confusion | Explicitly contrast per-order fulfillment path preservation with long-running support workflow maintenance |
+| TWC behavior looks like magic | Weak learning transfer from Part 1 | Always narrate the mapping from manual commands to controller actions |
+| Auto-upgrade seems to contradict Part 1 | Conceptual confusion | Explicitly contrast per-order fulfillment path preservation with long-running support workflow maintenance |
 
 ## Open Questions
 
 - Should this demo keep using only `processing-workers`, as in `java/enablements/ENABLEMENT.md`,
-  or add an `apps-workers` rollout after Exercise 01 is implemented?
+  or add an `apps-workers` rollout after Part 1 is implemented?
 - Should the final version run against local Temporal, Temporal Cloud, or support both overlays?
 - Is `enablements-workers` local-only for this demo, or should the updated KinD topology deploy it?
 - Should we keep ramp percentages short for workshop overlays, e.g. 50% then 100% with 10-second

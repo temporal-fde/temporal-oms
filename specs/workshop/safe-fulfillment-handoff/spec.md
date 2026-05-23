@@ -6,7 +6,7 @@
 
 **Exercise Mode:** Hands-on, using Temporal Worker Deployment CLI/operator commands directly
 
-**Production Follow-up:** Temporal Worker Controller demo under load
+**Production Follow-up:** Temporal Worker Controller rollout — see Part 2 spec: [twc-rollout.md](./twc-rollout.md)
 
 ## Current State
 

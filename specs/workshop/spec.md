@@ -45,7 +45,7 @@ Equip your team to deliver real-world solutions that require a reliable bridge b
 
 * Exercise 02 spec: [Observe The ShippingAgent Reliability Harness](./observe-shipping-agent/spec.md)
 
-* Demo spec: [Temporal Worker Controller Rollout](./demos/temporal-worker-controller/spec.md)
+* Workshop 1 Part 2 spec: [Temporal Worker Controller Rollout](./safe-fulfillment-handoff/twc-rollout.md)
 
 * Python: Augmenting plain ShippingAPI with agent ReAct via Nexus
 

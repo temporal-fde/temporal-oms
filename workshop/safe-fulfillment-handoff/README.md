@@ -1,19 +1,34 @@
-# Exercise 01: Safely Move Fulfillment Ownership
+# Workshop: Safely Move Fulfillment Ownership
 
 Source spec: [spec.md](../../specs/workshop/safe-fulfillment-handoff/spec.md)  
-Code solution: [SOLUTION.md](SOLUTION.md)
+Code solution: [SOLUTION.md](SOLUTION.md)  
+Part 2 source spec: [twc-rollout.md](../../specs/workshop/safe-fulfillment-handoff/twc-rollout.md)
 
 ## Goal
 
 Move fulfillment ownership from `processing.Order` to `apps.Order` without disrupting in-flight
 orders and without using application feature flags in workflow code.
 
-This is a live code-and-rollout exercise. You will keep order traffic running, change the code,
+This is a live code-and-rollout workshop. You will keep order traffic running, change the code,
 start new worker processes with new build IDs, and then use Temporal Worker Deployment commands to
-move traffic.
+move traffic. After that, you will see the Temporal Worker Controller automate the same lifecycle
+from Kubernetes rollout state.
 
-You can make the `processing v2` and `apps v2` code changes separately, or make both code changes
-up front. The operational rollout order stays the same:
+## Overview
+
+This workshop has two parts:
+
+- **Part 1 — Manual rollout via Temporal CLI** (45 min, hands-on): you change the code, start v2
+  workers, and call `set-current-version` / `set-ramping-version` to move traffic. Runs against a
+  local Temporal dev server; no Kubernetes required.
+- **Part 2 — Automated rollout with the Temporal Worker Controller** (15 min, instructor-led):
+  the same code change, deployed to a Kubernetes cluster, with TWC driving the rollout from a
+  `TemporalWorkerDeployment` manifest. Requires KinD or k3d.
+
+Part 2 reuses the Part 1 v2 code. The pedagogical point of Part 2 is that nothing in workflow code
+changes — only the operator surface differs (CLI commands vs. Kubernetes-driven rollout).
+
+The operational rollout order stays the same in both parts:
 
 1. Confirm `apps v1` and `processing v1` are current.
 2. Start sustained order traffic.
@@ -24,22 +39,24 @@ up front. The operational rollout order stays the same:
 7. Start and ramp or promote `apps v2`.
 8. Verify `fulfillment.Order` receives new-path traffic and Kafka handoffs stop for that path.
 
-## Starting Assumptions And Setup
+## Part 1: Manual Rollout via Temporal CLI
 
-The only workshop state assumed before this exercise is steps 1 and 2 in
+### Starting Assumptions And Setup
+
+The only workshop state assumed before this workshop is steps 1 and 2 in
 [WORKSHOP.md](../../WORKSHOP.md): you have access to keys and `.env.local` is present in your
 Codespace.
 
 Do not assume any local services are already running. Start Temporal, set up namespaces, then start
 the explicit service list below.
 
-Run the exercise from its directory:
+Run Part 1 from this workshop's directory:
 
 ```bash
 cd workshop/safe-fulfillment-handoff
 ```
 
-The `scripts/` directory contains the step runners for this exercise. They start foreground
+The `scripts/` directory contains the step runners for this workshop. They start foreground
 Java services and Python workers as background processes, write logs under
 `.workshop/safe-fulfillment-handoff/logs`, and write PID files under the matching
 `run` directory. Temporal CLI commands are shown directly in the steps because they are the
@@ -61,7 +78,7 @@ Set up namespaces and Nexus endpoints:
 ../../scripts/setup-temporal-namespaces.sh
 ```
 
-## Initial Services
+### Initial Services
 
 Start only the services needed for baseline order traffic and the enablements load generator:
 
@@ -90,7 +107,7 @@ Useful runtime commands:
 ./scripts/stop.sh
 ```
 
-## 1. Confirm `v1` Is Current
+### 1. Confirm `v1` Is Current
 
 Set both deployments to `v1`, then confirm the state:
 
@@ -120,7 +137,7 @@ temporal worker deployment describe \
 
 Expected result: `processing` and `apps` both show `v1` as current.
 
-## 2. Start Sustained Traffic
+### 2. Start Sustained Traffic
 
 Start the enablements load generator and leave it running through the rollout:
 
@@ -148,7 +165,7 @@ temporal workflow query \
 Expected result: new `apps.Order` executions appear continuously in the `apps` namespace with
 workflow IDs that start with `order-${ENABLEMENT_ID}`.
 
-## 3. Observe The Legacy Path
+### 3. Observe The Legacy Path
 
 Pick a generated order ID from Temporal UI in the `apps` namespace:
 
@@ -160,7 +177,7 @@ curl -s "http://localhost:8071/admin/order-fulfillment/${ORDER_ID}"
 Expected result: with `apps v1` and `processing v1`, generated orders create Kafka fulfillment
 records.
 
-## 4. Implement `processing v2`
+### 4. Implement `processing v2`
 
 > Only edit the processing proto contract and the **processing** OrderImplV1 Java file in this
 > step. The apps context will change shortly.
@@ -177,10 +194,10 @@ Step 5.
   [processing OrderImplV1.java](../../java/processing/processing-core/src/main/java/com/acme/processing/workflows/OrderImplV1.java).
 - Keep the default backward-compatible: absent `send_fulfillment` means `true`.
 
-The solution file shows repo-root paths. Keep this terminal in the exercise directory for the
+The solution file shows repo-root paths. Keep this terminal in the workshop directory for the
 scripts, but make code edits against the repo-root files it names.
 
-## 5. Start `processing v2`
+### 5. Start `processing v2`
 
 Build and run a second processing worker process with the same deployment name and a new build ID:
 
@@ -201,7 +218,7 @@ Do not stop `processing v1`. Existing pinned executions may still need it.
 > **Pro Tip**:
 > Check out the Temporal UI at `/namespaces/processing/workers/deployments/processing` to see the current status of all Deployments.
 
-## 6. Promote `processing v2`
+### 6. Promote `processing v2`
 
 ```bash
 temporal worker deployment set-current-version \
@@ -222,7 +239,7 @@ Expected result: new `processing.Order` executions are pinned to `processing v2`
 Why this is safe: `apps v1` still does not set `send_fulfillment`, and `processing v2` treats the
 absent field as `true`, so old app traffic still publishes the legacy Kafka handoff.
 
-## 7. Implement `apps v2`
+### 7. Implement `apps v2`
 
 Apply the **apps** changes from [SOLUTION.md](SOLUTION.md#apps-v2-code) in
 [apps OrderImplV1.java](../../java/apps/apps-core/src/main/java/com/acme/apps/workflows/OrderImplV1.java).
@@ -243,7 +260,7 @@ When that solution section is complete, come back here and continue with Step 8:
 >    java/apps/apps-core/src/main/java/com/acme/apps/workflows/OrderImplV1.java
 > ```
 
-## 8. Start Fulfillment Workers For The New Path
+### 8. Start Fulfillment Workers For The New Path
 
 Do this after the legacy path is proven and before any `apps v2` worker receives traffic. The
 initial service list intentionally left fulfillment stopped so the baseline generator shows
@@ -256,13 +273,13 @@ initial service list intentionally left fulfillment stopped so the baseline gene
 Expected result: Java fulfillment workers are healthy and the Python worker logs
 `python-fulfillment-worker ready` or `All workers polling`.
 
-You do not need to start `fulfillment-api` for this exercise. The new path reaches
+You do not need to start `fulfillment-api` for this workshop. The new path reaches
 `fulfillment.Order` through the `oms-fulfillment-v1` Nexus endpoint.
 
 > **Pro Tip**: 
 > Check out the fulfillment Worker running at `namespaces/fulfillment/workers/deployments`in the Temporal UI.
 
-## 9. Start `apps v2`
+### 9. Start `apps v2`
 
 Build and run a second apps worker process with the same deployment name and a new build ID:
 
@@ -280,7 +297,7 @@ temporal worker deployment describe \
 
 Do not stop `apps v1`. Existing pinned executions may still need it.
 
-## 10. Move Traffic To `apps v2`
+### 10. Move Traffic To `apps v2`
 
 For a visible mixed period, ramp `apps v2` first:
 
@@ -306,7 +323,7 @@ temporal worker deployment set-current-version \
 Expected result during the ramp: the generator keeps submitting orders; some new `apps.Order`
 executions run on `apps v1`, and some run on `apps v2`.
 
-## 11. Inspect Proof
+### 11. Inspect Proof
 
 In Temporal UI:
 
@@ -326,7 +343,7 @@ curl -s "http://localhost:8071/admin/order-fulfillment/${ORDER_ID}"
 Expected result: old-path orders have a Kafka record; new-path orders have a `fulfillment.Order`
 workflow and no Kafka record.
 
-## 12. Complete The Cutover
+### 12. Complete The Cutover
 
 ```bash
 temporal worker deployment set-current-version \
@@ -349,23 +366,193 @@ temporal worker deployment describe \
 Expected result: both deployments are current on `v2`; old pinned executions continue on their
 original versions until they drain.
 
-Stop the generator when the exercise is complete:
+Stop the generator when Part 1 is complete:
 
 ```bash
-temporal workflow terminate \
-  --workflow-id "${ENABLEMENT_ID}" \
-  --namespace default \
-  --reason "Exercise 01 complete"
+./scripts/stop-load.sh
 ```
 
-Stop exercise services when you are done:
+Stop the workshop services when you are done with Part 1, or leave them running if you plan to
+continue to Part 2's KinD demo on the same machine:
 
 ```bash
 ./scripts/stop.sh
 ```
 
-## Takeaway
+### Part 1 Takeaway
 
 Code changes create new worker behavior. Starting a worker with a new build ID makes that behavior
 available to Temporal. Worker Deployment commands decide when new workflow executions receive that
 behavior.
+
+## Part 2: Automated Rollout with the Temporal Worker Controller
+
+Source material: [java/enablements/ENABLEMENT.md](../../java/enablements/ENABLEMENT.md)
+
+Part 1 had you call `set-current-version` and `set-ramping-version` by hand. Part 2 shows the same
+Worker Deployment lifecycle driven by the Temporal Worker Controller (TWC) from a
+`TemporalWorkerDeployment` manifest in Kubernetes. The application code does not change between
+Part 1 and Part 2 — only the operator surface.
+
+This part is instructor-led with `k9s` as the primary view. The commands below are runnable for
+self-paced replay.
+
+### How Part 2 maps to Part 1
+
+| Part 1 manual command | Part 2 controller behavior |
+|---|---|
+| `set-current-version --deployment-name processing --build-id v2` | TWC promotes the new processing Worker Deployment Version after pollers appear |
+| `set-ramping-version --deployment-name apps --build-id v2 --percentage 50` | TWC applies progressive rollout steps from the `TemporalWorkerDeployment` spec |
+| `set-current-version --deployment-name apps --build-id v2` | TWC completes the rollout after each ramp step's pause |
+| manually stop old workers | TWC sunsets old versions after configured drain delays |
+
+### Prerequisites
+
+- A local Kubernetes cluster (KinD or k3d) — see [DEPLOYMENT.md](../../DEPLOYMENT.md) for setup
+- Temporal Worker Controller v1.3.1 installed in the cluster (Helm chart + CRDs applied
+  separately; see [DEPLOYMENT.md](../../DEPLOYMENT.md))
+- The Part 1 `processing v2` code change applied (`send_fulfillment` proto field + guarded Kafka
+  handoff). The apps v2 change is optional for Part 2 — Part 2 demonstrates the processing
+  rollout.
+- `k9s` on PATH for visual observation
+
+### 1. Bring up the Kubernetes Demo Stack
+
+Choose one cluster runner and stay with it:
+
+```bash
+OVERLAY=local ./scripts/kind/demo-up.sh
+# or
+OVERLAY=local ./scripts/k3d/demo-up.sh
+```
+
+These project-root scripts (not workshop-local) bring up the full topology: namespaces, configmaps,
+secrets, the `TemporalWorkerDeployment` resource for `processing-workers`, and the supporting Java
+and Python services.
+
+Open `k9s` and stay in the `temporal-oms-processing` namespace:
+
+```text
+:ctx kind-temporal-oms
+:ns temporal-oms-processing
+:pods
+```
+
+If the CRD alias is registered, pin the controller view in a second pane:
+
+```text
+:temporalworkerdeployments
+```
+
+Confirm `processing-workers` pods are running with image tag `:v1`.
+
+### 2. Generate Sustained Load
+
+Tunnel from the host into the cluster so a host-side Temporal CLI can talk to in-cluster Temporal
+(or to Temporal Cloud through the cluster):
+
+```bash
+./scripts/kind/tunnel.sh
+# or
+./scripts/k3d/tunnel.sh
+```
+
+Start the `WorkerVersionEnablement` workflow (same generator as Part 1, lower volume for the
+shorter Part 2 timebox):
+
+```bash
+export ENABLEMENT_ID="twc-demo-$(date +%Y%m%d%H%M%S)"
+
+temporal workflow start \
+  --task-queue enablements \
+  --type WorkerVersionEnablement \
+  --workflow-id "${ENABLEMENT_ID}" \
+  --namespace default \
+  --input "{\"enablementId\":\"${ENABLEMENT_ID}\",\"orderCount\":20,\"submitRatePerMin\":5,\"timeout\":\"600s\",\"orderIdSeed\":\"order\"}" \
+  --input-meta 'encoding=json/protobuf'
+```
+
+Verify in Temporal UI that new `processing.Order` workflows are reporting `DeploymentVersion = v1`.
+
+### 3. Deploy processing v2 and Watch the Controller Drive the Rollout
+
+Build, load, and patch the `TemporalWorkerDeployment` to the new image tag:
+
+```bash
+./scripts/apply-twc-processing.sh
+# wraps: VERSION=v2 ./scripts/<runner>/deploy-processing-workers.sh
+```
+
+In `k9s`, watch:
+
+- `:pods` — a new `processing-workers` pod comes up alongside the v1 pod instead of replacing it
+  abruptly
+- `:temporalworkerdeployments` — the controller registers the new build ID, waits for pollers,
+  then ramps traffic per the `rollout` policy
+
+Confirm from the CLI:
+
+```bash
+temporal worker deployment describe \
+  --name processing \
+  --namespace processing
+```
+
+The ramp is driven by `k8s/processing-versioned/base/temporal-worker-deployment.yaml`:
+
+```yaml
+rollout:
+  strategy: Progressive
+  steps:
+    - rampPercentage: 50
+      pauseDuration: 30s
+    - rampPercentage: 90
+      pauseDuration: 30s
+```
+
+The controller implicitly proceeds to 100% after the final step. In-flight `processing.Order`
+executions stay pinned to v1 — exactly the contract Part 1 protected by hand.
+
+### 4. Migrate the Long-Running `support-team` Workflow
+
+`support-team` is intentionally long-lived; with default `pinned` versioning it would keep v1 pods
+alive indefinitely.
+
+Move it to `auto_upgrade`:
+
+```bash
+temporal workflow update-options \
+  --workflow-id "support-team" \
+  --versioning-override-behavior auto_upgrade \
+  --namespace processing
+```
+
+Why `auto_upgrade` is safe here and not for orders: an order workflow must finish on the
+fulfillment path it started with (pinned) — that was the entire point of Part 1. `support-team`
+has no per-instance fulfillment contract; it can pick up the new code at its next workflow task.
+
+### 5. Watch v1 Pods Sunset
+
+In `k9s` `:pods`, the v1 `processing-workers` pod scales down once no pinned executions remain.
+Sunset timing is controlled by the manifest:
+
+```yaml
+sunset:
+  scaledownDelay: 30s
+  deleteDelay: 120s
+```
+
+### Part 2 Takeaway
+
+Every manual Worker Deployment command from Part 1 has a controller-driven equivalent. TWC is not
+a different architecture — it performs the same Worker Deployment lifecycle from Kubernetes
+rollout state, lets the manifest declare ramp policy and sunset timing, and contrasts naturally
+with `auto_upgrade` for long-running workflows that have no per-instance versioning contract.
+
+## Combined Takeaway
+
+Code changes create new worker behavior. Temporal Worker Deployments decide which new behavior new
+executions receive. In Part 1 you drove that decision interactively with the CLI. In Part 2 the
+Temporal Worker Controller drove the same decision from declarative manifests. Either way, in-flight
+executions stay on the build they started with, and operators control the rollout — not workflow
+code.
