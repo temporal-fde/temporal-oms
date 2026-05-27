@@ -1,14 +1,15 @@
-# Demo Spec: Temporal Worker Controller Rollout
+# Spec: Workshop 1 Part 2 - Temporal Worker Controller Rollout
 
-**Workshop Slot:** Post-Exercise 01 demo
+**Workshop Slot:** Workshop 1 (Safely Move Fulfillment Ownership), Part 2
 **Target Timebox:** 10-15 minutes
-**Demo Mode:** Instructor-led with k9s as the primary Kubernetes observation tool
-**Prerequisite:** Exercise 01 has shown the manual Worker Deployment commands
+**Mode:** Instructor-led with k9s as the primary Kubernetes observation tool
+**Prerequisite:** Part 1 has shown the manual Worker Deployment commands
 **Source Material:** `java/enablements/ENABLEMENT.md`
+**Participant guide:** [`workshop/safe-fulfillment-handoff/README.md`](../../../workshop/safe-fulfillment-handoff/README.md) (Part 2 section)
 
 ## Purpose
 
-Exercise 01 has participants run the Worker Deployment lifecycle directly for the fulfillment
+Part 1 has participants run the Worker Deployment lifecycle directly for the fulfillment
 handoff migration:
 
 1. promote `processing v2`
@@ -29,7 +30,7 @@ The repository already has a concrete enablement walkthrough in `java/enablement
 called "Safely Promoting Processing Workers Under Load." This TWC demo should be derived from that
 walkthrough and updated as the Kubernetes/KinD manifests are brought current.
 
-The repo also has a `TemporalWorkerDeployment` manifest for processing under
+The repo also has a `WorkerDeployment` manifest for processing under
 `k8s/processing-versioned/`.
 
 The current application topology includes:
@@ -57,19 +58,19 @@ Show that TWC automates Worker Deployment rollout mechanics:
 - keeps in-flight pinned workflows on their original version
 - sunsets old worker versions after drain
 
-Secondary goal: show one place where `auto_upgrade` is useful. Exercise 01 rejects auto-upgrade for
+Secondary goal: show one place where `auto_upgrade` is useful. Part 1 rejects auto-upgrade for
 order workflows because each order must keep its chosen fulfillment path. This demo can contrast
 that with the long-running `support-team` workflow, where auto-upgrade can be used deliberately so
 an always-running workflow stops holding old worker pods alive.
 
 ## Narrative
 
-The talk track should explicitly connect Exercise 01's manual commands to the automated TWC flow:
+The talk track should explicitly connect Part 1's manual commands to the automated TWC flow:
 
-| Exercise 01 manual command | TWC production behavior |
+| Part 1 manual command | TWC production behavior |
 |---|---|
 | `set-current-version --deployment-name processing --build-id v2` | Controller promotes or ramps the new processing Worker Deployment Version after pollers appear |
-| `set-ramping-version --deployment-name apps --build-id v2 --percentage 50` | Controller applies progressive rollout steps from the `TemporalWorkerDeployment` spec |
+| `set-ramping-version --deployment-name apps --build-id v2 --percentage 50` | Controller applies progressive rollout steps from the `WorkerDeployment` spec |
 | `set-current-version --deployment-name apps --build-id v2` | Controller completes the rollout after gates/pass conditions |
 | manually stop old workers | Controller sunsets old versions after configured drain delays |
 
@@ -118,12 +119,14 @@ Goal: get the full stack running with processing workers at `v1`.
 
    Useful k9s views for this demo:
    - `:pods` — watch old and new worker pods coexist during rollout
-   - `:temporalworkerdeployments` or `:twd` if the CRD alias is available — watch controller status
+   - `:wd` (or the long form `:workerdeployments`) — watch controller status. The CRD
+     ships with `wd` in its `shortNames`, so the short form works out of the box once the CRD
+     is installed; no per-user alias config is required
    - `:deploy` — inspect regular Kubernetes Deployments if needed
    - `:cm` / `:secret` — confirm config and Temporal connection resources when debugging
 
-   If the CRD alias is not available in k9s, use the command/search prompt and enter
-   `temporalworkerdeployments`.
+   k9s shows one resource type at a time per process. To watch pods and the controller
+   simultaneously, open a second terminal or tmux pane and run a second `k9s` there.
 3. Start local Temporal if the enablements workflow runs locally:
 
    ```bash
@@ -196,23 +199,21 @@ Goal: trigger the TWC rollout and observe progressive promotion under load.
    - Java build
    - Docker image tag `temporal-oms/processing-workers:v2`
    - `kind load docker-image` for KinD, or `k3d image import` for k3d
-   - `kubectl patch temporalworkerdeployment processing-workers ...`
+   - `kubectl patch workerdeployment processing-workers ...`
 
 3. In k9s, stay in `temporal-oms-processing` and watch `:pods`.
    The important visual is the new `processing-workers` pod coming up alongside the existing `v1`
    pod instead of replacing it abruptly.
 
-4. In k9s, switch to the `TemporalWorkerDeployment` resource and watch controller status:
+4. In k9s, switch to the `WorkerDeployment` resource and watch controller status:
 
    ```text
-   :temporalworkerdeployments
+   :wd
    ```
 
-   or, if the alias is configured:
-
-   ```text
-   :twd
-   ```
+   The CRD's `shortNames: [wd]` makes the short form work without further configuration. Use
+   the long form `:workerdeployments` if the short name is not picked up for some
+   reason (older CRD bundle, etc.).
 
 5. Watch Temporal Worker Deployment state:
 
@@ -264,11 +265,11 @@ case where auto-upgrade is appropriate.
      deleteDelay: 120s
    ```
 
-### Phase 6: Tie Back To Exercise 01
+### Phase 6: Tie Back To Part 1
 
 Reinforce the distinction:
 
-- Exercise 01 used manual Worker Deployment commands so participants could see the primitives.
+- Part 1 used manual Worker Deployment commands so participants could see the primitives.
 - TWC performs those operations from Kubernetes rollout state.
 - Auto-upgrade was not useful for the fulfillment handoff because each order must keep its chosen
   path.
@@ -283,14 +284,14 @@ Use k9s as the primary live view:
 :ctx kind-temporal-oms
 :ns temporal-oms-processing
 :pods
-:temporalworkerdeployments
+:workerdeployments
 ```
 
 Raw command equivalents are useful for scripts, fallback, or exact copy/paste proof:
 
 ```bash
-kubectl get temporalworkerdeployments -A
-kubectl describe temporalworkerdeployment <name> -n <namespace>
+kubectl get workerdeployments -A
+kubectl describe workerdeployment <name> -n <namespace>
 kubectl get pods -n <namespace> -w
 ```
 
@@ -301,7 +302,7 @@ temporal worker deployment describe \
 ```
 
 ```bash
-kubectl patch temporalworkerdeployment <name> \
+kubectl patch workerdeployment <name> \
   -n <namespace> \
   --type merge \
   -p '{"spec":{"template":{"spec":{"containers":[{"name":"worker","image":"...:v2"}]}}}}'
@@ -321,10 +322,10 @@ raw commands are fallback and validation aids.
 
 ## Success Criteria
 
-- Participants can map each manual Exercise 01 Worker Deployment command to the corresponding TWC
+- Participants can map each manual Part 1 Worker Deployment command to the corresponding TWC
   behavior.
 - The demo shows at least one new Worker Deployment Version becoming available.
-- The demo shows a ramp or promotion controlled by `TemporalWorkerDeployment` policy.
+- The demo shows a ramp or promotion controlled by `WorkerDeployment` policy.
 - The demo shows old executions/pods are not abruptly killed during rollout.
 - The demo explains why `support-team` can be auto-upgraded while per-order fulfillment workflows
   stay pinned.
@@ -337,15 +338,15 @@ raw commands are fallback and validation aids.
 | Kubernetes manifests are stale | Demo cannot run | Complete k8s/KinD topology update before scripting this demo |
 | Rollout takes too long for live workshop | Timebox blown | Pre-stage images and keep traffic lightweight; use short pause/sunset durations in workshop overlay |
 | Controller status is hard to read live | Main point gets lost | Use k9s as the primary view, with Temporal CLI describe and Temporal UI as supporting proof |
-| k9s does not expose a friendly alias for `TemporalWorkerDeployment` | Demo friction | Use the k9s command prompt with `temporalworkerdeployments`, or fall back to `kubectl get temporalworkerdeployment ... -w` |
+| k9s does not expose a friendly alias for `WorkerDeployment` | Demo friction | Use the k9s command prompt with `workerdeployments`, or fall back to `kubectl get workerdeployment ... -w` |
 | Image build or KinD load fails | Demo blocked | Build/load images before workshop; use a scripted preflight |
-| TWC behavior looks like magic | Weak learning transfer from Exercise 01 | Always narrate the mapping from manual commands to controller actions |
-| Auto-upgrade seems to contradict Exercise 01 | Conceptual confusion | Explicitly contrast per-order fulfillment path preservation with long-running support workflow maintenance |
+| TWC behavior looks like magic | Weak learning transfer from Part 1 | Always narrate the mapping from manual commands to controller actions |
+| Auto-upgrade seems to contradict Part 1 | Conceptual confusion | Explicitly contrast per-order fulfillment path preservation with long-running support workflow maintenance |
 
 ## Open Questions
 
 - Should this demo keep using only `processing-workers`, as in `java/enablements/ENABLEMENT.md`,
-  or add an `apps-workers` rollout after Exercise 01 is implemented?
+  or add an `apps-workers` rollout after Part 1 is implemented?
 - Should the final version run against local Temporal, Temporal Cloud, or support both overlays?
 - Is `enablements-workers` local-only for this demo, or should the updated KinD topology deploy it?
 - Should we keep ramp percentages short for workshop overlays, e.g. 50% then 100% with 10-second

@@ -14,7 +14,7 @@ public interface DeploymentActivities {
   /**
    * Deploy v2 workers to the Kubernetes cluster using Temporal Worker Controller.
    * <p>
-   * This activity applies the TemporalWorkerDeployment v2 CRD via kubectl,
+   * This activity applies the WorkerDeployment v2 CRD via kubectl,
    * which instructs the Temporal Worker Controller to spin up v2 worker pods.
    *
    * @return

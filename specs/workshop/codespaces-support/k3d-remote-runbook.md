@@ -165,7 +165,7 @@ This should:
 9. build OMS Docker images
 10. import images with `k3d image import`
 11. apply the local Kustomize overlay
-12. apply the processing `TemporalWorkerDeployment` overlay
+12. apply the processing `WorkerDeployment` overlay
 
 If the command fails, capture the failing phase and continue to the diagnostics section before
 tearing down.
@@ -188,8 +188,8 @@ Inspect cluster state:
 
 ```bash
 kubectl get pods -A
-kubectl get temporalworkerdeployments -A
-kubectl get temporalconnections -A
+kubectl get workerdeployments -A
+kubectl get connections -A
 kubectl get events -A --sort-by=.lastTimestamp
 ```
 
@@ -199,8 +199,8 @@ Expected minimum success:
 - `temporal-worker-controller-manager` is running.
 - repo Traefik pod is running.
 - OMS API and worker pods are running or ready.
-- `temporal-oms-processing/processing-workers` exists as a `TemporalWorkerDeployment`.
-- processing TWD eventually reports `TemporalConnectionHealthy=True`, `Ready=True`, and
+- `temporal-oms-processing/processing-workers` exists as a `WorkerDeployment`.
+- processing WorkerDeployment eventually reports `ConnectionHealthy=True`, `Ready=True`, and
   `RolloutComplete=True`.
 
 Check Temporal's view of the processing worker deployment:
@@ -294,8 +294,8 @@ If Kubernetes came up:
 ```bash
 export KUBECONFIG=/tmp/k3d-config.yaml
 kubectl get pods -A -o wide > .workshop/evidence/k3d-codespaces/pods.txt
-kubectl get temporalworkerdeployments -A -o yaml > .workshop/evidence/k3d-codespaces/twds.yaml
-kubectl get temporalconnections -A -o yaml > .workshop/evidence/k3d-codespaces/temporalconnections.yaml
+kubectl get workerdeployments -A -o yaml > .workshop/evidence/k3d-codespaces/wds.yaml
+kubectl get connections -A -o yaml > .workshop/evidence/k3d-codespaces/connections.yaml
 kubectl get events -A --sort-by=.lastTimestamp > .workshop/evidence/k3d-codespaces/events.txt
 kubectl describe pods -A > .workshop/evidence/k3d-codespaces/pod-describes.txt
 kubectl logs -n temporal-worker-controller-system deploy/temporal-worker-controller-manager --tail=300 > .workshop/evidence/k3d-codespaces/twc-controller.log
@@ -315,7 +315,7 @@ Common blocker categories to record:
 | cert-manager/TWC install fails | Helm/kubectl error and events | retry only after confirming network and CRDs |
 | image build/import fails | Docker build or `k3d image import` output | check disk and Docker daemon |
 | pods cannot reach Temporal | netcheck results and app logs | test `host.k3d.internal`; consider Temporal Cloud |
-| TWD never becomes ready | TWD YAML and controller logs | inspect Temporal connection and worker pollers |
+| WorkerDeployment never becomes ready | WorkerDeployment YAML and controller logs | inspect Temporal connection and worker pollers |
 | health endpoints fail | service logs and tunnel log | inspect pod readiness and port-forward state |
 
 ## Cleanup
@@ -361,7 +361,7 @@ After each Codespaces run, add a dated note to `specs/workshop/codespaces-suppor
 - Whether `host.docker.internal:7233` worked from pods.
 - Whether `host.k3d.internal:7233` was tested and worked.
 - Whether `OVERLAY=local ./scripts/k3d/demo-up.sh` completed.
-- Final `TemporalWorkerDeployment` conditions.
+- Final `WorkerDeployment` conditions.
 - API health results.
 - Exact blockers and small fixes made.
 - Whether the environment was fully cleaned up.

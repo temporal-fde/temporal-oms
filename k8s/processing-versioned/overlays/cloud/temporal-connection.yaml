@@ -1,5 +1,5 @@
 apiVersion: temporal.io/v1alpha1
-kind: TemporalConnection
+kind: Connection
 metadata:
   name: temporal-connection
   namespace: temporal-oms-processing

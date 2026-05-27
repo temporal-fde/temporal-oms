@@ -17,19 +17,19 @@ while a new worker version is rolled out — demonstrating zero disruption to in
 - `processing-workers` pod running and registered with Temporal Cloud
 - Load flowing into the `processing` namespace
 
-Verify the `TemporalWorkerDeployment` is healthy:
+Verify the `WorkerDeployment` is healthy:
 
 ```bash
 export KUBECONFIG=/tmp/kind-config.yaml
-kubectl get temporalworkerdeployment processing-workers -n temporal-oms-processing
-# TemporalConnectionHealthy should be True
+kubectl get workerdeployment processing-workers -n temporal-oms-processing
+# ConnectionHealthy should be True
 ```
 
 ---
 
 ## Key Concepts
 
-**How versioning works:** The Temporal Worker Controller manages a single `TemporalWorkerDeployment`
+**How versioning works:** The Temporal Worker Controller manages a single `WorkerDeployment`
 resource. When you change the `image` tag, the controller:
 
 1. Computes a new build-id from the image tag + a hash of the pod template spec
@@ -97,13 +97,13 @@ VERSION=v2 OVERLAY=cloud ./scripts/deploy-processing-workers.sh
 The script will:
 1. Build `temporal-oms/processing-workers:v2` from source
 2. Load the image into KinD (`kind load docker-image ... --name temporal-oms`)
-3. Patch the `TemporalWorkerDeployment` image — this is the version trigger
+3. Patch the `WorkerDeployment` image — this is the version trigger
 
 Watch the rollout begin immediately:
 
 ```bash
 export KUBECONFIG=/tmp/kind-config.yaml
-kubectl get temporalworkerdeployment processing-workers -n temporal-oms-processing -w
+kubectl get workerdeployment processing-workers -n temporal-oms-processing -w
 ```
 
 ---
@@ -136,7 +136,7 @@ Once all v1 workflows complete, the controller scales down v1 pods (after `scale
 
 | File | Purpose |
 |------|---------|
-| `k8s/processing-versioned/base/temporal-worker-deployment.yaml` | The `TemporalWorkerDeployment` CRD — rollout strategy, sunset config, pod template |
+| `k8s/processing-versioned/base/temporal-worker-deployment.yaml` | The `WorkerDeployment` CRD — rollout strategy, sunset config, pod template |
 | `k8s/processing-versioned/overlays/cloud/temporal-connection.yaml` | Controller's connection to Temporal Cloud (uses automations API key) |
 | `k8s/processing-versioned/overlays/cloud/temporal-namespace-patch.yaml` | Patches `temporalNamespace` to the fully-qualified cloud namespace |
 | `scripts/deploy-processing-workers.sh` | Version bump script: build → load → patch |

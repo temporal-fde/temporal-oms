@@ -27,7 +27,7 @@ public class DeploymentActivitiesImpl implements DeploymentActivities {
     private String manifestTemplatePath;
 
     /**
-     * Deploy v2 workers to Kubernetes by applying TemporalWorkerDeployment CRD.
+     * Deploy v2 workers to Kubernetes by applying WorkerDeployment CRD.
      * <p>
      * Reads the manifest template, substitutes version/build-id variables, and applies via kubectl.
      *

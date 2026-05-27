@@ -34,8 +34,8 @@ OVERLAY=cloud ./scripts/app-deploy.sh  # builds images, deploys all apps
 
 # Worker Controller connected to Temporal Cloud
 export KUBECONFIG=/tmp/kind-config.yaml
-kubectl get temporalworkerdeployment processing-workers -n temporal-oms-processing
-# TemporalConnectionHealthy: True
+kubectl get workerdeployment processing-workers -n temporal-oms-processing
+# ConnectionHealthy: True
 
 # App worker logs show connection to cloud
 kubectl logs -n temporal-oms-processing -l app=processing-workers --tail=20
@@ -58,7 +58,7 @@ creates k8s secrets imperatively — no secret values are ever written to commit
 
 | config file | k8s secret | key | consumer |
 |---|---|---|---|
-| `config/acme.automations.secret.yaml` | `temporal-processing-api-key` | `TEMPORAL_API_KEY` | Temporal Worker Controller (`TemporalConnection`) |
+| `config/acme.automations.secret.yaml` | `temporal-processing-api-key` | `TEMPORAL_API_KEY` | Temporal Worker Controller (`Connection`) |
 | `config/acme.processing.secret.yaml` | `temporal-processing-api-key` | `temporal-secret.yaml` | Spring app workers (processing namespace) |
 | `config/acme.apps.secret.yaml` | `temporal-apps-api-key` | `temporal-secret.yaml` | Spring app workers (apps namespace) |
 
@@ -66,7 +66,7 @@ creates k8s secrets imperatively — no secret values are ever written to commit
 
 ## Troubleshooting
 
-**`TemporalConnectionHealthy: False` — `Request unauthorized`**
+**`ConnectionHealthy: False` — `Request unauthorized`**
 - The Worker Controller uses the `acme-automations-service-account` key, not the processing key
 - Verify `config/acme.automations.secret.yaml` has the correct API key
 - Re-run `OVERLAY=cloud ./scripts/infra-up.sh` to re-apply the secret
@@ -86,7 +86,7 @@ creates k8s secrets imperatively — no secret values are ever written to commit
 
 **`processing-workers` pod not appearing**
 - Check controller logs: `kubectl logs -n temporal-worker-controller-system deployment/temporal-worker-controller-manager -c manager --tail=30`
-- Common causes: `TemporalConnection` unauthorized, bad namespace format, invalid rollout config
+- Common causes: `Connection` unauthorized, bad namespace format, invalid rollout config
 
 ---
 

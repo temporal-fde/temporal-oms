@@ -193,7 +193,7 @@ message WorkerVersionEnablementState {
 
   - **Phase 2 (On transitionToV2() signal):**
     - Trigger activities:
-      - deployV2Workers() - kubectl apply TemporalWorkerDeployment v2 (via Temporal Worker Controller)
+      - deployV2Workers() - kubectl apply WorkerDeployment v2 (via Temporal Worker Controller)
       - registerCompatibility() - Temporal build-id setup
     - Update DemoPhase → TRANSITIONING_TO_V2
     - Continue submitting orders (now both v1 and v2 workers available)
@@ -458,7 +458,7 @@ Deliverables:
 
 4. **Transition (at ~2 min mark):** Deploy v2 workers, mark compatible
    - Script or curl: `POST http://localhost:8080/api/v1/enablements/worker-version/demo-session-1/transition-to-v2` (sends signal to workflow)
-   - Workflow activity deployV2Workers() applies TemporalWorkerDeployment v2 via Temporal Worker Controller
+   - Workflow activity deployV2Workers() applies WorkerDeployment v2 via Temporal Worker Controller
    - Workflow activity registerCompatibility() sets up Temporal build-ids
    - DemoPhase transitions to: TRANSITIONING_TO_V2 → RUNNING_BOTH
 
@@ -540,7 +540,7 @@ Deliverables:
 - **Activity execution tracking:** Orders inherit worker_version from activity context (Temporal tracks which worker executed activity)
 - **Workflow state size:** `WorkerVersionEnablementState` with 50 recent orders ~5KB; well within Temporal event size limits
 - **Error handling:** If activity fails (apps-api down), retry with exponential backoff per Temporal defaults; continue with remaining orders
-- **V2 Deployment:** deployV2Workers activity uses Temporal Worker Controller (TemporalWorkerDeployment CRD) to deploy v2 workers. Pre-existing TemporalWorkerDeployment manifest for v2 must be available in the cluster; activity applies it via kubectl
+- **V2 Deployment:** deployV2Workers activity uses Temporal Worker Controller (WorkerDeployment CRD) to deploy v2 workers. Pre-existing WorkerDeployment manifest for v2 must be available in the cluster; activity applies it via kubectl
 
 ---
 

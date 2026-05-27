@@ -1,5 +1,5 @@
 apiVersion: temporal.io/v1alpha1
-kind: TemporalWorkerDeployment
+kind: WorkerDeployment
 metadata:
   name: processing-workers
   namespace: temporal-oms-processing

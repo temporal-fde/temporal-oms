@@ -132,8 +132,8 @@ Current repo observations that affect planning:
   Temporal Spring may still construct/register configured worker objects when `spring.temporal.workers`
   is present, but it must not start polling. Readiness checks should distinguish registration logs
   from actual pollers.
-- The current Kubernetes manifests include a `TemporalWorkerDeployment` path for processing only.
-  The practical TWC path needs `TemporalWorkerDeployment` coverage for `apps`, `processing`, and
+- The current Kubernetes manifests include a `WorkerDeployment` path for processing only.
+  The practical TWC path needs `WorkerDeployment` coverage for `apps`, `processing`, and
   `fulfillment`. The plain `processing-workers` Deployment can remain as reference material for
   comparison, but should not be the operational path for the workshop.
 - A local k3d failure was caused by stale packaged Maven artifacts: source and `target/classes`
@@ -150,7 +150,7 @@ Current repo observations that affect planning:
 | Plain local processes in Codespaces | High | Lowest runtime surface area; no Docker image build loop; direct Temporal CLI; easiest to explain Worker Deployment commands | Needs a reliable process supervisor and warm Java builds | Use for attendee hands-on exercises |
 | Docker Compose in Codespaces | Medium | One command can start services; isolates per-service env | Still requires Docker and image builds/pulls; no TWC benefit; extra networking/logging failure modes | Keep as fallback only if local supervision proves unreliable |
 | KinD in Codespaces | Low for hands-on, medium for TWC | Existing scripts and manifests support KinD; good fallback and known local path | Heavier control plane; image load loop; not needed for Exercise 01 | Keep as supported instructor/demo path |
-| k3d in Codespaces | Low for hands-on, promising for TWC | k3d runs lightweight k3s in Docker; K3s is designed for lighter environments; k3d has image import and managed registry support; local TWC validation passed | Codespaces Docker networking and resource behavior still need validation; apps and fulfillment TWD manifests still need to be added | Add as a parallel instructor/demo path, not the attendee Exercise 01 path |
+| k3d in Codespaces | Low for hands-on, promising for TWC | k3d runs lightweight k3s in Docker; K3s is designed for lighter environments; k3d has image import and managed registry support; local TWC validation passed | Codespaces Docker networking and resource behavior still need validation; apps and fulfillment WorkerDeployment manifests still need to be added | Add as a parallel instructor/demo path, not the attendee Exercise 01 path |
 | Hybrid | High | Local processes for exercises, instructor-controlled k8s for TWC | Requires two clearly separated runbooks | Recommended architecture |
 
 ## Recommended Architecture
@@ -403,8 +403,8 @@ k3d validation path:
   - Installed the repo Traefik manifest without conflicting with bundled K3s Traefik.
   - Imported local OMS images with `k3d image import`.
   - Applied the local app overlay successfully after rebuilding stale `enablements-api` artifacts.
-  - Applied the existing processing `TemporalWorkerDeployment` local overlay.
-  - Observed `TemporalConnectionHealthy=True`, `Ready=True`, and `RolloutComplete=True` for
+  - Applied the existing processing `WorkerDeployment` local overlay.
+  - Observed `ConnectionHealthy=True`, `Ready=True`, and `RolloutComplete=True` for
     `temporal-oms-processing/processing-workers`.
   - Verified Temporal CLI saw the k3d-managed deployment with current build ID `v1-5cb8`.
 - `scripts/k3d/*` now mirrors the KinD demo workflow without replacing KinD:
@@ -412,10 +412,10 @@ k3d validation path:
   - kubeconfig path: `/tmp/k3d-config.yaml`
   - cluster create command disables bundled K3s Traefik with `--k3s-arg '--disable=traefik@server:0'`
   - local image transfer uses `k3d image import ... --cluster temporal-oms`
-  - app overlays and processing `TemporalWorkerDeployment` overlays are the same Kustomize inputs
+  - app overlays and processing `WorkerDeployment` overlays are the same Kustomize inputs
     as KinD.
 - Codespaces validation is still required before adopting k3d for any participant-facing runbook.
-- Before a polished k3d demo, add TWD manifests for `apps` and `fulfillment`; processing alone is
+- Before a polished k3d demo, add WorkerDeployment manifests for `apps` and `fulfillment`; processing alone is
   not representative of the intended TWC topology.
 
 Current parallel script surfaces:
@@ -574,7 +574,7 @@ Useful status output:
 | k3d behaves differently from KinD | Demo blocked | Treat k3d as validation work, not initial dependency |
 | `host.docker.internal` does not resolve from k3d/KinD in Codespaces | Kubernetes pods cannot reach local Temporal | Validate networking; prefer Temporal Cloud or in-cluster Temporal for k8s demo if needed |
 | Stale Maven jars or Docker images do not match source | Runtime behavior differs between local source runs and k8s images | Build each v2 worker after its code change and verify the running process reports the expected build ID |
-| TWD coverage exists only for processing | TWC demo does not match workshop topology | Add and validate TWD manifests for `apps`, `processing`, and `fulfillment` before relying on the demo |
+| WorkerDeployment coverage exists only for processing | TWC demo does not match workshop topology | Add and validate WorkerDeployment manifests for `apps`, `processing`, and `fulfillment` before relying on the demo |
 
 ## Open Questions
 
@@ -592,7 +592,7 @@ Useful status output:
 - Should the instructor Codespace demo prefer KinD or k3d after fresh Codespaces validation?
 - For the k3d Codespaces path, should Temporal run on the devcontainer host, in the k3d cluster, or
   in Temporal Cloud?
-- What should the `apps` and `fulfillment` `TemporalWorkerDeployment` names, build IDs, and rollout
+- What should the `apps` and `fulfillment` `WorkerDeployment` names, build IDs, and rollout
   steps be?
 - Should `scripts/setup-temporal-namespaces.sh` set build IDs to `v1` for workshop mode rather than
   `local`?
@@ -635,7 +635,7 @@ TWC validation:
   - TWC install
   - image import or registry
   - host Temporal connectivity from pods
-  - `TemporalWorkerDeployment` rollout
+  - `WorkerDeployment` rollout
   - k9s observation flow
 - Repeat the k3d validation inside a fresh Codespace on the proposed instructor machine size using
   [`k3d-remote-runbook.md`](./k3d-remote-runbook.md).

@@ -10,10 +10,12 @@ kubectl delete namespace \
   temporal-oms-processing \
   temporal-oms-fulfillment \
   temporal-oms-enablements \
+  --ignore-not-found \
+  --wait=false \
   2>/dev/null || true
 
 echo "→ Stopping Traefik..."
-kubectl delete namespace traefik 2>/dev/null || true
+kubectl delete namespace traefik --ignore-not-found --wait=false 2>/dev/null || true
 
 echo "→ Deleting KinD cluster..."
 kind delete cluster --name temporal-oms 2>/dev/null || true
