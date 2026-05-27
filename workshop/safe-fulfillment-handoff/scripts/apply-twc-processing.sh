@@ -33,7 +33,7 @@ VERSION="$VERSION" "$DEPLOY_SCRIPT"
 cat <<EOF
 
 Done. Watch the rollout:
-  ./scripts/watch-twc-rollout.sh
+  $SCRIPT_DIR/watch-twc-rollout.sh
 or:
   kubectl get temporalworkerdeployment processing-workers -n temporal-oms-processing -w
 EOF

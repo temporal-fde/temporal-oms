@@ -397,6 +397,11 @@ Part 1 and Part 2 — only the operator surface.
 This part is instructor-led with `k9s` as the primary view. The commands below are runnable for
 self-paced replay.
 
+> **Working directory:** unlike Part 1, run Part 2 commands from the **repo root**. The
+> project-root scripts (`scripts/kind/*`, `scripts/k3d/*`) assume that cwd. Workshop-local
+> helpers are invoked with their full path,
+> e.g. `./workshop/safe-fulfillment-handoff/scripts/apply-twc-processing.sh`.
+
 ### How Part 2 maps to Part 1
 
 | Part 1 manual command | Part 2 controller behavior |
@@ -482,11 +487,12 @@ Verify in Temporal UI that new `processing.Order` workflows are reporting `Deplo
 
 ### 3. Deploy processing v2 and Watch the Controller Drive the Rollout
 
-Build, load, and patch the `TemporalWorkerDeployment` to the new image tag:
+Build, load, and patch the `TemporalWorkerDeployment` to the new image tag (run from repo root):
 
 ```bash
-./scripts/apply-twc-processing.sh
+./workshop/safe-fulfillment-handoff/scripts/apply-twc-processing.sh
 # wraps: VERSION=v2 ./scripts/<runner>/deploy-processing-workers.sh
+# override either with: VERSION=v3 RUNNER=k3d ./workshop/safe-fulfillment-handoff/scripts/apply-twc-processing.sh
 ```
 
 In `k9s`, watch:
