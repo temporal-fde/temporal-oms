@@ -203,12 +203,12 @@ env:
 
 **Kubernetes Deployment (via Temporal Worker Controller):**
 
-We use the Temporal Worker Controller (temporalio/temporal-worker-controller) with TemporalWorkerDeployment CRD for versioned worker management.
+We use the Temporal Worker Controller (temporalio/temporal-worker-controller) with WorkerDeployment CRD for versioned worker management.
 
 ```yaml
 # k8s/base/processing/temporal-worker-deployment-v1.yaml
 apiVersion: workload.temporal.io/v1
-kind: TemporalWorkerDeployment
+kind: WorkerDeployment
 metadata:
   name: processing-workers-v1
   namespace: temporal-oms-processing
@@ -220,7 +220,7 @@ spec:
 
 # k8s/base/processing/temporal-worker-deployment-v2.yaml (new for v2)
 apiVersion: workload.temporal.io/v1
-kind: TemporalWorkerDeployment
+kind: WorkerDeployment
 metadata:
   name: processing-workers-v2
   namespace: temporal-oms-processing
@@ -373,7 +373,7 @@ Deliverables:
 
 ### External Dependencies
 - Temporal 1.33+ (build-id support)
-- Temporal Worker Controller v1.1.2+ (temporalio/temporal-worker-controller) - for managing TemporalWorkerDeployment CRD
+- Temporal Worker Controller v1.7.0+ (temporalio/temporal-worker-controller; Helm chart 0.26.0+) - for managing WorkerDeployment CRD
 - Kubernetes 1.24+
 
 ### Cross-Cutting Concerns
@@ -383,7 +383,7 @@ Deliverables:
 - **Validation framework:** Needed to verify zero failures (from validation-framework spec)
 
 ### Rollout Blockers
-- [ ] Temporal Worker Controller deployed (v1.1.2+) with TemporalWorkerDeployment CRD
+- [ ] Temporal Worker Controller deployed (v1.7.0+ / Helm chart 0.26.0+) with WorkerDeployment CRD
 - [ ] Temporal cluster supports build-ids (verify version 1.33+)
 - [ ] Processing workflows forward-compatible with v2
 - [ ] Enablement workflow deployment ready (needed for test scenarios)

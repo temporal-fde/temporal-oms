@@ -30,7 +30,7 @@ The repository already has a concrete enablement walkthrough in `java/enablement
 called "Safely Promoting Processing Workers Under Load." This TWC demo should be derived from that
 walkthrough and updated as the Kubernetes/KinD manifests are brought current.
 
-The repo also has a `TemporalWorkerDeployment` manifest for processing under
+The repo also has a `WorkerDeployment` manifest for processing under
 `k8s/processing-versioned/`.
 
 The current application topology includes:
@@ -70,7 +70,7 @@ The talk track should explicitly connect Part 1's manual commands to the automat
 | Part 1 manual command | TWC production behavior |
 |---|---|
 | `set-current-version --deployment-name processing --build-id v2` | Controller promotes or ramps the new processing Worker Deployment Version after pollers appear |
-| `set-ramping-version --deployment-name apps --build-id v2 --percentage 50` | Controller applies progressive rollout steps from the `TemporalWorkerDeployment` spec |
+| `set-ramping-version --deployment-name apps --build-id v2 --percentage 50` | Controller applies progressive rollout steps from the `WorkerDeployment` spec |
 | `set-current-version --deployment-name apps --build-id v2` | Controller completes the rollout after gates/pass conditions |
 | manually stop old workers | Controller sunsets old versions after configured drain delays |
 
@@ -119,8 +119,8 @@ Goal: get the full stack running with processing workers at `v1`.
 
    Useful k9s views for this demo:
    - `:pods` — watch old and new worker pods coexist during rollout
-   - `:twd` (or the long form `:temporalworkerdeployments`) — watch controller status. The CRD
-     ships with `twd` in its `shortNames`, so the short form works out of the box once the CRD
+   - `:wd` (or the long form `:workerdeployments`) — watch controller status. The CRD
+     ships with `wd` in its `shortNames`, so the short form works out of the box once the CRD
      is installed; no per-user alias config is required
    - `:deploy` — inspect regular Kubernetes Deployments if needed
    - `:cm` / `:secret` — confirm config and Temporal connection resources when debugging
@@ -199,20 +199,20 @@ Goal: trigger the TWC rollout and observe progressive promotion under load.
    - Java build
    - Docker image tag `temporal-oms/processing-workers:v2`
    - `kind load docker-image` for KinD, or `k3d image import` for k3d
-   - `kubectl patch temporalworkerdeployment processing-workers ...`
+   - `kubectl patch workerdeployment processing-workers ...`
 
 3. In k9s, stay in `temporal-oms-processing` and watch `:pods`.
    The important visual is the new `processing-workers` pod coming up alongside the existing `v1`
    pod instead of replacing it abruptly.
 
-4. In k9s, switch to the `TemporalWorkerDeployment` resource and watch controller status:
+4. In k9s, switch to the `WorkerDeployment` resource and watch controller status:
 
    ```text
-   :twd
+   :wd
    ```
 
-   The CRD's `shortNames: [twd]` makes the short form work without further configuration. Use
-   the long form `:temporalworkerdeployments` if the short name is not picked up for some
+   The CRD's `shortNames: [wd]` makes the short form work without further configuration. Use
+   the long form `:workerdeployments` if the short name is not picked up for some
    reason (older CRD bundle, etc.).
 
 5. Watch Temporal Worker Deployment state:
@@ -284,14 +284,14 @@ Use k9s as the primary live view:
 :ctx kind-temporal-oms
 :ns temporal-oms-processing
 :pods
-:temporalworkerdeployments
+:workerdeployments
 ```
 
 Raw command equivalents are useful for scripts, fallback, or exact copy/paste proof:
 
 ```bash
-kubectl get temporalworkerdeployments -A
-kubectl describe temporalworkerdeployment <name> -n <namespace>
+kubectl get workerdeployments -A
+kubectl describe workerdeployment <name> -n <namespace>
 kubectl get pods -n <namespace> -w
 ```
 
@@ -302,7 +302,7 @@ temporal worker deployment describe \
 ```
 
 ```bash
-kubectl patch temporalworkerdeployment <name> \
+kubectl patch workerdeployment <name> \
   -n <namespace> \
   --type merge \
   -p '{"spec":{"template":{"spec":{"containers":[{"name":"worker","image":"...:v2"}]}}}}'
@@ -325,7 +325,7 @@ raw commands are fallback and validation aids.
 - Participants can map each manual Part 1 Worker Deployment command to the corresponding TWC
   behavior.
 - The demo shows at least one new Worker Deployment Version becoming available.
-- The demo shows a ramp or promotion controlled by `TemporalWorkerDeployment` policy.
+- The demo shows a ramp or promotion controlled by `WorkerDeployment` policy.
 - The demo shows old executions/pods are not abruptly killed during rollout.
 - The demo explains why `support-team` can be auto-upgraded while per-order fulfillment workflows
   stay pinned.
@@ -338,7 +338,7 @@ raw commands are fallback and validation aids.
 | Kubernetes manifests are stale | Demo cannot run | Complete k8s/KinD topology update before scripting this demo |
 | Rollout takes too long for live workshop | Timebox blown | Pre-stage images and keep traffic lightweight; use short pause/sunset durations in workshop overlay |
 | Controller status is hard to read live | Main point gets lost | Use k9s as the primary view, with Temporal CLI describe and Temporal UI as supporting proof |
-| k9s does not expose a friendly alias for `TemporalWorkerDeployment` | Demo friction | Use the k9s command prompt with `temporalworkerdeployments`, or fall back to `kubectl get temporalworkerdeployment ... -w` |
+| k9s does not expose a friendly alias for `WorkerDeployment` | Demo friction | Use the k9s command prompt with `workerdeployments`, or fall back to `kubectl get workerdeployment ... -w` |
 | Image build or KinD load fails | Demo blocked | Build/load images before workshop; use a scripted preflight |
 | TWC behavior looks like magic | Weak learning transfer from Part 1 | Always narrate the mapping from manual commands to controller actions |
 | Auto-upgrade seems to contradict Part 1 | Conceptual confusion | Explicitly contrast per-order fulfillment path preservation with long-running support workflow maintenance |

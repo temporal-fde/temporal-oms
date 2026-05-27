@@ -23,7 +23,7 @@ This workshop has two parts:
   local Temporal dev server; no Kubernetes required.
 - **Part 2 — Automated rollout with the Temporal Worker Controller** (15 min, instructor-led):
   the same code change, deployed to a Kubernetes cluster, with TWC driving the rollout from a
-  `TemporalWorkerDeployment` manifest. Requires KinD or k3d.
+  `WorkerDeployment` manifest. Requires KinD or k3d.
 
 Part 2 reuses the Part 1 v2 code. The pedagogical point of Part 2 is that nothing in workflow code
 changes — only the operator surface differs (CLI commands vs. Kubernetes-driven rollout).
@@ -391,7 +391,7 @@ Source material: [java/enablements/ENABLEMENT.md](../../java/enablements/ENABLEM
 
 Part 1 had you call `set-current-version` and `set-ramping-version` by hand. Part 2 shows the same
 Worker Deployment lifecycle driven by the Temporal Worker Controller (TWC) from a
-`TemporalWorkerDeployment` manifest in Kubernetes. The application code does not change between
+`WorkerDeployment` manifest in Kubernetes. The application code does not change between
 Part 1 and Part 2 — only the operator surface.
 
 This part is instructor-led with `k9s` as the primary view. The commands below are runnable for
@@ -407,14 +407,14 @@ self-paced replay.
 | Part 1 manual command | Part 2 controller behavior |
 |---|---|
 | `set-current-version --deployment-name processing --build-id v2` | TWC promotes the new processing Worker Deployment Version after pollers appear |
-| `set-ramping-version --deployment-name apps --build-id v2 --percentage 50` | TWC applies progressive rollout steps from the `TemporalWorkerDeployment` spec |
+| `set-ramping-version --deployment-name apps --build-id v2 --percentage 50` | TWC applies progressive rollout steps from the `WorkerDeployment` spec |
 | `set-current-version --deployment-name apps --build-id v2` | TWC completes the rollout after each ramp step's pause |
 | manually stop old workers | TWC sunsets old versions after configured drain delays |
 
 ### Prerequisites
 
 - A local Kubernetes cluster (KinD or k3d) — see [DEPLOYMENT.md](../../DEPLOYMENT.md) for setup
-- Temporal Worker Controller v1.3.1 installed in the cluster (Helm chart + CRDs applied
+- Temporal Worker Controller v1.7.0 installed in the cluster (Helm chart 0.26.0 + CRDs applied
   separately; see [DEPLOYMENT.md](../../DEPLOYMENT.md))
 - The Part 1 `processing v2` code change applied (`send_fulfillment` proto field + guarded Kafka
   handoff). The apps v2 change is optional for Part 2 — Part 2 demonstrates the processing
@@ -432,7 +432,7 @@ OVERLAY=local ./scripts/k3d/demo-up.sh
 ```
 
 These project-root scripts (not workshop-local) bring up the full topology: namespaces, configmaps,
-secrets, the `TemporalWorkerDeployment` resource for `processing-workers`, and the supporting Java
+secrets, the `WorkerDeployment` resource for `processing-workers`, and the supporting Java
 and Python services.
 
 Open `k9s` and stay in the `temporal-oms-processing` namespace:
@@ -444,15 +444,15 @@ Open `k9s` and stay in the `temporal-oms-processing` namespace:
 ```
 
 k9s shows one resource type at a time per process. To watch the controller as well, either
-switch the current view (`:twd` for `TemporalWorkerDeployment` — the CRD ships the `twd`
+switch the current view (`:wd` for `WorkerDeployment` — the CRD ships the `wd`
 short name, so no alias registration is required) or open `k9s` in a second terminal / tmux
-pane and run `:twd` there so you can watch pods and controller state side by side:
+pane and run `:wd` there so you can watch pods and controller state side by side:
 
 ```text
-:twd
+:wd
 ```
 
-Use the long form `:temporalworkerdeployments` if the short name is not picked up for any
+Use the long form `:workerdeployments` if the short name is not picked up for any
 reason (e.g., an older CRD bundle).
 
 Confirm `processing-workers` pods are running with image tag `:v1`.
@@ -487,7 +487,7 @@ Verify in Temporal UI that new `processing.Order` workflows are reporting `Deplo
 
 ### 3. Deploy processing v2 and Watch the Controller Drive the Rollout
 
-Build, load, and patch the `TemporalWorkerDeployment` to the new image tag (run from repo root):
+Build, load, and patch the `WorkerDeployment` to the new image tag (run from repo root):
 
 ```bash
 ./workshop/safe-fulfillment-handoff/scripts/apply-twc-processing.sh
@@ -499,7 +499,7 @@ In `k9s`, watch:
 
 - `:pods` — a new `processing-workers` pod comes up alongside the v1 pod instead of replacing it
   abruptly
-- `:temporalworkerdeployments` — the controller registers the new build ID, waits for pollers,
+- `:workerdeployments` — the controller registers the new build ID, waits for pollers,
   then ramps traffic per the `rollout` policy
 
 Confirm from the CLI:

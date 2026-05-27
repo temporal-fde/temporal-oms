@@ -58,11 +58,13 @@ kubectl apply -k "k8s/overlays/${OVERLAY}" >/dev/null
 if [ "$PROCESSING_WORKER_MODE" = "versioned" ]; then
   echo "  using WorkerDeployment for processing-workers"
   kubectl delete deployment processing-workers -n temporal-oms-processing --ignore-not-found >/dev/null
+  # Best-effort cleanup for clusters previously booted with pre-v1.7 TWC CRDs.
   kubectl delete temporalworkerdeployment processing-workers -n temporal-oms-processing --ignore-not-found --wait=false >/dev/null
   kubectl delete temporalconnection temporal-connection -n temporal-oms-processing --ignore-not-found --wait=false >/dev/null
   kubectl apply -k "k8s/processing-versioned/overlays/${OVERLAY}" >/dev/null
 else
   kubectl delete workerdeployment processing-workers -n temporal-oms-processing --ignore-not-found --wait=false >/dev/null
+  # Best-effort cleanup for clusters previously booted with pre-v1.7 TWC CRDs.
   kubectl delete temporalworkerdeployment processing-workers -n temporal-oms-processing --ignore-not-found --wait=false >/dev/null
 fi
 kubectl apply -f k8s/ingress/apps-api-ingress.yaml >/dev/null
