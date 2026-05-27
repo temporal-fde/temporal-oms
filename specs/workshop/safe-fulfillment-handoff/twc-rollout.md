@@ -119,12 +119,14 @@ Goal: get the full stack running with processing workers at `v1`.
 
    Useful k9s views for this demo:
    - `:pods` — watch old and new worker pods coexist during rollout
-   - `:temporalworkerdeployments` or `:twd` if the CRD alias is available — watch controller status
+   - `:twd` (or the long form `:temporalworkerdeployments`) — watch controller status. The CRD
+     ships with `twd` in its `shortNames`, so the short form works out of the box once the CRD
+     is installed; no per-user alias config is required
    - `:deploy` — inspect regular Kubernetes Deployments if needed
    - `:cm` / `:secret` — confirm config and Temporal connection resources when debugging
 
-   If the CRD alias is not available in k9s, use the command/search prompt and enter
-   `temporalworkerdeployments`.
+   k9s shows one resource type at a time per process. To watch pods and the controller
+   simultaneously, open a second terminal or tmux pane and run a second `k9s` there.
 3. Start local Temporal if the enablements workflow runs locally:
 
    ```bash
@@ -206,14 +208,12 @@ Goal: trigger the TWC rollout and observe progressive promotion under load.
 4. In k9s, switch to the `TemporalWorkerDeployment` resource and watch controller status:
 
    ```text
-   :temporalworkerdeployments
-   ```
-
-   or, if the alias is configured:
-
-   ```text
    :twd
    ```
+
+   The CRD's `shortNames: [twd]` makes the short form work without further configuration. Use
+   the long form `:temporalworkerdeployments` if the short name is not picked up for some
+   reason (older CRD bundle, etc.).
 
 5. Watch Temporal Worker Deployment state:
 

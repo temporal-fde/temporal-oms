@@ -438,11 +438,17 @@ Open `k9s` and stay in the `temporal-oms-processing` namespace:
 :pods
 ```
 
-If the CRD alias is registered, pin the controller view in a second pane:
+k9s shows one resource type at a time per process. To watch the controller as well, either
+switch the current view (`:twd` for `TemporalWorkerDeployment` — the CRD ships the `twd`
+short name, so no alias registration is required) or open `k9s` in a second terminal / tmux
+pane and run `:twd` there so you can watch pods and controller state side by side:
 
 ```text
-:temporalworkerdeployments
+:twd
 ```
+
+Use the long form `:temporalworkerdeployments` if the short name is not picked up for any
+reason (e.g., an older CRD bundle).
 
 Confirm `processing-workers` pods are running with image tag `:v1`.
 
