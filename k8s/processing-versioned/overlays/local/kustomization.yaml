@@ -8,7 +8,7 @@ resources:
 patches:
   # Local Temporal doesn't use API keys — remove the temporal-secret volume mount entirely
   - target:
-      kind: TemporalWorkerDeployment
+      kind: WorkerDeployment
       name: processing-workers
     patch: |-
       - op: remove

@@ -10,6 +10,8 @@ kubectl delete namespace \
   temporal-oms-processing \
   temporal-oms-fulfillment \
   temporal-oms-enablements \
+  --ignore-not-found \
+  --wait=false \
   2>/dev/null || true
 
 echo "✅ KinD applications removed"

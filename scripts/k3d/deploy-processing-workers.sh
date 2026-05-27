@@ -28,13 +28,13 @@ docker build -q -t "${IMAGE}" \
 echo "→ Importing image into k3d cluster..."
 k3d image import "${IMAGE}" --cluster temporal-oms
 
-echo "→ Patching TemporalWorkerDeployment to ${IMAGE}..."
-kubectl patch temporalworkerdeployment processing-workers \
+echo "→ Patching WorkerDeployment to ${IMAGE}..."
+kubectl patch workerdeployment processing-workers \
   -n temporal-oms-processing \
-  --type=merge \
-  -p "{\"spec\":{\"template\":{\"spec\":{\"containers\":[{\"name\":\"worker\",\"image\":\"${IMAGE}\"}]}}}}"
+  --type=json \
+  -p "[{\"op\":\"replace\",\"path\":\"/spec/template/spec/containers/0/image\",\"value\":\"${IMAGE}\"}]"
 
 echo ""
 echo "✅ processing-workers ${VERSION} deployed to k3d."
 echo "   Watch the rollout with:"
-echo "   kubectl get temporalworkerdeployment processing-workers -n temporal-oms-processing -w"
+echo "   kubectl get workerdeployment processing-workers -n temporal-oms-processing -w"

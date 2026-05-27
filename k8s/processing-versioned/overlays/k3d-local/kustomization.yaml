@@ -6,12 +6,12 @@ resources:
 
 patches:
   - target:
-      kind: TemporalConnection
+      kind: Connection
       name: temporal-connection
       namespace: temporal-oms-processing
     patch: |-
       apiVersion: temporal.io/v1alpha1
-      kind: TemporalConnection
+      kind: Connection
       metadata:
         name: temporal-connection
         namespace: temporal-oms-processing

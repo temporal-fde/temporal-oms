@@ -21,7 +21,7 @@ kubectl get pods -n temporal-oms-enablements --no-headers 2>/dev/null | awk '{pr
 
 echo ""
 echo "Temporal Worker Deployments:"
-kubectl get temporalworkerdeployments -A 2>/dev/null || echo "  (Temporal Worker Controller CRDs not found)"
+kubectl get workerdeployments -A 2>/dev/null || echo "  (Temporal Worker Controller CRDs not found)"
 
 echo ""
 echo "Temporal Server:"

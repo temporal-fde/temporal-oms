@@ -23,8 +23,8 @@ MODE="${MODE:-kubectl}"
 case "$MODE" in
   kubectl)
     require_command kubectl
-    echo "Watching TemporalWorkerDeployment ${NAME} in ${NAMESPACE} (Ctrl-C to exit)..."
-    kubectl get temporalworkerdeployment "$NAME" -n "$NAMESPACE" -w
+    echo "Watching WorkerDeployment ${NAME} in ${NAMESPACE} (Ctrl-C to exit)..."
+    kubectl get workerdeployment "$NAME" -n "$NAMESPACE" -w
     ;;
   k9s)
     require_command k9s

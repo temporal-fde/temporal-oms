@@ -63,11 +63,14 @@ echo "→ Deploying to k3d..."
 echo "  using kustomize overlay: ${KUSTOMIZE_OVERLAY}"
 kubectl apply -k "k8s/overlays/${KUSTOMIZE_OVERLAY}" >/dev/null
 if [ "$PROCESSING_WORKER_MODE" = "versioned" ]; then
-  echo "  using TemporalWorkerDeployment for processing-workers"
+  echo "  using WorkerDeployment for processing-workers"
   kubectl delete deployment processing-workers -n temporal-oms-processing --ignore-not-found >/dev/null
+  kubectl delete temporalworkerdeployment processing-workers -n temporal-oms-processing --ignore-not-found --wait=false >/dev/null
+  kubectl delete temporalconnection temporal-connection -n temporal-oms-processing --ignore-not-found --wait=false >/dev/null
   kubectl apply -k "k8s/processing-versioned/overlays/${KUSTOMIZE_OVERLAY}" >/dev/null
 else
-  kubectl delete temporalworkerdeployment processing-workers -n temporal-oms-processing --ignore-not-found >/dev/null
+  kubectl delete workerdeployment processing-workers -n temporal-oms-processing --ignore-not-found --wait=false >/dev/null
+  kubectl delete temporalworkerdeployment processing-workers -n temporal-oms-processing --ignore-not-found --wait=false >/dev/null
 fi
 kubectl apply -f k8s/ingress/apps-api-ingress.yaml >/dev/null
 kubectl apply -f k8s/ingress/processing-api-ingress.yaml >/dev/null
@@ -81,14 +84,14 @@ done
 sleep 8
 
 if [ "$PROCESSING_WORKER_MODE" = "versioned" ]; then
-  echo "→ Waiting for processing TemporalWorkerDeployment..."
+  echo "→ Waiting for processing WorkerDeployment..."
   if ! kubectl wait \
     --for=condition=Ready \
-    temporalworkerdeployment/processing-workers \
+    workerdeployment/processing-workers \
     -n temporal-oms-processing \
     --timeout=180s; then
-    echo "ERROR: processing TemporalWorkerDeployment did not become Ready." >&2
-    kubectl describe temporalworkerdeployment processing-workers -n temporal-oms-processing >&2 || true
+    echo "ERROR: processing WorkerDeployment did not become Ready." >&2
+    kubectl describe workerdeployment processing-workers -n temporal-oms-processing >&2 || true
     exit 1
   fi
 fi

@@ -1,8 +1,11 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$PROJECT_DIR"
+
+TEMPORAL_WORKER_CONTROLLER_CHART_VERSION="${TEMPORAL_WORKER_CONTROLLER_CHART_VERSION:-0.26.0}"
+TEMPORAL_WORKER_CONTROLLER_NAMESPACE="temporal-worker-controller-system"
 
 echo "🔧 Setting up KinD infrastructure..."
 
@@ -35,27 +38,20 @@ else
 fi
 
 echo "→ Installing Temporal Worker Controller CRDs..."
-if ! kubectl get crd temporalworkerdeployments.temporal.io &>/dev/null; then
-    CRDS_BASE="https://raw.githubusercontent.com/temporalio/temporal-worker-controller/v1.5.1/helm/temporal-worker-controller-crds/templates"
-    kubectl apply -f "${CRDS_BASE}/temporal.io_temporalconnections.yaml"
-    kubectl apply -f "${CRDS_BASE}/temporal.io_temporalworkerdeployments.yaml"
-    kubectl apply -f "${CRDS_BASE}/temporal.io_workerresourcetemplates.yaml"
-    kubectl wait --for=condition=established crd/temporalworkerdeployments.temporal.io --timeout=60s
-    kubectl wait --for=condition=established crd/temporalconnections.temporal.io --timeout=60s
-    kubectl wait --for=condition=established crd/workerresourcetemplates.temporal.io --timeout=60s
-else
-    echo "✓ Temporal Worker Controller CRDs already installed"
-fi
+helm template temporal-worker-controller-crds \
+    oci://docker.io/temporalio/temporal-worker-controller-crds \
+    --version "$TEMPORAL_WORKER_CONTROLLER_CHART_VERSION" \
+    --namespace "$TEMPORAL_WORKER_CONTROLLER_NAMESPACE" | kubectl apply -f - >/dev/null
+kubectl wait --for=condition=established crd/connections.temporal.io --timeout=60s
+kubectl wait --for=condition=established crd/workerdeployments.temporal.io --timeout=60s
+kubectl wait --for=condition=established crd/workerresourcetemplates.temporal.io --timeout=60s
 
 echo "→ Installing Temporal Worker Controller..."
-if ! kubectl get deployment temporal-worker-controller-manager -n temporal-worker-controller-system &>/dev/null; then
-    helm install temporal-worker-controller \
-        oci://docker.io/temporalio/temporal-worker-controller \
-        --namespace temporal-worker-controller-system \
-        --create-namespace
-else
-    echo "✓ Temporal Worker Controller already installed"
-fi
+helm upgrade --install temporal-worker-controller \
+    oci://docker.io/temporalio/temporal-worker-controller \
+    --version "$TEMPORAL_WORKER_CONTROLLER_CHART_VERSION" \
+    --namespace "$TEMPORAL_WORKER_CONTROLLER_NAMESPACE" \
+    --create-namespace >/dev/null
 
 echo "→ Installing Traefik Ingress..."
 kubectl apply -f "$PROJECT_DIR/k8s/ingress/traefik-deployment.yaml" >/dev/null

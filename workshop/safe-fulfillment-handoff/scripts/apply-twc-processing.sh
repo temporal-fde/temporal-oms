@@ -35,5 +35,5 @@ cat <<EOF
 Done. Watch the rollout:
   $SCRIPT_DIR/watch-twc-rollout.sh
 or:
-  kubectl get temporalworkerdeployment processing-workers -n temporal-oms-processing -w
+  kubectl get workerdeployment processing-workers -n temporal-oms-processing -w
 EOF
