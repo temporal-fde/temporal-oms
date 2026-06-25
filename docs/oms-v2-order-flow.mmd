@@ -1,0 +1,111 @@
+sequenceDiagram
+    actor CA as Commerce App
+    actor PP as Payment Processor
+
+    box Apps Namespace
+    participant AO as apps.Order
+    end
+
+    box Processing Namespace
+    participant PO as processing.Order
+    end
+
+    box Fulfillment Namespace
+    participant FO as fulfillment.Order
+    participant SA as ShippingAgent
+    end
+
+    participant EA as enablements-api
+
+    %% Capture phase
+
+    CA->>AO: submitOrder [Update]
+    PP->>AO: capturePayment [Update]
+    Note over AO: Both inputs received<br/>-> tryScheduleProcessOrder()
+
+    %% Concurrent: kick off fulfillment early + run processing
+
+    par validateOrder Nexus op (UpdateWithStart) || processOrder Nexus op
+        AO->>FO: validateOrder [Nexus / UpdateWithStart]
+        FO->>EA: verifyAddress [Activity / fulfillment-carriers]
+        EA-->>FO: EasyPost verified address
+        FO-->>AO: ValidateOrderResponse
+        Note over FO: execute() unblocked<br/>loadOptions [LocalActivity]<br/>holdItems [Nexus -> InventoryService -> EA]
+    and
+        AO->>PO: processOrder [Nexus]
+        Note over PO: validate order (EA/Commerce App)<br/>enrich items (EA/PIMS)<br/>validate payment (EA/Payment Processor)
+        PO-->>AO: GetProcessOrderStateResponse (enriched items)
+    end
+
+    %% Dispatch fulfillment
+
+    Note over AO: validatePromise.get() - ensures address verified
+    AO->>FO: fulfillOrder [Nexus Update / wait ACCEPTED]
+    Note over AO: await all handlers -> apps.Order completes
+
+    %% fulfillOrder Update handler
+
+    Note over FO: fulfillOrder Update received
+    FO->>EA: reserveItems [Nexus -> InventoryService]
+    EA-->>FO: ReserveItemsResponse (reservation_id)
+
+    %% ShippingAgent agentic loop
+
+    FO->>SA: recommendShippingOption [Nexus Update]
+
+    par Agent pre-fetch (parallel)
+        SA->>EA: lookup_inventory_address [Nexus -> InventoryService]
+        EA-->>SA: origin warehouse + EasyPost address
+    and
+        SA->>EA: verify_address [Activity / fulfillment-shipping]
+        EA-->>SA: verified EasyPost destination
+    end
+
+    Note over SA: cache miss<br/>-> build_system_prompt [LocalActivity]
+
+    loop ReAct - Reason then Act (until finalize_recommendation)
+        SA->>SA: call_llm [Activity / agents]
+        par Tool dispatch (concurrent)
+            SA->>EA: get_carrier_rates [Activity / fulfillment-shipping]
+            EA-->>SA: ShippingOption list
+        and
+            SA->>EA: get_location_events [Activity / agents]
+            EA-->>SA: LocationRiskSummary + events
+        end
+        opt MARGIN_SPIKE or SLA_BREACH guard (must call before finalizing)
+            SA->>EA: find_alternate_warehouse [Nexus -> InventoryService]
+            EA-->>SA: alternate warehouse address (or empty)
+        end
+    end
+
+    Note over SA: finalize_recommendation tool call<br/>-> cache ShippingOptionsResult (TTL 30 min)
+    SA-->>FO: RecommendShippingOptionResponse<br/>(outcome / recommended_option_id / margin_delta_cents)
+
+    Note over FO: applyRecommendation()<br/>upsert margin_leak SearchAttribute if MARGIN_SPIKE<br/>upsert sla_breach_days SearchAttribute if SLA_BREACH
+
+    %% Terminal activities (concurrent)
+
+    par Concurrent terminal operations
+        FO->>EA: printShippingLabel [Activity / fulfillment-carriers]
+        EA-->>FO: tracking_number + label_url
+    and
+        FO->>EA: deductInventory [Nexus -> InventoryService]
+        EA-->>FO: DeductInventoryResponse
+    end
+
+    Note over FO: FulfillOrderResponse -> apps.Order Nexus caller<br/>(tracking_number + ShippingSelection)
+
+    %% Delivery completion
+
+    Note over FO: await notifyDeliveryStatus<br/>(pre-populated from FulfillOrderRequest in demo,<br/>carrier webhook signal in production)
+    FO->>FO: notifyDeliveryStatus -> DELIVERY_STATUS_DELIVERED
+    Note over FO: FULFILLMENT_STATUS_DELIVERED -> workflow complete
+
+    %% Cancellation / compensation (any time before fulfillOrder)
+
+    opt Cancellation before fulfillOrder
+        CA->>AO: cancelOrder [Signal]
+        Note over AO: compensateOrder() - detached scope
+        AO->>FO: cancelOrder [Signal]
+        Note over FO: cancelFlag = true<br/>detached scope: releaseHold [Nexus -> InventoryService -> EA]
+    end

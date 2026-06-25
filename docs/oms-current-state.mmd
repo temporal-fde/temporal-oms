@@ -1,0 +1,40 @@
+flowchart TD
+  subgraph Orders_Processing_Current_State["Orders Processing Current State"]
+    CommerceWebhook["Commerce App Integration\n(webhook)"]
+    TopicCommerce[("topic:commerce")]
+    OMSUpdatePayment["OMS: UpdatePayment"]
+    WriteToDB["Write To DB"]
+    HasAllData{"Has All Data?"}
+    TopicEnrich[("topic:orders.enrich-order")]
+    EnrichAPI["Enrich API"]
+    DB1[("DB")]
+    TopicPayments[("topic:payments")]
+    PaymentProcessor["Payment Processor"]
+    TopicOrdersValidate[("topic:orders.validate")]
+    OMSValidate["OMS: Validate"]
+    OrderValid{"Order Valid?"}
+    TopicOrdersAllocate[("topic:orders.allocate")]
+    AllocationService["Allocation Service"]
+    OrderCorrectionApp["Order Correction App"]
+    TopicOrdersDlq[("topic:orders.dlq")]
+    DB2[("DB")]
+    CronProcessOrders["Cron: ProcessOrders"]
+    OMSTransform["OMS: Transform"]
+    OrderOK{"Order OK?"}
+  end
+
+  CommerceWebhook --> TopicCommerce --> OMSUpdatePayment --> WriteToDB --> HasAllData
+  HasAllData -- "Yes" --> TopicEnrich --> EnrichAPI --> DB1
+  HasAllData -- "No" --> TopicOrdersDlq --> DB2
+
+  PaymentProcessor -- "publishes" --> TopicPayments
+  TopicPayments --> OMSUpdatePayment
+
+  CronProcessOrders -- "publishes *" --> TopicOrdersValidate
+  TopicOrdersValidate --> OMSValidate --> OrderValid
+  OrderValid -- "Yes" --> TopicOrdersAllocate --> AllocationService
+  OrderValid -- "No" --> OrderCorrectionApp
+
+  TopicEnrich --> OMSTransform --> OrderOK
+  OrderOK -- "Yes" --> WriteToDB
+  OrderOK -- "No" --> TopicOrdersDlq
