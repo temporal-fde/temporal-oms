@@ -43,7 +43,7 @@ mvn clean install
 3. Restart the worker terminal (Ctrl+C, then re-run)
 4. New workflow instances use the updated code; in-flight instances continue on the old code
 
-> **Worker Versioning note:** When running locally without the Temporal Worker Controller, restarting a worker does not change the current version — it just restarts the same build-id. If you need a new version to be the current version (e.g. to test versioning behavior), re-run `scripts/setup-temporal-namespaces.sh` with a different `--build-id`. In Kubernetes, bumping the image tag is the version trigger — see [java/enablements/README.md](java/enablements/README.md).
+> **Worker Versioning note:** When running locally without the Temporal Worker Controller, restarting a worker does not change the current version — it just restarts the same build-id. If you need a new version to be the current version (e.g. to test versioning behavior), re-run `scripts/setup-temporal-namespaces.sh` with a different `--build-id`. In Kubernetes, bumping the image tag is the version trigger — see [java/enablements/README.md](../java/enablements/README.md).
 
 ---
 

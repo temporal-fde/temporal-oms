@@ -134,7 +134,7 @@ brew install java maven nodejs kind k3d kubectl
 
 If deploying to **Temporal Cloud** (OVERLAY=cloud), API keys are managed through gitignored local config files. They are never written to committed files.
 
-See **[README.md — Level 3](README.md)** for the full one-time Temporal Cloud setup (namespaces, service accounts, API keys, Nexus endpoints).
+See **[README.md — Level 3](../README.md)** for the full one-time Temporal Cloud setup (namespaces, service accounts, API keys, Nexus endpoints).
 
 Once you have your API keys, copy the templates and fill them in:
 

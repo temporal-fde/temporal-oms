@@ -428,6 +428,6 @@ temporal worker deployment describe \
 - **[DEVELOPMENT.md](DEVELOPMENT.md)** — Protocol Buffers, workflow changes, debugging, testing
 - **[DEPLOYMENT.md](DEPLOYMENT.md)** — Kubernetes deployment (KinD + Temporal Cloud)
 - **[Temporal Documentation](https://docs.temporal.io/)** — Complete SDK docs
-- **[domain/apps/README.md](./domain/apps/README.md)** — Apps context details
-- **[domain/processing/README.md](./domain/processing/README.md)** — Processing context details
-- **[scripts/scenarios/README.md](./scripts/scenarios/README.md)** — Demo scenarios
+- **[domain/apps/README.md](../domain/apps/README.md)** — Apps context details
+- **[domain/processing/README.md](../domain/processing/README.md)** — Processing context details
+- **[scripts/scenarios/README.md](../scripts/scenarios/README.md)** — Demo scenarios

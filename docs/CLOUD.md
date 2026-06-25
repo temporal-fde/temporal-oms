@@ -2,7 +2,7 @@
 
 Configure Temporal OMS to connect to Temporal Cloud instead of a local Temporal server.
 
-> **First time?** Complete the one-time Temporal Cloud setup in [README.md](README.md) — Level 3, Step 1 before continuing here.
+> **First time?** Complete the one-time Temporal Cloud setup in [README.md](../README.md) — Level 3, Step 1 before continuing here.
 
 ---
 

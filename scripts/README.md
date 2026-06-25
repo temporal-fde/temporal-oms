@@ -2,7 +2,7 @@
 
 Modular scripts for managing the Temporal OMS Kubernetes deployment with either KinD or k3d.
 
-> For complete deployment documentation including Temporal Cloud API key setup, see [../DEPLOYMENT.md](../DEPLOYMENT.md).
+> For complete deployment documentation including Temporal Cloud API key setup, see [../docs/DEPLOYMENT.md](../docs/DEPLOYMENT.md).
 
 ## Runtime Paths
 

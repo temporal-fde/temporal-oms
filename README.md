@@ -118,10 +118,10 @@ Start at Level 1 and work up. Each level builds on the previous.
 
 Fastest path to a working system. All services run as local JVM processes against a local Temporal server.
 
-> **Important:** The workers use Worker Versioning (Temporal Deployments). Without the Temporal Worker Controller in the environment, you must call `set-current-version` manually before tasks will be dispatched — `scripts/setup-temporal-namespaces.sh` handles this. See [GETTING_STARTED.md](GETTING_STARTED.md) for the full explanation.
+> **Important:** The workers use Worker Versioning (Temporal Deployments). Without the Temporal Worker Controller in the environment, you must call `set-current-version` manually before tasks will be dispatched — `scripts/setup-temporal-namespaces.sh` handles this. See [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md) for the full explanation.
 
-→ **[GETTING_STARTED.md](GETTING_STARTED.md)** — local setup, demo scenarios, troubleshooting
-→ **[DEVELOPMENT.md](DEVELOPMENT.md)** — protobuf changes, workflow modifications, debugging, testing
+→ **[docs/GETTING_STARTED.md](docs/GETTING_STARTED.md)** — local setup, demo scenarios, troubleshooting
+→ **[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)** — protobuf changes, workflow modifications, debugging, testing
 
 ---
 
@@ -138,7 +138,7 @@ Full stack in a local Kubernetes cluster. Choose one runner and use that directo
 ./scripts/k3d/app-deploy.sh
 ```
 
-→ **[DEPLOYMENT.md](DEPLOYMENT.md)** for full prerequisites, verification, and troubleshooting.
+→ **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** for full prerequisites, verification, and troubleshooting.
 
 ---
 
@@ -222,7 +222,7 @@ OVERLAY=cloud ./scripts/k3d/infra-up.sh
 OVERLAY=cloud ./scripts/k3d/app-deploy.sh
 ```
 
-→ **[CLOUD.md](CLOUD.md)** for verification steps and troubleshooting.
+→ **[docs/CLOUD.md](docs/CLOUD.md)** for verification steps and troubleshooting.
 
 ---
 
@@ -267,8 +267,8 @@ Demonstrates zero-downtime worker version rollouts against a live order stream. 
 | [docs/prd/README.md](docs/prd/README.md) | Business requirements and full application scope |
 | [docs/prd/v1-order-processing.md](docs/prd/v1-order-processing.md) | v1 PRD: Processing phase requirements and data specs |
 | [docs/prd/v2-smart-fulfillment.md](docs/prd/v2-smart-fulfillment.md) | v2 PRD: Smart Fulfillment with LLM Shipping Agent |
-| [GETTING_STARTED.md](GETTING_STARTED.md) | Local setup, demo scenarios, and troubleshooting |
-| [DEPLOYMENT.md](DEPLOYMENT.md) | Kubernetes deployment (Level 2 and 3) |
-| [CLOUD.md](CLOUD.md) | Temporal Cloud verification and troubleshooting |
-| [DEVELOPMENT.md](DEVELOPMENT.md) | Protobuf changes, workflow modifications, testing |
-| [CHANGELOG.md](CHANGELOG.md) | Version history |
+| [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md) | Local setup, demo scenarios, and troubleshooting |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Kubernetes deployment (Level 2 and 3) |
+| [docs/CLOUD.md](docs/CLOUD.md) | Temporal Cloud verification and troubleshooting |
+| [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | Protobuf changes, workflow modifications, testing |
+| [docs/CHANGELOG.md](docs/CHANGELOG.md) | Version history |

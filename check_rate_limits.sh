@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# handy to use for workshop prep...
 set -euo pipefail
 
 : "${ANTHROPIC_API_KEY:?ANTHROPIC_API_KEY is not set}"
