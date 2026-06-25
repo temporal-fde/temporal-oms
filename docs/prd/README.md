@@ -20,7 +20,7 @@ The workshops follow this application through two major versions, each introduci
 
 ### v1 — Order Processing
 
-**[PRD: OMS Order Processing](docs/prd-v1-order-processing.md)**
+**[PRD: OMS Order Processing](v1-order-processing.md)**
 
 The initial scope targets the **Processing** phase. The existing system uses a fragile Kafka-based chain of consumers to validate, enrich, and coordinate orders. Temporal replaces this with a durable workflow that:
 
@@ -36,7 +36,7 @@ The initial scope targets the **Processing** phase. The existing system uses a f
 
 ### v2 — Smart Fulfillment
 
-**[PRD: OMS Smart Fulfillment](docs/prd-v2-smart-fulfillment.md)**
+**[PRD: OMS Smart Fulfillment](v2-smart-fulfillment.md)**
 
 The second scope replaces the legacy Kafka-based fulfillment consumer with a **Temporal Smart Fulfillment Workflow** powered by an LLM Shipping Agent. Where v1 dropped a message on a Kafka topic and walked away, v2 owns the fulfillment process end-to-end:
 
