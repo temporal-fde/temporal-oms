@@ -1,0 +1,64 @@
+flowchart TD
+
+  subgraph Ext["External Systems"]
+    CA["Commerce App<br/>webhook + API"]
+    PP["Payment Processor"]
+    Carrier["Carrier<br/>webhook"]
+  end
+
+  subgraph AppsNS["Temporal — Apps Namespace"]
+    AO["apps.Order<br/>Collects submitOrder + capturePayment inputs<br/>Orchestrates processing and fulfillment via Nexus"]
+  end
+
+  subgraph ProcNS["Temporal — Processing Namespace"]
+    PO["processing.Order<br/>Validate order via Commerce App<br/>Enrich items via PIMS<br/>Confirm payment via Payment Processor"]
+  end
+
+  subgraph FulfillNS["Temporal — Fulfillment Namespace  (Java)"]
+    FO["fulfillment.Order<br/>validateOrder Update — verify shipping address early<br/>holdItems — eager inventory hold while processing runs<br/>fulfillOrder Update — reserve inventory<br/>recommendShippingOption — call ShippingAgent via Nexus<br/>printShippingLabel + deductInventory — concurrent<br/>await notifyDeliveryStatus Signal"]
+    Attrs[("margin_leak<br/>sla_breach_days<br/>Search Attributes")]
+  end
+
+  subgraph AgentsNS["Temporal — Agents Namespace  (Python)"]
+    SA["ShippingAgent<br/>WorkflowID: customer_id  —  long-running per customer<br/>ReAct agentic loop  —  30 min result cache<br/>recommend_shipping_option Update"]
+    AT["Activity Tools<br/>lookup_inventory_address  ·  get_carrier_rates<br/>get_location_events  ·  find_alternate_warehouse"]
+  end
+
+  EA[("enablements-api<br/>Integration abstraction layer<br/>Shipping  ·  Inventory  ·  Commerce App  ·  PIMS<br/>fixture-backed for workshops  —  live credentials for production")]
+
+  CA -->|"submitOrder [Update]"| AO
+  PP -->|"capturePayment [Update]"| AO
+
+  AO -->|"processOrder [Nexus]"| PO
+  PO -.->|"GetProcessOrderStateResponse<br/>enriched items"| AO
+  PO -->|"validateOrder + enrichOrder<br/>Activities"| EA
+
+  AO -->|"validateOrder [Nexus UpdateWithStart]<br/>fires concurrent with processOrder"| FO
+  AO -->|"fulfillOrder [Nexus Update — ACCEPTED]<br/>after processOrder completes"| FO
+
+  FO -->|"verifyAddress  holdItems  reserveItems<br/>deductInventory  releaseHold  printShippingLabel<br/>Activities via fulfillment-carriers + InventoryService Nexus"| EA
+
+  FO -->|"recommendShippingOption<br/>[Nexus Update]"| SA
+  SA -.->|"ShippingRecommendation<br/>RecommendationOutcome + ShippingOptions"| FO
+
+  SA --> AT
+  AT -->|"all tool calls route through"| EA
+
+  Carrier -->|"notifyDeliveryStatus [Signal]<br/>DELIVERED or CANCELED"| FO
+  FO --- Attrs
+
+  classDef ext fill:#e8f4fd,stroke:#2980b9,color:#1a252f
+  classDef workflow fill:#eee8ff,stroke:#6f42c1,color:#1a1a2e
+  classDef fulfillment fill:#e9f7ef,stroke:#218838,color:#0d2b1a
+  classDef agent fill:#f3e8ff,stroke:#7b3fe4,color:#1a0a2e
+  classDef tool fill:#e9f7ef,stroke:#27ae60,color:#0d2b1a
+  classDef integration fill:#fef9e7,stroke:#d4ac0d,color:#2d1f00
+  classDef attr fill:#f2f3f4,stroke:#7f8c8d,color:#2c3e50
+
+  class CA,PP,Carrier ext
+  class AO,PO workflow
+  class FO fulfillment
+  class SA agent
+  class AT tool
+  class EA integration
+  class Attrs attr

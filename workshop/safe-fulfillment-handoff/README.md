@@ -413,9 +413,9 @@ self-paced replay.
 
 ### Prerequisites
 
-- A local Kubernetes cluster (KinD or k3d) — see [DEPLOYMENT.md](../../DEPLOYMENT.md) for setup
+- A local Kubernetes cluster (KinD or k3d) — see [DEPLOYMENT.md](../../docs/DEPLOYMENT.md) for setup
 - Temporal Worker Controller v1.7.0 installed in the cluster (Helm chart 0.26.0 + CRDs applied
-  separately; see [DEPLOYMENT.md](../../DEPLOYMENT.md))
+  separately; see [DEPLOYMENT.md](../../docs/DEPLOYMENT.md))
 - The Part 1 `processing v2` code change applied (`send_fulfillment` proto field + guarded Kafka
   handoff). The apps v2 change is optional for Part 2 — Part 2 demonstrates the processing
   rollout.

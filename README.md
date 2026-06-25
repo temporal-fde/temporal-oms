@@ -1,25 +1,81 @@
-# ACME Order Management System (OMS)
+# ACME Order Management System
 
-A Java-based Order Management System demonstrating Temporal workflow orchestration across bounded contexts — apps and processing — connected via Nexus.
-
-> **Business requirements and architecture scope:** [PROJECT_REQUIREMENTS_DOCUMENT.md](PROJECT_REQUIREMENTS_DOCUMENT.md)
+A reference application for a fictional clothing retailer's Order Management System, built progressively with Temporal. This is the foundation for hands-on workshops that show how Temporal applications are designed, evolved, and operated in production.
 
 ---
 
-## Steps to Temporal Deployment Maturity
+## What This Application Teaches
 
-Start at Level 1 and work up. Each level builds on the previous.
+The application is structured as two evolving versions of the same business problem. Each version adds a new layer of Temporal capability, and the workshops take you through real operational scenarios against live running code.
 
-| Level | Description | What you need |
-|-------|-------------|---------------|
-| **1** | Run locally — no Kubernetes | Java, Maven, Docker, Temporal CLI |
-| **2** | KinD or k3d cluster with local Temporal | Level 1 + KinD or k3d, Helm, kubectl, k9s |
-| **3** | KinD or k3d cluster connected to Temporal Cloud | Level 2 + Temporal Cloud account, namespaces, service accounts, API keys |
-| **4** | Worker Versioning Enablement (live demo) | Level 3 running + load generation |
+### Temporal Concepts Covered
+
+| Concept | Where |
+|---------|-------|
+| Signals, timers, activities | `apps.Order` and `processing.Order` workflows |
+| Rate limiting via worker options | Commerce App validation (`processing` context) |
+| Worker Deployments (versioning) | All workers — foundation for the rollout workshop |
+| Nexus cross-namespace operations | `apps.Order` → `fulfillment.Order` |
+| `UpdateWithStart` | `fulfillment.Order` early-start pattern |
+| Child workflow lifecycle | ShippingAgent scoped to `apps.Order` |
+| LLM agent integration | `ShippingAgent` reliability harness (Python) |
+| Workflow pinning and draining | v1 → v2 ownership transfer |
+| Temporal Worker Controller | Kubernetes-automated rollout (Part 2 of handoff workshop) |
+
+### Workshops
+
+| Workshop | Goal |
+|---------|------|
+| [Safely Move Fulfillment Ownership](workshop/safe-fulfillment-handoff/README.md) | Transfer ownership of fulfillment between bounded contexts under live traffic without feature flags or downtime — first manually via CLI, then automated via the Temporal Worker Controller on Kubernetes |
+| [Observe the ShippingAgent Reliability Harness](workshop/observe-shipping-agent/README.md) | Trace an AI-assisted shipping recommendation end to end, connecting the advisory LLM boundary to durable workflow state via Search Attributes |
 
 ---
 
-## Tool Prerequisites
+## The Application
+
+ACME's OMS processes clothing orders through three phases:
+
+| Phase | Description |
+|-------|-------------|
+| **Capture** | Collect order from Commerce App and Payment Processor |
+| **Processing** | Validate, enrich, and coordinate order data across downstream services |
+| **Fulfillment** | Allocate inventory, select carrier, generate label, track delivery |
+
+### v1 — Order Processing
+
+Temporal replaces a fragile Kafka-based consumer chain. The `processing.Order` workflow aggregates inputs that arrive out of order, validates order data against a rate-limited Commerce App API, waits up to 30 days for Payment Capture, and emits an enriched order to fulfillment.
+
+→ [PRD: v1 Order Processing](docs/prd/v1-order-processing.md)
+
+### v2 — Smart Fulfillment
+
+An LLM-driven `ShippingAgent` replaces the static downstream Kafka consumer. The `apps.Order` workflow starts `fulfillment.Order` early via Nexus (`UpdateWithStart`), then hands off the enriched order once processing completes. The agent re-shops carrier rates at fulfillment time to protect margins and route around supply chain disruptions.
+
+→ [PRD: v2 Smart Fulfillment](docs/prd/v2-smart-fulfillment.md)
+
+### Architecture
+
+Orders flow across two Temporal namespaces — `apps` and `processing` — connected to the fulfillment bounded context via Nexus:
+
+```
+Commerce App ──→  apps namespace           ──Nexus──→  fulfillment (Python)
+                  apps.Order workflow                   fulfillment.Order workflow
+                  (Java)                                ShippingAgent workflow
+
+Payment Processor → processing namespace
+                    processing.Order workflow
+                    (Java)
+```
+
+→ Full requirements and evolution: [docs/prd/README.md](docs/prd/README.md)
+
+A web UI for order management and observability is in development.
+
+---
+
+## Getting Started
+
+### Tool Prerequisites
 
 All tool versions are pinned in [`.tool-versions`](.tool-versions). Install with [asdf](https://asdf-vm.com/):
 
@@ -45,14 +101,27 @@ asdf install
 
 ---
 
+## Steps to Temporal Deployment Maturity
+
+Start at Level 1 and work up. Each level builds on the previous.
+
+| Level | Description | What you need |
+|-------|-------------|---------------|
+| **1** | Run locally — no Kubernetes | Java, Maven, Docker, Temporal CLI |
+| **2** | KinD or k3d cluster with local Temporal | Level 1 + KinD or k3d, Helm, kubectl, k9s |
+| **3** | KinD or k3d cluster connected to Temporal Cloud | Level 2 + Temporal Cloud account, namespaces, service accounts, API keys |
+| **4** | Worker Versioning Enablement (live demo) | Level 3 running + load generation |
+
+---
+
 ## Level 1 — Run Locally (No Kubernetes)
 
 Fastest path to a working system. All services run as local JVM processes against a local Temporal server.
 
-> **Important:** The workers use Worker Versioning (Temporal Deployments). Without the Temporal Worker Controller in the environment, you must call `set-current-version` manually before tasks will be dispatched — `scripts/setup-temporal-namespaces.sh` handles this. See [GETTING_STARTED.md](GETTING_STARTED.md) for the full explanation.
+> **Important:** The workers use Worker Versioning (Temporal Deployments). Without the Temporal Worker Controller in the environment, you must call `set-current-version` manually before tasks will be dispatched — `scripts/setup-temporal-namespaces.sh` handles this. See [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md) for the full explanation.
 
-→ **[GETTING_STARTED.md](GETTING_STARTED.md)** — local setup, demo scenarios, troubleshooting
-→ **[DEVELOPMENT.md](DEVELOPMENT.md)** — protobuf changes, workflow modifications, debugging, testing
+→ **[docs/GETTING_STARTED.md](docs/GETTING_STARTED.md)** — local setup, demo scenarios, troubleshooting
+→ **[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)** — protobuf changes, workflow modifications, debugging, testing
 
 ---
 
@@ -69,7 +138,7 @@ Full stack in a local Kubernetes cluster. Choose one runner and use that directo
 ./scripts/k3d/app-deploy.sh
 ```
 
-→ **[DEPLOYMENT.md](DEPLOYMENT.md)** for full prerequisites, verification, and troubleshooting.
+→ **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** for full prerequisites, verification, and troubleshooting.
 
 ---
 
@@ -153,7 +222,7 @@ OVERLAY=cloud ./scripts/k3d/infra-up.sh
 OVERLAY=cloud ./scripts/k3d/app-deploy.sh
 ```
 
-→ **[CLOUD.md](CLOUD.md)** for verification steps and troubleshooting.
+→ **[docs/CLOUD.md](docs/CLOUD.md)** for verification steps and troubleshooting.
 
 ---
 
@@ -188,3 +257,18 @@ Demonstrates zero-downtime worker version rollouts against a live order stream. 
 | `scripts/k3d/tunnel.sh` | Port-forward APIs for local access through k3d |
 
 → **[scripts/README.md](scripts/README.md)** for detailed usage.
+
+---
+
+## Documentation
+
+| Document | Contents |
+|----------|----------|
+| [docs/prd/README.md](docs/prd/README.md) | Business requirements and full application scope |
+| [docs/prd/v1-order-processing.md](docs/prd/v1-order-processing.md) | v1 PRD: Processing phase requirements and data specs |
+| [docs/prd/v2-smart-fulfillment.md](docs/prd/v2-smart-fulfillment.md) | v2 PRD: Smart Fulfillment with LLM Shipping Agent |
+| [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md) | Local setup, demo scenarios, and troubleshooting |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Kubernetes deployment (Level 2 and 3) |
+| [docs/CLOUD.md](docs/CLOUD.md) | Temporal Cloud verification and troubleshooting |
+| [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | Protobuf changes, workflow modifications, testing |
+| [docs/CHANGELOG.md](docs/CHANGELOG.md) | Version history |
