@@ -1,15 +1,36 @@
 # Getting Started with Temporal OMS
 
-Use this path first when you want a local system running quickly. It starts Temporal in one
-terminal and all OMS APIs and workers from another terminal.
+Use this path first when you want a local system running quickly. It uses local processes only:
+no Kubernetes, no Docker, and no Temporal Cloud account.
 
 ## Fastest Local Start
 
-Install prerequisites first. In Codespaces they are already installed. On your machine, install the
-tool versions pinned in `.tool-versions`; with asdf, run `asdf install` from the repo root after
-cloning.
+Required commands for a fresh clone:
 
-You will use **two terminals** to run this local setup.
+- JDK 21 (`java` and `javac`)
+- Maven 3.9+
+- Temporal CLI
+- `uv` with Python 3.10+ for the Python fulfillment worker
+- `curl` for readiness checks
+- `xh` for the bundled scenario scripts
+
+Docker, KinD, k3d, kubectl, Helm, k9s, yq, buf, Node.js, and Temporal Cloud credentials are not
+required for this local path. Node.js is only needed if you run the web UI. `buf` is only needed if
+you regenerate protobuf contracts.
+
+In Codespaces, these tools are already installed. On your machine,
+[asdf](https://asdf-vm.com/guide/getting-started.html) can install the pinned asdf-managed versions
+from `.tool-versions` after `./scripts/setup-asdf-plugins.sh` adds the matching plugins. Install
+the Temporal CLI separately and manually install only the local subset if you want the smallest
+setup.
+
+```bash
+./scripts/setup-asdf-plugins.sh
+asdf install
+```
+
+The first run may download Maven and Python dependencies unless they are already cached. You will
+use **two terminals** to run this local setup.
 
 ### 1. Clone GitHub Repository
 
@@ -33,19 +54,20 @@ Temporal UI will be available at `http://localhost:8233`.
 Run this from the repo root in *another terminal*:
 
 ```bash
-./scripts/setup-temporal-namespaces.sh
 ./scripts/local-up.sh
 ```
 
-`local-up.sh` starts the APIs, Java workers, enablements workers, fulfillment workers, and Python
-fulfillment worker. On a fresh clone, it builds missing Java artifacts before starting services.
+`local-up.sh` verifies Temporal is reachable, creates the local namespaces, registers Nexus
+endpoints, sets local Worker Deployment versions, and starts the APIs, Java workers, enablements
+workers, fulfillment workers, and Python fulfillment worker. On a fresh clone, it builds missing
+Java artifacts before starting services.
 
 ### Optional Dry Run
 
 Run the valid-order scenario between `local-up.sh` and `local-down.sh`:
 
 ```bash
-./scripts/runscenario.sh # run the "valid-order" scenario
+./scripts/runscenario.sh valid-order --yes
 ```
 
 Then open `http://localhost:8233` and inspect the order workflows in the `apps`, `processing`, and
@@ -68,7 +90,7 @@ Stop the Temporal dev server with `Ctrl+C` in its own terminal.
 Use this repo's devcontainer. It installs the workshop toolchain for you:
 
 - Java 21 and Maven 3.9.9
-- Python 3.12 and `uv`
+- Python 3.13 and `uv`
 - Temporal CLI `1.7.0`
 - Docker-in-Docker
 - `kubectl`, Helm, `kind`, `k3d`, and `k9s`
@@ -92,15 +114,14 @@ If you want to run the full application stack in Kubernetes (locally via KinD/k3
 
 ## Prerequisite Details
 
-### Required Tools
+### Local Required Tools
 
-1. **Java 21+**
+These are enough for `temporal server start-dev` plus `./scripts/local-up.sh`.
+
+1. **JDK 21**
    ```bash
-   # Install with asdf (recommended)
-   asdf install  # Uses .tool-versions
-
-   # Or install manually
    java --version  # Must be 21+
+   javac --version # Must be 21+
    ```
 
 2. **Maven 3.9+**
@@ -117,12 +138,8 @@ If you want to run the full application stack in Kubernetes (locally via KinD/k3
    temporal --version
    ```
 
-4. **HTTP Client (xh or curl)**
+4. **curl**
    ```bash
-   # macOS with xh (recommended - cleaner syntax)
-   brew install xh
-
-   # Or use curl (included on all systems)
    curl --version
    ```
 
@@ -133,9 +150,37 @@ If you want to run the full application stack in Kubernetes (locally via KinD/k3
 
    # Or: curl -LsSf https://astral.sh/uv/install.sh | sh
 
-   # Install Python dependencies, run from the repo root
+   # Optional warm-up, run from the repo root
    uv sync --project python
    ```
+
+6. **xh** (only for bundled scenario scripts)
+   ```bash
+   # macOS
+   brew install xh
+
+   xh --version
+   ```
+
+Docker, Kubernetes tools, Temporal Cloud credentials, Node.js, and `buf` are outside the local
+startup path. Install them only when you work on the matching path: Kubernetes deployment, web UI,
+or protobuf generation.
+
+### Local Ports
+
+The local process stack uses fixed ports. Make sure these are free before running
+`./scripts/local-up.sh`:
+
+| Port | Used by |
+|------|---------|
+| `8050`, `9050` | `enablements-api` and management |
+| `8060`, `9071` | `fulfillment-api` and management |
+| `8061`, `9072` | `fulfillment-workers` and management |
+| `8070`, `9081` | `processing-api` and management |
+| `8071`, `9082` | `processing-workers` and management |
+| `8080`, `9091` | `apps-api` and management |
+| `8081`, `9092` | `apps-workers` and management |
+| `9052` | `enablements-workers` management |
 
 ### Optional Environment File
 
@@ -147,7 +192,9 @@ services:
 cp .env.example .env.local
 ```
 
-All Java services and Python workers load `.env.local` automatically — no extra steps needed once it exists. The defaults in `.env.example` are already correct for local Temporal (no API keys required for Temporal itself).
+All Java services and Python workers load `.env.local` automatically. The defaults in
+`.env.example` are already correct for local Temporal, with no API keys required for Temporal
+itself.
 
 For Codespaces runs, use the committed non-secret defaults instead:
 
@@ -157,7 +204,9 @@ cp .env.codespaces .env.local
 
 Keep `ANTHROPIC_API_KEY` and `OPENAI_API_KEY` out of `.env.local` in Codespaces. Provide them as GitHub Codespaces secrets so they are exposed as runtime environment variables.
 
-API keys are only needed for integration features. Workers start and connect without them — activities that call external APIs will fail with a clear error message if the key is missing when that feature is exercised.
+API keys are only needed for integration features. Workers start and connect without them. Activities
+that call external APIs will fail with a clear error message if the key is missing when that feature
+is exercised.
 
 | Variable | Where to get it | Needed for |
 |----------|----------------|------------|
