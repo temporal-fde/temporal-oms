@@ -35,11 +35,11 @@ The application is structured as two evolving versions of the same business prob
 
 ACME's OMS processes clothing orders through three phases:
 
-| Phase | Description |
-|-------|-------------|
-| **Capture** | Collect order from Commerce App and Payment Processor |
-| **Processing** | Validate, enrich, and coordinate order data across downstream services |
-| **Fulfillment** | Allocate inventory, select carrier, generate label, track delivery |
+| Phase           | Description                                                            |
+|-----------------|------------------------------------------------------------------------|
+| **Accumulate**  | Accumulate order inputs from Commerce App and Payment Processor        |
+| **Processing**  | Validate, enrich, and coordinate order data across downstream services |
+| **Fulfillment** | Allocate inventory, select carrier, generate label, track delivery     |
 
 ### v1 — Order Processing
 
@@ -77,27 +77,54 @@ A web UI for order management and observability is in development.
 
 ### Tool Prerequisites
 
-All tool versions are pinned in [`.tool-versions`](.tool-versions). Install with [asdf](https://asdf-vm.com/):
+Preferred setup uses [asdf](https://asdf-vm.com/guide/getting-started.html) to install the tools
+listed in [`.tool-versions`](.tool-versions). Review asdf and
+[`scripts/setup-asdf-plugins.sh`](scripts/setup-asdf-plugins.sh) before running this path if you
+want to audit what will execute.
 
 ```bash
+./scripts/setup-asdf-plugins.sh
 asdf install
 ```
 
-| Tool | Purpose |
-|------|---------|
-| `java` (OpenJDK 21) | Build and run Java services |
-| `maven` 3.9+ | Java build tool |
-| `nodejs` | Web tooling |
-| `kind` | Local Kubernetes cluster |
-| `k3d` | Lightweight local Kubernetes cluster |
-| `k9s` | Kubernetes cluster UI |
-| `temporal` CLI | Namespace, workflow, and Nexus management |
-| `kubectl` | Kubernetes control plane |
-| `helm` | Install Temporal Worker Controller |
-| `yq` | YAML parsing used in deploy scripts |
-| `buf` | Protocol Buffer code generation |
-| `docker` | Container runtime (Docker Desktop) |
-| `xh` | HTTP client for demo scenarios (or use `curl`) |
+What the preferred path does:
+
+- `./scripts/setup-asdf-plugins.sh` reads `.tool-versions`, checks `asdf plugin list`, and runs
+  `asdf plugin add <tool>` for each missing asdf plugin, using your installed asdf's plugin index.
+- `asdf install` then uses those plugins to download, build when required, and install the pinned
+  tool versions from `.tool-versions` into your local asdf installation.
+- This path changes your local asdf plugin and tool directories. It does not install tools that are
+  not listed in `.tool-versions`, and it does not install Docker, Temporal CLI, curl, or yq.
+
+The table below shows what is in the pinned toolchain, what the local process path needs, and what
+the full Kubernetes paths need. ✅ means included or required; a blank cell means not needed for
+that column.
+
+| Dependency | Pinned in `.tool-versions` | Local run | K8s paths | Purpose |
+|------------|----------------------------|-----------|-----------|---------|
+| `java` (OpenJDK 21) | ✅ | ✅ | ✅ | Build and run Java services |
+| `maven` 3.9+ | ✅ | ✅ | ✅ | Java build tool |
+| `python` | ✅ | ✅ | | Runtime for local Python fulfillment worker |
+| `uv` | ✅ | ✅ | | Python dependency manager for local worker |
+| `temporal` CLI | | ✅ | ✅ | Temporal dev server, namespace, workflow, and Nexus setup |
+| `curl` | | ✅ | ✅ | Readiness checks and API smoke tests |
+| `xh` | ✅ | ✅ | ✅ | HTTP client used by scenario scripts |
+| `docker` | | | ✅ | Container runtime for KinD and k3d |
+| `kind` | ✅ | | ✅ | Local Kubernetes cluster runner |
+| `k3d` | ✅ | | ✅ | Lightweight local Kubernetes cluster runner |
+| `kubectl` | ✅ | | ✅ | Kubernetes control plane |
+| `helm` | ✅ | | ✅ | Install Temporal Worker Controller |
+| `yq` | | | ✅ | Parse cloud secret YAML in k8s scripts |
+| `k9s` | ✅ | | | Optional Kubernetes cluster UI |
+| `nodejs` | ✅ | | | Optional web UI tooling |
+| `buf` | ✅ | | | Optional protobuf linting and generation |
+| `caddy` | ✅ | | | Optional instructor key distribution helper |
+| `cloudflared` | ✅ | | | Optional instructor key distribution helper |
+
+Local run means `temporal server start-dev` plus `./scripts/local-up.sh`. K8s paths mean
+`scripts/kind/*` or `scripts/k3d/*`, with either local Temporal or Temporal Cloud. Tools with a
+blank `.tool-versions` cell are not installed by `asdf install`; install them separately when your
+chosen path requires them.
 
 ---
 
@@ -107,8 +134,8 @@ Start at Level 1 and work up. Each level builds on the previous.
 
 | Level | Description | What you need |
 |-------|-------------|---------------|
-| **1** | Run locally — no Kubernetes | Java, Maven, Docker, Temporal CLI |
-| **2** | KinD or k3d cluster with local Temporal | Level 1 + KinD or k3d, Helm, kubectl, k9s |
+| **1** | Run locally, no Kubernetes | JDK 21, Maven, Temporal CLI, Python with `uv`, `curl`; `xh` for scenarios |
+| **2** | KinD or k3d cluster with local Temporal | Level 1 + Docker, KinD or k3d, Helm, kubectl, yq; k9s optional |
 | **3** | KinD or k3d cluster connected to Temporal Cloud | Level 2 + Temporal Cloud account, namespaces, service accounts, API keys |
 | **4** | Worker Versioning Enablement (live demo) | Level 3 running + load generation |
 
@@ -116,12 +143,32 @@ Start at Level 1 and work up. Each level builds on the previous.
 
 ## Level 1 — Run Locally (No Kubernetes)
 
-Fastest path to a working system. All services run as local JVM processes against a local Temporal server.
+Fastest path to a working system. All services run as local processes against a local Temporal
+server.
 
-> **Important:** The workers use Worker Versioning (Temporal Deployments). Without the Temporal Worker Controller in the environment, you must call `set-current-version` manually before tasks will be dispatched — `scripts/setup-temporal-namespaces.sh` handles this. See [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md) for the full explanation.
+Terminal 1:
 
-→ **[docs/GETTING_STARTED.md](docs/GETTING_STARTED.md)** — local setup, demo scenarios, troubleshooting
-→ **[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)** — protobuf changes, workflow modifications, debugging, testing
+```bash
+temporal server start-dev
+```
+
+Terminal 2:
+
+```bash
+# bring up all APIs, workers, local namespaces, Nexus endpoints, and Worker Versioning state
+./scripts/local-up.sh
+
+# Optional dry run to see it all work
+./scripts/runscenario.sh valid-order --yes
+
+# tear down all local services except Temporal server
+./scripts/local-down.sh
+```
+
+Stop the Temporal dev server with `Ctrl+C` in Terminal 1.
+
+- **[docs/GETTING_STARTED.md](docs/GETTING_STARTED.md)**: local setup, demo scenarios, troubleshooting
+- **[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)**: protobuf changes, workflow modifications, debugging, testing
 
 ---
 
@@ -130,10 +177,16 @@ Fastest path to a working system. All services run as local JVM processes agains
 Full stack in a local Kubernetes cluster. Choose one runner and use that directory consistently.
 
 ```bash
+# Terminal 1
+temporal server start-dev --ip 0.0.0.0 --ui-ip 0.0.0.0
+
+# Terminal 2
+./scripts/setup-temporal-namespaces.sh
 ./scripts/kind/infra-up.sh
 ./scripts/kind/app-deploy.sh
 
 # or
+./scripts/setup-temporal-namespaces.sh
 ./scripts/k3d/infra-up.sh
 ./scripts/k3d/app-deploy.sh
 ```
@@ -146,50 +199,56 @@ Full stack in a local Kubernetes cluster. Choose one runner and use that directo
 
 ### Step 1: Set Up Temporal Cloud (Manual, One-Time)
 
-#### a) Create Two Namespaces
+#### a) Create Temporal Namespaces
 
-In [Temporal Cloud](https://cloud.temporal.io) → Namespaces, create:
+In [Temporal Cloud](https://cloud.temporal.io) > Namespaces, create:
 
 | Namespace | Purpose |
 |-----------|---------|
 | `apps` | Order orchestration and data collection |
-| `processing` | Order validation, enrichment, and fulfillment |
+| `processing` | Order validation and enrichment |
+| `fulfillment` | Fulfillment workflow and ShippingAgent workers |
 
 Your fully-qualified namespace names will be `<namespace-name>.<account-id>`.
 
+The cloud overlay currently points enablements workers at `default`. If your account does not have
+that namespace, create or choose an enablements namespace and update the cloud configmaps before
+deploying.
+
 #### b) Create Service Accounts and API Keys
 
-In Temporal Cloud → Settings → Identities, create three service accounts:
+In Temporal Cloud > Settings > Identities, create four service accounts:
 
 | Service Account | Role | Used by |
 |----------------|------|---------|
 | `acme-apps-service-account` | Developer | `apps` Spring workers |
 | `acme-processing-service-account` | Developer | `processing` Spring workers |
+| `acme-fulfillment-service-account` | Developer | `fulfillment` Spring and Python workers |
 | `acme-automations-service-account` | Developer or Admin | Temporal Worker Controller |
 
 > **Why a separate automations account?** The Worker Controller calls Temporal's Worker Deployment API to register build-ids and manage traffic ramp. This requires broader permissions than a standard worker connection. Keep it separate so it can be rotated independently.
 
-For each service account, generate an API key. Copy the values — they are shown only once.
+For each service account, generate an API key. Copy the values. They are shown only once.
 
 #### c) Create Nexus Endpoints
 
-In Temporal Cloud → Nexus, create:
+In Temporal Cloud > Nexus, create:
 
 | Endpoint name | Target namespace | Target task queue |
 |--------------|----------------|-----------------|
 | `oms-processing-v1` | `processing` | `processing` |
 | `oms-apps-v1` | `apps` | `apps` |
+| `oms-integrations-v1` | `default` or your enablements namespace | `integrations` |
+| `oms-fulfillment-v1` | `fulfillment` | `fulfillment` |
+| `oms-fulfillment-agents-v1` | `fulfillment` | `agents` |
 
-Or use the script (requires your cloud address):
-
-```bash
-TEMPORAL_ADDRESS=<your-region>.aws.api.temporal.io:7233 \
-  ./scripts/setup-temporal-namespaces.sh
-```
+Use fully-qualified namespace names, for example `apps.<account-id>`. The
+`scripts/setup-temporal-namespaces.sh` helper is for local Temporal unless it is extended with Cloud
+API key and TLS flags.
 
 #### d) Note Your Region Endpoint
 
-Find your region in Temporal Cloud → Namespaces → (select namespace) → Connection:
+Find your region in Temporal Cloud > Namespaces > (select namespace) > Connection:
 
 ```
 <your-region>.aws.api.temporal.io:7233
@@ -197,11 +256,12 @@ Find your region in Temporal Cloud → Namespaces → (select namespace) → Con
 
 ### Step 2: Create Local Secret Files
 
-Copy the templates and fill in your API keys. These files are gitignored — never commit them.
+Copy the templates and fill in your API keys. These files are gitignored. Never commit them.
 
 ```bash
 cp config/acme.apps.secret.template.yaml        config/acme.apps.secret.yaml
 cp config/acme.processing.secret.template.yaml  config/acme.processing.secret.yaml
+cp config/acme.fulfillment.secret.template.yaml config/acme.fulfillment.secret.yaml
 cp config/acme.automations.secret.template.yaml config/acme.automations.secret.yaml
 ```
 
@@ -240,6 +300,7 @@ Demonstrates zero-downtime worker version rollouts against a live order stream. 
 
 | Script | Purpose |
 |--------|---------|
+| `scripts/setup-asdf-plugins.sh` | Install missing asdf plugins listed in `.tool-versions` |
 | `scripts/kind/infra-up.sh` | Create KinD cluster, install Temporal Worker Controller, apply cloud secrets |
 | `scripts/k3d/infra-up.sh` | Create k3d cluster, install Temporal Worker Controller, apply cloud secrets |
 | `scripts/kind/app-deploy.sh` | Build Docker images, load into KinD, deploy all applications |
@@ -252,7 +313,9 @@ Demonstrates zero-downtime worker version rollouts against a live order stream. 
 | `scripts/k3d/infra-down.sh` | Tear down the k3d cluster |
 | `scripts/kind/status.sh` | Show pod status across namespaces in KinD |
 | `scripts/k3d/status.sh` | Show pod status across namespaces in k3d |
-| `scripts/setup-temporal-namespaces.sh` | Create Temporal namespaces and Nexus endpoints |
+| `scripts/local-up.sh` | Start all local OMS APIs and workers |
+| `scripts/local-down.sh` | Stop services started by `local-up.sh` |
+| `scripts/setup-temporal-namespaces.sh` | Create local Temporal namespaces, Nexus endpoints, search attributes, and current Worker Deployment versions |
 | `scripts/kind/tunnel.sh` | Port-forward APIs for local access through KinD |
 | `scripts/k3d/tunnel.sh` | Port-forward APIs for local access through k3d |
 

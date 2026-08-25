@@ -1,7 +1,8 @@
 # Temporal OMS - Deployment Guide
 
-This guide covers deploying the Temporal OMS application to **KinD (Kubernetes in Docker)**,
-**k3d**, or **running locally** without Kubernetes.
+This guide covers deploying the Temporal OMS application to **KinD (Kubernetes in Docker)** or
+**k3d**. For the lower-barrier local process path, with no Kubernetes and no Docker, use
+[GETTING_STARTED.md](GETTING_STARTED.md).
 
 The Kubernetes scripts are split by cluster runtime:
 
@@ -48,10 +49,11 @@ OVERLAY=cloud ./scripts/k3d/demo-up.sh
 ### Option 3: Deploy to k3d with Local Temporal
 
 ```bash
-# Start your local Temporal server first and bind it to all interfaces for k3d pods
+# Terminal 1: start local Temporal and bind it to all interfaces for k3d pods
 temporal server start-dev --ip 0.0.0.0 --ui-ip 0.0.0.0
 
-# Deploy with local overlay
+# Terminal 2: configure Temporal, then deploy with local overlay
+./scripts/setup-temporal-namespaces.sh
 OVERLAY=local ./scripts/k3d/demo-up.sh
 
 # Check status
@@ -67,10 +69,11 @@ OVERLAY=local ./scripts/k3d/demo-up.sh
 ### Option 4: Deploy to KinD with Local Temporal
 
 ```bash
-# Start your local Temporal server first (on port 7233)
-temporal server start-dev &
+# Terminal 1: start local Temporal and bind it so KinD pods can reach it
+temporal server start-dev --ip 0.0.0.0 --ui-ip 0.0.0.0
 
-# Deploy with local overlay
+# Terminal 2: configure Temporal, then deploy with local overlay
+./scripts/setup-temporal-namespaces.sh
 OVERLAY=local ./scripts/kind/demo-up.sh
 
 # Check status
@@ -83,48 +86,64 @@ OVERLAY=local ./scripts/kind/demo-up.sh
 ./scripts/kind/demo-down.sh
 ```
 
-### Option 5: Run Everything Locally (No Kubernetes)
+### Not Kubernetes: Run Everything as Local Processes
+
+Use [GETTING_STARTED.md](GETTING_STARTED.md) for this path. It does not require Docker, KinD, k3d,
+kubectl, Helm, k9s, yq, or Temporal Cloud credentials.
 
 ```bash
-# Start Temporal server
-temporal server start-dev &
+# Terminal 1
+temporal server start-dev
+```
 
-# In another terminal, build and run the apps
-cd java/apps
-mvn spring-boot:run
+```bash
+# Terminal 2, from the repo root
+./scripts/local-up.sh
 
-# Test
-curl http://localhost:8080/api/v1/commerce-app/clothing
+# Optional dry run
+./scripts/runscenario.sh valid-order --yes
+
+./scripts/local-down.sh
 ```
 
 ---
 
 ## Prerequisites
 
-### Required Tools
+### Required Tools by Path
 
-Install using asdf (recommended) or your preferred package manager:
+Install using [asdf](https://asdf-vm.com/guide/getting-started.html) or your preferred package
+manager. `.tool-versions` pins most asdf-managed tool versions used by this repo. Use the helper
+script to add the matching plugins, then install the pinned versions. Install the Temporal CLI
+separately unless you are using the devcontainer.
 
 ```bash
 # Using asdf
-asdf plugin add java https://github.com/halcyon/asdf-java.git
-asdf plugin add maven https://github.com/asdf-community/asdf-maven.git
-asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git
-asdf plugin add kind https://github.com/johnlayton/asdf-kind.git
-asdf plugin add k3d https://github.com/spencergilbert/asdf-k3d.git
-
-# Install versions from .tool-versions
+./scripts/setup-asdf-plugins.sh
 asdf install
 
 # Or install manually
-brew install java maven nodejs kind k3d kubectl
+brew install java maven kind k3d kubectl helm yq temporal
 ```
+
+| Path | Required |
+|------|----------|
+| Any k8s deployment | JDK 21, Maven 3.9+, Docker daemon, kubectl, Helm, yq, and either KinD or k3d |
+| `OVERLAY=local` | Any k8s deployment tools plus Temporal CLI and a local Temporal dev server reachable from cluster pods |
+| `OVERLAY=cloud` | Any k8s deployment tools plus Temporal Cloud namespaces, service-account API keys, and cloud overlay config |
+| Verification and scenarios | `curl`; `xh` for the bundled scenario scripts |
+| Optional operator UI | k9s |
+
+Node.js is not required for Kubernetes deployment unless you are also working on the Svelte web UI.
+`buf` is only required when regenerating protobuf contracts.
 
 ### System Resources
 
-- **Minikube alternative**: Using KinD or k3d requires Docker
-- **Memory**: 4GB minimum (8GB recommended)
+- **Docker**: KinD and k3d both run Kubernetes nodes in Docker containers.
+- **Memory**: 8GB minimum, 16GB recommended for local k8s runs.
 - **Disk**: 5GB free space
+- **Network**: first run downloads Maven dependencies, Docker base images, cert-manager manifests,
+  and Temporal Worker Controller Helm charts.
 
 ---
 
@@ -141,6 +160,7 @@ Once you have your API keys, copy the templates and fill them in:
 ```bash
 cp config/acme.apps.secret.template.yaml        config/acme.apps.secret.yaml
 cp config/acme.processing.secret.template.yaml  config/acme.processing.secret.yaml
+cp config/acme.fulfillment.secret.template.yaml config/acme.fulfillment.secret.yaml
 cp config/acme.automations.secret.template.yaml config/acme.automations.secret.yaml
 ```
 
@@ -155,22 +175,32 @@ See **[CLOUD.md](CLOUD.md)** for the full secret-to-Kubernetes mapping and troub
 # Install Temporal CLI (if not already installed)
 brew install temporal
 
-# Start local Temporal server (in background or separate terminal).
+# Terminal 1: start local Temporal.
 # Binding to 0.0.0.0 lets KinD/k3d pods reach it through host.docker.internal.
 temporal server start-dev --ip 0.0.0.0 --ui-ip 0.0.0.0
 
-# Verify it's running
+# Terminal 2: verify it is running and create Temporal namespaces/endpoints.
 temporal workflow list
+./scripts/setup-temporal-namespaces.sh
 # Note: Listens on port 7233 by default
 ```
 
 > **Worker Versioning and `set-current-version`**
 >
-> When running with `OVERLAY=local`, the apps and processing workers start with Worker Versioning enabled. The **Temporal Worker Controller** handles version promotion automatically: it watches for pollers to appear on a new build-id, then calls `set-current-version` itself. You never need to run it manually when the controller is present.
+> When running k8s with `OVERLAY=local`, run `scripts/setup-temporal-namespaces.sh` to create
+> Temporal namespaces, Nexus endpoints, and search attributes. The apps and processing workers
+> start with Worker Versioning enabled, and the **Temporal Worker Controller** handles version
+> promotion automatically: it watches for pollers to appear on a new build-id, then calls
+> `set-current-version` itself. You do not need to run a separate manual promotion after deploy.
 >
-> This is why tasks route correctly after deploy without any extra steps — the controller is the bridge between a new image landing in Kubernetes and Temporal knowing to route work to it.
+> This is why tasks route correctly after deploy without extra versioning steps. The controller is
+> the bridge between a new image landing in Kubernetes and Temporal knowing to route work to it.
 >
-> If workers are running **without the Temporal Worker Controller in the environment** (e.g. Level 1, running directly on your machine), you must call `set-current-version` yourself. This is what `scripts/setup-temporal-namespaces.sh` does. If you skip it, workers will connect and poll but the server will dispatch no tasks — workflows stall silently. See [GETTING_STARTED.md](GETTING_STARTED.md) for details.
+> If workers are running **without the Temporal Worker Controller in the environment** (for example,
+> Level 1 running directly on your machine), you must call `set-current-version` yourself. This is
+> what `scripts/setup-temporal-namespaces.sh` does. If you skip it, workers will connect and poll,
+> but the server will dispatch no tasks. Workflows stall silently. See
+> [GETTING_STARTED.md](GETTING_STARTED.md) for details.
 
 ### 3. Build and Deploy to Kubernetes
 
@@ -250,10 +280,11 @@ open http://localhost:8080/api/docs
 - **Namespace**: Your fully-qualified Temporal Cloud namespace (e.g., `apps.<account-id>`)
 
 **Config Files:**
-- `k8s/overlays/cloud/configmap/` — Temporal address, namespace, TLS settings (committed, no secrets)
-- `config/acme.apps.secret.yaml` — Apps worker API key (gitignored, created from template)
-- `config/acme.processing.secret.yaml` — Processing worker API key (gitignored, created from template)
-- `config/acme.automations.secret.yaml` — Temporal Worker Controller API key (gitignored, created from template)
+- `k8s/overlays/cloud/configmap/`: Temporal address, namespace, TLS settings (committed, no secrets)
+- `config/acme.apps.secret.yaml`: Apps worker API key (gitignored, created from template)
+- `config/acme.processing.secret.yaml`: Processing worker API key (gitignored, created from template)
+- `config/acme.fulfillment.secret.yaml`: Fulfillment worker API key (gitignored, created from template)
+- `config/acme.automations.secret.yaml`: Temporal Worker Controller API key (gitignored, created from template)
 
 Kubernetes secrets are created imperatively by `scripts/kind/infra-up.sh` or
 `scripts/k3d/infra-up.sh` from those files. No secrets are committed.
@@ -326,32 +357,23 @@ kubectl exec -n temporal-oms-apps <pod-name> -- cat /etc/config/temporal-secret/
 
 ## Running Locally (Without Kubernetes)
 
-For local development without Kubernetes:
+Use [GETTING_STARTED.md](GETTING_STARTED.md) for the local process path. The short version is:
 
 ```bash
-# Terminal 1: Start Temporal
+# Terminal 1
 temporal server start-dev
+```
 
-# Terminal 2: Start apps-api
-cd java/apps/apps-api
-mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=local"
-
-# Terminal 3: Start apps-workers
-cd java/apps/apps-workers
-mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=local"
-
-# Terminal 4: Start processing-workers
-cd java/processing/processing-workers
-mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=local"
-
-# Terminal 5: Test the API
-curl http://localhost:8080/api/v1/commerce-app/clothing
+```bash
+# Terminal 2, from the repo root
+./scripts/local-up.sh
+./scripts/local-down.sh
 ```
 
 **Notes:**
-- Each service runs on its configured port (apps-api: 8080, workers: internal only)
-- No configuration mounting needed - classpath configuration is used
-- Logs appear in the terminal where you started each service
+- `local-up.sh` starts all local APIs and workers.
+- Logs are written under `.workshop/logs`.
+- `local-down.sh` stops the OMS services. Stop the Temporal dev server separately with `Ctrl+C`.
 
 ---
 

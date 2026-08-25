@@ -279,17 +279,37 @@ run_temporal_setup() {
 }
 
 check_artifacts() {
-  local build_hint="Run: cd java && mvn -DskipTests install"
+  local artifacts=(
+    "$ROOT_DIR/java/apps/apps-api/target/apps-api-1.0.0-SNAPSHOT.jar"
+    "$ROOT_DIR/java/apps/apps-workers/target/apps-workers-1.0.0-SNAPSHOT.jar"
+    "$ROOT_DIR/java/processing/processing-api/target/processing-api-1.0.0-SNAPSHOT.jar"
+    "$ROOT_DIR/java/processing/processing-workers/target/processing-workers-1.0.0-SNAPSHOT.jar"
+    "$ROOT_DIR/java/fulfillment/fulfillment-api/target/fulfillment-api-1.0.0-SNAPSHOT.jar"
+    "$ROOT_DIR/java/fulfillment/fulfillment-workers/target/fulfillment-workers-1.0.0-SNAPSHOT.jar"
+    "$ROOT_DIR/java/enablements/enablements-api/target/enablements-api-1.0.0-SNAPSHOT.jar"
+    "$ROOT_DIR/java/enablements/enablements-workers/target/enablements-workers-1.0.0-SNAPSHOT.jar"
+  )
+  local missing=0
+  local artifact
 
-  require_file "$ROOT_DIR/java/apps/apps-api/target/apps-api-1.0.0-SNAPSHOT.jar" "$build_hint"
-  require_file "$ROOT_DIR/java/apps/apps-workers/target/apps-workers-1.0.0-SNAPSHOT.jar" "$build_hint"
-  require_file "$ROOT_DIR/java/processing/processing-api/target/processing-api-1.0.0-SNAPSHOT.jar" "$build_hint"
-  require_file "$ROOT_DIR/java/processing/processing-workers/target/processing-workers-1.0.0-SNAPSHOT.jar" "$build_hint"
-  require_file "$ROOT_DIR/java/fulfillment/fulfillment-api/target/fulfillment-api-1.0.0-SNAPSHOT.jar" "$build_hint"
-  require_file "$ROOT_DIR/java/fulfillment/fulfillment-workers/target/fulfillment-workers-1.0.0-SNAPSHOT.jar" "$build_hint"
-  require_file "$ROOT_DIR/java/enablements/enablements-api/target/enablements-api-1.0.0-SNAPSHOT.jar" "$build_hint"
-  require_file "$ROOT_DIR/java/enablements/enablements-workers/target/enablements-workers-1.0.0-SNAPSHOT.jar" "$build_hint"
-  require_file "$ROOT_DIR/python/pyproject.toml" "Run: cd python && uv sync"
+  require_file "$ROOT_DIR/python/pyproject.toml" "The Python project is missing from this checkout."
+
+  for artifact in "${artifacts[@]}"; do
+    if [[ ! -f "$artifact" ]]; then
+      missing=1
+      break
+    fi
+  done
+
+  if [[ "$missing" -eq 1 ]]; then
+    require_command mvn
+    echo "Java artifacts missing; building Java services ..."
+    mvn -f "$ROOT_DIR/java/pom.xml" -DskipTests install
+  fi
+
+  for artifact in "${artifacts[@]}"; do
+    require_file "$artifact" "Java build completed, but this artifact was not created."
+  done
 }
 
 print_summary() {

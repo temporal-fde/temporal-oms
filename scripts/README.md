@@ -16,6 +16,23 @@ the operational paths easy to read and avoids cluster-driver conditionals inside
 
 ## Quick Start
 
+Local process stack:
+
+```bash
+# Terminal 1
+temporal server start-dev
+```
+
+```bash
+# Terminal 2, from the repo root
+./scripts/local-up.sh
+
+# Optional dry run
+./scripts/runscenario.sh valid-order --yes
+
+./scripts/local-down.sh
+```
+
 KinD with Temporal Cloud:
 
 ```bash
@@ -31,14 +48,22 @@ OVERLAY=cloud ./scripts/k3d/demo-up.sh
 KinD with local Temporal:
 
 ```bash
-temporal server start-dev
+# Terminal 1
+temporal server start-dev --ip 0.0.0.0 --ui-ip 0.0.0.0
+
+# Terminal 2
+./scripts/setup-temporal-namespaces.sh
 OVERLAY=local ./scripts/kind/demo-up.sh
 ```
 
 k3d with local Temporal:
 
 ```bash
+# Terminal 1
 temporal server start-dev --ip 0.0.0.0 --ui-ip 0.0.0.0
+
+# Terminal 2
+./scripts/setup-temporal-namespaces.sh
 OVERLAY=local ./scripts/k3d/demo-up.sh
 ```
 
@@ -160,15 +185,47 @@ WORKSHOP_PIN_OUTPUT=false ./scripts/serve-workshop-api-keys.sh
 | `tunnel.sh` | Port-forward APIs |
 | `status.sh` | Show deployment status |
 
+## Local Scripts
+
+| Script | Purpose |
+|---|---|
+| `setup-asdf-plugins.sh` | Install missing asdf plugins listed in `.tool-versions` |
+| `local-up.sh` | Start all local OMS APIs and workers against an already running Temporal dev server |
+| `local-down.sh` | Stop services started by `local-up.sh` |
+| `setup-temporal-namespaces.sh` | Create local Temporal namespaces, Nexus endpoints, search attributes, and current Worker Deployment versions |
+
 ## Requirements
 
+Install the asdf-managed toolchain:
+
+```bash
+./scripts/setup-asdf-plugins.sh
+asdf install
+```
+
+Local process scripts:
+
+- JDK 21 and Maven 3.9+
+- Temporal CLI
+- `uv` with Python 3.10+
+- `curl`
+- `xh` for scenario scripts
+
+Cluster scripts:
+
+- JDK 21 and Maven 3.9+ for Java builds
+- Docker
 - `kubectl`
-- `docker`
+- Helm
+- yq
 - `kind` for `scripts/kind/*`
 - `k3d` for `scripts/k3d/*`
-- `helm`
-- `temporal`
-- Maven and Java 21+
+- k9s, optional
+- Temporal CLI and a local Temporal dev server for `OVERLAY=local`
+
+Cloud overlay scripts also require Temporal Cloud namespaces, service-account API keys, cloud
+overlay config values, and the gitignored `config/*.secret.yaml` files described in
+[../docs/DEPLOYMENT.md](../docs/DEPLOYMENT.md).
 
 ## Overlays
 
