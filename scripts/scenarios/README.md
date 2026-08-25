@@ -19,6 +19,15 @@ with `ORDER_ID=...` and/or `CUSTOMER_ID=...`.
 - ✅ `xh` (HTTP client) installed
 - ✅ `temporal` CLI installed
 
+## Fastest Dry Run
+
+After `./scripts/local-up.sh`, run the valid-order path from the repo root:
+
+```bash
+./scripts/scenarios/valid-order/1-submit-order.sh
+./scripts/scenarios/valid-order/2-capture-payment.sh
+```
+
 ## Scenarios
 
 Run any scenario from the repository root with the dynamic selector:

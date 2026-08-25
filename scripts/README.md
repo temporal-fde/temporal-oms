@@ -16,6 +16,25 @@ the operational paths easy to read and avoids cluster-driver conditionals inside
 
 ## Quick Start
 
+Local process stack:
+
+```bash
+# Terminal 1
+temporal server start-dev
+```
+
+```bash
+# Terminal 2, from the repo root
+./scripts/setup-temporal-namespaces.sh
+./scripts/local-up.sh
+
+# Optional dry run
+./scripts/scenarios/valid-order/1-submit-order.sh
+./scripts/scenarios/valid-order/2-capture-payment.sh
+
+./scripts/local-down.sh
+```
+
 KinD with Temporal Cloud:
 
 ```bash
@@ -159,6 +178,14 @@ WORKSHOP_PIN_OUTPUT=false ./scripts/serve-workshop-api-keys.sh
 | `deploy-processing-workers.sh` | Build and deploy a new processing worker image through TWC |
 | `tunnel.sh` | Port-forward APIs |
 | `status.sh` | Show deployment status |
+
+## Local Scripts
+
+| Script | Purpose |
+|---|---|
+| `local-up.sh` | Start all local OMS APIs and workers against an already running Temporal dev server |
+| `local-down.sh` | Stop services started by `local-up.sh` |
+| `setup-temporal-namespaces.sh` | Create local Temporal namespaces, Nexus endpoints, search attributes, and current Worker Deployment versions |
 
 ## Requirements
 

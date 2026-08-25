@@ -1,10 +1,69 @@
 # Getting Started with Temporal OMS
 
-A Java-based Order Management System powered by Temporal workflows.
+Use this path first when you want a local system running quickly. It starts Temporal in one
+terminal and all OMS APIs and workers from another terminal.
 
-## Choose Your Setup Path
+## Fastest Local Start
 
-### ☁️ Running in GitHub Codespaces for the Workshop?
+Install prerequisites first. In Codespaces they are already installed. On your machine, install the
+tool versions pinned in `.tool-versions`; with asdf, run `asdf install` from the repo root after
+cloning.
+
+You will use **two terminals** to run this local setup.
+
+### 1. Clone GitHub Repository
+
+```bash
+git clone https://github.com/temporal-ps/temporal-oms.git
+cd temporal-oms
+```
+
+### 2. Start Temporal
+
+Run this in one terminal and leave it running:
+
+```bash
+temporal server start-dev
+```
+
+Temporal UI will be available at `http://localhost:8233`.
+
+### 3. Start OMS
+
+Run this from the repo root in *another terminal*:
+
+```bash
+./scripts/setup-temporal-namespaces.sh
+./scripts/local-up.sh
+```
+
+`local-up.sh` starts the APIs, Java workers, enablements workers, fulfillment workers, and Python
+fulfillment worker. On a fresh clone, it builds missing Java artifacts before starting services.
+
+### Optional Dry Run
+
+Run the valid-order scenario between `local-up.sh` and `local-down.sh`:
+
+```bash
+./scripts/runscenario.sh # run the "valid-order" scenario
+```
+
+Then open `http://localhost:8233` and inspect the order workflows in the `apps`, `processing`, and
+`fulfillment` namespaces.
+
+### 4. Stop OMS
+
+```bash
+./scripts/local-down.sh
+```
+
+Stop the Temporal dev server with `Ctrl+C` in its own terminal.
+
+---
+
+## Other Setup Paths
+
+### Running in GitHub Codespaces?
 
 Use this repo's devcontainer. It installs the workshop toolchain for you:
 
@@ -21,7 +80,7 @@ committed non-secret `.env.codespaces` file and prebuilds Java/Python dependenci
 Instructor-only key distribution helpers (`caddy` and `cloudflared`) run from the instructor's
 local machine, not from attendee Codespaces.
 
-### 🎯 Want to Deploy to Kubernetes?
+### Deploying to Kubernetes?
 
 If you want to run the full application stack in Kubernetes (locally via KinD/k3d or with Temporal Cloud), see **[DEPLOYMENT.md](DEPLOYMENT.md)** for:
 - Parallel Kubernetes runners under `scripts/kind/*` and `scripts/k3d/*`
@@ -29,18 +88,11 @@ If you want to run the full application stack in Kubernetes (locally via KinD/k3
 - Production-like Kubernetes environment
 - Traefik ingress for API access
 
-### 🏃 Want to Run Locally First?
-
-Continue below for pure local development without Kubernetes. This is great for:
-- Quick iteration on code
-- Understanding the architecture
-- Running workflows directly on your machine
-
 ---
 
-## Quick Start
+## Prerequisite Details
 
-### Prerequisites
+### Required Tools
 
 1. **Java 21+**
    ```bash
@@ -81,13 +133,15 @@ Continue below for pure local development without Kubernetes. This is great for:
 
    # Or: curl -LsSf https://astral.sh/uv/install.sh | sh
 
-   # Install Python dependencies (run once from repo root)
-   cd python && uv sync
+   # Install Python dependencies, run from the repo root
+   uv sync --project python
    ```
 
-### Configure Environment
+### Optional Environment File
 
-Copy the environment template before starting any services:
+`scripts/local-up.sh` creates `.env.local` from `.env.codespaces` when `.env.local` is missing.
+If you want to manage local defaults yourself, copy the environment template before starting
+services:
 
 ```bash
 cp .env.example .env.local
@@ -95,7 +149,7 @@ cp .env.example .env.local
 
 All Java services and Python workers load `.env.local` automatically — no extra steps needed once it exists. The defaults in `.env.example` are already correct for local Temporal (no API keys required for Temporal itself).
 
-For Codespaces/workshop runs, use the committed non-secret defaults instead:
+For Codespaces runs, use the committed non-secret defaults instead:
 
 ```bash
 cp .env.codespaces .env.local
@@ -112,141 +166,46 @@ API keys are only needed for integration features. Workers start and connect wit
 | `OPENAI_API_KEY` | [platform.openai.com](https://platform.openai.com) | AI exercises or tooling that calls OpenAI APIs |
 | `PREDICTHQ_API_KEY` | [predicthq.com](https://www.predicthq.com) | Location risk events (weather/event disruption data) |
 
-### Step 1: Start Local Temporal
+## What The Local Scripts Do
 
-```bash
-temporal server start-dev
-```
+`scripts/setup-temporal-namespaces.sh` creates the local Temporal namespaces, Nexus endpoints,
+fulfillment search attributes, and current Worker Deployment versions.
 
-Verify Temporal is running:
-```bash
-# Visit UI
-open http://localhost:8233
+`scripts/local-up.sh` starts:
 
-# Or check with CLI
-temporal operator namespace list
-```
+- `apps-api` on `http://localhost:8080`
+- `processing-api` on `http://localhost:8070`
+- `fulfillment-api` on `http://localhost:8060`
+- `enablements-api` on `http://localhost:8050`
+- Java workers for `apps`, `processing`, `fulfillment`, and `enablements`
+- Python fulfillment workers for the shipping agent path
 
-### Step 2: Setup Temporal Namespaces
+`scripts/local-down.sh` stops the OMS services started by `local-up.sh`. Stop the Temporal dev
+server separately with `Ctrl+C`.
 
-Create Temporal namespaces and Nexus endpoints for cross-namespace communication:
-
-```bash
-./scripts/setup-temporal-namespaces.sh
-```
-
-This creates:
-- ✅ `apps` namespace — Order orchestration and data collection
-- ✅ `processing` namespace — Order validation, enrichment, fulfillment
-- ✅ `fulfillment` namespace — Order fulfillment
-- ✅ Nexus endpoints for Apps → Processing communication
-- ✅ Sets the current worker version for the `processing` deployment
-
-> **Why `set-current-version`?** The workers in this project run with Worker Versioning enabled (`deployment-properties` in their config). When versioning is active, Temporal tracks each deployment by build-id and only routes tasks to a version that has been explicitly set as the "current" version. Until that happens, workers will connect and poll successfully — but the server will not dispatch any tasks to them, and Nexus calls into `processing` will silently stall.
->
-> The script calls this on your behalf:
-> ```bash
-> temporal worker deployment set-current-version \
->   --deployment-name processing \
->   --build-id local \
->   --allow-no-pollers \
->   --namespace processing
-> ```
-> The `--allow-no-pollers` flag lets you set the version before the workers have started. Once workers come up and poll, they see themselves as the current version and tasks flow normally.
->
-> **This is different from Levels 2 and 3 (Kubernetes).** When the Temporal Worker Controller is present, `set-current-version` is called automatically — the controller waits for pollers to appear on a new build-id and then promotes that version itself. You never run it manually. See [DEPLOYMENT.md](DEPLOYMENT.md) for details.
-
-Verify setup:
-```bash
-temporal operator namespace list
-temporal operator nexus endpoint list
-```
-
-### Step 3: Build Java Services
-
-```bash
-cd java
-
-# Build all modules
-mvn clean install -DskipTests
-```
-
-This creates:
-- `java/apps/apps-api/target/apps-api-1.0.0-SNAPSHOT.jar` — REST API
-- `java/apps/apps-workers/target/apps-workers-1.0.0-SNAPSHOT.jar` — Apps Worker
-- `java/processing/processing-workers/target/processing-workers-1.0.0-SNAPSHOT.jar` — Processing Worker
-
-### Step 4: Run Services
-
-**Terminal 1 — Apps REST API** (localhost:8080):
-```bash
-cd java/apps/apps-api
-mvn spring-boot:run
-```
-
-**Terminal 2 — Apps Worker**:
-```bash
-cd java/apps/apps-workers
-mvn spring-boot:run
-```
-
-**Terminal 3 — Processing Worker**:
-```bash
-cd java/processing/processing-workers
-mvn spring-boot:run
-```
-
-**Terminal 4 — Fulfillment Worker** (Java):
-```bash
-cd java/fulfillment/fulfillment-workers
-mvn spring-boot:run
-```
-
-> Uses `EASYPOST_API_KEY` from `.env.local` for address verification. The worker starts without it, but address verification activities will fail with a clear error until the key is set.
-
-**Terminal 5 — Python Fulfillment Workers** (shipping agent + EasyPost + PredictHQ):
-```bash
-cd python/fulfillment
-uv run --project .. python -m src.worker
-```
-
-> Uses `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `EASYPOST_API_KEY`, and `PREDICTHQ_API_KEY` from the environment or `.env.local`. Workers connect and poll without them — activities that call these APIs surface a clear error when invoked without the key.
-
-All services are now ready:
-- ✅ Apps API running on `http://localhost:8080`
-- ✅ Apps Worker connected to `apps` namespace
-- ✅ Processing Worker connected to `processing` namespace
-- ✅ Fulfillment Worker connected to `fulfillment` namespace
-- ✅ Python Workers (shipping agent, EasyPost, PredictHQ) connected to `fulfillment` namespace
-- ✅ Temporal UI at `http://localhost:8233`
+The setup script is safe to rerun. Worker Versioning is enabled in the local workers, so the script
+also sets build-id `local` as current for the `apps`, `processing`, and `fulfillment` deployments.
 
 ---
 
 ## Demo Scenarios
 
-Once services are running, try the customer demo scenarios:
+Once services are running, try the valid-order dry run:
 
 ```bash
-cd scripts/scenarios
-
-# Valid order (happy path)
-cd valid-order
-./1-submit-order.sh
-./2-capture-payment.sh
-
-# Invalid order (manual correction)
-cd ../invalid-order
-./1-submit-order.sh
-./2-capture-payment.sh
-./3-complete-validation.sh
-
-# Order cancellation
-cd ../cancel-order
-./1-submit-order.sh
-./2-cancel-order.sh
+./scripts/scenarios/valid-order/1-submit-order.sh
+./scripts/scenarios/valid-order/2-capture-payment.sh
 ```
 
-See `scripts/scenarios/README.md` for detailed demo instructions and talking points.
+Other scenarios are available through the selector:
+
+```bash
+./scripts/runscenario.sh
+./scripts/runscenario.sh invalid-order --yes
+./scripts/runscenario.sh cancel-order --yes
+```
+
+See `scripts/scenarios/README.md` for detailed demo instructions.
 
 ---
 
@@ -309,7 +268,9 @@ java/
 └── generated/                 # Generated protobuf code
 
 scripts/
-├── scenarios/                 # Customer demo scripts
+├── local-up.sh                # Start all local OMS services
+├── local-down.sh              # Stop services started by local-up.sh
+├── scenarios/                 # Demo scenario scripts
 └── setup-temporal-namespaces.sh
 ```
 

@@ -35,11 +35,11 @@ The application is structured as two evolving versions of the same business prob
 
 ACME's OMS processes clothing orders through three phases:
 
-| Phase | Description |
-|-------|-------------|
-| **Capture** | Collect order from Commerce App and Payment Processor |
-| **Processing** | Validate, enrich, and coordinate order data across downstream services |
-| **Fulfillment** | Allocate inventory, select carrier, generate label, track delivery |
+| Phase           | Description                                                            |
+|-----------------|------------------------------------------------------------------------|
+| **Accumulate**  | Accumulate order inputs from Commerce App and Payment Processor        |
+| **Processing**  | Validate, enrich, and coordinate order data across downstream services |
+| **Fulfillment** | Allocate inventory, select carrier, generate label, track delivery     |
 
 ### v1 — Order Processing
 
@@ -116,12 +116,34 @@ Start at Level 1 and work up. Each level builds on the previous.
 
 ## Level 1 — Run Locally (No Kubernetes)
 
-Fastest path to a working system. All services run as local JVM processes against a local Temporal server.
+Fastest path to a working system. All services run as local processes against a local Temporal
+server.
 
-> **Important:** The workers use Worker Versioning (Temporal Deployments). Without the Temporal Worker Controller in the environment, you must call `set-current-version` manually before tasks will be dispatched — `scripts/setup-temporal-namespaces.sh` handles this. See [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md) for the full explanation.
+Terminal 1:
 
-→ **[docs/GETTING_STARTED.md](docs/GETTING_STARTED.md)** — local setup, demo scenarios, troubleshooting
-→ **[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)** — protobuf changes, workflow modifications, debugging, testing
+```bash
+temporal server start-dev
+```
+
+Terminal 2:
+
+```bash
+# create namespaces, and configure Worker Versioning
+./scripts/setup-temporal-namespaces.sh
+# bring up all APIs, workers and other services (except Temporal itself)
+./scripts/local-up.sh
+
+# Optional dry run to see it all work
+./scripts/runscenario.sh # select "valid-order"
+
+# tear down all local services except Temporal server
+./scripts/local-down.sh
+```
+
+Stop the Temporal dev server with `Ctrl+C` in Terminal 1.
+
+- **[docs/GETTING_STARTED.md](docs/GETTING_STARTED.md)**: local setup, demo scenarios, troubleshooting
+- **[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)**: protobuf changes, workflow modifications, debugging, testing
 
 ---
 
@@ -252,7 +274,9 @@ Demonstrates zero-downtime worker version rollouts against a live order stream. 
 | `scripts/k3d/infra-down.sh` | Tear down the k3d cluster |
 | `scripts/kind/status.sh` | Show pod status across namespaces in KinD |
 | `scripts/k3d/status.sh` | Show pod status across namespaces in k3d |
-| `scripts/setup-temporal-namespaces.sh` | Create Temporal namespaces and Nexus endpoints |
+| `scripts/local-up.sh` | Start all local OMS APIs and workers |
+| `scripts/local-down.sh` | Stop services started by `local-up.sh` |
+| `scripts/setup-temporal-namespaces.sh` | Create local Temporal namespaces, Nexus endpoints, search attributes, and current Worker Deployment versions |
 | `scripts/kind/tunnel.sh` | Port-forward APIs for local access through KinD |
 | `scripts/k3d/tunnel.sh` | Port-forward APIs for local access through k3d |
 

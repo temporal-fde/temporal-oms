@@ -86,15 +86,20 @@ OVERLAY=local ./scripts/kind/demo-up.sh
 ### Option 5: Run Everything Locally (No Kubernetes)
 
 ```bash
-# Start Temporal server
-temporal server start-dev &
+# Terminal 1
+temporal server start-dev
+```
 
-# In another terminal, build and run the apps
-cd java/apps
-mvn spring-boot:run
+```bash
+# Terminal 2, from the repo root
+./scripts/setup-temporal-namespaces.sh
+./scripts/local-up.sh
 
-# Test
-curl http://localhost:8080/api/v1/commerce-app/clothing
+# Optional dry run
+./scripts/scenarios/valid-order/1-submit-order.sh
+./scripts/scenarios/valid-order/2-capture-payment.sh
+
+./scripts/local-down.sh
 ```
 
 ---
@@ -326,32 +331,24 @@ kubectl exec -n temporal-oms-apps <pod-name> -- cat /etc/config/temporal-secret/
 
 ## Running Locally (Without Kubernetes)
 
-For local development without Kubernetes:
+Use [GETTING_STARTED.md](GETTING_STARTED.md) for the local process path. The short version is:
 
 ```bash
-# Terminal 1: Start Temporal
+# Terminal 1
 temporal server start-dev
+```
 
-# Terminal 2: Start apps-api
-cd java/apps/apps-api
-mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=local"
-
-# Terminal 3: Start apps-workers
-cd java/apps/apps-workers
-mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=local"
-
-# Terminal 4: Start processing-workers
-cd java/processing/processing-workers
-mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=local"
-
-# Terminal 5: Test the API
-curl http://localhost:8080/api/v1/commerce-app/clothing
+```bash
+# Terminal 2, from the repo root
+./scripts/setup-temporal-namespaces.sh
+./scripts/local-up.sh
+./scripts/local-down.sh
 ```
 
 **Notes:**
-- Each service runs on its configured port (apps-api: 8080, workers: internal only)
-- No configuration mounting needed - classpath configuration is used
-- Logs appear in the terminal where you started each service
+- `local-up.sh` starts all local APIs and workers.
+- Logs are written under `.workshop/logs`.
+- `local-down.sh` stops the OMS services. Stop the Temporal dev server separately with `Ctrl+C`.
 
 ---
 
